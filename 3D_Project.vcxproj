@@ -18,6 +18,26 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="common\ImGui\imgui.cpp" />
+    <ClCompile Include="common\ImGui\imgui_draw.cpp" />
+    <ClCompile Include="common\ImGui\imgui_impl_glfw.cpp" />
+    <ClCompile Include="common\ImGui\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="common\ImGui\imgui_widgets.cpp" />
+    <ClCompile Include="src\main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="common\defs.h" />
+    <ClInclude Include="common\enum.h" />
+    <ClInclude Include="common\ImGui\imconfig.h" />
+    <ClInclude Include="common\ImGui\imgui.h" />
+    <ClInclude Include="common\ImGui\imgui_impl_glfw.h" />
+    <ClInclude Include="common\ImGui\imgui_impl_opengl3.h" />
+    <ClInclude Include="common\ImGui\imgui_internal.h" />
+    <ClInclude Include="common\ImGui\imstb_rectpack.h" />
+    <ClInclude Include="common\ImGui\imstb_textedit.h" />
+    <ClInclude Include="common\ImGui\imstb_truetype.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{6CA885D9-1BD2-41CE-B511-3913D3DE6BF9}</ProjectGuid>
@@ -76,6 +96,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -114,26 +135,6 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="..\common\ImGui\imgui.cpp" />
-    <ClCompile Include="..\common\ImGui\imgui_draw.cpp" />
-    <ClCompile Include="..\common\ImGui\imgui_impl_glfw.cpp" />
-    <ClCompile Include="..\common\ImGui\imgui_impl_opengl3.cpp" />
-    <ClCompile Include="..\common\ImGui\imgui_widgets.cpp" />
-    <ClCompile Include="..\src\main.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\common\defs.h" />
-    <ClInclude Include="..\common\enum.h" />
-    <ClInclude Include="..\common\ImGui\imconfig.h" />
-    <ClInclude Include="..\common\ImGui\imgui.h" />
-    <ClInclude Include="..\common\ImGui\imgui_impl_glfw.h" />
-    <ClInclude Include="..\common\ImGui\imgui_impl_opengl3.h" />
-    <ClInclude Include="..\common\ImGui\imgui_internal.h" />
-    <ClInclude Include="..\common\ImGui\imstb_rectpack.h" />
-    <ClInclude Include="..\common\ImGui\imstb_textedit.h" />
-    <ClInclude Include="..\common\ImGui\imstb_truetype.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

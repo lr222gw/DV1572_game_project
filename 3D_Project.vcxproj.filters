@@ -24,55 +24,55 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\main.cpp">
+    <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\ImGui\imgui_impl_opengl3.cpp">
+    <ClCompile Include="common\ImGui\imgui_draw.cpp">
       <Filter>Source Files\ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\ImGui\imgui_impl_glfw.cpp">
+    <ClCompile Include="common\ImGui\imgui_impl_glfw.cpp">
       <Filter>Source Files\ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\ImGui\imgui_draw.cpp">
+    <ClCompile Include="common\ImGui\imgui_impl_opengl3.cpp">
       <Filter>Source Files\ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\ImGui\imgui.cpp">
+    <ClCompile Include="common\ImGui\imgui_widgets.cpp">
       <Filter>Source Files\ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\ImGui\imgui_widgets.cpp">
+    <ClCompile Include="common\ImGui\imgui.cpp">
       <Filter>Source Files\ImGui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\common\ImGui\imstb_rectpack.h">
-      <Filter>Header Files\common\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\ImGui\imgui_internal.h">
-      <Filter>Header Files\common\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\ImGui\imgui_impl_opengl3.h">
-      <Filter>Header Files\common\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\ImGui\imgui_impl_glfw.h">
-      <Filter>Header Files\common\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\ImGui\imgui.h">
-      <Filter>Header Files\common\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\ImGui\imconfig.h">
-      <Filter>Header Files\common\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\ImGui\imstb_truetype.h">
-      <Filter>Header Files\common\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\ImGui\imstb_textedit.h">
-      <Filter>Header Files\common\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\defs.h">
+    <ClInclude Include="common\defs.h">
       <Filter>Header Files\common</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\enum.h">
+    <ClInclude Include="common\enum.h">
       <Filter>Header Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\ImGui\imgui.h">
+      <Filter>Header Files\common\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="common\ImGui\imgui_impl_glfw.h">
+      <Filter>Header Files\common\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="common\ImGui\imgui_impl_opengl3.h">
+      <Filter>Header Files\common\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="common\ImGui\imgui_internal.h">
+      <Filter>Header Files\common\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="common\ImGui\imstb_rectpack.h">
+      <Filter>Header Files\common\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="common\ImGui\imstb_textedit.h">
+      <Filter>Header Files\common\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="common\ImGui\imstb_truetype.h">
+      <Filter>Header Files\common\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="common\ImGui\imconfig.h">
+      <Filter>Header Files\common\ImGui</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
