@@ -1,12 +1,12 @@
-#include "../common/defs.h"
-//HMMM test
+#include "misc/defs.h"
+
 #include <GL/glew.h> // always include before gl.h & glfw3.h
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
-#include "../common/ImGui/imgui.h"
-#include "../common/ImGui/imgui_impl_glfw.h"
-#include "../common/ImGui/imgui_impl_opengl3.h"
+#include "misc/ImGui/imgui.h"
+#include "misc/ImGui/imgui_impl_glfw.h"
+#include "misc/ImGui/imgui_impl_opengl3.h"
 
 #include <range/v3/all.hpp>
 

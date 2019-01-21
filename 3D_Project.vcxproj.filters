@@ -13,66 +13,69 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\common">
-      <UniqueIdentifier>{e89c2481-3303-41f0-a618-29ca073c44ae}</UniqueIdentifier>
+    <Filter Include="Header Files\misc">
+      <UniqueIdentifier>{57303b01-14d4-4f32-8f03-7e16ea1b609d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\ImGui">
-      <UniqueIdentifier>{2fa67a2b-6959-4a8e-86ce-80dce2c09a52}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\common\ImGui">
+    <Filter Include="Header Files\misc\ImGui">
       <UniqueIdentifier>{19f1aacd-1858-4dfd-ba31-03be06e8adf6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\misc">
+      <UniqueIdentifier>{2a3902c7-a694-48e5-bbd9-452bb72a25b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\misc\ImGui">
+      <UniqueIdentifier>{2fa67a2b-6959-4a8e-86ce-80dce2c09a52}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="common\ImGui\imgui_draw.cpp">
-      <Filter>Source Files\ImGui</Filter>
+    <ClCompile Include="src\misc\ImGui\imgui.cpp">
+      <Filter>Source Files\misc\ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="common\ImGui\imgui_impl_glfw.cpp">
-      <Filter>Source Files\ImGui</Filter>
+    <ClCompile Include="src\misc\ImGui\imgui_draw.cpp">
+      <Filter>Source Files\misc\ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="common\ImGui\imgui_impl_opengl3.cpp">
-      <Filter>Source Files\ImGui</Filter>
+    <ClCompile Include="src\misc\ImGui\imgui_impl_glfw.cpp">
+      <Filter>Source Files\misc\ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="common\ImGui\imgui_widgets.cpp">
-      <Filter>Source Files\ImGui</Filter>
+    <ClCompile Include="src\misc\ImGui\imgui_impl_opengl3.cpp">
+      <Filter>Source Files\misc\ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="common\ImGui\imgui.cpp">
-      <Filter>Source Files\ImGui</Filter>
+    <ClCompile Include="src\misc\ImGui\imgui_widgets.cpp">
+      <Filter>Source Files\misc\ImGui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="common\defs.h">
-      <Filter>Header Files\common</Filter>
+    <ClInclude Include="src\misc\defs.h">
+      <Filter>Header Files\misc</Filter>
     </ClInclude>
-    <ClInclude Include="common\enum.h">
-      <Filter>Header Files\common</Filter>
+    <ClInclude Include="src\misc\enum.h">
+      <Filter>Header Files\misc</Filter>
     </ClInclude>
-    <ClInclude Include="common\ImGui\imgui.h">
-      <Filter>Header Files\common\ImGui</Filter>
+    <ClInclude Include="src\misc\ImGui\imgui_internal.h">
+      <Filter>Header Files\misc\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="common\ImGui\imgui_impl_glfw.h">
-      <Filter>Header Files\common\ImGui</Filter>
+    <ClInclude Include="src\misc\ImGui\imstb_rectpack.h">
+      <Filter>Header Files\misc\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="common\ImGui\imgui_impl_opengl3.h">
-      <Filter>Header Files\common\ImGui</Filter>
+    <ClInclude Include="src\misc\ImGui\imstb_textedit.h">
+      <Filter>Header Files\misc\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="common\ImGui\imgui_internal.h">
-      <Filter>Header Files\common\ImGui</Filter>
+    <ClInclude Include="src\misc\ImGui\imstb_truetype.h">
+      <Filter>Header Files\misc\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="common\ImGui\imstb_rectpack.h">
-      <Filter>Header Files\common\ImGui</Filter>
+    <ClInclude Include="src\misc\ImGui\imconfig.h">
+      <Filter>Header Files\misc\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="common\ImGui\imstb_textedit.h">
-      <Filter>Header Files\common\ImGui</Filter>
+    <ClInclude Include="src\misc\ImGui\imgui.h">
+      <Filter>Header Files\misc\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="common\ImGui\imstb_truetype.h">
-      <Filter>Header Files\common\ImGui</Filter>
+    <ClInclude Include="src\misc\ImGui\imgui_impl_glfw.h">
+      <Filter>Header Files\misc\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="common\ImGui\imconfig.h">
-      <Filter>Header Files\common\ImGui</Filter>
+    <ClInclude Include="src\misc\ImGui\imgui_impl_opengl3.h">
+      <Filter>Header Files\misc\ImGui</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

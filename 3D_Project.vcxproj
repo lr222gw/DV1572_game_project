@@ -19,24 +19,24 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="common\ImGui\imgui.cpp" />
-    <ClCompile Include="common\ImGui\imgui_draw.cpp" />
-    <ClCompile Include="common\ImGui\imgui_impl_glfw.cpp" />
-    <ClCompile Include="common\ImGui\imgui_impl_opengl3.cpp" />
-    <ClCompile Include="common\ImGui\imgui_widgets.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\misc\ImGui\imgui.cpp" />
+    <ClCompile Include="src\misc\ImGui\imgui_draw.cpp" />
+    <ClCompile Include="src\misc\ImGui\imgui_impl_glfw.cpp" />
+    <ClCompile Include="src\misc\ImGui\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="src\misc\ImGui\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="common\defs.h" />
-    <ClInclude Include="common\enum.h" />
-    <ClInclude Include="common\ImGui\imconfig.h" />
-    <ClInclude Include="common\ImGui\imgui.h" />
-    <ClInclude Include="common\ImGui\imgui_impl_glfw.h" />
-    <ClInclude Include="common\ImGui\imgui_impl_opengl3.h" />
-    <ClInclude Include="common\ImGui\imgui_internal.h" />
-    <ClInclude Include="common\ImGui\imstb_rectpack.h" />
-    <ClInclude Include="common\ImGui\imstb_textedit.h" />
-    <ClInclude Include="common\ImGui\imstb_truetype.h" />
+    <ClInclude Include="src\misc\defs.h" />
+    <ClInclude Include="src\misc\enum.h" />
+    <ClInclude Include="src\misc\ImGui\imconfig.h" />
+    <ClInclude Include="src\misc\ImGui\imgui.h" />
+    <ClInclude Include="src\misc\ImGui\imgui_impl_glfw.h" />
+    <ClInclude Include="src\misc\ImGui\imgui_impl_opengl3.h" />
+    <ClInclude Include="src\misc\ImGui\imgui_internal.h" />
+    <ClInclude Include="src\misc\ImGui\imstb_rectpack.h" />
+    <ClInclude Include="src\misc\ImGui\imstb_textedit.h" />
+    <ClInclude Include="src\misc\ImGui\imstb_truetype.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
