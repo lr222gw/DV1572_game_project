@@ -259,3 +259,8 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
+
+# Ignore some of the unix specific files and folders
+/tmp
+/bin
+makefile.o
