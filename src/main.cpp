@@ -8,7 +8,6 @@
 #include "misc/ImGui/imgui_impl_glfw.h"
 #include "misc/ImGui/imgui_impl_opengl3.h"
 
-//#include <range/v3/all.hpp>
 
 /////////////////////////////////////////////////////////////////////
 
