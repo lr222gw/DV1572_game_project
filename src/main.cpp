@@ -9,16 +9,25 @@
 #include "misc/ImGui/imgui_impl_opengl3.h"
 
 
-
+//Temporära bibliotek (och sånt) för temporära lösningar
 #include "lop_Model.h"
-#include "main.h"
+//#include "main.h"
 
 //#include <range/v3/all.hpp>
 
-//En konstant
-constexpr int	g_height = 768,
+//En PreProcessor Macro						 ; #define		PI 3.14
+//En vanlig Konstant är en "RunTime" konstant; const		int h_height
+	//Känns igen bara till när programmet väl körs
+//En "constexpr" är en "CompileTime" Konstant; constexpr	int h_height 
+	//Känns igen till och med innan/under kompilerinsstadiet
+//i.e. 
+constexpr Int32	g_height = 768,
 				g_width = 1024;
 
+
+constexpr Float32	g_near_plane = 0.01f,
+					g_far_plane = 100.0f,
+					g_fov_rad = 0.01f;
 
 /////////////////////////////////////////////////////////////////////
 void init_camera();
@@ -38,7 +47,7 @@ void init_camera();
 /////////////////////////////////////////////////////////////////////
 
 
-int main( int argc, char* argv[] ) {
+Int32 main( Int32 argc, char* argv[] ) {
    // initialise GLFW
    glewExperimental = true; // <- needed for core profile
    if ( !glfwInit() ) {
@@ -127,7 +136,7 @@ int main( int argc, char* argv[] ) {
       
       // rendering
       ImGui::Render();
-      int display_w, display_h;
+      nt32 display_w, display_h;
       glfwMakeContextCurrent( window);
       glfwGetFramebufferSize( window, &display_w, &display_h );
       glViewport( 0, 0, display_w, display_h );
@@ -153,16 +162,49 @@ int main( int argc, char* argv[] ) {
 
 void init_camera() {
 
+	//initiserar Model (world) matrisen
 	glm::mat4  model{ 1.0f };
-	glm::mat4  view{ 1.0f };
 
-	float FOV = glm::radians(45.0f);
-	float aspectRatio = g_height / g_width;
+	//Initierar View-matrisen
+	glm::mat4  view{ 1.0f };
+	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+
+	Float32 FOV = glm::radians(45.0f);
+	Float32 aspectRatio = g_height / g_width;
 	glm::mat4  projection = glm::perspective(FOV, aspectRatio, 0.1f, 100.0f);
+
 
 	
 
 
 
 
+}
+
+// generates a 4x4 world matrix
+inline glm::mat4  generate_world_matrix() {
+	return  glm::mat4{ 1.0f }; // 4x4 identity matrix
+}
+
+
+// generates a 4x4 view matrix
+inline glm::mat4  generate_view_matrix
+(   // function args:
+	glm::vec3  camera_pos{ 0,  0, -2 },
+	glm::vec3  camera_target{ 0,  0,  0 },
+	glm::vec3  camera_up_vec{ 0,  1,  0 }
+) { // function body
+	return glm::lookAt(camera_pos, camera_target, camera_up_vec);
+}
+
+
+// generates a 4x4 perspective matrix
+inline glm::mat4  generate_perspective_matrix
+(   // function args:
+	Float32  near_plane	= g_near_plane,
+	Float32  far_plane	= g_far_plane,
+	Float32  fov_rad		= g_fov_rad;
+) { // function body
+	Float32  aspect = (Float32)WIDTH / (Float32)HEIGHT;
+	return glm::perspective(fov_rad, aspect, near_plane, far_plane);
 }
