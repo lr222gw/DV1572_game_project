@@ -190,9 +190,9 @@ inline glm::mat4  generate_world_matrix() {
 // generates a 4x4 view matrix
 inline glm::mat4  generate_view_matrix
 (   // function args:
-	glm::vec3  camera_pos{ 0,  0, -2 },
-	glm::vec3  camera_target{ 0,  0,  0 },
-	glm::vec3  camera_up_vec{ 0,  1,  0 }
+	glm::vec3  camera_pos	 = { 0.0f,  0.0f, -2.0f },
+	glm::vec3  camera_target = { 0.0f,  0.0f,  0.0f },
+	glm::vec3  camera_up_vec = { 0.0f,  1.0f,  0.0f }
 ) { // function body
 	return glm::lookAt(camera_pos, camera_target, camera_up_vec);
 }
@@ -203,8 +203,8 @@ inline glm::mat4  generate_perspective_matrix
 (   // function args:
 	Float32  near_plane	= g_near_plane,
 	Float32  far_plane	= g_far_plane,
-	Float32  fov_rad		= g_fov_rad;
+	Float32  fov_rad	= g_fov_rad
 ) { // function body
-	Float32  aspect = (Float32)WIDTH / (Float32)HEIGHT;
+	Float32  aspect = (Float32)g_width / (Float32)g_height;
 	return glm::perspective(fov_rad, aspect, near_plane, far_plane);
 }
