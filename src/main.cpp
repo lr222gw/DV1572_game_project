@@ -136,7 +136,7 @@ Int32 main( Int32 argc, char* argv[] ) {
       
       // rendering
       ImGui::Render();
-      nt32 display_w, display_h;
+      Int32 display_w, display_h;
       glfwMakeContextCurrent( window);
       glfwGetFramebufferSize( window, &display_w, &display_h );
       glViewport( 0, 0, display_w, display_h );
