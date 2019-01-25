@@ -71,7 +71,7 @@ public:
 		//Klassnamn & operator=(Klassnamn const &other) {}	// copy assignment
 		//Klassnamn & operator=( Klassnamn &&other ) {}		// move assignment
 		//Klassnamn(Klassnamn  &&other) = delete;			// generera inte en copy constructor, 
-																//dumma kompilator
+																//dumma kompilator.
 	inline void update(Float32 delta_t);
 
 private:
