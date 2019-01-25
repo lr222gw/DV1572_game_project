@@ -31,15 +31,55 @@ constexpr Float32	g_near_plane = 0.01f,
 
 /////////////////////////////////////////////////////////////////////
 
-
 struct CameraData {
 	glm::mat4	view,
 				model,
 				projection;
 };
-		
+
+class Renderer {
+public:
+	// && => temporärt värde; kallas "rValueReference", vi kan "stjäla" värdet
+	Renderer(CameraData &&cd) : _camera(std::move(cd)) {}
+						// "&&" indikerar vi att det är ett temporärt värde... 
+						// Försvinner efter funktionanropet
+			 // Med "std::move(cd)" så "Klipper vi ut" datan till "cd"-parametern
+			 // Det innebär att om vi skickar in en "CameraData objekt" till 
+			 // denna konstruktor såhär "renderer(std::move(myCamData))" Så
+			 // Kommer inte "myCamData" kunna användas mer efter vi skapat 
+			 // "Renderer"-objektet  genom denna konstruktor.
+			 // Datan hamnar Automatiskt i "_camera" då det är den som följer 
+			 // "Render(CameraData &&cd)" med ": _camera(std::move(cd))" 
+					// "_camera" <- detta är en referering av vårt privata Attribut "_camera"
+			  
+			//När ":" följs efter en Konstruktor påbörjas vad som kallas en 
+			// "initialiser List", där vi initiserar Attributen genom 
+				//Attributnamnet + en Parentes med datan attributet ska innehålla
+
+	//https://www.geeksforgeeks.org/when-do-we-use-initializer-list-in-c/
+	// Vi använder "Initializer List" då vi nu får alla 
+	// Definitioner skilda från alla Deklarationer; 
+			//Deklarationer sker nu alltid i Konstruktorn
+			//Attribut deklareras inte i deras defintioner längre... 
+	// En annan anledning är; Om vi har ett attribut som är en Konstant Pekare; "obj const &father"
+	// så kan vi sätta ett värde på den i "Initlializer List" baserat på vad vi skickar 
+	// till vår konstruktor...
+
+	//Olika typer av Konstruktorer
+		//Klassnamn(Klassnamn  const &other) {}				// copy constructor
+		//Klassnamn(Klassnamn  &&other) {}					// move constructor
+		//Klassnamn & operator=(Klassnamn const &other) {}	// copy assignment
+		//Klassnamn & operator=( Klassnamn &&other ) {}		// move assignment
+		//Klassnamn(Klassnamn  &&other) = delete;			// generera inte en copy constructor, 
+																//dumma kompilator
+	inline void update(Float32 delta_t);
+
+private:
+	CameraData _camera;
+};
 
 
+	
 [[nodiscard]] String lowercase( char const *base ) {
    String s( base );
    std::transform( s.begin(), s.end(), s.begin(), ::tolower );
@@ -82,7 +122,7 @@ inline glm::mat4  generate_perspective_matrix
 	return glm::perspective(fov_rad, aspect, near_plane, far_plane);
 }
 
-CameraData init_camera() {
+CameraData make_camera() {
 
 	//initiserar Model (world) matrisen
 	glm::mat4  model = generate_world_matrix();
@@ -116,10 +156,10 @@ Int32 main(Int32 argc, char* argv[]) {
 	// 4xAA
 	glfwWindowHint(GLFW_SAMPLES, 4);
 	// GLSL v130
-	const char* glsl_version = "#version 130";
-	// OpenGL v3.3
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	const char* glsl_version = "#version 440";
+	// OpenGL v4.4
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
 	// for MacOS; should not be needed
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	// use OpenGL core profile
@@ -130,7 +170,7 @@ Int32 main(Int32 argc, char* argv[]) {
 	window = glfwCreateWindow(g_width, g_height, "3D Project -- WINDOW", NULL, NULL);
 	if (window == NULL) {
 		fprintf(stderr, "[ERROR] Failed to open GLFW window.\n"
-			"        If you have an Intel GPU, they're not 3.3 compatible.\n");
+			"        If you have an Intel GPU, they're not 4.4 compatible.\n");
 		getchar();
 		glfwTerminate();
 		return -1;
@@ -167,15 +207,15 @@ Int32 main(Int32 argc, char* argv[]) {
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
 
-	//Camera
-	CameraData ourCamera = init_camera();
 
 
 	//Test for ModelLoading, Early testing of Deffered Rendering
-	Model hehe{ "dat/meshes/12330_Statue_v1_L2.obj" };
+	Model modelObj{ "dat/meshes/12330_Statue_v1_L2.obj" };
+	
+	//Camera
+	CameraData cam = make_camera();
 
-	//Model myModel = Model(hehe);
-
+	Renderer renderer(std::move(cam));
 
  // Main loop:
 	while (!glfwWindowShouldClose(window)) {
@@ -202,6 +242,8 @@ Int32 main(Int32 argc, char* argv[]) {
 		glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
 		glClear(GL_COLOR_BUFFER_BIT);
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+		
 
 		glfwMakeContextCurrent(window);
 		glfwSwapBuffers(window);
