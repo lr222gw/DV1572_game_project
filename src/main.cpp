@@ -12,6 +12,8 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+//#include "lop_Model.h"
+
 //#include <range/v3/all.hpp>
 
 /////////////////////////////////////////////////////////////////////
@@ -91,6 +93,11 @@ int main( int argc, char* argv[] ) {
 
    // clear color
    ImVec4 clear_color = ImVec4( 0.45f, 0.55f, 0.60f, 1.00f );
+
+
+   //Test for ModelLoading, Early testing of Deffered Rendering
+   Model myModel = new Model();
+
 
 // Main loop:
    while ( !glfwWindowShouldClose(window) ) {
