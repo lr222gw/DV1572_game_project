@@ -86,8 +86,8 @@
     <ClInclude Include="src\lop_shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\stb_image.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\misc\stb_image.h">
+      <Filter>Header Files\misc</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

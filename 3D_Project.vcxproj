@@ -40,7 +40,7 @@
     <ClInclude Include="src\misc\ImGui\imstb_rectpack.h" />
     <ClInclude Include="src\misc\ImGui\imstb_textedit.h" />
     <ClInclude Include="src\misc\ImGui\imstb_truetype.h" />
-    <ClInclude Include="src\stb_image.h" />
+    <ClInclude Include="src\misc\stb_image.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

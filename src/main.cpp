@@ -8,11 +8,9 @@
 #include "misc/ImGui/imgui_impl_glfw.h"
 #include "misc/ImGui/imgui_impl_opengl3.h"
 
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
 
-//#include "lop_Model.h"
+
+#include "lop_Model.h"
 
 //#include <range/v3/all.hpp>
 
@@ -96,7 +94,9 @@ int main( int argc, char* argv[] ) {
 
 
    //Test for ModelLoading, Early testing of Deffered Rendering
-   Model myModel = new Model();
+   Model hehe { "dat/meshes/12330_Statue_v1_L2.obj" };
+
+   //Model myModel = Model(hehe);
 
 
 // Main loop:
