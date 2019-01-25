@@ -30,6 +30,7 @@
     <ClInclude Include="src\lop_mesh.h" />
     <ClInclude Include="src\lop_Model.h" />
     <ClInclude Include="src\lop_shader.h" />
+    <ClInclude Include="src\main.h" />
     <ClInclude Include="src\misc\defs.h" />
     <ClInclude Include="src\misc\enum.h" />
     <ClInclude Include="src\misc\ImGui\imconfig.h" />

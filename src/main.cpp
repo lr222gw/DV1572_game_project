@@ -11,10 +11,17 @@
 
 
 #include "lop_Model.h"
+#include "main.h"
 
 //#include <range/v3/all.hpp>
 
+//En konstant
+constexpr int	g_height = 768,
+				g_width = 1024;
+
+
 /////////////////////////////////////////////////////////////////////
+void init_camera();
 
 [[nodiscard]] String lowercase( char const *base ) {
    String s( base );
@@ -53,7 +60,7 @@ int main( int argc, char* argv[] ) {
 
    // open a window and create its OpenGL context
    GLFWwindow* window;
-   window = glfwCreateWindow( 1024, 768, "3D Project -- WINDOW", NULL, NULL );
+   window = glfwCreateWindow(g_width, g_height, "3D Project -- WINDOW", NULL, NULL );
    if ( window == NULL ) {
       fprintf( stderr, "[ERROR] Failed to open GLFW window.\n"
                        "        If you have an Intel GPU, they're not 3.3 compatible.\n" );
@@ -91,6 +98,9 @@ int main( int argc, char* argv[] ) {
 
    // clear color
    ImVec4 clear_color = ImVec4( 0.45f, 0.55f, 0.60f, 1.00f );
+
+   //Camera
+   init_camera();
 
 
    //Test for ModelLoading, Early testing of Deffered Rendering
@@ -139,4 +149,20 @@ int main( int argc, char* argv[] ) {
    glfwTerminate(); // close OpenGL window & terminate GLFW
 
    return 0; // successful exit
+}
+
+void init_camera() {
+
+	glm::mat4  model{ 1.0f };
+	glm::mat4  view{ 1.0f };
+
+	float FOV = glm::radians(45.0f);
+	float aspectRatio = g_height / g_width;
+	glm::mat4  projection = glm::perspective(FOV, aspectRatio, 0.1f, 100.0f);
+
+	
+
+
+
+
 }
