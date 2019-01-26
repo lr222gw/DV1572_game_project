@@ -58,41 +58,15 @@ GLint gShaderDataLoc = -1;
 
 /////////////////////////////////////////////////////////////////////
 
+
+
+void create_shader() {
+
+}
+
+
 void CreateShaders() {
-	// local buffer to store error strings when compiling.
-	char buff[1024];
-	memset(buff, 0, 1024);
-	GLint compileResult = 0;
-
-
-	// vertex shader:
-
-		// create vertex shader "name" and store it in "vs"
-	GLuint vs = glCreateShader(GL_VERTEX_SHADER);
-
-	// open .glsl file and put it in a string
-	ifstream shaderFile("VertexShader.glsl");
-	std::string shaderText((std::istreambuf_iterator<char>(shaderFile)), std::istreambuf_iterator<char>());
-	shaderFile.close();
-
-	// glShaderSource requires a double pointer.
-	// get the pointer to the c style string stored in the string object.
-	const char* shaderTextPtr = shaderText.c_str();
-
-	// ask GL to use this string a shader code source
-	glShaderSource(vs, 1, &shaderTextPtr, nullptr);
-
-	// try to compile this shader source.
-	glCompileShader(vs);
-
-	// check for compilation error
-	glGetShaderiv(vs, GL_COMPILE_STATUS, &compileResult);
-	if (compileResult == GL_FALSE) {
-		// query information about the compilation (nothing if compilation went fine!)
-		glGetShaderInfoLog(vs, 1024, nullptr, buff);
-		// print to Visual Studio debug console output
-		OutputDebugStringA(buff);
-	}
+	
 
 
 
@@ -261,13 +235,113 @@ private:
 };
 
 
+                        
+
+class IEntity {
+public:
+   using EntityID = Uint64;
+
+   IEntity():
+      _id ( _generate_id() ) // assign unique ID
+   {}
+
+   virtual void update( Float32 delta_t ) = 0;
+   virtual void render( Float32 delta_t ) = 0;
+
+   EntityID get_id() const { return _id };
+
+private:
+   // generate unique ID
+   [[nodiscarð]]  EntityID _generate_id() {
+      static EntityID next_id { 1 };
+      return next_id++;
+  }
+
+  EntityID _id;
+};
 
 
 
 
 
 
+UnorderedMap<EntityID, String> entity_name;
+entity_name[id];
 
+
+
+
+class GraphNode : public IEntity {
+public:
+   GraphNode( IEntity &e ):
+      _element  ( e )
+   {}
+
+   void update( Float32 delta_t ) {
+      _element.update( delta_t );
+      for ( auto &c : _children )
+         c.update( delta_t );
+   }
+
+   void render( Float32 delta_t ) {
+      _element.render( delta_t );
+      for ( auto &c : _children )
+         c.render( delta_t );
+   }
+
+   void attach( IEntity &e ) {
+      _children.push_back( GraphNode(e) ); // TODO: <LOW PRIORITY> emplace_back? optimisering
+   }
+
+   void detach( IEntity const &e ) {
+      std::remove( _children.begin(), _children.end(), e );
+   }
+
+   Vector<GraphNode> & get_children() {
+      return _children;
+   }
+
+   IEntity const & get_element() const {
+      return _element;
+   }
+
+   //  depth first search
+   Optional<GraphNode> find( EntityID id ) {
+      for ( auto &c : _children ) {
+         if ( id == c.get_id() )
+            return c;
+         else {
+            Optional<GraphNode> match = c.find(id);
+            if ( match ) // match was found
+               return *match;
+         }
+      }
+      return {}; // no match was found
+   }
+
+private:
+   IEntity            &_element;
+   Vector<GraphNode>   _children;
+};
+
+
+/*
+
+main() {
+   1. initiera allt som har med openGL, imgui, osv att göra
+
+   2. skapa viewport
+   3. skapa scene graph
+   4. ladda några element (t.ex. meshen) in i scene graphen
+
+   loop:
+      uppdatera & rendrera allt i scene graph (relativt till viewport?)
+
+   x: avsluta allt
+}
+
+
+*/
 
 
 
@@ -289,6 +363,7 @@ public:
    if ( _shader_ids.contains(filename) )
       return _shader_ids[filename]; // returnera ID:t till befintlig instans
    else {
+      //------------------------------------FIRST READ THE SHADER FROM FILE---------------------------//
       // declare files we need
       String        shader_code;
       Ifstream      shader_file;
@@ -311,7 +386,45 @@ public:
       catch ( std::ifstream::failure e ) {
          std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
       }
-      const char* ShaderCodeStr = ShaderCode.c_str();
+      const char* shader_code_str = shader_stream.c_str();
+
+      //-------------------------------------THEN COMPILE THE SHADER----------------------------------//
+
+      // local buffer to store error strings when compiling.
+      char buffer[1024];
+      memset( buffer, 0, 1024 );
+      GLint compile_result = 0;
+
+      // vertex shader:
+      // create vertex shader "name" and store it in "vs"
+      GLuint location;
+
+      switch ( type ) {
+         case ShaderType::vertex:   location = glCreateShader( GL_VERTEX_SHADER   ); break;
+         case ShaderType::geometry: location = glCreateShader( GL_GEOMETRY_SHADER ); break;
+         case ShaderType::fragment: location = glCreateShader( GL_FRAGMENT_SHADER ); break;
+         default: throw {}; // TODO: exception?
+      }
+      // glShaderSource requires a double pointer.
+      // get the pointer to the c style string stored in the string object.
+      const char* shaderTextPtr = shaderText.c_str();
+
+      // ask GL to use this string a shader code source
+      glShaderSource( location, 1, &shader_code_str, nullptr );
+
+      // try to compile this shader source.
+      glCompileShader( location );
+
+      // check for compilation error
+      glGetShaderiv( location, GL_COMPILE_STATUS, &compile_result );
+      if ( compile_result == GL_FALSE ) {
+         // query information about the compilation (nothing if compilation went fine!)
+         glGetShaderInfoLog( location, 1024, nullptr, buffer );
+         // print to Visual Studio debug console output
+         OutputDebugStringA( buffer );
+      }
+
+      //----------------------------------------THEN RETURN-------------------------------------------//
 
       // om filen laddats in utan problem:
       ShaderID id   = _generate_id( type ); // generate unique ID
@@ -460,21 +573,21 @@ Int32 main(Int32 argc, char* argv[]) {
 	// initialise GLFW
 	glewExperimental = true; // <- needed for core profile
 	if (!glfwInit()) {
-		fprintf(stderr, "[ERROR] Failed to initialize GLFW.\n");
+		fprintf( stderr, "[ERROR] Failed to initialize GLFW.\n" );
 		return -1;
 	}
 
 	// 4xAA
-	glfwWindowHint(GLFW_SAMPLES, 4);
+	glfwWindowHint( GLFW_SAMPLES, 4 );
 	// GLSL v130
 	const char* glsl_version = "#version 440";
 	// OpenGL v4.4
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
+	glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 4 );
+	glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 4 );
 	// for MacOS; should not be needed
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+	glfwWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE );
 	// use OpenGL core profile
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
 
 	// open a window and create its OpenGL context
 	GLFWwindow* window;
