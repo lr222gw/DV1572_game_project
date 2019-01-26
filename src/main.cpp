@@ -34,7 +34,7 @@ constexpr Float32	g_near_plane = 0.01f,
 
 class Config {
 public:
-    StringView shader_path { "/dat/shader"; }
+    StringView shader_path { "./dat/shader/"; }
 } g_config;
 
 
@@ -46,114 +46,99 @@ public:
 GLuint gVertexBuffer    = 0;
 GLuint gVertexAttribute = 0;
 GLuint gShaderProgram   = 0;
-GLuint gUniformBuffer   = 0.0f;
-
-
-struct ShaderData {
-	glm::mat4 gRotate2D;
-	float gOffsetX = 0.0f;
-};
-GLint gShaderDataLoc = -1;
-
+GLuint gUniformBuffer   = 0;
 
 /////////////////////////////////////////////////////////////////////
 
+class Scene {
+
+// function that loads the test scene
+Scene( AssetManager &assets, SceneManager &scene ):
+   _assets ( assets ),
+   _scene  ( scene  )
+{
+   // load the statue into memory
+   auto statue_handle = assets.load_model( "Statue" );
+
+   // create 9 statues arranged thusly:
+   //   1  2  3    
+   //   4  5  6    
+   //   7  8  9    
+   for ( int i=0;  i<9;  ++i ) {
+      glm::vec3 position { i/3, i%3, 0 };
+      auto instance_id = scene.add_model( statue_handle, position ); // 
+      instances.push_back( instance_id );
+   }
+}
+
+private:
+   AssetManager  &_assets;
+   SceneManager  &_scene;
+};
 
 
-void create_shader() {
 
+
+
+
+
+
+
+
+
+
+
+
+class Model {};
+
+class Renderer {
+public:
+
+private:
+   UnorderedMap<ModelId, ModelInstance> _instances;
 }
 
 
-void CreateShaders() {
-	
 
 
-
-
-	// geometry shader:
-
-		// create geometry shader "name" and store it in "gs"
-	GLuint gs = glCreateShader(GL_GEOMETRY_SHADER);
-
-	// open .glsl file and put it in a string
-	shaderFile.open("GeometryShader.glsl");
-	shaderText.assign((std::istreambuf_iterator<char>(shaderFile)), std::istreambuf_iterator<char>());
-	shaderFile.close();
-
-	// glShaderSource requires a double pointer.
-	// get the pointer to the c style string stored in the string object.
-	shaderTextPtr = shaderText.c_str();
-
-	// ask GL to use this string a shader code source
-	glShaderSource(gs, 1, &shaderTextPtr, nullptr);
-
-	// try to compile this shader source.
-	glCompileShader(gs);
-
-	// check for compilation error
-	glGetShaderiv(gs, GL_COMPILE_STATUS, &compileResult);
-	if (compileResult == GL_FALSE) {
-		memset(buff, 0, 1024);
-		// query information about the compilation (nothing if compilation went fine!)
-		glGetShaderInfoLog(gs, 1024, nullptr, buff);
-		// print to Visual Studio debug console output
-		OutputDebugStringA(buff);
-	}
-
-
-	// repeat process for Fragment Shader (or Pixel Shader)
-	GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
-	shaderFile.open("FragmentShader.glsl");
-	shaderText.assign((std::istreambuf_iterator<char>(shaderFile)), std::istreambuf_iterator<char>());
-	shaderFile.close();
-	shaderTextPtr = shaderText.c_str();
-	glShaderSource(fs, 1, &shaderTextPtr, nullptr);
-	glCompileShader(fs);
-	// query information about the compilation (nothing if compilation went fine!)
-	compileResult = GL_FALSE;
-	glGetShaderiv(fs, GL_COMPILE_STATUS, &compileResult);
-	if (compileResult == GL_FALSE) {
-		// query information about the compilation (nothing if compilation went fine!)
-		memset(buff, 0, 1024);
-		glGetShaderInfoLog(fs, 1024, nullptr, buff);
-		// print to Visual Studio debug console output
-		OutputDebugStringA(buff);
-	}
+void create_shaders() {
+	// ...
 
 	// link shader program (connect vs and ps)
-	gShaderProgram = glCreateProgram();
-	glAttachShader(gShaderProgram, fs);
-	glAttachShader(gShaderProgram, gs);
-	glAttachShader(gShaderProgram, vs);
-	glLinkProgram(gShaderProgram);
+	auto g_shader_program = glCreateProgram();
+	glAttachShader( shader_program, fs );
+	glAttachShader( shader_program, gs );
+	glAttachShader( shader_program, vs );
+	glLinkProgram(  shader_program );
 
 	// check once more, if the Vertex Shader and the Fragment Shader can be used
 	// together
-	compileResult = GL_FALSE;
-	glGetProgramiv(gShaderProgram, GL_LINK_STATUS, &compileResult);
-	if (compileResult == GL_FALSE) {
+	compile_result = GL_FALSE;
+	glGetProgramiv( g_shader_program, GL_LINK_STATUS, &compile_result );
+	if ( compile_result == GL_FALSE ) {
 		// query information about the compilation (nothing if compilation went fine!)
-		memset(buff, 0, 1024);
-		glGetProgramInfoLog(gShaderProgram, 1024, nullptr, buff);
+		memset( buffer, 0, 1024 );
+		glGetProgramInfoLog( g_shader_program, 1024, nullptr, buffer );
 		// print to Visual Studio debug console output
-		OutputDebugStringA(buff);
+		OutputDebugStringA( buffer );
 	}
-	// in any case (compile sucess or not), we only want to keep the
-	// Program around, not the shaders.
-	glDetachShader(gShaderProgram, vs);
-	glDetachShader(gShaderProgram, gs);
-	glDetachShader(gShaderProgram, fs);
-	glDeleteShader(vs);
-	glDeleteShader(gs);
-	glDeleteShader(fs);
+
+	// regardless of the compilation status we only need the program
+   // so detach the shaders:
+	glDetachShader( gShaderProgram, vs );
+	glDetachShader( gShaderProgram, gs );
+	glDetachShader( gShaderProgram, fs );
+   // and  delete the shaders:
+	glDeleteShader( vs );
+	glDeleteShader( gs );
+	glDeleteShader( fs );
 }
 
-void CreateUniformBuffer() {
-	glGenBuffers(1, &gUniformBuffer);
-	glBindBuffer(GL_UNIFORM_BUFFER, gUniformBuffer);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(ShaderData), NULL, GL_DYNAMIC_COPY);
-	glBindBufferBase(GL_UNIFORM_BUFFER, 10, gUniformBuffer);
+void create_uniform_buffers() {
+	glGenBuffers( 1, &g_uniform_buffer );
+	glBindBuffer( GL_UNIFORM_BUFFER, g_uniform_buffer );
+	glBufferData( GL_UNIFORM_BUFFER, sizeof(ShaderData), NULL, GL_DYNAMIC_COPY );
+	glBindBufferBase(GL_UNIFORM_BUFFER, 10, g_uniform_buffer );
 }
 
 /*
@@ -194,7 +179,7 @@ public:
    // ersätts av render i modellerna efter att Assimp integrerats
    // TODO: migrera globala g_shader till någonstans
    void render() {
-      glClearColor( 0.45f, 0.55f, 0.60f, 1.00f );
+      glClearColor( 0.2f, 0.2f, 0.2f, 0.2f );
       glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ); // clear color & Z buffer
 
       glUseProgram( g_shader );
@@ -239,25 +224,25 @@ private:
 
 class IEntity {
 public:
-   using EntityID = Uint64;
+   using EntityId = Uint64;
 
    IEntity():
-      _id ( _generate_id() ) // assign unique ID
+      _id ( _generate_id() ) // assign unique Id
    {}
 
    virtual void update( Float32 delta_t ) = 0;
    virtual void render( Float32 delta_t ) = 0;
 
-   EntityID get_id() const { return _id };
+   EntityId get_id() const { return _id };
 
 private:
-   // generate unique ID
-   [[nodiscarð]]  EntityID _generate_id() {
-      static EntityID next_id { 1 };
+   // generate unique Id
+   [[nodiscard]]  EntityId _generate_id() {
+      static EntityId next_id { 1 };
       return next_id++;
   }
 
-  EntityID _id;
+  EntityId _id;
 };
 
 
@@ -265,7 +250,7 @@ private:
 
 
 
-UnorderedMap<EntityID, String> entity_name;
+UnorderedMap<EntityId, String> entity_name;
 entity_name[id];
 
 
@@ -306,7 +291,7 @@ public:
    }
 
    //  depth first search
-   Optional<GraphNode> find( EntityID id ) {
+   Optional<GraphNode> find( EntityId id ) {
       for ( auto &c : _children ) {
          if ( id == c.get_id() )
             return c;
@@ -356,12 +341,12 @@ MAKE_ENUM( ShaderType, Uint8, vertex, geometry, fragment ); // TODO: add more sh
 
 class ShaderHandler {
 public:
-    using ShaderID = Uint64; // 64-bit representation used to representate shaders with unique IDs.
+    using ShaderId = Uint64; // 64-bit representation used to representate shaders with unique Ids.
 
 // TODO: embed type into filename? extract from within file?
-[[nodiscarð]] ShaderID add_shader( StringView filename  ) {
+[[nodiscard]] ShaderId add_shader( StringView filename  ) {
    if ( _shader_ids.contains(filename) )
-      return _shader_ids[filename]; // returnera ID:t till befintlig instans
+      return _shader_ids[filename]; // returnera Id:t till befintlig instans
    else {
       //------------------------------------FIRST READ THE SHADER FROM FILE---------------------------//
       // declare files we need
@@ -427,34 +412,34 @@ public:
       //----------------------------------------THEN RETURN-------------------------------------------//
 
       // om filen laddats in utan problem:
-      ShaderID id   = _generate_id( type ); // generate unique ID
+      ShaderId id   = _generate_id( type ); // generate unique Id
       _shaders[id]  = shader_code; // TODO: <LOW PRIORITY> move semantics optimization (emplace?)
       return id;
    }
 }
 
-[[nodiscarð]] Shader const & get_shader( ShaderID id ) const {
+[[nodiscard]] Shader const & get_shader( ShaderId id ) const {
    if ( _shaders.contains(id) )
       return _shaders[id];
    else throw {}; // TODO: exceptions
 }
 
-// extracts the type of a shader from a shader ID
+// extracts the type of a shader from a shader Id
 // by extracting the 8 leftmost bits and converting to ShaderType enum type.
-[[nodiscarð]]  ShaderType get_type( ShaderID id ) const {
+[[nodiscard]]  ShaderType get_type( ShaderId id ) const {
     return static_cast<ShaderType>(id >> 56); // TODO: if it doesn't work, use dynamic_cast
 }
 
 private:
-  // Maintains a static ID counter that determines the next ID.
-  // Embeds the shader type category into the ID by masking the 8 leftmost bits.
-  [[nodiscarð]]  ShaderID _generate_id( ShaderType type ) {
-      static ShaderID next_id { 1 };
+  // Maintains a static Id counter that determines the next Id.
+  // Embeds the shader type category into the Id by masking the 8 leftmost bits.
+  [[nodiscard]]  ShaderId _generate_id( ShaderType type ) {
+      static ShaderId next_id { 1 };
       return (type << 56) & next_id++;
   }
   
   [[nodiscard]] ShaderType _extract_type( StringView filename ) const {
-      auto extension = filename.substr(filename.find_last_of(".") + 1);
+      auto extension = filename.substr( filename.find_last_of(".") + 1) ;
       if      ( extension == "vs" )
           return ShaderType::vertex;
       else if ( extension == "gs" )
@@ -464,8 +449,8 @@ private:
       else throw {}; // TODO: exceptions
   }
     
-  UnorderedMap<ShaderID,Shader> _shaders;    // maps unique shader IDs to loaded shaders. 
-  UnorderedMap<String,ShaderID> _shader_ids; // maps shader filenames to unique shader IDs
+  UnorderedMap<ShaderId,Shader> _shaders;    // maps unique shader Ids to loaded shaders. 
+  UnorderedMap<String,ShaderId> _shader_ids; // maps shader filenames to unique shader Ids
 };
 
 
@@ -559,9 +544,9 @@ inline glm::mat4  generate_view_matrix
 // generates a 4x4 perspective matrix
 inline glm::mat4  generate_perspective_matrix
 (   // function args:
-	Float32  near_plane	= g_near_plane,
-	Float32  far_plane	= g_far_plane,
-	Float32  fov_rad	= g_fov_rad
+	Float32  near_plane = g_near_plane,
+	Float32  far_plane  = g_far_plane,
+	Float32  fov_rad	  = g_fov_rad
 ) { // function body
 	Float32  aspect = (Float32)g_width / (Float32)g_height;
 	return glm::perspective(fov_rad, aspect, near_plane, far_plane);
@@ -569,7 +554,7 @@ inline glm::mat4  generate_perspective_matrix
 
 
 
-Int32 main(Int32 argc, char* argv[]) {
+Int32 main( Int32 argc, char const *argv[] ) {
 	// initialise GLFW
 	glewExperimental = true; // <- needed for core profile
 	if (!glfwInit()) {
@@ -580,7 +565,7 @@ Int32 main(Int32 argc, char* argv[]) {
 	// 4xAA
 	glfwWindowHint( GLFW_SAMPLES, 4 );
 	// GLSL v130
-	const char* glsl_version = "#version 440";
+	char const *glsl_version = "#version 440";
 	// OpenGL v4.4
 	glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 4 );
 	glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 4 );
@@ -590,28 +575,25 @@ Int32 main(Int32 argc, char* argv[]) {
 	glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
 
 	// open a window and create its OpenGL context
-	GLFWwindow* window;
-	window = glfwCreateWindow(g_width, g_height, "3D Project -- WINDOW", NULL, NULL);
-	if (window == NULL) {
+	GLFWwindow *window;
+	window = glfwCreateWindow( g_width, g_height, "3D Project -- WINDOW", NULL, NULL );
+	if ( window == NULL ) {
 		fprintf(stderr, "[ERROR] Failed to open GLFW window.\n"
-			"        If you have an Intel GPU, they're not 4.4 compatible.\n");
+			             "        If you have an Intel GPU, they're not 4.4 compatible.\n" );
 		getchar();
 		glfwTerminate();
 		return -1;
 	}
-	glfwMakeContextCurrent(window); // initialize GLEW
+	glfwMakeContextCurrent( window ); // initialize GLEW
  // glfwSwapInterval(1); // enable vsync -- TODO: decide!
 
-	if (glewInit() != GLEW_OK) {
-		fprintf(stderr, "[ERROR] Failed to initialize GLEW.\n");
+	if ( glewInit() != GLEW_OK ) {
+		fprintf( stderr, "[ERROR] Failed to initialize GLEW.\n" );
 		return -1;
 	}
 
 	// ensure we can capture the escape key being pressed below
-	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
-
-	// dark grey background
-	glClearColor(0.2f, 0.2f, 0.2f, 0.2f);
+	glfwSetInputMode( window, GLFW_STICKY_KEYS, GL_TRUE );
 
 	// ImGui context setup
 	IMGUI_CHECKVERSION();
