@@ -35,25 +35,24 @@ constexpr Float32	g_near_plane = 0.01f,
 // created resources (shaders, vertices, textures, etc)
 // For simplicity, we make them global here, but it is
 // safe to put them in a class and pass around...
-GLuint gVertexBuffer = 0;
+GLuint gVertexBuffer    = 0;
 GLuint gVertexAttribute = 0;
-GLuint gShaderProgram = 0;
+GLuint gShaderProgram   = 0;
 
-GLuint gUniformBuffer = 0.0f;
+GLuint gUniformBuffer      = 0.0f;
 
-glm::mat4 gUniformModel{};
-glm::mat4 gUniformView{};
-glm::mat4 gUniformPerspective{};
-glm::mat4 gUniformRotation{};
+glm::mat4 gUniformModel       {};
+glm::mat4 gUniformView        {};
+glm::mat4 gUniformPerspective {};
+glm::mat4 gUniformRotation    {};
 
-GLint gUniformModelLoc = -1;
-GLint gUniformViewLoc = -1;
+GLint gUniformModelLoc       = -1;
+GLint gUniformViewLoc        = -1;
 GLint gUniformPerspectiveLoc = -1;
-GLint gUniformRotationLoc = -1;
 
 struct ShaderData {
-	glm::mat4 gRotate2D;
-	float gOffsetX = 0.0f;
+    glm::mat4 gRotate2D;    
+    float gOffsetX = 0.0f;
 };
 GLint gShaderDataLoc = -1;
 
