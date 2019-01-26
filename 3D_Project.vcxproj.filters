@@ -89,8 +89,5 @@
     <ClInclude Include="src\misc\stb_image.h">
       <Filter>Header Files\misc</Filter>
     </ClInclude>
-    <ClInclude Include="src\main.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

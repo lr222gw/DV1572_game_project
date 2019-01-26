@@ -31,6 +31,186 @@ constexpr Float32	g_near_plane = 0.01f,
 
 /////////////////////////////////////////////////////////////////////
 
+// OpenGL uses unsigned integers to keep track of
+// created resources (shaders, vertices, textures, etc)
+// For simplicity, we make them global here, but it is
+// safe to put them in a class and pass around...
+GLuint gVertexBuffer = 0;
+GLuint gVertexAttribute = 0;
+GLuint gShaderProgram = 0;
+
+GLuint gUniformBuffer = 0.0f;
+
+glm::mat4 gUniformModel{};
+glm::mat4 gUniformView{};
+glm::mat4 gUniformPerspective{};
+glm::mat4 gUniformRotation{};
+
+GLint gUniformModelLoc = -1;
+GLint gUniformViewLoc = -1;
+GLint gUniformPerspectiveLoc = -1;
+GLint gUniformRotationLoc = -1;
+
+struct ShaderData {
+	glm::mat4 gRotate2D;
+	float gOffsetX = 0.0f;
+};
+GLint gShaderDataLoc = -1;
+
+
+/////////////////////////////////////////////////////////////////////
+
+void CreateShaders() {
+	// local buffer to store error strings when compiling.
+	char buff[1024];
+	memset(buff, 0, 1024);
+	GLint compileResult = 0;
+
+
+	// vertex shader:
+
+		// create vertex shader "name" and store it in "vs"
+	GLuint vs = glCreateShader(GL_VERTEX_SHADER);
+
+	// open .glsl file and put it in a string
+	ifstream shaderFile("VertexShader.glsl");
+	std::string shaderText((std::istreambuf_iterator<char>(shaderFile)), std::istreambuf_iterator<char>());
+	shaderFile.close();
+
+	// glShaderSource requires a double pointer.
+	// get the pointer to the c style string stored in the string object.
+	const char* shaderTextPtr = shaderText.c_str();
+
+	// ask GL to use this string a shader code source
+	glShaderSource(vs, 1, &shaderTextPtr, nullptr);
+
+	// try to compile this shader source.
+	glCompileShader(vs);
+
+	// check for compilation error
+	glGetShaderiv(vs, GL_COMPILE_STATUS, &compileResult);
+	if (compileResult == GL_FALSE) {
+		// query information about the compilation (nothing if compilation went fine!)
+		glGetShaderInfoLog(vs, 1024, nullptr, buff);
+		// print to Visual Studio debug console output
+		OutputDebugStringA(buff);
+	}
+
+
+
+
+	// geometry shader:
+
+		// create geometry shader "name" and store it in "gs"
+	GLuint gs = glCreateShader(GL_GEOMETRY_SHADER);
+
+	// open .glsl file and put it in a string
+	shaderFile.open("GeometryShader.glsl");
+	shaderText.assign((std::istreambuf_iterator<char>(shaderFile)), std::istreambuf_iterator<char>());
+	shaderFile.close();
+
+	// glShaderSource requires a double pointer.
+	// get the pointer to the c style string stored in the string object.
+	shaderTextPtr = shaderText.c_str();
+
+	// ask GL to use this string a shader code source
+	glShaderSource(gs, 1, &shaderTextPtr, nullptr);
+
+	// try to compile this shader source.
+	glCompileShader(gs);
+
+	// check for compilation error
+	glGetShaderiv(gs, GL_COMPILE_STATUS, &compileResult);
+	if (compileResult == GL_FALSE) {
+		memset(buff, 0, 1024);
+		// query information about the compilation (nothing if compilation went fine!)
+		glGetShaderInfoLog(gs, 1024, nullptr, buff);
+		// print to Visual Studio debug console output
+		OutputDebugStringA(buff);
+	}
+
+
+	// repeat process for Fragment Shader (or Pixel Shader)
+	GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
+	shaderFile.open("FragmentShader.glsl");
+	shaderText.assign((std::istreambuf_iterator<char>(shaderFile)), std::istreambuf_iterator<char>());
+	shaderFile.close();
+	shaderTextPtr = shaderText.c_str();
+	glShaderSource(fs, 1, &shaderTextPtr, nullptr);
+	glCompileShader(fs);
+	// query information about the compilation (nothing if compilation went fine!)
+	compileResult = GL_FALSE;
+	glGetShaderiv(fs, GL_COMPILE_STATUS, &compileResult);
+	if (compileResult == GL_FALSE) {
+		// query information about the compilation (nothing if compilation went fine!)
+		memset(buff, 0, 1024);
+		glGetShaderInfoLog(fs, 1024, nullptr, buff);
+		// print to Visual Studio debug console output
+		OutputDebugStringA(buff);
+	}
+
+	// link shader program (connect vs and ps)
+	gShaderProgram = glCreateProgram();
+	glAttachShader(gShaderProgram, fs);
+	glAttachShader(gShaderProgram, gs);
+	glAttachShader(gShaderProgram, vs);
+	glLinkProgram(gShaderProgram);
+
+	// check once more, if the Vertex Shader and the Fragment Shader can be used
+	// together
+	compileResult = GL_FALSE;
+	glGetProgramiv(gShaderProgram, GL_LINK_STATUS, &compileResult);
+	if (compileResult == GL_FALSE) {
+		// query information about the compilation (nothing if compilation went fine!)
+		memset(buff, 0, 1024);
+		glGetProgramInfoLog(gShaderProgram, 1024, nullptr, buff);
+		// print to Visual Studio debug console output
+		OutputDebugStringA(buff);
+	}
+	// in any case (compile sucess or not), we only want to keep the
+	// Program around, not the shaders.
+	glDetachShader(gShaderProgram, vs);
+	glDetachShader(gShaderProgram, gs);
+	glDetachShader(gShaderProgram, fs);
+	glDeleteShader(vs);
+	glDeleteShader(gs);
+	glDeleteShader(fs);
+}
+
+void CreateUniformBuffer() {
+	glGenBuffers(1, &gUniformBuffer);
+	glBindBuffer(GL_UNIFORM_BUFFER, gUniformBuffer);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(ShaderData), NULL, GL_DYNAMIC_COPY);
+	glBindBufferBase(GL_UNIFORM_BUFFER, 10, gUniformBuffer);
+}
+
+void Render() {
+	glClearColor(gClearColor[0], gClearColor[1], gClearColor[2], 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear color & Z buffer
+
+	glUseProgram(gShaderProgram);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, bth_tex_name);
+
+	// pass uniforms
+	glUniform3fv(gUniformTintColorLoc, 1, &gUniformTintColor[0]);
+	glUniform1fv(gUniformBlendFactorLoc, 1, &gUniformBlendFactor);
+
+	glUniformMatrix4fv(gUniformModelLoc, 1, GL_FALSE, glm::value_ptr(gUniformModel));
+	glUniformMatrix4fv(gUniformViewLoc, 1, GL_FALSE, glm::value_ptr(gUniformView));
+	glUniformMatrix4fv(gUniformPerspectiveLoc, 1, GL_FALSE, glm::value_ptr(gUniformPerspective));
+	glUniformMatrix4fv(gUniformRotationLoc, 1, GL_FALSE, glm::value_ptr(gUniformRotation));
+
+	// tell opengl we are going to use the VAO we described earlier
+	glBindVertexArray(gVertexAttribute);
+
+	// ask OpenGL to draw 6 vertices starting from index 0 in the vertex array 
+	// currently bound (VAO), with current in-use shader. Use TOPOLOGY GL_TRIANGLES,
+	// so for one quad we need 6 vertices (two tris)
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
 struct CameraData {
 	glm::mat4	view,
 				model,
@@ -72,7 +252,9 @@ public:
 		//Klassnamn & operator=( Klassnamn &&other ) {}		// move assignment
 		//Klassnamn(Klassnamn  &&other) = delete;			// generera inte en copy constructor, 
 																//dumma kompilator.
-	inline void update(Float32 delta_t);
+	inline void update(Float32 delta_t) {
+
+	}
 
 private:
 	CameraData _camera;
@@ -206,7 +388,18 @@ Int32 main(Int32 argc, char* argv[]) {
 	// clear color
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
+	//Shaders, Uniform hantering, 
 
+	CreateShaders();
+	CreateUniformBuffer();
+
+	gUniformModelLoc = glGetUniformLocation(gShaderProgram, "modelMatrix");
+	gUniformViewLoc = glGetUniformLocation(gShaderProgram, "viewMatrix");
+	gUniformPerspectiveLoc = glGetUniformLocation(gShaderProgram, "perspectiveMatrix");
+	gUniformRotationLoc = glGetUniformLocation(gShaderProgram, "rotationMatrix");
+
+	gUniformModel = generate_world_matrix();
+	gUniformView = generate_view_matrix();
 
 
 	//Test for ModelLoading, Early testing of Deffered Rendering
@@ -217,6 +410,9 @@ Int32 main(Int32 argc, char* argv[]) {
 
 	Renderer renderer(std::move(cam));
 
+	//Aktivera DepthTest och StencilTest för OpenGL...
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_STENCIL_TEST);
  // Main loop:
 	while (!glfwWindowShouldClose(window)) {
 		// Poll and handle events (inputs, window resize, etc.)
@@ -243,6 +439,10 @@ Int32 main(Int32 argc, char* argv[]) {
 		glClear(GL_COLOR_BUFFER_BIT);
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
+		float dt_time_s = ImGui::GetIO().DeltaTime;
+
+		glBindBuffer(GL_UNIFORM_BUFFER, gUniformBuffer);
+		Render();
 		
 
 		glfwMakeContextCurrent(window);
