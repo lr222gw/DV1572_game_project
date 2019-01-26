@@ -31,25 +31,23 @@ constexpr Float32	g_near_plane = 0.01f,
 
 /////////////////////////////////////////////////////////////////////
 
+
+class Config {
+public:
+    StringView shader_path { "/dat/shader"; }
+} g_config;
+
+
+
 // OpenGL uses unsigned integers to keep track of
 // created resources (shaders, vertices, textures, etc)
 // For simplicity, we make them global here, but it is
 // safe to put them in a class and pass around...
-GLuint gVertexBuffer = 0;
+GLuint gVertexBuffer    = 0;
 GLuint gVertexAttribute = 0;
-GLuint gShaderProgram = 0;
+GLuint gShaderProgram   = 0;
+GLuint gUniformBuffer   = 0.0f;
 
-GLuint gUniformBuffer = 0.0f;
-
-glm::mat4 gUniformModel{};
-glm::mat4 gUniformView{};
-glm::mat4 gUniformPerspective{};
-glm::mat4 gUniformRotation{};
-
-GLint gUniformModelLoc = -1;
-GLint gUniformViewLoc = -1;
-GLint gUniformPerspectiveLoc = -1;
-GLint gUniformRotationLoc = -1;
 
 struct ShaderData {
 	glm::mat4 gRotate2D;
@@ -184,38 +182,190 @@ void CreateUniformBuffer() {
 	glBindBufferBase(GL_UNIFORM_BUFFER, 10, gUniformBuffer);
 }
 
-void Render() {
-	glClearColor(gClearColor[0], gClearColor[1], gClearColor[2], 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear color & Z buffer
+/*
+CameraData make_camera() {
 
-	glUseProgram(gShaderProgram);
+   //initiserar Model (world) matrisen
+   glm::mat4  model = generate_world_matrix();
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, bth_tex_name);
+   //Initierar View-matrisen
+   glm::mat4  view = generate_view_matrix();
+   //view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
 
-	// pass uniforms
-	glUniform3fv(gUniformTintColorLoc, 1, &gUniformTintColor[0]);
-	glUniform1fv(gUniformBlendFactorLoc, 1, &gUniformBlendFactor);
+   //Float32 FOV = glm::radians(45.0f);
+   //Float32 aspectRatio = g_height / g_width;
+   glm::mat4  projection = generate_perspective_matrix();//;glm::perspective(FOV, aspectRatio, 0.1f, 100.0f);
 
-	glUniformMatrix4fv(gUniformModelLoc, 1, GL_FALSE, glm::value_ptr(gUniformModel));
-	glUniformMatrix4fv(gUniformViewLoc, 1, GL_FALSE, glm::value_ptr(gUniformView));
-	glUniformMatrix4fv(gUniformPerspectiveLoc, 1, GL_FALSE, glm::value_ptr(gUniformPerspective));
-	glUniformMatrix4fv(gUniformRotationLoc, 1, GL_FALSE, glm::value_ptr(gUniformRotation));
+   //CameraData camera{view, model, projection};
+   CameraData camera;
+   camera.view = view;
+   camera.model = model;
+   camera.projection = projection;
 
-	// tell opengl we are going to use the VAO we described earlier
-	glBindVertexArray(gVertexAttribute);
+   return camera;
 
-	// ask OpenGL to draw 6 vertices starting from index 0 in the vertex array 
-	// currently bound (VAO), with current in-use shader. Use TOPOLOGY GL_TRIANGLES,
-	// so for one quad we need 6 vertices (two tris)
-	glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+*/
+class Viewport {
+public:
+
+   Viewport():
+      _view        ( generate_view_matrix()        ),
+      _model       ( generate_model_matrix()       ),
+      _perspective ( generate_perspective_matrix() )
+   {}
+
+
+   // Temporär funktion;
+   // ersätts av render i modellerna efter att Assimp integrerats
+   // TODO: migrera globala g_shader till någonstans
+   void render() {
+      glClearColor( 0.45f, 0.55f, 0.60f, 1.00f );
+      glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ); // clear color & Z buffer
+
+      glUseProgram( g_shader );
+
+      // pass uniforms
+      glUniform3fv(   gUniformTintColorLoc, 1, &gUniformTintColor[0] );
+      glUniform1fv( gUniformBlendFactorLoc, 1, &gUniformBlendFactor  );
+
+      model_loc       = glGetUniformLocation( g_shader, "modelMatrix" );
+      view_loc        = glGetUniformLocation( g_shader, "viewMatrix" );
+      perspective_loc = glGetUniformLocation( g_shader, "perspectiveMatrix" );
+
+      glUniformMatrix4fv(       model_loc, 1, GL_FALSE, glm::value_ptr(_model)       );
+      glUniformMatrix4fv(        view_loc, 1, GL_FALSE, glm::value_ptr(_view)        );
+      glUniformMatrix4fv( perspective_loc, 1, GL_FALSE, glm::value_ptr(_perspective) );
+
+      // tell opengl we are going to use the VAO we described earlier
+      glBindVertexArray( gVertexAttribute );
+
+      // ask OpenGL to draw 6 vertices starting from index 0 in the vertex array 
+      // currently bound (VAO), with current in-use shader. Use TOPOLOGY GL_TRIANGLES,
+      // so for one quad we need 6 vertices (two tris)
+      glDrawArrays( GL_TRIANGLES, 0, 6 );
+   }
+
+   bool add_shader( Shader &&s ) {}
+
+private:
+	glm::mat4	_view,
+				   _model,
+				   _projection;
+   GLint       _view_loc,
+               _model_loc,
+               _perspective_loc;
+
+   Vector<Shader> _shaders;
+
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+MAKE_ENUM( ShaderType, Uint8, vertex, geometry, fragment ); // TODO: add more shaders here AND in get_type
+
+class ShaderHandler {
+public:
+    using ShaderID = Uint64; // 64-bit representation used to representate shaders with unique IDs.
+
+// TODO: embed type into filename? extract from within file?
+[[nodiscarð]] ShaderID add_shader( StringView filename  ) {
+   if ( _shader_ids.contains(filename) )
+      return _shader_ids[filename]; // returnera ID:t till befintlig instans
+   else {
+      // declare files we need
+      String        shader_code;
+      Ifstream      shader_file;
+      StringStream  shader_stream;
+
+      // .vs = vertex   shader
+      // .gs = geometry shader
+      // .fs = fragment shader
+      ShaderType type = _extract_type( filename );
+
+      // ensure ifstream objects can throw exceptions:
+      shader_file.exceptions( std::ifstream::failbit | std::ifstream::badbit );
+
+      try {
+         shader_file.open( g_config.shader_path + filename ); // open file
+         shader_stream << shader_file.rdbuf();                // read content into stream
+         shader_file.close();                                 // close file handle
+         shader_code = shader_stream.str();                   // convert to string
+      }
+      catch ( std::ifstream::failure e ) {
+         std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
+      }
+      const char* ShaderCodeStr = ShaderCode.c_str();
+
+      // om filen laddats in utan problem:
+      ShaderID id   = _generate_id( type ); // generate unique ID
+      _shaders[id]  = shader_code; // TODO: <LOW PRIORITY> move semantics optimization (emplace?)
+      return id;
+   }
 }
 
-struct CameraData {
-	glm::mat4	view,
-				model,
-				projection;
+[[nodiscarð]] Shader const & get_shader( ShaderID id ) const {
+   if ( _shaders.contains(id) )
+      return _shaders[id];
+   else throw {}; // TODO: exceptions
+}
+
+// extracts the type of a shader from a shader ID
+// by extracting the 8 leftmost bits and converting to ShaderType enum type.
+[[nodiscarð]]  ShaderType get_type( ShaderID id ) const {
+    return static_cast<ShaderType>(id >> 56); // TODO: if it doesn't work, use dynamic_cast
+}
+
+private:
+  // Maintains a static ID counter that determines the next ID.
+  // Embeds the shader type category into the ID by masking the 8 leftmost bits.
+  [[nodiscarð]]  ShaderID _generate_id( ShaderType type ) {
+      static ShaderID next_id { 1 };
+      return (type << 56) & next_id++;
+  }
+  
+  [[nodiscard]] ShaderType _extract_type( StringView filename ) const {
+      auto extension = filename.substr(filename.find_last_of(".") + 1);
+      if      ( extension == "vs" )
+          return ShaderType::vertex;
+      else if ( extension == "gs" )
+          return ShaderType::geometry;
+      else if ( extension == "fs" )
+          return ShaderType::fragment;
+      else throw {}; // TODO: exceptions
+  }
+    
+  UnorderedMap<ShaderID,Shader> _shaders;    // maps unique shader IDs to loaded shaders. 
+  UnorderedMap<String,ShaderID> _shader_ids; // maps shader filenames to unique shader IDs
 };
+
+
+
+
+
+
+
+
+
+
+
+
 
 class Renderer {
 public:
@@ -232,7 +382,7 @@ public:
 			 // "Render(CameraData &&cd)" med ": _camera(std::move(cd))" 
 					// "_camera" <- detta är en referering av vårt privata Attribut "_camera"
 			  
-			//När ":" följs efter en Konstruktor påbörjas vad som kallas en 
+			//När ":" följ+s efter en Konstruktor påbörjas vad som kallas en 
 			// "initialiser List", där vi initiserar Attributen genom 
 				//Attributnamnet + en Parentes med datan attributet ska innehålla
 
@@ -277,7 +427,7 @@ private:
 /////////////////////////////////////////////////////////////////////
 
 // generates a 4x4 world matrix
-inline glm::mat4  generate_world_matrix() {
+inline glm::mat4  generate_model_matrix() {
 	return  glm::mat4{ 1.0f }; // 4x4 identity matrix
 }
 
@@ -304,28 +454,7 @@ inline glm::mat4  generate_perspective_matrix
 	return glm::perspective(fov_rad, aspect, near_plane, far_plane);
 }
 
-CameraData make_camera() {
 
-	//initiserar Model (world) matrisen
-	glm::mat4  model = generate_world_matrix();
-
-	//Initierar View-matrisen
-	glm::mat4  view = generate_view_matrix();
-	//view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-
-	//Float32 FOV = glm::radians(45.0f);
-	//Float32 aspectRatio = g_height / g_width;
-	glm::mat4  projection = generate_perspective_matrix();//;glm::perspective(FOV, aspectRatio, 0.1f, 100.0f);
-
-	//CameraData camera{view, model, projection};
-	CameraData camera;
-	camera.view = view;
-	camera.model = model;
-	camera.projection = projection;
-
-	return camera;
-
-}
 
 Int32 main(Int32 argc, char* argv[]) {
 	// initialise GLFW
@@ -385,21 +514,11 @@ Int32 main(Int32 argc, char* argv[]) {
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init(glsl_version);
 
-	// clear color
-	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-
 	//Shaders, Uniform hantering, 
 
 	CreateShaders();
 	CreateUniformBuffer();
 
-	gUniformModelLoc = glGetUniformLocation(gShaderProgram, "modelMatrix");
-	gUniformViewLoc = glGetUniformLocation(gShaderProgram, "viewMatrix");
-	gUniformPerspectiveLoc = glGetUniformLocation(gShaderProgram, "perspectiveMatrix");
-	gUniformRotationLoc = glGetUniformLocation(gShaderProgram, "rotationMatrix");
-
-	gUniformModel = generate_world_matrix();
-	gUniformView = generate_view_matrix();
 
 
 	//Test for ModelLoading, Early testing of Deffered Rendering
