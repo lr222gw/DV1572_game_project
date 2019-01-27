@@ -56,45 +56,7 @@ SharedPtr<Shader> ShaderManager::load_shader( String const &filename  ) {
 }
 
 SharedPtr<ShaderProgram> ShaderManager::create_program( Vector<SharedPtr<Shader>> shaders) {
-   // local buffer to store error strings when compiling.
-   char buffer[1024];
-   memset( buffer, 0, 1024 );
-   
-
-   GLuint shader_program = glCreateProgram();
-
-   for ( auto &shaderPtr : shaders)
-      glAttachShader( shader_program, shaderPtr->get_location());
-
-   glLinkProgram( shader_program );
-
-   auto compile_result = GL_FALSE;
-   glGetProgramiv( shader_program, GL_LINK_STATUS, &compile_result );
-   if ( compile_result == GL_FALSE ) {
-      // query information about the compilation (nothing if compilation went fine!)
-      memset( buffer, 0, 1024 );
-      glGetProgramInfoLog( shader_program, 1024, nullptr, buffer );
-      // print to Visual Studio debug console output
-      std::cerr << ("Some error in ShaderManager: ") << buffer << "\n";
-   }
-
-   // auto id = _generate_shader_program_id();
-   // _shader_programs[id] = shader_program;
-
-   /* TODO: hantera detach och delete?
-
-      // regardless of the compilation status we only need the program
-      // so detach the shaders:
-      glDetachShader( shader_program, vs );
-      glDetachShader( shader_program, gs );
-      glDetachShader( shader_program, fs );
-      // and  delete the shaders:
-      glDeleteShader( vs );
-      glDeleteShader( gs );
-      glDeleteShader( fs );
-   */
-
-   return id;
+   return std::make_shared<ShaderProgram>( shaders );
 }
 
 /*

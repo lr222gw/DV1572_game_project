@@ -1,5 +1,5 @@
 #pragma once
-
+5
 #include "Shader.h"
 #include "misc/defs.h"
 
@@ -24,6 +24,7 @@ class ShaderProgram {
 public:
    using Id = Uint32; // 32-bit representation used to representate shader programs with unique Ids.
    
+   // TODO: (low priority) make constructor private and make make_shared a friend
    ShaderProgram(
       Vector<SharedPtr<Shader>> const &shader_ptrs
       /*, UniformInitializer initializer*/);
