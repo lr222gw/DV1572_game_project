@@ -1,8 +1,9 @@
 #pragma once
 
 #include "misc/defs.h"
+#include "Shader.h"
 
-class ShaderHandler {
+class ShaderManager {
 public:
    using ShaderId        = Uint32; // 32-bit representation used to representate shaders with unique Ids.
    using ShaderProgramId = Uint32; // 32-bit representation used to representate shader programs with unique Ids.
@@ -17,5 +18,5 @@ private:
   UnorderedMap<ShaderProgramId,GLuint>  _shader_programs; // maps unique shader Ids to loaded shaders. 
   UnorderedMap<ShaderId,GLuint>         _shaders;         // maps unique shader Ids to loaded shaders. 
   */
-  UnorderedMap<String,WeakPtr<Shader>>  _loaded_shaders_map;         // maps filenames to weak pointers
+  HashMap<String,WeakPtr<Shader>>  _loaded_shaders_map;         // maps filenames to weak pointers
 };

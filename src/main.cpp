@@ -474,7 +474,7 @@ private:
 [[nodiscard]] String uppercase( char const *base ) {
    String s = base;
    std::transform( s.begin(), s.end(), s.begin(), ::toupper );
-   return s;
+   return s;   
 }
 
 /////////////////////////////////////////////////////////////////////
