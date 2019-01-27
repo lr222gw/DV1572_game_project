@@ -20,35 +20,46 @@
 //En "constexpr" är en "CompileTime" Konstant; constexpr	int h_height 
 	//Känns igen till och med innan/under kompilerinsstadiet
 //i.e. 
-constexpr Int32	g_height = 768,
-				      g_width  = 1024;
 
 
-constexpr Float32	g_near_plane = 0.01f,
-				   	g_far_plane  = 100.0f,
-				   	g_fov_rad    = 0.01f;
+
+
 
 /////////////////////////////////////////////////////////////////////
+
+
+   // OpenGL uses unsigned integers to keep track of
+   // created resources (shaders, vertices, textures, etc)
+   // For simplicity, we make them global here, but it is
+   // safe to put them in a class and pass around...
+   // TODO: fundera över vart dessa borde bo?
+   GLuint g_vertex_buffer    = 0;
+   GLuint g_vertex_attribute = 0;
+   GLuint g_shader_program   = 0; // TODO: ta bort -- då vi ska hantera den med klassen ShaderProgram och skicka den som argument
+   GLuint g_uniform_buffer   = 0;
 
 
 class Config {
 public:
-    StringView shader_path { "./dat/shader/" };
-    StringView model_path  { "./dat/models/" };
+   constexpr Int32   g_height = 768,
+                     g_width  = 1024;
+
+   constexpr Float32 near_plane = 0.01f,
+                     far_plane  = 100.0f,
+                     fov_rad    = 0.01f;
+
+   StringView shader_path { "./dat/shader/" };
+   StringView model_path  { "./dat/models/" };
 } g_config;
 
 
 
-// OpenGL uses unsigned integers to keep track of
-// created resources (shaders, vertices, textures, etc)
-// For simplicity, we make them global here, but it is
-// safe to put them in a class and pass around...
-GLuint gVertexBuffer    = 0;
-GLuint gVertexAttribute = 0;
-GLuint gShaderProgram   = 0;
-GLuint gUniformBuffer   = 0;
+
 
 /////////////////////////////////////////////////////////////////////
+/*
+TODO:   fundera över om vi ska ha en Scene-klass och på så vis tillåta
+        att växla scener senare via SceneManager. (LÅG PRIORITET)
 
 class Scene {
 
@@ -74,7 +85,7 @@ Scene( AssetManager &assets, SceneManager &scene ):
 private:
    AssetManager  &_assets;
    SceneManager  &_scene;
-};
+};*/
 
 
 
@@ -88,7 +99,7 @@ private:
 
 
 
-
+/*
 class Model {};
 
 class Renderer {
@@ -96,49 +107,20 @@ public:
 
 private:
    UnorderedMap<ModelId, ModelInstance> _instances;
-}
+}*/
 
 
 
-void create_shaders() {
-	// ...
 
-	// link shader program (connect vs and ps)
-	auto g_shader_program = glCreateProgram();
-	glAttachShader( shader_program, fs );
-	glAttachShader( shader_program, gs );
-	glAttachShader( shader_program, vs );
-	glLinkProgram(  shader_program );
-
-	// check once more, if the Vertex Shader and the Fragment Shader can be used
-	// together
-	compile_result = GL_FALSE;
-	glGetProgramiv( g_shader_program, GL_LINK_STATUS, &compile_result );
-	if ( compile_result == GL_FALSE ) {
-		// query information about the compilation (nothing if compilation went fine!)
-		memset( buffer, 0, 1024 );
-		glGetProgramInfoLog( g_shader_program, 1024, nullptr, buffer );
-		// print to Visual Studio debug console output
-		OutputDebugStringA( buffer );
-	}
-
-	// regardless of the compilation status we only need the program
-   // so detach the shaders:
-	glDetachShader( gShaderProgram, vs );
-	glDetachShader( gShaderProgram, gs );
-	glDetachShader( gShaderProgram, fs );
-   // and  delete the shaders:
-	glDeleteShader( vs );
-	glDeleteShader( gs );
-	glDeleteShader( fs );
-}
-
+/*
 void create_uniform_buffers() {
 	glGenBuffers( 1, &g_uniform_buffer );
 	glBindBuffer( GL_UNIFORM_BUFFER, g_uniform_buffer );
 	glBufferData( GL_UNIFORM_BUFFER, sizeof(ShaderData), NULL, GL_DYNAMIC_COPY );
 	glBindBufferBase(GL_UNIFORM_BUFFER, 10, g_uniform_buffer );
 }
+*/
+
 
 /*
 CameraData make_camera() {
@@ -164,6 +146,10 @@ CameraData make_camera() {
 
 }
 */
+
+
+/*
+TODO:  fundera över hur vi ska hantera viewport/camera i vårt projekt
 class Viewport {
 public:
 
@@ -217,10 +203,11 @@ private:
    Vector<Shader> _shaders;
 
 };
+*/
 
 
                         
-
+/*
 class IEntity {
 public:
    using EntityId = Uint64;
@@ -242,19 +229,19 @@ private:
   }
 
   EntityId _id;
-};
+};*/
 
 
 
 
 
-
+/*
 UnorderedMap<EntityId, String> entity_name;
-entity_name[id];
+entity_name[id];*/
 
 
 
-
+/*
 class GraphNode : public IEntity {
 public:
    GraphNode( IEntity &e ):
@@ -307,7 +294,7 @@ private:
    IEntity            &_element;
    Vector<GraphNode>   _children;
 };
-
+*/
 
 /*
 
@@ -327,19 +314,6 @@ main() {
 
 */
 
-make_shared<Shader>(...):
-    reference_count = 1; 
-    Shader *data;
-
-
-
-
-Model {}
-
-ModelInstance {
-   Model &model;
-   Vec3   position;
-}
 
 
 
@@ -394,7 +368,7 @@ inline glm::mat4  generate_perspective_matrix
 
 
 
-
+/*
 // alternativ till scene graph som verkar vara mer förekommande och korrekt
 class RenderHandler {
 public:
@@ -408,11 +382,12 @@ public:
          e.render();
    }
 
-   void load( IEntity e ) { /*TODO*/ };
+   void load( IEntity e ) {  };
 
 private:
    Vector<IEntityInstance>  loaded_entities;
 };
+*/
 
 
 
@@ -443,7 +418,7 @@ private:
 
 
 
-
+/*
 class Renderer {
 public:
 	// && => temporärt värde; kallas "rValueReference", vi kan "stjäla" värdet
@@ -485,7 +460,7 @@ public:
 
 private:
 	CameraData _camera;
-};
+};*/
 
 
 	
@@ -597,11 +572,10 @@ Int32 main( Int32 argc, char const *argv[] ) {
 		glClear(GL_COLOR_BUFFER_BIT);
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
+// programkod här
 		float dt_time_s = ImGui::GetIO().DeltaTime;
-
-		glBindBuffer(GL_UNIFORM_BUFFER, gUniformBuffer);
-		Render();
-		
+		// glBindBuffer(GL_UNIFORM_BUFFER, gUniformBuffer);
+		// Render();
 
 		glfwMakeContextCurrent(window);
 		glfwSwapBuffers(window);
@@ -618,85 +592,3 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
 	return 0; // successful exit
 }
-
-
-
-
-
-// BAREBONES UPPLÄGG:
-
-/*
-
-//-------------------SHADERS----------------------------//
-
-MAKE_ENUM( ShaderType,...);
-
-class Shader {
-   Shader( char const *code, ShaderType type ); // skapa via ShaderManager::load_shader(...);
-   ~Shader();
-};
-
-class ShaderProgram {
-   ShaderProgram( Vector<SharedPtr<Shader>> &&shaders );
-   ~ShaderProgram();
-};
-
-class ShaderManager {
-   load_shader( StringView filename );
-};
-
-//-------------------MODELS----------------------------//
-
-class Model { // skapa via AssetManager::load_model(...)
-public:
-   // destructor (TODO: vad ska vara i destruktorn?)
-   // ...
-private:
-
-   // private constructor + friend class AssetManager?  (TODO: vad ska vara i konstruktorn?)
-};
-
-
-
-class ModelInstance { // skapa via SceneManager::add(...)
-public:
-   // destructor  (TODO: vad ska vara i destruktorn?)
-   // ...
-   // set/get position
-   // render
-private:
-   // private constructor + friend class SceneManager? (TODO: vad ska vara i konstruktorn?)
-   SharedPtr<Model>  _model;
-   glm::vec3         _global_position;
-   // unique ID?
-}; 
-
-
-
-class AssetManager {
-   SharedPtr<Model> load_model( StringView filename );
-};
-
-//-------------------SCENE----------------------------//
-
-class SceneManager {
-   add( SharedPtr<Model> model_instance, Vec3 global_pos );
-   void update();
-   void render();
-// TODO: scene graph, attaching nodes, pruning, transforms
-};
-
-void init_demo_scene(...);  // skapar vår demoscen
-
-//-------------------ENGINE----------------------------//
-
-int main(...) {
-   // init openGL
-   // init imgui
-   // skapa scene manager
-   // skapa asset manager
-   // main loop
-}
-
-
-*/
