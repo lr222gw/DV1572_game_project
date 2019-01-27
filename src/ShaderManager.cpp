@@ -12,7 +12,6 @@ SharedPtr<Shader> ShaderManager::load_shader( String const &filename  ) {
    else {
       //------------------------------------FIRST READ THE SHADER FROM FILE---------------------------//
       // declare files we need
-      String        shader_code;
       Ifstream      shader_file;
       StringStream  shader_stream;
 
@@ -28,13 +27,11 @@ SharedPtr<Shader> ShaderManager::load_shader( String const &filename  ) {
          shader_file.open( g_config.shader_path + filename ); // open file
          shader_stream << shader_file.rdbuf();                // read content into stream
          shader_file.close();                                 // close file handle
-         shader_code = shader_stream.str();                   // convert to string
+          const char *shader_code = shader_stream.str();      // convert to string
       }
       catch ( std::ifstream::failure e ) {
          std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
       }
-      //const char *shader_code_str = shader_stream.c_str();
-
 
       //-------------------------------------THEN COMPILE THE SHADER----------------------------------//
       // create a shared pointer to the shader
