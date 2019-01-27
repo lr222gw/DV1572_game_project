@@ -11,5 +11,5 @@ namespace config {
 
    String const shader_path { "./dat/shader/" };
    String const model_path  { "./dat/models/" };
-} g_config;
+};
 

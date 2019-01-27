@@ -1,11 +1,6 @@
 #include "misc/defs.h"
 #include "Config.h"
 
-#include <GL/glew.h> // <- always include before gl.h & glfw3.h
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
 #include "misc/ImGui/imgui.h"
 #include "misc/ImGui/imgui_impl_glfw.h"
 #include "misc/ImGui/imgui_impl_opengl3.h"
