@@ -73,6 +73,3 @@ template <class T>          using Opt          = Optional<T>;
 
 constexpr Idx  const   invalid_idx = -1;
 constexpr char const * invalid_str = "ERROR";
-
-Shared<Shader>
-SharedPtr<Shader> 
