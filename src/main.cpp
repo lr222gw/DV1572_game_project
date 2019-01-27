@@ -41,10 +41,10 @@
 
 class Config {
 public:
-   constexpr Int32   g_height = 768,
+   static constexpr Int32   g_height = 768,
                      g_width  = 1024;
 
-   constexpr Float32 near_plane = 0.01f,
+   static constexpr Float32 near_plane = 0.01f,
                      far_plane  = 100.0f,
                      fov_rad    = 0.01f;
 
