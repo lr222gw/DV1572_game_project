@@ -27,7 +27,7 @@ SharedPtr<Shader> ShaderManager::load_shader( String const &filename  ) {
          shader_file.open( g_config.shader_path + filename ); // open file
          shader_stream << shader_file.rdbuf();                // read content into stream
          shader_file.close();                                 // close file handle
-          const char *shader_code = shader_stream.str();      // convert to string
+          const char *shader_code = shader_stream.str().c_str();      // convert to string
       }
       catch ( std::ifstream::failure e ) {
          std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
