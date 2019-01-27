@@ -6,7 +6,7 @@
 
 class Shader {
 public:
-   enum class Type{vertex, geometry, fragment};
+   enum class Type{vertex, geometry, fragment, error };
 
    using Id = Uint32; // 32-bit representation used to represent shader with uniqie Ids.
    Shader( char const *shader_str, Type const type);

@@ -1,7 +1,7 @@
 #pragma once;
 #include "misc/defs.h"
 
-struct Config {
+namespace config {
    static constexpr Int32     height = 768,
                               width  = 1024;
 
@@ -11,5 +11,5 @@ struct Config {
 
    String const shader_path { "./dat/shader/" };
    String const model_path  { "./dat/models/" };
-} g_config;
+};
 

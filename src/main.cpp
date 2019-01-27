@@ -345,12 +345,12 @@ inline glm::mat4  generate_view_matrix
 // generates a 4x4 perspective matrix
 inline glm::mat4  generate_perspective_matrix
 (   // function args:
-   Float32  near_plane = g_config.near_plane,
-   Float32  far_plane  = g_config.far_plane,
-   Float32  fov_rad    = g_config.fov_rad
+   Float32  near_plane = config::near_plane,
+   Float32  far_plane  = config::far_plane,
+   Float32  fov_rad    = config::fov_rad
 ) { // function body
-   Float32  aspect = (Float32)g_config.width / (Float32)g_config.height;
-   return glm::perspective(g_config.fov_rad, aspect, g_config.near_plane, g_config.far_plane);
+   Float32  aspect = (Float32)config::width / (Float32)config::height;
+   return glm::perspective(config::fov_rad, aspect, config::near_plane, config::far_plane);
 }
 
 
@@ -491,7 +491,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
 	// open a window and create its OpenGL context
 	GLFWwindow *window;
-	window = glfwCreateWindow( g_config.width, g_config.height, "3D Project -- WINDOW", NULL, NULL );
+	window = glfwCreateWindow( config::width, config::height, "3D Project -- WINDOW", NULL, NULL );
 	if ( window == NULL ) {
 		fprintf(stderr, "[ERROR] Failed to open GLFW window.\n"
 			             "        If you have an Intel GPU, they're not 4.4 compatible.\n" );
