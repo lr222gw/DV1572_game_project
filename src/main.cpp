@@ -1,4 +1,5 @@
 #include "misc/defs.h"
+#include "Config.h"
 
 #include <GL/glew.h> // <- always include before gl.h & glfw3.h
 #include <GLFW/glfw3.h>
@@ -38,20 +39,6 @@
    GLuint g_vertex_attribute = 0;
    GLuint g_shader_program   = 0; // TODO: ta bort -- då vi ska hantera den med klassen ShaderProgram och skicka den som argument
    GLuint g_uniform_buffer   = 0;
-
-
-class Config {
-public:
-   static constexpr Int32     height = 768,
-							         width  = 1024;
-
-   static constexpr Float32   near_plane = 0.01f,
-							         far_plane  = 100.0f,
-							         fov_rad    = 0.01f;
-
-   StringView shader_path { "./dat/shader/" };
-   StringView model_path  { "./dat/models/" };
-} g_config;
 
 
 

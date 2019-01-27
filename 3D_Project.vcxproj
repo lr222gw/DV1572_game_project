@@ -35,6 +35,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\AssetManager.h" />
+    <ClInclude Include="src\Config.h" />
     <ClInclude Include="src\lop_mesh.h" />
     <ClInclude Include="src\lop_Model.h" />
     <ClInclude Include="src\lop_shader.h" />

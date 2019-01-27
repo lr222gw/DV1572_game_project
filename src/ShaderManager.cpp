@@ -33,11 +33,12 @@ SharedPtr<Shader> ShaderManager::load_shader( String const &filename  ) {
       catch ( std::ifstream::failure e ) {
          std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
       }
-      const char *shader_code_str = shader_stream.c_str();
+      //const char *shader_code_str = shader_stream.c_str();
+
 
       //-------------------------------------THEN COMPILE THE SHADER----------------------------------//
       // create a shared pointer to the shader
-      auto shader_ptr = std::make_shared<Shader>( shader_code_str, type );
+      auto shader_ptr = std::make_shared<Shader>( shader_code, type );
       // add a weak version to the loaded shaders list
       _shader_is_loaded[filename] = true; // TODO: (låg prio) kommer aldrig att bli falsk; ej skalbart dynamiskt
       _loaded_shaders[filename]   = WeakPtr( shader_ptr );
@@ -54,7 +55,7 @@ SharedPtr<Shader> ShaderManager::load_shader( String const &filename  ) {
    }
 }
 
-ShaderProgram::Id ShaderManager::create_program( Vector<SharedPtr<Shader>> shaders) {
+SharedPtr<ShaderProgram> ShaderManager::create_program( Vector<SharedPtr<Shader>> shaders) {
    // local buffer to store error strings when compiling.
    char buffer[1024];
    memset( buffer, 0, 1024 );
@@ -74,11 +75,11 @@ ShaderProgram::Id ShaderManager::create_program( Vector<SharedPtr<Shader>> shade
       memset( buffer, 0, 1024 );
       glGetProgramInfoLog( shader_program, 1024, nullptr, buffer );
       // print to Visual Studio debug console output
-      OutputDebugStringA( buffer );
+      std::cerr << ("Some error in ShaderManager: ") << buffer << "\n";
    }
 
-   auto id = _generate_shader_program_id();
-   _shader_programs[id] = shader_program;
+   // auto id = _generate_shader_program_id();
+   // _shader_programs[id] = shader_program;
 
    /* TODO: hantera detach och delete?
 
@@ -128,8 +129,8 @@ ShaderProgram::Id ShaderManager::create_program( Vector<SharedPtr<Shader>> shade
   }
   */
  
-  /* 
-  [[nodiscard]] Shader::Type ShaderManager::_extract_type( StringView filename ) const {
+ 
+Shader::Type ShaderManager::_extract_type( StringView filename ) const {
       auto extension = filename.substr( filename.find_last_of(".") + 1) ;
       if      ( extension == "vs" )
           return Shader::Type::vertex;
@@ -137,8 +138,8 @@ ShaderProgram::Id ShaderManager::create_program( Vector<SharedPtr<Shader>> shade
           return Shader::Type::geometry;
       else if ( extension == "fs" )
           return Shader::Type::fragment;
-      else throw {}; // TODO: exceptions
+      else assert(false && "Unaccounted for Shader-extension"); // TODO: exceptions
   }
-  */
+ 
 
 

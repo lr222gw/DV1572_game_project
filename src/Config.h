@@ -1,4 +1,5 @@
 #pragma once;
+#include "misc/defs.h"
 
 struct Config {
    static constexpr Int32     height = 768,
@@ -8,7 +9,7 @@ struct Config {
                               far_plane  = 100.0f,
                               fov_rad    = 0.01f;
 
-   StringView shader_path { "./dat/shader/" };
-   StringView model_path  { "./dat/models/" };
+   String const shader_path { "./dat/shader/" };
+   String const model_path  { "./dat/models/" };
 } g_config;
 
