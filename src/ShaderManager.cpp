@@ -14,6 +14,7 @@ SharedPtr<Shader> ShaderManager::load_shader( String const &filename  ) {
       // declare files we need
       Ifstream      shader_file;
       StringStream  shader_stream;
+      String        shader_code;
 
       // .vs = vertex   shader
       // .gs = geometry shader
@@ -27,7 +28,7 @@ SharedPtr<Shader> ShaderManager::load_shader( String const &filename  ) {
          shader_file.open( g_config.shader_path + filename ); // open file
          shader_stream << shader_file.rdbuf();                // read content into stream
          shader_file.close();                                 // close file handle
-          const char *shader_code = shader_stream.str();      // convert to string
+         shader_code = shader_stream.str();      // convert to string
       }
       catch ( std::ifstream::failure e ) {
          std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
@@ -35,7 +36,7 @@ SharedPtr<Shader> ShaderManager::load_shader( String const &filename  ) {
 
       //-------------------------------------THEN COMPILE THE SHADER----------------------------------//
       // create a shared pointer to the shader
-      auto shader_ptr = std::make_shared<Shader>( shader_code, type );
+      auto shader_ptr = std::make_shared<Shader>( shader_code.c_str(), type );
       // add a weak version to the loaded shaders list
       _shader_is_loaded[filename] = true; // TODO: (låg prio) kommer aldrig att bli falsk; ej skalbart dynamiskt
       _loaded_shaders[filename]   = WeakPtr( shader_ptr );
