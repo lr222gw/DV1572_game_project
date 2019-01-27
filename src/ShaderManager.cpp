@@ -4,7 +4,7 @@
 
 
 // TODO: embed type into filename? extract from within file?
-[[nodiscard]] SharedPtr<Shader> ShaderManager::load_shader( StringView filename  ) {
+SharedPtr<Shader> ShaderManager::load_shader( StringView filename  ) {
    // if shader is currently loaded, create a shared pointer to it
    if ( _loaded_shaders_map.contains(filename) && !_loaded_shaders_map[filename].expired() )
       return _loaded_shaders_map[filename].lock(); // return the shared pointer made from the weak pointer
@@ -53,7 +53,7 @@
    }
 }
 
-[[nodiscard]] ShaderProgramId ShaderManager::create_program( Vector<ShaderId> shader_ids ) {
+ShaderProgram::Id ShaderManager::create_program( Vector<Shader::Id> shader_ids ) {
    // local buffer to store error strings when compiling.
    char buffer[1024];
    memset( buffer, 0, 1024 );

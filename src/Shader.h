@@ -6,6 +6,7 @@ MAKE_ENUM( ShaderType, Uint8, vertex, geometry, fragment ); // TODO: add more sh
 
 class Shader {
 public:
+   using Id = Uint32; // 32-bit representation used to represent shader with uniqie Ids.
    Shader( char const *shader_str, ShaderType const );
 
    ~Shader();

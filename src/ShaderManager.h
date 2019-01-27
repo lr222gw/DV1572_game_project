@@ -2,13 +2,14 @@
 
 #include "misc/defs.h"
 #include "Shader.h"
+#include "ShaderProgram.h"
 
 class ShaderManager {
 public:
    // TODO: embed type into filename? extract from within file?
    [[nodiscard]] SharedPtr<Shader> load_shader( StringView filename );
 
-   [[nodiscard]] ShaderProgramId create_program( Vector<ShaderId> shader_ids );
+   [[nodiscard]] ShaderProgram::Id create_program( Vector<Shader::Id> shader_ids );
 
 private:
   /*
