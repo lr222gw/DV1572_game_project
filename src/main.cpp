@@ -41,12 +41,12 @@
 
 class Config {
 public:
-   static constexpr Int32   g_height = 768,
-                     g_width  = 1024;
+   static constexpr Int32     height = 768,
+							         width  = 1024;
 
-   static constexpr Float32 near_plane = 0.01f,
-                     far_plane  = 100.0f,
-                     fov_rad    = 0.01f;
+   static constexpr Float32   near_plane = 0.01f,
+							         far_plane  = 100.0f,
+							         fov_rad    = 0.01f;
 
    StringView shader_path { "./dat/shader/" };
    StringView model_path  { "./dat/models/" };
@@ -321,11 +321,11 @@ main() {
 
 
 
-void create_demo_scene( AssetHandler &assets, Scene &scene, RenderHandler &renderer ) {
+void create_demo_scene( /*AssetHandler &assets, Scene &scene, RenderHandler &renderer*/ ) {
    // TODO: setup the viewport camera
 
    // load the statue into memory
-   auto statue_handle = assets.load_model( "12330_Statue_v1_L2.obj" );
+   //auto statue_handle = assets.load_model( "12330_Statue_v1_L2.obj" );
 
    // create 9 statues arranged thusly:
    //   0  1  2    
@@ -333,7 +333,7 @@ void create_demo_scene( AssetHandler &assets, Scene &scene, RenderHandler &rende
    //   6  7  8    
    for ( int i=0;  i<9;  ++i ) {
       glm::vec3 position { i/3, i%3, 0 };
-      auto instance_id = scene.add_object( statue_handle, position );
+      //auto instance_id = scene.add_object( statue_handle, position );
    }
 }
 
@@ -353,15 +353,14 @@ inline glm::mat4  generate_view_matrix
    return glm::lookAt(camera_pos, camera_target, camera_up_vec);
 }
 
-
 // generates a 4x4 perspective matrix
 inline glm::mat4  generate_perspective_matrix
 (   // function args:
-   Float32  near_plane = g_near_plane,
-   Float32  far_plane  = g_far_plane,
-   Float32  fov_rad    = g_fov_rad
+   Float32  near_plane = g_config.near_plane,
+   Float32  far_plane  = g_config.far_plane,
+   Float32  fov_rad    = g_config.fov_rad
 ) { // function body
-   Float32  aspect = (Float32)g_width / (Float32)g_height;
+   Float32  aspect = (Float32)g_config.width / (Float32)g_config.height;
    return glm::perspective(fov_rad, aspect, near_plane, far_plane);
 }
 
@@ -503,7 +502,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
 	// open a window and create its OpenGL context
 	GLFWwindow *window;
-	window = glfwCreateWindow( g_width, g_height, "3D Project -- WINDOW", NULL, NULL );
+	window = glfwCreateWindow( g_config.width, g_config.height, "3D Project -- WINDOW", NULL, NULL );
 	if ( window == NULL ) {
 		fprintf(stderr, "[ERROR] Failed to open GLFW window.\n"
 			             "        If you have an Intel GPU, they're not 4.4 compatible.\n" );
