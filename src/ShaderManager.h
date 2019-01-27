@@ -9,9 +9,10 @@ class ShaderManager {
 public:
    // TODO: embed type into filename? extract from within file?
    [[nodiscard]] SharedPtr<Shader> load_shader(String const &filename);
-      //TODO: just nu kan vi ha ,t.ex., flera VertexShader till ett program => ogitligt program
+      //TODO: (LOW PRIORITY) just nu kan vi ha ,t.ex., flera VertexShader till ett program => ogitligt program
 
    [[nodiscard]] SharedPtr<ShaderProgram> create_program( Vector<SharedPtr<Shader>> shaders );
+      //TODO: (LOW PRIORITY) Fixa så att man inte kan göra identiska ShaderProgram! 
 
 private:
    [[nodiscard]] Shader::Type _extract_type(StringView filename) const;

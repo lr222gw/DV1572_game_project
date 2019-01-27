@@ -17,6 +17,6 @@ public:
 
 
 private:
-   Type  _type;
+   Type        _type;
    GLuint      _shader_location;
 };

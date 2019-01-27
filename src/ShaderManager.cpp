@@ -54,7 +54,12 @@ SharedPtr<Shader> ShaderManager::load_shader( String const &filename  ) {
 }
 
 SharedPtr<ShaderProgram> ShaderManager::create_program( Vector<SharedPtr<Shader>> shaders) {
-   return std::make_shared<ShaderProgram>( shaders );
+      //
+   return std::make_shared<ShaderProgram>(  shaders );   
+
+      //Alternativt detta sätt, men då det nästan inte ger oss någon skillnad för
+      //prestanda kör vi sättet över...
+         //return std::make_shared<ShaderProgram>( std::move( shaders ));
    
 }
 
