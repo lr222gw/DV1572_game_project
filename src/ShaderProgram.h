@@ -17,7 +17,7 @@
 // 
 // TODO: how to handle the encapsulation of uniform parameters to the shader program
 class ShaderProgram {
-public:
+public:5
    ShaderProgram(
       Vector<SharedPtr<Shader>> const &shader_ptrs,
       UniformInitializer initializer
