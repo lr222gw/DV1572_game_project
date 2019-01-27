@@ -21,20 +21,20 @@
 	//Känns igen till och med innan/under kompilerinsstadiet
 //i.e. 
 constexpr Int32	g_height = 768,
-				g_width = 1024;
+				      g_width  = 1024;
 
 
 constexpr Float32	g_near_plane = 0.01f,
-				   	g_far_plane = 100.0f,
-				   	g_fov_rad = 0.01f;
+				   	g_far_plane  = 100.0f,
+				   	g_fov_rad    = 0.01f;
 
 /////////////////////////////////////////////////////////////////////
 
 
 class Config {
 public:
-    StringView shader_path { "./dat/shader/"; }
-    StringView model_path  { "./dat/models/"; }
+    StringView shader_path { "./dat/shader/" };
+    StringView model_path  { "./dat/models/" };
 } g_config;
 
 
@@ -363,6 +363,36 @@ void create_demo_scene( AssetHandler &assets, Scene &scene, RenderHandler &rende
    }
 }
 
+// generates a 4x4 world matrix
+inline glm::mat4  generate_model_matrix() {
+   return  glm::mat4{ 1.0f }; // 4x4 identity matrix
+}
+
+
+// generates a 4x4 view matrix
+inline glm::mat4  generate_view_matrix
+(   // function args:
+   glm::vec3  camera_pos    = { 0.0f,  0.0f, -2.0f },
+   glm::vec3  camera_target = { 0.0f,  0.0f,  0.0f },
+   glm::vec3  camera_up_vec = { 0.0f,  1.0f,  0.0f }
+) { // function body
+   return glm::lookAt(camera_pos, camera_target, camera_up_vec);
+}
+
+
+// generates a 4x4 perspective matrix
+inline glm::mat4  generate_perspective_matrix
+(   // function args:
+   Float32  near_plane = g_near_plane,
+   Float32  far_plane  = g_far_plane,
+   Float32  fov_rad    = g_fov_rad
+) { // function body
+   Float32  aspect = (Float32)g_width / (Float32)g_height;
+   return glm::perspective(fov_rad, aspect, near_plane, far_plane);
+}
+
+
+
 
 
 // alternativ till scene graph som verkar vara mer förekommande och korrekt
@@ -392,272 +422,15 @@ private:
 
 
 
-MAKE_ENUM( ShaderType, Uint8, vertex, geometry, fragment ); // TODO: add more shaders here AND in get_type
-
-
-class Shader {
-public:
-   Shader( char const *shader_str, ShaderType const type ) {
-      // local buffer to store error strings when compiling.
-      char buffer[1024];
-      memset( buffer, 0, 1024 );
-      GLint compile_result = 0;
-
-      switch ( type ) {
-         case ShaderType::vertex:   _shader_location = glCreateShader( GL_VERTEX_SHADER   ); break;
-         case ShaderType::geometry: _shader_location = glCreateShader( GL_GEOMETRY_SHADER ); break;
-         case ShaderType::fragment: _shader_location = glCreateShader( GL_FRAGMENT_SHADER ); break;
-         default: throw {}; // TODO: exception?
-      }
-
-      // ask GL to use this string a shader code source
-      glShaderSource( _shader_location, 1, &shader_str, nullptr );
-
-      // try to compile this shader source.
-      glCompileShader( _shader_location );
-
-      // check for compilation error
-      glGetShaderiv( _shader_location, GL_COMPILE_STATUS, &compile_result );
-      if ( compile_result == GL_FALSE ) {
-         // query information about the compilation (nothing if compilation went fine!)
-         glGetShaderInfoLog( _shader_location, 1024, nullptr, buffer );
-         // print to Visual Studio debug console output
-         OutputDebugStringA( buffer );
-      }
-   }
-
-   ~Shader() {
-      glDeleteShader( _shader_location );
-   }
-
-   GLuint get_location() const {
-      return _shader_location;
-   }
-
-private:
-   ShaderType  _type;
-   GLuint      _shader_location;
-};
-
-
-
-// 1. vi behöver iterera genom alla uniforms som nämns i shadern (t.ex. enligt stackoverflown)
-// 2. men vi behöver populera uniform_data mappen och binda dess element till motsvarande openGL locations
-// 
-// sp.uniform_data["rotation_speed"] = Float32   { 0.4f };
-// sp.uniform_data["view_matrix"]    = glm::mat4 { 1.0f };
-// 
-// Map<String,Variant< Int32,
-//                     Float32,
-//                     glm::vec2,
-//                     glm::vec3,
-//                     glm::vec4,
-//                     glm::mat2,
-//                     glm::mat3,
-//                     glm::mat4 >> uniform_data;
-// 
-// 
-// TODO: how to handle the encapsulation of uniform parameters to the shader program
-class ShaderProgram {
-public:
-   ShaderProgram(
-      Vector<SharedPtr<Shader>> const &shader_ptrs,
-      UniformInitializer initializer
-   ):
-      _shader_ptrs ( shader_ptrs )
-   {
-      // local buffer to store error strings when compiling.
-      char buffer[1024];
-      memset( buffer, 0, 1024 );
-
-      initializer();
-
-      _program_location = GlCreateProgram();
-
-      for ( auto &shader_ptr : shader_ptrs )
-         glAttachShader( _program_location, shader_ptr->get_location() );
-
-      glLinkProgram( _program_location );
-
-      auto compile_result = GL_FALSE;
-      glGetProgramiv( _program_location, GL_LINK_STATUS, &compile_result );
-      if ( compile_result == GL_FALSE ) {
-         // query information about the compilation (nothing if compilation went fine!)
-         memset( buffer, 0, 1024 );
-         glGetProgramInfoLog( _program_location, 1024, nullptr, buffer );
-         // print to Visual Studio debug console output
-         OutputDebugStringA( buffer );
-      }
-
-      auto id = _generate_shader_program_id();
-      _shader_programs[id] = _program_location;
-   }
-
-   ~ShaderProgram() {
-      for ( auto &shader : shader_ptrs )
-         glDetachShader( _program_location, shader_ptr->get_location() );
-      glDeleteProgram( _program_location );
-   }
-
-private:
-   GLuint                     _program_location;
-   Vector<SharedPtr<Shader>>  _shader_ptrs;
-}
 
 
 
 
 
 
-class ShaderHandler {
-public:
-   using ShaderId        = Uint32; // 32-bit representation used to representate shaders with unique Ids.
-   using ShaderProgramId = Uint32; // 32-bit representation used to representate shader programs with unique Ids.
 
-// TODO: embed type into filename? extract from within file?
-[[nodiscard]] SharedPtr<Shader> load_shader( StringView filename  ) {
-   // if shader is currently loaded, create a shared pointer to it
-   if ( _loaded_shaders_map.contains(filename) && !_loaded_shaders_map[filename].expired() )
-      return _loaded_shaders_map[filename].lock(); // return the shared pointer made from the weak pointer
 
-   else {
-      //------------------------------------FIRST READ THE SHADER FROM FILE---------------------------//
-      // declare files we need
-      String        shader_code;
-      Ifstream      shader_file;
-      StringStream  shader_stream;
 
-      // .vs = vertex   shader
-      // .gs = geometry shader
-      // .fs = fragment shader
-      ShaderType type = _extract_type( filename );
-
-      // ensure ifstream objects can throw exceptions:
-      shader_file.exceptions( std::ifstream::failbit | std::ifstream::badbit );
-
-      try {
-         shader_file.open( g_config.shader_path + filename ); // open file
-         shader_stream << shader_file.rdbuf();                // read content into stream
-         shader_file.close();                                 // close file handle
-         shader_code = shader_stream.str();                   // convert to string
-      }
-      catch ( std::ifstream::failure e ) {
-         std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
-      }
-      const char *shader_code_str = shader_stream.c_str();
-
-      //-------------------------------------THEN COMPILE THE SHADER----------------------------------//
-      // create a shared pointer to the shader
-      auto shader_ptr = std::make_shared<Shader>( shader_code_str, type );
-      // add a weak version to the loaded shaders list
-      _loaded_shaders_map[filename] = WeakPtr( shader_ptr );
-
-      //----------------------------------------THEN RETURN-------------------------------------------//
-      return shader_ptr;
-
-      /* gammal kod med index:
-      // om filen laddats in utan problem:
-      ShaderId id   = _generate_shader_id( type ); // generate unique Id
-      _shaders[id]  = shader_loc;
-      return id;
-      */
-   }
-}
-
-[[nodiscard]] ShaderProgramId create_program( Vector<ShaderId> shader_ids ) {
-   // local buffer to store error strings when compiling.
-   char buffer[1024];
-   memset( buffer, 0, 1024 );
-
-   GLuint shader_program = GlCreateProgram();
-
-   for ( auto &id : shaders_ids )
-      glAttachShader( shader_program, get_shader(id) );
-
-   glLinkProgram( shader_program );
-
-   auto compile_result = GL_FALSE;
-   glGetProgramiv( shader_program, GL_LINK_STATUS, &compile_result );
-   if ( compile_result == GL_FALSE ) {
-      // query information about the compilation (nothing if compilation went fine!)
-      memset( buffer, 0, 1024 );
-      glGetProgramInfoLog( shader_program, 1024, nullptr, buffer );
-      // print to Visual Studio debug console output
-      OutputDebugStringA( buffer );
-   }
-
-   auto id = _generate_shader_program_id();
-   _shader_programs[id] = shader_program;
-
-   /* TODO: hantera detach och delete?
-
-      // regardless of the compilation status we only need the program
-      // so detach the shaders:
-      glDetachShader( shader_program, vs );
-      glDetachShader( shader_program, gs );
-      glDetachShader( shader_program, fs );
-      // and  delete the shaders:
-      glDeleteShader( vs );
-      glDeleteShader( gs );
-      glDeleteShader( fs );
-   */
-
-   return id;
-}
-
-/*
-[[nodiscard]] Shader const & get_shader( ShaderId id ) const {
-   if ( _shaders.contains(id) )
-      return _shaders[id];
-   else throw {}; // TODO: exceptions
-}
-*/
-
-// extracts the type of a shader from a shader Id
-// by extracting the 8 leftmost bits and converting to ShaderType enum type.
-/*
-[[nodiscard]]  ShaderType get_type( ShaderId id ) const {
-    return static_cast<ShaderType>(id >> 56); // TODO: if it doesn't work, use dynamic_cast
-}
-*/
-
-private:
-  // Maintains a static Id counter that determines the next Id.
-  // Embeds the shader type category into the Id by masking the 8 leftmost bits.
-   /*
-  [[nodiscard]]  ShaderId _generate_shader_id( ShaderType type ) {
-      static ShaderId next_id { 1 };
-      return (type << 56) & next_id++;
-  }
-  */
-
-  /*
-  [[nodiscard]]  ShaderProgramId _generate_shader_program_id() {
-      static ShaderProgramId next_id { 1 };
-      return next_id++;
-  }
-  */
- 
-  /* 
-  [[nodiscard]] ShaderType _extract_type( StringView filename ) const {
-      auto extension = filename.substr( filename.find_last_of(".") + 1) ;
-      if      ( extension == "vs" )
-          return ShaderType::vertex;
-      else if ( extension == "gs" )
-          return ShaderType::geometry;
-      else if ( extension == "fs" )
-          return ShaderType::fragment;
-      else throw {}; // TODO: exceptions
-  }
-  */
-   
-  /*
-  UnorderedMap<ShaderProgramId,GLuint>  _shader_programs; // maps unique shader Ids to loaded shaders. 
-  UnorderedMap<ShaderId,GLuint>         _shaders;         // maps unique shader Ids to loaded shaders. 
-  */
-  UnorderedMap<String,WeakPtr<Shader>>  _loaded_shaders_map;         // maps filenames to weak pointers
-
-};
 
 
 
@@ -730,33 +503,6 @@ private:
 
 /////////////////////////////////////////////////////////////////////
 
-// generates a 4x4 world matrix
-inline glm::mat4  generate_model_matrix() {
-	return  glm::mat4{ 1.0f }; // 4x4 identity matrix
-}
-
-
-// generates a 4x4 view matrix
-inline glm::mat4  generate_view_matrix
-(   // function args:
-	glm::vec3  camera_pos	 = { 0.0f,  0.0f, -2.0f },
-	glm::vec3  camera_target = { 0.0f,  0.0f,  0.0f },
-	glm::vec3  camera_up_vec = { 0.0f,  1.0f,  0.0f }
-) { // function body
-	return glm::lookAt(camera_pos, camera_target, camera_up_vec);
-}
-
-
-// generates a 4x4 perspective matrix
-inline glm::mat4  generate_perspective_matrix
-(   // function args:
-	Float32  near_plane = g_near_plane,
-	Float32  far_plane  = g_far_plane,
-	Float32  fov_rad	  = g_fov_rad
-) { // function body
-	Float32  aspect = (Float32)g_width / (Float32)g_height;
-	return glm::perspective(fov_rad, aspect, near_plane, far_plane);
-}
 
 
 
@@ -879,7 +625,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
 // BAREBONES UPPLÄGG:
 
-
+/*
 
 //-------------------SHADERS----------------------------//
 
@@ -947,7 +693,10 @@ void init_demo_scene(...);  // skapar vår demoscen
 int main(...) {
    // init openGL
    // init imgui
-   // 
+   // skapa scene manager
+   // skapa asset manager
+   // main loop
 }
 
 
+*/

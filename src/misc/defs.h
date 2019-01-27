@@ -61,8 +61,9 @@ template <class T>          using Vec          = Vector<T>;
 template <class T, Size N>  using Array        = std::array<T,N>;
 template <class T, Size N>  using Arr          = Array<T,N>;
 // smart pointer types:
-template <class T>          using Shared       = std::shared_ptr<T>;
-template <class T>          using Unique       = std::unique_ptr<T>;
+template <class T>          using SharedPtr    = std::shared_ptr<T>;
+template <class T>          using UniquePtr    = std::unique_ptr<T>;
+template <class T>          using WeakPtr      = std::weak_ptr<T>;
 // container types:
 template <class K, class V> using Map          = std::map<K,V>;
 template <class K, class V> using HashMap      = std::unordered_map<K,V>;
@@ -72,3 +73,6 @@ template <class T>          using Opt          = Optional<T>;
 
 constexpr Idx  const   invalid_idx = -1;
 constexpr char const * invalid_str = "ERROR";
+
+Shared<Shader>
+SharedPtr<Shader> 
