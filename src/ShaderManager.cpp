@@ -4,9 +4,9 @@
 
 
 // TODO: embed type into filename? extract from within file?
-SharedPtr<Shader> ShaderManager::load_shader( StringView filename  ) {
+SharedPtr<Shader> ShaderManager::load_shader( String const &filename  ) {
    // if shader is currently loaded, create a shared pointer to it
-   if ( _loaded_shaders_map.contains(filename) && !_loaded_shaders_map[filename].expired() )
+   if ( (_loaded_shaders_map[filename] != nullptr)  && (!_loaded_shaders_map[filename].expired()) )
       return _loaded_shaders_map[filename].lock(); // return the shared pointer made from the weak pointer
 
    else {
@@ -19,7 +19,7 @@ SharedPtr<Shader> ShaderManager::load_shader( StringView filename  ) {
       // .vs = vertex   shader
       // .gs = geometry shader
       // .fs = fragment shader
-      ShaderType type = _extract_type( filename );
+      Shader::Type type = _extract_type( filename );
 
       // ensure ifstream objects can throw exceptions:
       shader_file.exceptions( std::ifstream::failbit | std::ifstream::badbit );
@@ -53,15 +53,16 @@ SharedPtr<Shader> ShaderManager::load_shader( StringView filename  ) {
    }
 }
 
-ShaderProgram::Id ShaderManager::create_program( Vector<Shader::Id> shader_ids ) {
+ShaderProgram::Id ShaderManager::create_program( Vector<SharedPtr<Shader>> shaders) {
    // local buffer to store error strings when compiling.
    char buffer[1024];
    memset( buffer, 0, 1024 );
+   
 
-   GLuint shader_program = GlCreateProgram();
+   GLuint shader_program = glCreateProgram();
 
-   for ( auto &id : shaders_ids )
-      glAttachShader( shader_program, get_shader(id) );
+   for ( auto &shaderPtr : shaders)
+      glAttachShader( shader_program, shaderPtr->get_location());
 
    glLinkProgram( shader_program );
 
@@ -103,17 +104,17 @@ ShaderProgram::Id ShaderManager::create_program( Vector<Shader::Id> shader_ids )
 */
 
 // extracts the type of a shader from a shader Id
-// by extracting the 8 leftmost bits and converting to ShaderType enum type.
+// by extracting the 8 leftmost bits and converting to Shader::Type enum type.
 /*
-[[nodiscard]]  ShaderType ShaderManager::get_type( ShaderId id ) const {
-    return static_cast<ShaderType>(id >> 56); // TODO: if it doesn't work, use dynamic_cast
+[[nodiscard]]  Shader::Type ShaderManager::get_type( ShaderId id ) const {
+    return static_cast<Shader::Type>(id >> 56); // TODO: if it doesn't work, use dynamic_cast
 }
 */
 
   // Maintains a static Id counter that determines the next Id.
   // Embeds the shader type category into the Id by masking the 8 leftmost bits.
    /*
-  [[nodiscard]]  ShaderId ShaderManager::_generate_shader_id( ShaderType type ) {
+  [[nodiscard]]  ShaderId ShaderManager::_generate_shader_id( Shader::Type type ) {
       static ShaderId next_id { 1 };
       return (type << 56) & next_id++;
   }
@@ -127,14 +128,14 @@ ShaderProgram::Id ShaderManager::create_program( Vector<Shader::Id> shader_ids )
   */
  
   /* 
-  [[nodiscard]] ShaderType ShaderManager::_extract_type( StringView filename ) const {
+  [[nodiscard]] Shader::Type ShaderManager::_extract_type( StringView filename ) const {
       auto extension = filename.substr( filename.find_last_of(".") + 1) ;
       if      ( extension == "vs" )
-          return ShaderType::vertex;
+          return Shader::Type::vertex;
       else if ( extension == "gs" )
-          return ShaderType::geometry;
+          return Shader::Type::geometry;
       else if ( extension == "fs" )
-          return ShaderType::fragment;
+          return Shader::Type::fragment;
       else throw {}; // TODO: exceptions
   }
   */

@@ -81,5 +81,5 @@ template <class K, class V> using HashMap      = std::unordered_map<K,V>;
 // optional type:
 template <class T>          using Optional     = std::optional<T>;
 
-constexpr Idx  const   invalid_idx = -1;
+//constexpr Idx  const   invalid_idx = -1;
 constexpr char const * invalid_str = "ERROR";

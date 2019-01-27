@@ -7,9 +7,9 @@
 class ShaderManager {
 public:
    // TODO: embed type into filename? extract from within file?
-   [[nodiscard]] SharedPtr<Shader> load_shader( StringView filename );
+   [[nodiscard]] SharedPtr<Shader> load_shader(String const &filename);
 
-   [[nodiscard]] ShaderProgram::Id create_program( Vector<Shader::Id> shader_ids );
+   [[nodiscard]] ShaderProgram::Id create_program( Vector<SharedPtr<Shader>> shaders );
 
 private:
   /*

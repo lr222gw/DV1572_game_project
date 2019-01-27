@@ -1,16 +1,16 @@
 #include "Shader.h"
 
-Shader::Shader( char const *shader_str, ShaderType const type ) {
+Shader::Shader( char const *shader_str, Type const type ) {
    // local buffer to store error strings when compiling.
    char buffer[1024];
    memset( buffer, 0, 1024 );
    GLint compile_result = 0;
 
    switch ( type ) {
-      case ShaderType::vertex:   _shader_location = glCreateShader( GL_VERTEX_SHADER   ); break;
-      case ShaderType::geometry: _shader_location = glCreateShader( GL_GEOMETRY_SHADER ); break;
-      case ShaderType::fragment: _shader_location = glCreateShader( GL_FRAGMENT_SHADER ); break;
-      default: throw {}; // TODO: exception?
+      case Type::vertex:   _shader_location = glCreateShader( GL_VERTEX_SHADER   ); break;
+      case Type::geometry: _shader_location = glCreateShader( GL_GEOMETRY_SHADER ); break;
+      case Type::fragment: _shader_location = glCreateShader( GL_FRAGMENT_SHADER ); break;
+      default: assert(false && "Todo: lägg till ny Shadertyp för Shader.cpp"); // TODO: exception?
    }
 
    // ask GL to use this string a shader code source
@@ -25,7 +25,8 @@ Shader::Shader( char const *shader_str, ShaderType const type ) {
       // query information about the compilation (nothing if compilation went fine!)
       glGetShaderInfoLog( _shader_location, 1024, nullptr, buffer );
       // print to Visual Studio debug console output
-      OutputDebugStringA( buffer );
+      //OutputDebugStringA( buffer );
+      std::cerr << buffer << "\n";
    }
 }
 
