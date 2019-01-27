@@ -1,5 +1,4 @@
 #pragma once
-5
 #include "Shader.h"
 #include "misc/defs.h"
 
