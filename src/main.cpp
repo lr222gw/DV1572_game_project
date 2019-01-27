@@ -3,13 +3,14 @@
 #include <GL/glew.h> // <- always include before gl.h & glfw3.h
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "misc/ImGui/imgui.h"
 #include "misc/ImGui/imgui_impl_glfw.h"
 #include "misc/ImGui/imgui_impl_opengl3.h"
 
 //Temporära bibliotek (och sånt) för temporära lösningar
-#include "lop_Model.h"
+//#include "lop_Model.h"
 //#include "main.h"
 
 //#include <range/v3/all.hpp>
@@ -350,6 +351,7 @@ inline glm::mat4  generate_view_matrix
    glm::vec3  camera_target = { 0.0f,  0.0f,  0.0f },
    glm::vec3  camera_up_vec = { 0.0f,  1.0f,  0.0f }
 ) { // function body
+   
    return glm::lookAt(camera_pos, camera_target, camera_up_vec);
 }
 
@@ -361,7 +363,7 @@ inline glm::mat4  generate_perspective_matrix
    Float32  fov_rad    = g_config.fov_rad
 ) { // function body
    Float32  aspect = (Float32)g_config.width / (Float32)g_config.height;
-   return glm::perspective(fov_rad, aspect, near_plane, far_plane);
+   return glm::perspective(g_config.fov_rad, aspect, g_config.near_plane, g_config.far_plane);
 }
 
 
