@@ -5,13 +5,10 @@
 
 class ShaderManager {
 public:
-   using ShaderId        = Uint32; // 32-bit representation used to representate shaders with unique Ids.
-   using ShaderProgramId = Uint32; // 32-bit representation used to representate shader programs with unique Ids.
+   // TODO: embed type into filename? extract from within file?
+   [[nodiscard]] SharedPtr<Shader> load_shader( StringView filename );
 
-// TODO: embed type into filename? extract from within file?
-[[nodiscard]] SharedPtr<Shader> load_shader( StringView filename );
-
-[[nodiscard]] ShaderProgramId create_program( Vector<ShaderId> shader_ids );
+   [[nodiscard]] ShaderProgramId create_program( Vector<ShaderId> shader_ids );
 
 private:
   /*

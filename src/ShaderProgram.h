@@ -22,6 +22,8 @@
 // TODO: how to handle the encapsulation of uniform parameters to the shader program
 class ShaderProgram {
 public:
+   using Id = Uint32; // 32-bit representation used to representate shader programs with unique Ids.
+   
    ShaderProgram(
       Vector<SharedPtr<Shader>> const &shader_ptrs
       /*, UniformInitializer initializer*/);
