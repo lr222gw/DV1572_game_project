@@ -30,11 +30,11 @@
    // For simplicity, we make them global here, but it is
    // safe to put them in a class and pass around...
    // TODO: fundera över vart dessa borde bo?
-   GLuint g_vertex_buffer    = 0;
-   GLuint g_vertex_attribute = 0;
-   GLuint g_shader_program   = 0; // TODO: ta bort -- då vi ska hantera den med klassen ShaderProgram och skicka den som argument
-   GLuint g_uniform_buffer   = 0;
-
+//   GLuint g_vertex_buffer    = 0;
+//   GLuint g_vertex_attribute = 0;
+//   GLuint g_shader_program   = 0; // TODO: ta bort -- då vi ska hantera den med klassen ShaderProgram och skicka den som argument
+//   GLuint g_uniform_buffer   = 0;
+//
 
 
 
