@@ -39,7 +39,7 @@ SharedPtr<Shader> ShaderManager::load_shader( String const &filename  ) {
       auto shader_ptr = std::make_shared<Shader>( shader_code.c_str(), type );
       // add a weak version to the loaded shaders list
       _shader_is_loaded[filename] = true; // TODO: (låg prio) kommer aldrig att bli falsk; ej skalbart dynamiskt
-      _loaded_shaders[filename]   = WeakPtr( shader_ptr );
+      _loaded_shaders[filename]   = WeakPtr<Shader>( shader_ptr );
 
       //----------------------------------------THEN RETURN-------------------------------------------//
       return shader_ptr;
@@ -55,6 +55,7 @@ SharedPtr<Shader> ShaderManager::load_shader( String const &filename  ) {
 
 SharedPtr<ShaderProgram> ShaderManager::create_program( Vector<SharedPtr<Shader>> shaders) {
    return std::make_shared<ShaderProgram>( shaders );
+   
 }
 
 /*
