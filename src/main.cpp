@@ -219,7 +219,7 @@ private:
 
 
 /*
-UnorderedMap<EntityId, String> entity_name;
+HashMap<EntityId, String> entity_name;
 entity_name[id];*/
 
 
@@ -486,6 +486,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
 	// open a window and create its OpenGL context
 	GLFWwindow *window;
+
+   //TODO: handle Window Resize!
 	window = glfwCreateWindow( config::width, config::height, "3D Project -- WINDOW", NULL, NULL );
 	if ( window == NULL ) {
 		fprintf(stderr, "[ERROR] Failed to open GLFW window.\n"
@@ -525,6 +527,15 @@ Int32 main( Int32 argc, char const *argv[] ) {
 //	CameraData cam = make_camera();
 //	Renderer renderer(std::move(cam));
 
+   //Gör Instans av ShaderManager
+      //Följande kod skrivs här, men ska brytas ut till en lämpligare placering
+         //Ladda in Shaders
+         //Gör ShaderProgram 
+         //Knyt ShaderProgram till OpenGL
+
+   //Gör Instans av SceneManager
+   //Gör Instans av AssetManager
+
 	// activate depth test and stencil test for openGL
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_STENCIL_TEST);
@@ -551,6 +562,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 		glfwMakeContextCurrent(window);
 		glfwGetFramebufferSize(window, &display_w, &display_h);
 		glViewport(0, 0, display_w, display_h);
+      
       glClearColor(0.2f, 0.2f, 0.2f, 1.0f);//glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
 		glClear(GL_COLOR_BUFFER_BIT);
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

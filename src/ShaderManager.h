@@ -9,6 +9,7 @@ class ShaderManager {
 public:
    // TODO: embed type into filename? extract from within file?
    [[nodiscard]] SharedPtr<Shader> load_shader(String const &filename);
+      //TODO: just nu kan vi ha ,t.ex., flera VertexShader till ett program => ogitligt program
 
    [[nodiscard]] SharedPtr<ShaderProgram> create_program( Vector<SharedPtr<Shader>> shaders );
 
