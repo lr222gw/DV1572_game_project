@@ -16,5 +16,6 @@ private:
   UnorderedMap<ShaderProgramId,GLuint>  _shader_programs; // maps unique shader Ids to loaded shaders. 
   UnorderedMap<ShaderId,GLuint>         _shaders;         // maps unique shader Ids to loaded shaders. 
   */
-  HashMap<String,WeakPtr<Shader>>  _loaded_shaders_map;         // maps filenames to weak pointers
+  HashMap<String,WeakPtr<Shader>>  _loaded_shaders;         // maps filenames to weak pointers
+  HashMap<String,Bool>             _shader_is_loaded;
 };

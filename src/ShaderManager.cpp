@@ -6,8 +6,8 @@
 // TODO: embed type into filename? extract from within file?
 SharedPtr<Shader> ShaderManager::load_shader( String const &filename  ) {
    // if shader is currently loaded, create a shared pointer to it
-   if ( (_loaded_shaders_map[filename] != nullptr)  && (!_loaded_shaders_map[filename].expired()) )
-      return _loaded_shaders_map[filename].lock(); // return the shared pointer made from the weak pointer
+   if ( _shader_is_loaded[filename] && !_loaded_shaders[filename].expired() )
+      return _loaded_shaders[filename].lock(); // return the shared pointer made from the weak pointer
 
    else {
       //------------------------------------FIRST READ THE SHADER FROM FILE---------------------------//
@@ -39,7 +39,8 @@ SharedPtr<Shader> ShaderManager::load_shader( String const &filename  ) {
       // create a shared pointer to the shader
       auto shader_ptr = std::make_shared<Shader>( shader_code_str, type );
       // add a weak version to the loaded shaders list
-      _loaded_shaders_map[filename] = WeakPtr( shader_ptr );
+      _shader_is_loaded[filename] = true; // TODO: (låg prio) kommer aldrig att bli falsk; ej skalbart dynamiskt
+      _loaded_shaders[filename]   = WeakPtr( shader_ptr );
 
       //----------------------------------------THEN RETURN-------------------------------------------//
       return shader_ptr;
