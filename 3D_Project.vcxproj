@@ -19,14 +19,26 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\AssetManager.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\misc\ImGui\imgui.cpp" />
     <ClCompile Include="src\misc\ImGui\imgui_draw.cpp" />
     <ClCompile Include="src\misc\ImGui\imgui_impl_glfw.cpp" />
     <ClCompile Include="src\misc\ImGui\imgui_impl_opengl3.cpp" />
     <ClCompile Include="src\misc\ImGui\imgui_widgets.cpp" />
+    <ClCompile Include="src\Model.cpp" />
+    <ClCompile Include="src\ModelInstance.cpp" />
+    <ClCompile Include="src\SceneManager.cpp" />
+    <ClCompile Include="src\Shader.cpp" />
+    <ClCompile Include="src\ShaderManager.cpp" />
+    <ClCompile Include="src\ShaderProgram.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\AssetManager.h" />
+    <ClInclude Include="src\Config.h" />
+    <ClInclude Include="src\lop_mesh.h" />
+    <ClInclude Include="src\lop_Model.h" />
+    <ClInclude Include="src\lop_shader.h" />
     <ClInclude Include="src\misc\defs.h" />
     <ClInclude Include="src\misc\enum.h" />
     <ClInclude Include="src\misc\ImGui\imconfig.h" />
@@ -37,6 +49,13 @@
     <ClInclude Include="src\misc\ImGui\imstb_rectpack.h" />
     <ClInclude Include="src\misc\ImGui\imstb_textedit.h" />
     <ClInclude Include="src\misc\ImGui\imstb_truetype.h" />
+    <ClInclude Include="src\misc\stb_image.h" />
+    <ClInclude Include="src\Model.h" />
+    <ClInclude Include="src\ModelInstance.h" />
+    <ClInclude Include="src\SceneManager.h" />
+    <ClInclude Include="src\Shader.h" />
+    <ClInclude Include="src\ShaderManager.h" />
+    <ClInclude Include="src\ShaderProgram.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -89,7 +108,12 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
