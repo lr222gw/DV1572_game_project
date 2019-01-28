@@ -1,9 +1,3 @@
-#pragma once
-
-class AssetManager; < -funktion: ladda in modeller(returnerar ett handle)
-
-class SceneManager; < -funktion: instantiera modeller som laddats in via AssetManager samt rendrera ?
-
 //Todo; 
    //-Implementera AssetManager, Se till att Importering av Modell-filer genom Assimp Fungerar (Insperation kolla på Shadermanager)
          //LoadModel() 
@@ -20,6 +14,12 @@ class SceneManager; < -funktion: instantiera modeller som laddats in via AssetMa
          //   auto delta_t = ...;
          //   scene.render(view, delta_t);
          //}
+		 
+		 
+class AssetManager; < -funktion: ladda in modeller(returnerar ett handle)
+
+class SceneManager; < -funktion: instantiera modeller som laddats in via AssetManager samt rendrera ?
+
 
 class AssetManager {
 public:
