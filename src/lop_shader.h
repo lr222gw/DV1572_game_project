@@ -3,14 +3,16 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-//#include <glad/glad.h>
-#include <GL/glew.h>
-#include <glm/glm.hpp>
+//#include "misc/defs.h"
 
-#include <string>
-#include <fstream>
-#include <sstream>
-#include <iostream>
+//#include <glad/glad.h>
+//#include <GL/glew.h>
+//#include <glm/glm.hpp>
+
+//#include <string>
+//#include <fstream>
+//#include <sstream>
+//#include <iostream>
 
 class Shader
 {

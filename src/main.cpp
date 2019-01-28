@@ -5,6 +5,12 @@
 #include "misc/ImGui/imgui_impl_glfw.h"
 #include "misc/ImGui/imgui_impl_opengl3.h"
 
+//#include "misc/stb_image.h" //TODO: ska denna  vara här?
+
+#include "AssetManager.h"
+
+//#include "misc/stb_image.h" //TODO: ska denna  vara här?
+
 //Temporära bibliotek (och sånt) för temporära lösningar
 //#include "lop_Model.h"
 //#include "main.h"
@@ -540,6 +546,11 @@ Int32 main( Int32 argc, char const *argv[] ) {
 	// activate depth test and stencil test for openGL
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_STENCIL_TEST);
+
+   //testa   vår AssetManager TODO: heh 
+   //AssetManager assMan{};
+   //SharedPtr<Model> myModel = assMan.load_model("nanosuit.obj");
+
 
  // main loop:
 	while (!glfwWindowShouldClose(window)) {

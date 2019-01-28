@@ -1,13 +1,14 @@
 #pragma once
 
 #include "misc/defs.h"
-#include "lop_Model.h"
-#include "Config.h"
+#include "Model.h"
+//#include "lop_Model.h"
+//#include "Config.h" TODO: Hur kan vi ha Config här? Ska vi det?
 
 class AssetManager {
 public:
    // TODO: embed type into filename? extract from within file?
-   [[nodiscard]] SharedPtr<Model> load_model(String const &filename);   
+   [[nodiscard]] SharedPtr<Model>(String const &filename);   
 
 private:
    /*

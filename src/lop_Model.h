@@ -4,25 +4,30 @@
 #define STB_IMAGE_IMPLEMENTATION
 
 //#include <glad/glad.h> 
-#include <GL/glew.h>
+//#include <GL/glew.h>
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+//#include <glm/glm.hpp>
+//#include <glm/gtc/matrix_transform.hpp>
 
-#include "misc/stb_image.h"
+
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+#include "misc/stb_image.h" //TODO: ska denna  vara här?
+
 #include "lop_mesh.h"
 #include "lop_shader.h"
 
-#include <string>
-#include <fstream>
-#include <sstream>
-#include <iostream>
-#include <map>
-#include <vector>
+//#include <string>
+//#include <fstream>
+//#include <sstream>
+//#include <iostream>
+//#include <map>
+//#include <vector>
+
+//#include "misc/defs.h"
+
 using namespace std;
 
 unsigned int TextureFromFile(const char *path, const string &directory, bool gamma = false);
