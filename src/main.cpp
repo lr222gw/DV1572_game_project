@@ -527,6 +527,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 //	CameraData cam = make_camera();
 //	Renderer renderer(std::move(cam));
 
+
    //Gör Instans av ShaderManager
       //Följande kod skrivs här, men ska brytas ut till en lämpligare placering
          //Ladda in Shaders

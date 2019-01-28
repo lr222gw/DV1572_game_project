@@ -7,6 +7,8 @@
 
 class ShaderManager {
 public:
+      //TODO: ingen konstruktor? 
+
    // TODO: embed type into filename? extract from within file?
    [[nodiscard]] SharedPtr<Shader> load_shader(String const &filename);
       //TODO: (LOW PRIORITY) just nu kan vi ha ,t.ex., flera VertexShader till ett program => ogitligt program
