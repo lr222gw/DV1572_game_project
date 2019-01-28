@@ -31,7 +31,7 @@ public:
 
 private:
 
-   Uint32 VAO,
+   GLuint VAO,
           VBO,
           EBO;
 

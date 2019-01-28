@@ -34,8 +34,13 @@ ShaderProgram::ShaderProgram(
   // _shader_programs[id] = _program_location;
 }
 
+const GLuint ShaderProgram::getProgramLoc() {
+   return _program_location;
+}
+
 ShaderProgram::~ShaderProgram() {
    for (auto &shader_ptr : _shader_ptrs)
       glDetachShader(_program_location, shader_ptr->get_location());
+
    glDeleteProgram(_program_location);
 }
