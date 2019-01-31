@@ -7,8 +7,9 @@
 
 class AssetManager {
 public:
+
    // TODO: embed type into filename? extract from within file?
-   [[nodiscard]] SharedPtr<Model>(String const &filename);   
+   [[nodiscard]]SharedPtr<Model> loadModel(String const &filename);   
 
 private:
    /*

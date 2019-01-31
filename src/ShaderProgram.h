@@ -28,7 +28,7 @@ public:
       Vector<SharedPtr<Shader>> const &shader_ptrs
       /*, UniformInitializer initializer*/);
          //initializer list finns i .cpp filen
-
+   const GLuint getProgramLoc();
    ~ShaderProgram();
 
 private:

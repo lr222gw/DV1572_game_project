@@ -1,11 +1,11 @@
 #include "AssetManager.h"
 
-SharedPtr<Model> AssetManager::load_model(String const &filename) {
+SharedPtr<Model> AssetManager::loadModel(String const &filename) {
    if (_model_is_loaded[filename] && !_loaded_models[filename].expired()) {
       return _loaded_models[filename].lock(); // return the shared pointer made from the weak pointer
    }
    else {         
-      string filenameAndDir = "dat\\meshes\\" + filename;
+      String filenameAndDir = "dat\\meshes\\" + filename;
       auto model_ptr = std::make_shared<Model>(filenameAndDir);
       
       _model_is_loaded[filename] = true; // TODO: (låg prio) kommer aldrig att bli falsk; ej skalbart dynamiskt
