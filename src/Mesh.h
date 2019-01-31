@@ -5,36 +5,36 @@
 #include "ShaderProgram.h"
 
 struct Vertex {
-   glm::vec3 Position;
-   glm::vec3 Normal;
-   glm::vec2 TexCoord;
+   glm::vec3 position;
+   glm::vec3 normal;
+   glm::vec2 uv;//texCoord
 };
 
 struct Texture {
    Uint32 id;
    String type;
-
+   String path;
 };
 
 class Mesh {
 public:
-   Vector<Vertex>    Vertex_list;
-   Vector<Uint32>    Index_list;
-   Vector<Texture>   Texture_list;
+   Vector<Vertex>    vertex_list;
+   Vector<Uint32>    index_list;
+   Vector<Texture>   texture_list;
 
    Mesh(Vector<Vertex> vert_list, Vector<Uint32> index_list, Vector<Texture> texture_list) :
-      Vertex_list(vert_list), Index_list(index_list), Texture_list(texture_list) {
-         initializeMesh();
+      vertex_list(vert_list), index_list(index_list), texture_list(texture_list) {
+         _initialize_mesh();
    };
 
    void draw(ShaderProgram shaderProgram);
 
 private:
 
-   GLuint VAO,
-          VBO,
-          EBO;
+   GLuint _vao,
+          _vbo,
+          _ebo;
 
-   void initializeMesh();
+   void _initialize_mesh();
 
 };
