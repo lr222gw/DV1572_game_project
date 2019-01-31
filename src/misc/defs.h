@@ -50,7 +50,7 @@
                             using Int32        = int32_t;
                             using Int64        = int64_t;
 // byte type:
-                            using Byte         = unsigned char;
+                            using Byte         = std::byte;
 // glm vectors:
                             using Vec2         = glm::vec2;
                             using Vec3         = glm::vec3;
