@@ -2,6 +2,9 @@
 
 #include "misc/defs.h"
 #include "Model.h"
+
+#include "Config.h"
+
 //#include "lop_Model.h"
 //#include "Config.h" TODO: Hur kan vi ha Config här? Ska vi det?
 
