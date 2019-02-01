@@ -18,7 +18,7 @@ void Mesh::_initialize_mesh() {
    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ebo);
    glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_list.size() * sizeof(Uint32), &index_list[0], GL_STATIC_DRAW);
 
-   //Attributes för Vertex Strukten; Position, Normal och TexturKoordinat
+   //Attributes fï¿½r Vertex Strukten; Position, Normal och TexturKoordinat
    //Position
    glEnableVertexAttribArray(0);
    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
@@ -34,18 +34,18 @@ void Mesh::_initialize_mesh() {
    glBindVertexArray(0);
 }
 
-void Mesh::_draw(ShaderProgram &shader_program) {
+void Mesh::_draw(ShaderProgram &shaderProgram) {
    GLuint diffuseNr = 1;
    GLuint specularNr = 1;
    GLuint normalNr = 1;
 
    for (GLuint i = 0; i < this->texture_list.size(); i++) {
       
-      //ställa in vilken Textur vi jobbar på, vi kan högst ha 32 (eller 16?)
+      //stï¿½lla in vilken Textur vi jobbar pï¿½, vi kan hï¿½gst ha 32 (eller 16?)
       glActiveTexture(GL_TEXTURE0 + i); 
          // varv 1; i = 0; GL_TEXTURE0 + i = GL_TEXTURE0;;; varv 2; i = 1 ; GL_TEXTURE0 + i = GL_TEXTURE1, osv.
 
-      //Vi hämtar datan 
+      //Vi hï¿½mtar datan 
       std::stringstream ss; 
       String number;
       String name = this->texture_list[i].type; 
@@ -62,16 +62,16 @@ void Mesh::_draw(ShaderProgram &shader_program) {
 
       number = ss.str();
 
-      glUniform1i(glGetUniformLocation(shader_program.getProgramLoc(), (name + number).c_str()), i);
+      glUniform1i(glGetUniformLocation(shaderProgram->getProgramLoc(), (name + number).c_str()), i);
       glBindTexture(GL_TEXTURE_2D, this->texture_list[i].id);
    }
 
-   glUniform1f(glGetUniformLocation(shader_program.getProgramLoc(), "material.shininess"), 16.0f);
+   glUniform1f(glGetUniformLocation(shaderProgram->getProgramLoc(), "material.shininess"), 16.0f);
 
    glBindVertexArray(this->_vao);
    glDrawElements(GL_TRIANGLES, this->index_list.size(), GL_UNSIGNED_INT, 0);
 
-   //Bind OpenGL till standard värderna...
+   //Bind OpenGL till standard vï¿½rderna...
    glBindVertexArray(0);
    for (GLuint i = 0; i < this->texture_list.size(); i++) {
 
