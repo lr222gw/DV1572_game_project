@@ -6,16 +6,16 @@
 
 void Mesh::_initialize_mesh() {
 
-   glGenVertexArrays(1, &VAO);
-   glGenBuffers(1, &VBO);
-   glGenBuffers(1, &EBO);
+   glGenVertexArrays(1, &_vao);
+   glGenBuffers(1, &_vbo);
+   glGenBuffers(1, &_ebo);
 
-   glBindVertexArray(VAO);
-   glBindBuffer(GL_ARRAY_BUFFER, VBO);
+   glBindVertexArray(_vao);
+   glBindBuffer(GL_ARRAY_BUFFER, _vbo);
 
    glBufferData(GL_ARRAY_BUFFER, vertex_list.size() * sizeof(Vertex), &vertex_list[0], GL_STATIC_DRAW);
    
-   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ebo);
    glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_list.size() * sizeof(Uint32), &index_list[0], GL_STATIC_DRAW);
 
    //Attributes för Vertex Strukten; Position, Normal och TexturKoordinat
@@ -25,11 +25,11 @@ void Mesh::_initialize_mesh() {
                       //0 indicates that this is the first Element of a Struct, 
    //Normal
    glEnableVertexAttribArray(1);
-   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Normal));
+   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
                       //1 indicates that this is the second element of  the struct
    //TextureKoordinat
    glEnableVertexAttribArray(2);
-   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoord));
+   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, uv));
                      //2 indicates that this is the third element of  the struct
    glBindVertexArray(0);
 }
@@ -64,7 +64,7 @@ void Mesh::draw(ShaderProgram shaderProgram) {
 
    glUniform1f(glGetUniformLocation(shaderProgram.getProgramLoc(), "material.shininess"), 16.0f);
 
-   glBindVertexArray(this->VAO);
+   glBindVertexArray(this->_vao);
    glDrawElements(GL_TRIANGLES, this->index_list.size(), GL_UNSIGNED_INT, 0);
 
 

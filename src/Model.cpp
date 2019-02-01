@@ -1,9 +1,53 @@
 #include "Model.h"
 
-#include "misc/defs.h"
+//#include "misc/defs.h"
 
 
-Uint32 load_texture_from_file(String const str);
+Uint32 load_texture_from_file(FilePath path) {
+
+   Uint32 texture_id;
+   glGenTextures(1, &texture_id);
+
+   Int32 width, height, channel_count;
+   //Byte istället för Unsigned Char, samma storlek...
+   Uint8 *image_data = stbi_load(path.relative_path().c_str(), &width, &height, &channel_count, 0);
+
+   if (image_data) {
+      GLenum format;
+      if (1 == channel_count)
+         format = GL_RED;
+      else if (3 == channel_count)
+         format = GL_RGB;
+      else if (4 == channel_count)
+         format = GL_RGBA;
+
+      glBindTexture(GL_TEXTURE_2D, texture_id);
+      glTexImage2D(GL_TEXTURE_2D,
+         0,
+         format,
+         width,
+         height,
+         0,
+         format,
+         GL_UNSIGNED_BYTE,
+         image_data);
+      glGenerateMipmap(GL_TEXTURE_2D);
+
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+   }
+   else {
+      //TODO: FMT bibliotek här, sträng hantering?
+      assert(false && String("Error While Loading Texture using \"load_texture_from_file\": " + path.relative_path() + " \n").c_str());
+   }
+
+   stbi_image_free(image_data);
+
+   return texture_id;
+}
 
 Model::Model(String const &filename) {
    
@@ -128,33 +172,29 @@ Mesh Model::_process_mesh(aiMesh *mesh, const aiScene *scene) {
    }   
 
    //Implement more MaterialMaps based on ASSIMP's aiTextureType's (Enums) 
+   return Mesh(a_vertex_list, a_index_list,a_texture_list);
 }
-   
+
+//TODO: Bryta ut "_load_material_textures" och "load_texture_from_file" till TextureHandler
+// Undvik att ladda in en textur som redan är inladdad... 
 Vector<Texture> Model::_load_material_textures(aiMaterial *material, aiTextureType type, String type_name) {
    Vector<Texture> texture_list;
    
    for (Uint32 i = 0; i < material->GetTextureCount(type); i++) {
 
       aiString str;
-      material->GetTexture(type, i, &str);
+      material->GetTexture(type, i, &str);      
 
+      String path_to_file = config::model_path + String(str.C_Str());
+      FilePath path{ FileType::texture, String(str.C_Str()) };
+      
       Texture texture;
-      texture.id = TextureFromFile;
-      texture.type = ;
-      texture.path = ;
-
+      texture.id = load_texture_from_file(path);
+      texture.type = type_name;
+      texture.path = path.relative_path();
+      texture_list.push_back(texture);
    }
+
+   return texture_list;
 }
 
-Uint32 load_texture_from_file(String const &file_name) {
-
-   String path_to_file = config::model_path + file_name;
-
-   Uint32 texture_id;
-   glGenTextures(1, &texture_id);
-
-   Uint32 width, height, nr_components;
-   Unsigned
-
-
-}
