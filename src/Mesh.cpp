@@ -34,9 +34,10 @@ void Mesh::_initialize_mesh() {
    glBindVertexArray(0);
 }
 
-void Mesh::draw(ShaderProgram shaderProgram) {
+void Mesh::_draw(ShaderProgram *shaderProgram) {
    GLuint diffuseNr = 1;
    GLuint specularNr = 1;
+   GLuint normalNr = 1;
 
    for (GLuint i = 0; i < this->texture_list.size(); i++) {
       
@@ -49,24 +50,26 @@ void Mesh::draw(ShaderProgram shaderProgram) {
       String number;
       String name = this->texture_list[i].type; 
 
-      if ("texture_diffuse" == name) {
+      if ("tex_diff" == name) {
          ss << diffuseNr++;
       }
-      else if ("texture_specular" == name) {
+      else if ("tex_spec" == name) {
          ss << specularNr++;
+      }
+      else if ("tex_norm" == name) {
+         ss << normalNr++;
       }
 
       number = ss.str();
 
-      glUniform1i(glGetUniformLocation(shaderProgram.getProgramLoc(), (name + number).c_str()), i);
+      glUniform1i(glGetUniformLocation(shaderProgram->getProgramLoc(), (name + number).c_str()), i);
       glBindTexture(GL_TEXTURE_2D, this->texture_list[i].id);
    }
 
-   glUniform1f(glGetUniformLocation(shaderProgram.getProgramLoc(), "material.shininess"), 16.0f);
+   glUniform1f(glGetUniformLocation(shaderProgram->getProgramLoc(), "material.shininess"), 16.0f);
 
    glBindVertexArray(this->_vao);
    glDrawElements(GL_TRIANGLES, this->index_list.size(), GL_UNSIGNED_INT, 0);
-
 
    //Bind OpenGL till standard värderna...
    glBindVertexArray(0);

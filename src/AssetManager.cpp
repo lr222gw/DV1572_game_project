@@ -1,6 +1,6 @@
 #include "AssetManager.h"
 
-SharedPtr<Model> AssetManager::loadModel(String const &filename) {
+SharedPtr<Model> AssetManager::load_model(String const &filename) {
    if (_model_is_loaded[filename] && !_loaded_models[filename].expired()) {
       return _loaded_models[filename].lock(); // return the shared pointer made from the weak pointer
    }

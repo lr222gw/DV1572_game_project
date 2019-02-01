@@ -57,41 +57,48 @@ Model::Model(String const &filename) {
 
 void Model::_load_model(String const &filename) {
 
-   // read file via ASSIMP
+   // Använder Assimps Importer klass för att importera en Modelfil.
    Assimp::Importer importer;
-   const aiScene* scene = importer.ReadFile(filename, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
-   // check for errors
-   if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
-   {
-      std::cout << "ERROR::ASSIMP:: " << importer.GetErrorString() << std::endl;
-      return;
-   }
-   // retrieve the directory path of the filepath
-   //directory = path.substr(0, path.find_last_of('/'));
+   //Vi får en Scene, den innehåller alla data för modellen; Normaler, Vertricer, matrial, etc
+                  //aiProcess_Triangulate       : Om Modellen inte består av trianglar så gör den allt till trianglar
+                  //aiProcess_FlipUVs           : Flippar UV'n på Y-axeln     
+                  // Finns fler Post-Processing Options för Assimp
+   aiScene const *  scene = importer.ReadFile(filename, aiProcess_Triangulate | aiProcess_FlipUVs);
 
-   // process ASSIMP's root node recursively
+   bool encounteredError = !scene || (scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) || !scene->mRootNode;
+   if (encounteredError) // if is Not Zero
+   {
+      assert(false && String("Error; Assimp: " + String(importer.GetErrorString()) + "\n").c_str());            
+   }
+
    _process_node(scene->mRootNode, scene);
 }
 
-void Model::_process_node(aiNode *node, const aiScene *scene)
+void Model::_process_node(aiNode *node,  aiScene const *scene)
 {
-   // process each mesh located at the current node
-   for (unsigned int i = 0; i < node->mNumMeshes; i++)
-   {
-      // the node object only contains indices to index the actual objects in the scene. 
-      // the scene contains all the data, node is just to keep stuff organized (like relations between nodes).
+   //Gå igenom varje Node (eller childNodes) Mesh, ProcessMesh för varje mesh
+   for (Uint32 i = 0; i < node->mNumMeshes; i++)
+   {      
       aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
       _mesh_list.push_back(_process_mesh(mesh, scene));
    }
-   // after we've processed all of the meshes (if any) we then recursively process each of the children nodes
-   for (unsigned int i = 0; i < node->mNumChildren; i++)
+
+   //När Noden's Mesh är behandlad gör vi samma med Nodens ChildNodes
+   for (Uint32 i = 0; i < node->mNumChildren; i++)
    {
       _process_node(node->mChildren[i], scene);
    }
-
+   
 }
 
-Mesh Model::_process_mesh(aiMesh *mesh, const aiScene *scene) {
+void Model::draw(ShaderProgram *shaderProgram) {
+  
+   for (auto &e : get_mesh_list()) {
+      e._draw(shaderProgram);
+   }
+}
+
+Mesh Model::_process_mesh(aiMesh *mesh, aiScene const *scene) {
    Vector<Vertex> a_vertex_list;
    Vector<Uint32> a_index_list;
    Vector<Texture> a_texture_list;
@@ -106,7 +113,7 @@ Mesh Model::_process_mesh(aiMesh *mesh, const aiScene *scene) {
 
       // vi binder en referens till en av de vertricerna vi
       // förallkorat; 
-      Vertex &vertex = a_vertex_list[i];
+      Vertex vertex;
       
       // sen sätter vi värden för Position, Normal och uv
       // på den Vertexen i Listan...
@@ -120,14 +127,16 @@ Mesh Model::_process_mesh(aiMesh *mesh, const aiScene *scene) {
       
       //Innehåller vår mesh textures över huvudtaget?
       if (mesh->mTextureCoords[0]) {
-         vertex.uv.x = mesh->mTextureCoords[i]->x;
-         vertex.uv.y = mesh->mTextureCoords[i]->y;
+         
+         vertex.uv.x = mesh->mTextureCoords[0][i].x;
+         vertex.uv.y = mesh->mTextureCoords[0][i].y;
       }
       else {
          vertex.uv.x = 0.0f;
          vertex.uv.y = 0.0f;
       }           
-         
+      
+      a_vertex_list.push_back(vertex);
    }
 
    //En loop som går igenom Totala antalet Indicies
@@ -141,11 +150,11 @@ Mesh Model::_process_mesh(aiMesh *mesh, const aiScene *scene) {
    }
    
    a_index_list.reserve(nmrOfIndiciesTotal);
-
+   Uint32 counter = 0; 
    for (Uint32 i = 0; i < nmrFaces; i++) {
-      for (Uint32 j = 0; j < mesh->mFaces[j].mNumIndices; j++) {
-         //Då vi allokerat index-listan kan vi köra följande rad
-         a_index_list[j] = mesh->mFaces[j].mIndices[j];
+      for (Uint32 j = 0; j < mesh->mFaces[i].mNumIndices; j++) {
+         //Då vi allokerat index-listan kan vi köra följande rad         
+         a_index_list.push_back(mesh->mFaces[i].mIndices[j]);
       }
    }
    
