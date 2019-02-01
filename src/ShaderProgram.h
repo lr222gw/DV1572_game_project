@@ -24,14 +24,15 @@ public:
    using Id = Uint32; // 32-bit representation used to representate shader programs with unique Ids.
    
    // TODO: (low priority) make constructor private and make make_shared a friend
-   ShaderProgram(
-      Vector<SharedPtr<Shader>> const &shader_ptrs
-      /*, UniformInitializer initializer*/);
-         //initializer list finns i .cpp filen
-   const GLuint getProgramLoc();
+   ShaderProgram( Vector<SharedPtr<Shader>> const &shader_ptrs );
+   //initializer list finns i .cpp filen
+   GLuint getProgramLoc() const;
    ~ShaderProgram();
+
+   GLuint get_transform_location() const;
 
 private:
    GLuint                     _program_location;
+   GLuint                     _transform_location;
    Vector<SharedPtr<Shader>>  _shader_ptrs;
 };

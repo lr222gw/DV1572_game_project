@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<config>
+    <source_groups>
+        <source_group_70f02570-8eed-4ef3-a4e1-776cba12c722>
+            <compiler_flags>
+                <compiler_flag>-Wall -Wformat -std=c++1z -lGL -lGLU -lglfw -lGLEW -lassimp</compiler_flag>
+            </compiler_flags>
+            <cpp_standard>c++17</cpp_standard>
+            <cross_compilation>
+                <target>
+                    <abi>unknown</abi>
+                    <arch>x86_64</arch>
+                    <sys>unknown</sys>
+                    <vendor>unknown</vendor>
+                </target>
+                <target_options_enabled>0</target_options_enabled>
+            </cross_compilation>
+            <header_search_paths>
+                <header_search_path>/usr/local/include</header_search_path>
+            </header_search_paths>
+            <name>C++ Source Group</name>
+            <source_extensions>
+                <source_extension>.cpp</source_extension>
+                <source_extension>.cxx</source_extension>
+                <source_extension>.cc</source_extension>
+                <source_extension>.h</source_extension>
+                <source_extension>.hpp</source_extension>
+            </source_extensions>
+            <source_paths>
+                <source_path>src/main.cpp</source_path>
+                <source_path>src</source_path>
+            </source_paths>
+            <status>enabled</status>
+            <type>C++ Source Group</type>
+        </source_group_70f02570-8eed-4ef3-a4e1-776cba12c722>
+    </source_groups>
+    <version>7</version>
+</config>
