@@ -3,11 +3,12 @@
 
 namespace config {
    static constexpr Int32     height = 768,
-                              width  = 1024;
+                              width = 1024;
 
    static constexpr Float32   near_plane = 0.01f,
-                              far_plane  = 100.0f,
-                              fov_rad    = 0.01f;
+                              far_plane = 100.0f,
+                              fov_rad = 1.5708f, //90 grader i radianer
+                              aspect_ratio = (Float32)height / (Float32)width;
 
    String const shader_path { "dat/shaders/" };
    String const model_path  { "dat/models/" };
