@@ -17,6 +17,9 @@ struct Texture {
 };
 
 class Mesh {
+   friend class Model; //Ger oss tillgång till Mesh's privata
+                       //funktioner från Model klassen
+
 public:
    Vector<Vertex>    vertex_list;
    Vector<Uint32>    index_list;
@@ -27,14 +30,12 @@ public:
          _initialize_mesh();
    };
 
-   void draw(ShaderProgram shaderProgram);
-
 private:
-
    GLuint _vao,
           _vbo,
           _ebo;
 
+   void _draw(ShaderProgram *shaderProgram);
    void _initialize_mesh();
 
 };

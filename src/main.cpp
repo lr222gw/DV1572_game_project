@@ -8,6 +8,7 @@
 #include "misc/ImGui/imgui_impl_opengl3.h"
 
 #include "AssetManager.h"
+#include "ShaderManager.h"
 
 //#include "misc/stb_image.h" //TODO: ska denna  vara här?
 
@@ -548,8 +549,15 @@ Int32 main( Int32 argc, char const *argv[] ) {
 	glEnable(GL_STENCIL_TEST);
 
    //testa   vår AssetManager TODO: heh 
-   //AssetManager assMan{};
-   //SharedPtr<Model> myModel = assMan.load_model("nanosuit.obj");
+   ShaderManager shaMan{};
+   auto fraShader = shaMan.load_shader("fraSha.fs");
+   auto vertShader = shaMan.load_shader("vertSha.vs");
+
+   auto shaProg = shaMan.create_program({fraShader, vertShader});
+
+   AssetManager assMan{};
+   SharedPtr<Model> myModel = assMan.load_model("12330_Statue_v1_L2.obj");
+   
 
 
  // main loop:
@@ -580,6 +588,10 @@ Int32 main( Int32 argc, char const *argv[] ) {
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 // programkod här
+      //myMinstance->ttranceform(aTransformMatris)
+      //myMinstance->render(&*shaProg);
+
+
 		float dt_time_s = ImGui::GetIO().DeltaTime;
 		// glBindBuffer(GL_UNIFORM_BUFFER, gUniformBuffer);
 		// Render();

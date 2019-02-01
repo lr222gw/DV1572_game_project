@@ -9,9 +9,9 @@ namespace config {
                               far_plane  = 100.0f,
                               fov_rad    = 0.01f;
 
-   String const shader_path { "./dat/shader/" };
-   String const model_path  { "./dat/models/" };
-   String const texture_path{ "./dat/models/" }; //TODO: behöver vi en Texture mapp?
+   String const shader_path { "dat/shaders/" };
+   String const model_path  { "dat/models/" };
+   String const texture_path{ "dat/models/" }; //TODO: behöver vi en Texture mapp?
 };
 
 enum class FileType { model, texture };

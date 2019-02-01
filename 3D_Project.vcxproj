@@ -33,6 +33,7 @@
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\ShaderManager.cpp" />
     <ClCompile Include="src\ShaderProgram.cpp" />
+    <ClCompile Include="src\ViewPort.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\AssetManager.h" />
@@ -58,6 +59,11 @@
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\ShaderManager.h" />
     <ClInclude Include="src\ShaderProgram.h" />
+    <ClInclude Include="src\ViewPort.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="dat\shaders\fraSha.fs" />
+    <None Include="dat\shaders\vertSha.vs" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
