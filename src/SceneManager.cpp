@@ -1,9 +1,9 @@
 #include "SceneManager.h"
 
 SharedPtr<ModelInstance> SceneManager::instantiate_model(
-   String const                  &model_name,
-   SharedPtr<ModelShaderProgram>  shader_program,
-   Vec3                           global_position )
+   String const             &model_name,
+   SharedPtr<ShaderProgram>  shader_program,
+   Vec3                      global_position )
 {
    // SharedPtr<Model>, SharedPtr<ShaderProgram>
    // r r r t   |  1 0 0 x
