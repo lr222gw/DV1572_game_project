@@ -1,17 +1,19 @@
 #pragma once
 
 #include "misc/defs.h"
+#include "ModelInstance"
+#include "ShaderProgram"
 
 class SceneManager {
 
    SharedPtr<ModelInstance> instantiate_model(
       String const                  &model_name,
-      SharedPtr<ModelShaderProgram>  shader_program,
+      SharedPtr<ShaderProgram>       shader_program,
       Vec3                           global_position={0,0,0} );
 
 
    void draw();
-   
+
 private:
    Vector<WeakPtr<ModelInstance> _instances;
 };
