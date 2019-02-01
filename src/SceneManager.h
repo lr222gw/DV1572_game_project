@@ -1,7 +1,17 @@
 #pragma once
 
+#include "misc/defs.h"
+
 class SceneManager {
 
+   SharedPtr<ModelInstance> instantiate_model(
+      String const                  &model_name,
+      SharedPtr<ModelShaderProgram>  shader_program,
+      Vec3                           global_position={0,0,0} );
 
 
+   void draw();
+   
+private:
+   Vector<WeakPtr<ModelInstance> _instances;
 };

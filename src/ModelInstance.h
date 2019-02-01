@@ -13,7 +13,7 @@ public:
       _shader_program(shader_program),
       _transform(transform)      
    {}
-   void draw(GLuint transform_location);
+   void draw();
    void transform(Mat4 transform);   
 
 

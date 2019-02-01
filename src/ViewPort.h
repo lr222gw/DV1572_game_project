@@ -7,32 +7,11 @@
 // TODO: uppåt vektorn baserat på normalen av ytan spelaren står på
 class Viewport {
 public:
-   Viewport(Vec3 position = { 0,0,0 }, Float32 fov = config::fov_rad): 
-      _fov(fov)
-   {
-      // TODO: bind _camera och uniform buffer för Mat4
-      
-      _model = Mat4(1.0f);
-      _view = glm::lookAt(position, position + Vec3{0, 0, 1}, Vec3{ 0,1,0 });
-      _projection = glm::perspective(fov,
-                                    config::aspect_ratio,
-                                    config::near_plane, 
-                                    config::far_plane);
-      
-      _write_to_buffer();
-    
-   }
+   Viewport( Vec3 position = { 0,0,0 }, Float32 fov = config::fov_rad );
 
-   void transform(Mat4 transformation) {
-      _model *= transformation;
-      _write_to_buffer();
-   }
+   void transform(Mat4 transformation);
 
-   void bind_shader_program(ShaderProgram &shapro) {
-      
-      _location = glGetUniformLocation(shapro.getProgramLoc(), "view_tranform");
-      _write_to_buffer();
-   }
+   void bind_shader_program(ShaderProgram &shapro);
 
 private:
    void _write_to_buffer() {

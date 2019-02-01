@@ -24,7 +24,5 @@ private:
   */
   HashMap<String,WeakPtr<Shader>>  _loaded_shaders;         // maps filenames to weak pointers
   HashMap<String,Bool>             _shader_is_loaded;
-  
-
 };
 
