@@ -12,8 +12,6 @@ public:
    {
       // TODO: bind _camera och uniform buffer för Mat4
       
-      Uint32 cam_loc = glGenUniformLocation();
-
       _model = Mat4(1.0f);
       _view = glm::lookAt(position, position + Vec3{0, 0, 1}, Vec3{ 0,1,0 });
       _projection = glm::perspective(fov,

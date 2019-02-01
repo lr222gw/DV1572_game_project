@@ -91,7 +91,7 @@ void Model::_process_node(aiNode *node,  aiScene const *scene)
    
 }
 
-void Model::draw(ShaderProgram *shaderProgram) {
+void Model::draw(ShaderProgram &shaderProgram) {
   
    for (auto &e : get_mesh_list()) {
       e._draw(shaderProgram);

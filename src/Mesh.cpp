@@ -34,7 +34,7 @@ void Mesh::_initialize_mesh() {
    glBindVertexArray(0);
 }
 
-void Mesh::_draw(ShaderProgram *shaderProgram) {
+void Mesh::_draw(ShaderProgram &shaderProgram) {
    GLuint diffuseNr = 1;
    GLuint specularNr = 1;
    GLuint normalNr = 1;
