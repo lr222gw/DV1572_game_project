@@ -1,11 +1,11 @@
+#define STB_IMAGE_IMPLEMENTATION //Den bor här annars kompilerar inte stb_image.h
+
 #include "misc/defs.h"
 #include "Config.h"
 
 #include "misc/ImGui/imgui.h"
 #include "misc/ImGui/imgui_impl_glfw.h"
 #include "misc/ImGui/imgui_impl_opengl3.h"
-
-//#include "misc/stb_image.h" //TODO: ska denna  vara här?
 
 #include "AssetManager.h"
 

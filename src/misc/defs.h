@@ -26,7 +26,6 @@
 #include <map>
 #include <optional>
 
-
 #include "enum.h"
 
 #include <GL/glew.h> // <- always include before gl.h & glfw3.h
@@ -34,7 +33,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-//#include "misc/stb_image.h" //TODO: ska denna  vara här?
+
+#include "misc/stb_image.h" 
 //
 
 // #include <string_view>
@@ -49,6 +49,8 @@
                             using Int16        = int16_t;
                             using Int32        = int32_t;
                             using Int64        = int64_t;
+// byte type:
+                            using Byte         = std::byte;
 // glm vectors:
                             using Vec2         = glm::vec2;
                             using Vec3         = glm::vec3;
