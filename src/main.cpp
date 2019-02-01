@@ -354,7 +354,7 @@ inline glm::mat4  generate_perspective_matrix
    Float32  aspect = (Float32)config::width / (Float32)config::height;
    return glm::perspective(config::fov_rad, aspect, config::near_plane, config::far_plane);
 }
-
+ 
 
 
 

@@ -20,7 +20,7 @@ public:
       return _mesh_list;
    }   
 
-   void draw(ShaderProgram *shaderProgram);
+   void draw(ShaderProgram &shaderProgram);
 
 private:
    Vector<Texture> _texture_list;

@@ -35,7 +35,7 @@ private:
           _vbo,
           _ebo;
 
-   void _draw(ShaderProgram *shaderProgram);
+   void _draw(ShaderProgram &shaderProgram);
    void _initialize_mesh();
 
 };
