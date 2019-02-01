@@ -66,8 +66,7 @@ void Model::_load_model(String const &filename) {
    aiScene const *  scene = importer.ReadFile(filename, aiProcess_Triangulate | aiProcess_FlipUVs);
 
    bool encounteredError = !scene || (scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) || !scene->mRootNode;
-   if (encounteredError) // if is Not Zero
-   {
+   if (encounteredError) {// if is Not Zero
       assert(false && String("Error; Assimp: " + String(importer.GetErrorString()) + "\n").c_str());            
    }
 

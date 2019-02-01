@@ -15,5 +15,5 @@ class SceneManager {
    void draw();
 
 private:
-   Vector<WeakPtr<ModelInstance> _instances;
+   Vector<WeakPtr<ModelInstance>> _instances;
 };

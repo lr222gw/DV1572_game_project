@@ -34,7 +34,7 @@ void Mesh::_initialize_mesh() {
    glBindVertexArray(0);
 }
 
-void Mesh::_draw(ShaderProgram &shaderProgram) {
+void Mesh::_draw(ShaderProgram &shader_program) {
    GLuint diffuseNr = 1;
    GLuint specularNr = 1;
    GLuint normalNr = 1;
@@ -62,11 +62,11 @@ void Mesh::_draw(ShaderProgram &shaderProgram) {
 
       number = ss.str();
 
-      glUniform1i(glGetUniformLocation(shaderProgram->getProgramLoc(), (name + number).c_str()), i);
+      glUniform1i(glGetUniformLocation(shader_program.getProgramLoc(), (name + number).c_str()), i);
       glBindTexture(GL_TEXTURE_2D, this->texture_list[i].id);
    }
 
-   glUniform1f(glGetUniformLocation(shaderProgram->getProgramLoc(), "material.shininess"), 16.0f);
+   glUniform1f(glGetUniformLocation(shader_program.getProgramLoc(), "material.shininess"), 16.0f);
 
    glBindVertexArray(this->_vao);
    glDrawElements(GL_TRIANGLES, this->index_list.size(), GL_UNSIGNED_INT, 0);
