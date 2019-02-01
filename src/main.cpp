@@ -558,7 +558,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    AssetManager assMan{};
    SharedPtr<Model> myModel = assMan.load_model("12330_Statue_v1_L2.obj");
    
-   //
+   // hmmeses
 
  // main loop:
 	while (!glfwWindowShouldClose(window)) {
