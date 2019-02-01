@@ -23,7 +23,7 @@ private:
    SharedPtr<ShaderProgram> _shader_program;
    SharedPtr<Model>  _model;
 
-}
+};
 
 
 
