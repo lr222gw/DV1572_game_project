@@ -61,7 +61,7 @@ void Mesh::_draw(ShaderProgram &shader_program) {
       }
 
       number = ss.str();
-
+      // hello björn
       glUniform1i(glGetUniformLocation(shader_program.getProgramLoc(), (name + number).c_str()), i);
       glBindTexture(GL_TEXTURE_2D, this->texture_list[i].id);
    }
