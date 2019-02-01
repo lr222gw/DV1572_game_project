@@ -1,8 +1,8 @@
 #pragma once
 
 #include "misc/defs.h"
-#include "ModelInstance"
-#include "ShaderProgram"
+#include "ModelInstance.h"
+#include "ShaderProgram.h"
 
 class SceneManager {
 
