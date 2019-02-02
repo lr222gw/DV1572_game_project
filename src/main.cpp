@@ -1,6 +1,7 @@
 #define STB_IMAGE_IMPLEMENTATION //Den bor här annars kompilerar inte stb_image.h
 
 // Åke Göran Hälga
+// Öre Mås Ära
 
 #include "misc/defs.h"
 #include "Config.h"
