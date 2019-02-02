@@ -61,6 +61,8 @@
                             using Mat2         = glm::mat2;
                             using Mat3         = glm::mat3;
                             using Mat4         = glm::mat4;
+// gtc quaternion:
+                            using Quat         = glm::quat;
 // floating point types:
                             using Float32      = float;
                             using Float64      = double;
