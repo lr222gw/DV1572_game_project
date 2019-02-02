@@ -474,9 +474,9 @@ private:
 
 void draw_camera_debug_window( Float32 &rot_x, Float32 &rot_y, Float32 &rot_z ) {
    ImGui::Begin( "Camera:" );
-      ImGui::SliderFloat( "X-axis", rot_x );
-      ImGui::SliderFloat( "Y-axis", rot_y );
-      ImGui::SliderFloat( "Z-axis", rot_z );
+      ImGui::SliderAngle( "X-axis", &rot_x );
+      ImGui::SliderAngle( "Y-axis", &rot_y );
+      ImGui::SliderAngle( "Z-axis", &rot_z );
       ImGui::Spacing();
       ImGui::Text( "\t%.1f FPS (avg %.3f ms/frame)",
                   ImGui::GetIO().Framerate,
