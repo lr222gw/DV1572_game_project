@@ -66,7 +66,7 @@ void Mesh::_draw(ShaderProgram &shader_program) {
       glBindTexture(GL_TEXTURE_2D, this->texture_list[i].id);
    }
 
-   glUniform1f(glGetUniformLocation(shader_program.getProgramLoc(), "material.shininess"), 16.0f);
+   //glUniform1f(glGetUniformLocation(shader_program.getProgramLoc(), "material.shininess"), 16.0f);
 
    glBindVertexArray(this->_vao);
    glDrawElements(GL_TRIANGLES, this->index_list.size(), GL_UNSIGNED_INT, 0);

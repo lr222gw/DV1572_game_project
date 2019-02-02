@@ -16,8 +16,10 @@ SharedPtr<ModelInstance> SceneManager::instantiate_model(
         transform[2][3] = global_position.z;
 
    //auto model      = _assman->load_model(model_name); // TODO: std::move(transform)? (LÅG PRIO)
+   auto instance_ptr = std::make_shared<ModelInstance>(model, shader_program, transform);
+   _instances.push_back(instance_ptr);
 
-   return std::make_shared<ModelInstance>( model, shader_program, transform );
+   return instance_ptr;
 }
 
 void SceneManager::draw() {

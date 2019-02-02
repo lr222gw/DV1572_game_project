@@ -561,10 +561,15 @@ Int32 main( Int32 argc, char const *argv[] ) {
    SharedPtr<Model> myModel = assMan.load_model("12330_Statue_v1_L2.obj");
    
    SceneManager scenMan{};
-   SharedPtr<ModelInstance> modelInstance = scenMan.instantiate_model(myModel,shaProg, Vec3(0.0f, 0.0f, 1.0f));
+   SharedPtr<ModelInstance> modelInstance = 
+      scenMan.instantiate_model(myModel,
+                                shaProg, 
+                                Vec3(0.0f, 0.0f, 1.0f));
    //scenMan
 
-   Viewport myView {Vec3(0.0f,0.0f,-1.0f)};
+   Viewport myView { Vec3(0.0f,0.0f, -1.0f),
+                     (Vec3(0.0f,0.0f, 1.0f)),
+                     config::fov_rad};
    myView.bind_shader_program(*shaProg);
    
 
@@ -601,6 +606,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
       //myMinstance->ttranceform(aTransformMatris)
       //myMinstance->render(&*shaProg);
 
+      scenMan.draw();
 
 		float dt_time_s = ImGui::GetIO().DeltaTime;
 		// glBindBuffer(GL_UNIFORM_BUFFER, gUniformBuffer);

@@ -7,7 +7,7 @@
 // TODO: uppåt vektorn baserat på normalen av ytan spelaren står på
 class Viewport {
 public:
-   Viewport(Vec3 position = { 0,0,0 }, Vec3 rotation, Float32 fov = config::fov_rad);
+   Viewport(Vec3 position, Vec3 rotation, Float32 fov = config::fov_rad);
 
    void transform(Mat4 transformation);
 

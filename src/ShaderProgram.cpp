@@ -16,19 +16,22 @@ ShaderProgram::ShaderProgram( Vector<SharedPtr<Shader>> const &shader_ptrs):
 
    glLinkProgram(_program_location);
 
+   
    auto compile_result = GL_FALSE;
    glGetProgramiv(_program_location, GL_LINK_STATUS, &compile_result);
+
    if (compile_result == GL_FALSE) {
       // query information about the compilation (nothing if compilation went fine!)
       memset(buffer, 0, 1024);
       glGetProgramInfoLog(_program_location, 1024, nullptr, buffer);
       // print to Visual Studio debug console output
-      std::cerr << buffer << "\n"; // TODO: ersätt med assert(...)
+      assert(false && buffer);// TODO: ersätt med assert(...)
       // OutputDebugStringA(buffer);
-   }
+   }   
 
    // förvarar en modellinstans transform
-   _transform_location = glGetUniformLocation( _program_location, "model_transform" );
+   _transform_location = glGetUniformLocation(_program_location, "model_transform");
+
 
   // auto id = _generate_shader_program_id();
   // _shader_programs[id] = _program_location;

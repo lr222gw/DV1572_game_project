@@ -8,7 +8,8 @@ uniform sampler2D tex_spec1;
 uniform sampler2D tex_norm1;
 
 void main() {    
-    FragColor = texture( tex_diff1, uv_fs )
-              + texture( tex_spec1, uv_fs )
-              + texture( tex_norm1, uv_fs );
+    FragColor =     vec4(1.0f,0.0,0.0f,1.0f);
+                    //texture( tex_diff1, uv_fs )
+                    //+ texture( tex_spec1, uv_fs )
+                    //+ texture( tex_norm1, uv_fs );
 }
