@@ -42,7 +42,7 @@ void Viewport::transform(Mat4 transformation) {
 }
 
 void Viewport::bind_shader_program(ShaderProgram &shapro) {
-   _location = glGetUniformLocation(shapro.getProgramLoc(), "view_tranform");
+   _location = glGetUniformLocation(shapro.getProgramLoc(), "mvp_transform");
    _write_to_buffer();
 }
 

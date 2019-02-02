@@ -6,7 +6,7 @@ layout (location = 2) in vec2 uv_vs;
 
 out vec2 uv_fs;
 
-uniform mat4 view_tranform;
+uniform mat4 mvp_transform;
 uniform mat4 model_transform;
 
 void main()
