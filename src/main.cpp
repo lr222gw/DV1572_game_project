@@ -567,8 +567,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
                                 Vec3(0.0f, 0.0f, 1.0f));
    //scenMan
 
-   Viewport myView { Vec3(0.0f,0.0f, -1.0f),
-                     (Vec3(0.0f,0.0f, 1.0f)),
+   Viewport myView { Vec3(0.0f,0.0f, -20.0f),
+                     (Vec3(0.0f,0.0f,1.0f)),
                      config::fov_rad};
    myView.bind_shader_program(*shaProg);
    
