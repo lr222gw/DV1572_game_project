@@ -1,7 +1,5 @@
 #define STB_IMAGE_IMPLEMENTATION //Den bor här annars kompilerar inte stb_image.h
 
-// Åke Göran Hälga   
-
 #include "misc/defs.h"
 #include "Config.h"
 
