@@ -1,10 +1,10 @@
 #include "Viewport.h"
-// TODO: läs ViewPort -> Viewport
+// TODO: lï¿½s ViewPort -> Viewport
 
 Viewport::Viewport(Vec3 position , Vec3 rotation, Float32 fov) :
    _fov(fov)
 {
-   // TODO: bind _camera och uniform buffer för Mat4
+   // TODO: bind _camera och uniform buffer fï¿½r Mat4
 
    _model = Mat4(1.0f);
 
@@ -17,7 +17,7 @@ Viewport::Viewport(Vec3 position , Vec3 rotation, Float32 fov) :
                                    config::near_plane,
                                    config::far_plane);
    
-   //tillfällig
+   //tillfï¿½llig
    // _model = glm::rotate(_model, glm::radians(32.0f), Vec3(0.0f, 1.0f, 0.0f));
    
    _write_to_buffer();
@@ -50,9 +50,9 @@ void Viewport::_update_view_matrix() {
         new_position[1][3] = _position.y;
         new_position[2][3] = _position.z;
 
-   glm::quat rotation_quaternion { _rotation, 0.0f };
+   glm::quat rotation_quaternion {Vec4( _rotation, 0.0f) };
 
-   _view = new_position * quaternion::toMat4(rotation_quaternion);;
+   _view = new_position * glm::toMat4(rotation_quaternion);;
 
    _write_to_buffer();
 }
