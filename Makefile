@@ -6,7 +6,7 @@ TARGET      := binary
 
 # project structure
 SRCDIR      := src
-INCDIR      := src/misc
+INCDIR      := inc # src/misc ?
 BUILDDIR    := tmp
 TARGETDIR   := bin
 RESDIR      := res

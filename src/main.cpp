@@ -1,6 +1,6 @@
 #define STB_IMAGE_IMPLEMENTATION //Den bor här annars kompilerar inte stb_image.h
 
-// Åke Göran Hälga
+// Åke Göran Hälga   
 
 #include "misc/defs.h"
 #include "Config.h"
@@ -625,7 +625,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
       //myMinstance->ttranceform(aTransformMatris)
       //myMinstance->render(&*shaProg);
 
-      scenMan.draw();
+      scenMan.draw(); // undersök om buffer binds
 
 		float dt_time_s = ImGui::GetIO().DeltaTime;
 		// glBindBuffer(GL_UNIFORM_BUFFER, gUniformBuffer);

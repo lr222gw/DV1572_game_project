@@ -38,7 +38,7 @@
 
 #include <glm/gtx/quaternion.hpp>
 
-#include "misc/stb_image.h" 
+#include "stb_image.h" 
 //
 
 // #include <string_view>
