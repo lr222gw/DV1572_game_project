@@ -26,6 +26,6 @@ private:
         _rotation;
 
    Float32 _fov;
-   Mat4 _view, _projection, _camera, _model;
+   Mat4 _view, _projection, _camera;
    GLuint _location;
 };

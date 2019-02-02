@@ -6,7 +6,7 @@ Viewport::Viewport(Vec3 position , Vec3 rotation, Float32 fov) :
 {
    // TODO: bind _camera och uniform buffer f�r Mat4
 
-   _model = Mat4(1.0f);
+   //_model = Mat4(1.0f);
 
    // validera
    _view = glm::lookAt( position,
@@ -37,16 +37,16 @@ void Viewport::set_rotation(Vec3 new_rotation) {
 }
 
 void Viewport::transform(Mat4 transformation) {
-   _model *= transformation; // validera
+   _view *= transformation; // validera
    _write_to_buffer();
 }
 
 void Viewport::bind_shader_program(ShaderProgram &shapro) {
-   _location = glGetUniformLocation(shapro.getProgramLoc(), "mvp_transform");
+   _location = glGetUniformLocation(shapro.getProgramLoc(), "viewport_transform");
    _write_to_buffer();
 }
 
-void Viewport::_update_model_matrix() {
+void Viewport::_update_view_matrix() {
    // validera?
    Mat4 new_position       = Mat4(1.0f);
         new_position[0][3] = _position.x;
@@ -55,13 +55,13 @@ void Viewport::_update_model_matrix() {
 
    glm::quat rotation_quaternion {Vec4( _rotation, 0.0f) };
 
-   _model = new_position * glm::toMat4(rotation_quaternion);;
+   _view = new_position * glm::toMat4(rotation_quaternion);;
 
    _write_to_buffer();
 }
 
 
 void Viewport::_write_to_buffer() {
-   _camera = _projection * _view * _model; // validera?
-   glUniformMatrix4fv(_location, 1, GL_FALSE, glm::value_ptr(_camera));
+   _camera = _projection * _view; // * _model; // validera?
+   glUniformMatrix4fv( _location, 1, GL_FALSE, glm::value_ptr(_camera) );
 }
