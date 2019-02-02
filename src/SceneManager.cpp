@@ -1,7 +1,7 @@
 #include "SceneManager.h"
 
 SharedPtr<ModelInstance> SceneManager::instantiate_model(
-   String const             &model_name,
+   SharedPtr<Model>          model,
    SharedPtr<ShaderProgram>  shader_program,
    Vec3                      global_position )
 {
@@ -15,14 +15,17 @@ SharedPtr<ModelInstance> SceneManager::instantiate_model(
         transform[1][3] = global_position.y;
         transform[2][3] = global_position.z;
 
-   auto model      = _assman->load_model(model_name); // TODO: std::move(transform)? (LÅG PRIO)
+   //auto model      = _assman->load_model(model_name); // TODO: std::move(transform)? (LÅG PRIO)
 
-   auto instance   = std::make_shared<ModelInstance>( model, shader_program, transform );
+   return std::make_shared<ModelInstance>( model, shader_program, transform );
 }
 
 void SceneManager::draw() {
    // TODO: sortera instanserna efter ShaderProgram m.h.a. std::partition()
    for ( auto &instance : _instances ) {
-      instance.draw();
+      
+      if (!instance.expired()) {
+         instance.lock()->draw();
+      }      
    }
 }

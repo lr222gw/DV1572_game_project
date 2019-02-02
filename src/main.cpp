@@ -9,6 +9,8 @@
 
 #include "AssetManager.h"
 #include "ShaderManager.h"
+#include "Viewport.h"
+#include "SceneManager.h"
 
 //#include "misc/stb_image.h" //TODO: ska denna  vara här?
 
@@ -558,6 +560,14 @@ Int32 main( Int32 argc, char const *argv[] ) {
    AssetManager assMan{};
    SharedPtr<Model> myModel = assMan.load_model("12330_Statue_v1_L2.obj");
    
+   SceneManager scenMan{};
+   SharedPtr<ModelInstance> modelInstance = scenMan.instantiate_model(myModel,shaProg, Vec3(0.0f, 0.0f, 1.0f));
+   //scenMan
+
+   Viewport myView {Vec3(0.0f,0.0f,-1.0f)};
+   myView.bind_shader_program(*shaProg);
+   
+
    // hmmeses
 
  // main loop:

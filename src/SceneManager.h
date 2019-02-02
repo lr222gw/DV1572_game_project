@@ -5,9 +5,9 @@
 #include "ShaderProgram.h"
 
 class SceneManager {
-
+public:
    SharedPtr<ModelInstance> instantiate_model(
-      String const                  &model_name,
+      SharedPtr<Model>               model,
       SharedPtr<ShaderProgram>       shader_program,
       Vec3                           global_position={0,0,0} );
 

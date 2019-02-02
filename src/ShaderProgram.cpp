@@ -28,7 +28,7 @@ ShaderProgram::ShaderProgram( Vector<SharedPtr<Shader>> const &shader_ptrs):
    }
 
    // förvarar en modellinstans transform
-   _location = glGetUniformLocation( _program_location, "model_transform" );
+   _transform_location = glGetUniformLocation( _program_location, "model_transform" );
 
   // auto id = _generate_shader_program_id();
   // _shader_programs[id] = _program_location;

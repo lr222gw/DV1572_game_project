@@ -1,7 +1,7 @@
 #include "Viewport.h"
 // TODO: läs ViewPort -> Viewport
 
-Viewport::Viewport(Vec3 position = { 0,0,0 }, Float32 fov = config::fov_rad) :
+Viewport::Viewport(Vec3 position , Vec3 rotation, Float32 fov) :
    _fov(fov)
 {
    // TODO: bind _camera och uniform buffer för Mat4
@@ -12,7 +12,10 @@ Viewport::Viewport(Vec3 position = { 0,0,0 }, Float32 fov = config::fov_rad) :
       config::aspect_ratio,
       config::near_plane,
       config::far_plane);
-
+   
+   //tillfällig
+   _model = glm::rotate(_model, glm::radians(32.0f), Vec3(0.0f, 1.0f, 0.0f));
+   
    _write_to_buffer();
 
 }
