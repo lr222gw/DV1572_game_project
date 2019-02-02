@@ -473,15 +473,18 @@ private:
 
 
 void draw_camera_debug_window( Float32 &rot_x, Float32 &rot_y, Float32 &rot_z ) {
-   ImGui::Begin( "Camera:" );
+   ImGui::Begin( "Camera:" ); // begin our Camera window:
+   {  // draw our window GUI components and do I/O:
       ImGui::SliderAngle( "X-axis", &rot_x );
       ImGui::SliderAngle( "Y-axis", &rot_y );
       ImGui::SliderAngle( "Z-axis", &rot_z );
+      // add some vertical spacing:
       ImGui::Spacing();
+      // print our current framerate:
       ImGui::Text( "\t%.1f FPS (avg %.3f ms/frame)",
                   ImGui::GetIO().Framerate,
                   1000.0f / ImGui::GetIO().Framerate );
-   ImGui::End();
+   } ImGui::End(); // end our Camera window
 }
 
 
