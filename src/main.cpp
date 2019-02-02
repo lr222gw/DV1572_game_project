@@ -602,10 +602,14 @@ Int32 main( Int32 argc, char const *argv[] ) {
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
+      draw_camera_debug_window( axis_rotations.x, axis_rotations.y, axis_rotations.z );
+      myView.set_rotation( axis_rotations );
+
+      ImGui::Render();
 		// !! ImGui kod här !!
 
 		// rendering
-		ImGui::Render();
+
 		Int32 display_w, display_h;
 		glfwMakeContextCurrent(window);
 		glfwGetFramebufferSize(window, &display_w, &display_h);
@@ -616,8 +620,6 @@ Int32 main( Int32 argc, char const *argv[] ) {
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 // programkod här
-      draw_camera_debug_window( axis_rotations.x, axis_rotations.y, axis_rotations.z );
-      myView.set_rotation( axis_rotations );
       //myMinstance->ttranceform(aTransformMatris)
       //myMinstance->render(&*shaProg);
 
