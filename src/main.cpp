@@ -472,6 +472,20 @@ private:
 
 
 
+void draw_camera_debug_window( Float32 &rot_x, Float32 &rot_y, Float32 &rot_z ) {
+   ImGui::Begin( "Camera:" );
+      ImGui::SliderAngle( "X-axis", &rot_x );
+      ImGui::SliderAngle( "Y-axis", &rot_y );
+      ImGui::SliderAngle( "Z-axis", &rot_z );
+      ImGui::Spacing();
+      ImGui::Text( "\t%.1f FPS (avg %.3f ms/frame)",
+                  ImGui::GetIO().Framerate,
+                  1000.0f / ImGui::GetIO().Framerate );
+   ImGui::End();
+}
+
+
+
 
 Int32 main( Int32 argc, char const *argv[] ) {
 	// initialise GLFW
@@ -567,13 +581,12 @@ Int32 main( Int32 argc, char const *argv[] ) {
                                 Vec3(0.0f, 0.0f, 1.0f));
    //scenMan
 
-   Viewport myView { Vec3(0.0f,0.0f, -20.0f),
-                     (Vec3(0.0f,0.0f,1.0f)),
+   Viewport myView { Vec3(0.0f, 0.0f, -4.0f),
+                     Vec3(0.0f, 0.0f,  1.0f),
                      config::fov_rad};
    myView.bind_shader_program(*shaProg);
    
-
-   // hmmeses
+   Vec3 axis_rotations { 0.0f, 0.0f, 0.0f };
 
  // main loop:
 	while (!glfwWindowShouldClose(window)) {
@@ -589,10 +602,14 @@ Int32 main( Int32 argc, char const *argv[] ) {
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
+      draw_camera_debug_window( axis_rotations.x, axis_rotations.y, axis_rotations.z );
+      myView.set_rotation( axis_rotations );
+
+      ImGui::Render();
 		// !! ImGui kod här !!
 
 		// rendering
-		ImGui::Render();
+
 		Int32 display_w, display_h;
 		glfwMakeContextCurrent(window);
 		glfwGetFramebufferSize(window, &display_w, &display_h);

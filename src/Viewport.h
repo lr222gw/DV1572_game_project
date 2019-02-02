@@ -13,10 +13,19 @@ public:
 
    void bind_shader_program(ShaderProgram &shapro);
 
+   void set_position(Vec3 new_position);
+
+   void set_rotation(Vec3 new_rotation);
+
+
 private:
+   void _update_view_matrix();
    void _write_to_buffer();
 
+   Vec3 _position,
+        _rotation;
+
    Float32 _fov;
-   Mat4 _model, _view, _projection, _camera;
+   Mat4 _view, _projection, _camera, _model;
    GLuint _location;
 };
