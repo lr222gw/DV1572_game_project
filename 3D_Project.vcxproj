@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\aMesh.cpp" />
     <ClCompile Include="src\AssetManager.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
@@ -37,7 +36,6 @@
     <ClCompile Include="src\Viewport.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\aMesh.h" />
     <ClInclude Include="src\AssetManager.h" />
     <ClInclude Include="src\Config.h" />
     <ClInclude Include="src\lop_mesh.h" />

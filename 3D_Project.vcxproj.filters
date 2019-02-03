@@ -75,9 +75,6 @@
     <ClCompile Include="src\Viewport.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\aMesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\misc\defs.h">
@@ -150,9 +147,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Viewport.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\aMesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

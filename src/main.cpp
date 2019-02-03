@@ -12,7 +12,6 @@
 #include "Viewport.h"
 #include "SceneManager.h"
 
-#include "aMesh.h"
 
 void processInput(GLFWwindow *window);
 
@@ -609,10 +608,6 @@ Int32 main( Int32 argc, char const *argv[] ) {
    
    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-   char const *he = "dat/models/12330_Statue_v1_L2.obj";
-   aMesh a_Mesh(he);
-
-
 
 
  // main loop:
@@ -657,9 +652,9 @@ Int32 main( Int32 argc, char const *argv[] ) {
       //myModel->draw(*shaProg);
       
       
-      //scenMan.draw(); // undersök om buffer binds
-      glUseProgram(shaProg->getProgramLoc());
-      a_Mesh.render();
+      scenMan.draw(); // undersök om buffer binds
+      //glUseProgram(shaProg->getProgramLoc());
+      //a_Mesh.render();
 
 
 	  ImGui::Render();
