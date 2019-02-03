@@ -21,10 +21,10 @@ Viewport::Viewport(Vec3 position, Float32 fov_rad) :
                                    config::near_plane,
                                    config::far_plane);
    
-   //tillfällig
+   //tillfï¿½llig
    _model = Mat4( 1.0f );
    _model = glm::translate(_model, glm::vec3(0.0f, 0.0f, 0.0f)); // Translate it down a bit so it's at the center of the scene
-   _model = glm::scale(_model, glm::vec3(0.1f, 0.1f, 0.1f));   // It's a bit too big for our scene, so scale it down
+   _model = glm::scale(_model, glm::vec3(10.0f, 10.0f, 10.0f));   // It's a bit too big for our scene, so scale it down
    
    _write_to_buffer();
 
@@ -63,17 +63,17 @@ void Viewport::_update_view_matrix() {
    // _position = vec3 med x,y,z
    // _rotation = vec3 med rotation kring x, y, z i radianer
    // dvs.
-   // _rotation.x = hur många radianer roterar vi kring X-axeln
-   // _rotation.y = hur många radianer roterar vi kring Y-axeln
-   // _rotation.z = hur många radianer roterar vi kring Z-axeln
+   // _rotation.x = hur mï¿½nga radianer roterar vi kring X-axeln
+   // _rotation.y = hur mï¿½nga radianer roterar vi kring Y-axeln
+   // _rotation.z = hur mï¿½nga radianer roterar vi kring Z-axeln
 
- /*/ den här använder inte rotation
+ /*/ den hï¿½r anvï¿½nder inte rotation
       _view = glm::lookAt( _position,
                            _position + Vec3{ 0, 0, -1 },
                            Vec3{ 0, 1, 0 } );
 //*/
 
-/// den här roterar med kvatern
+/// den hï¿½r roterar med kvatern
    glm::quat rotation_quaternion {Vec4( _rotation, 0.0f) };
 
    _view       = glm::toMat4(rotation_quaternion);;
