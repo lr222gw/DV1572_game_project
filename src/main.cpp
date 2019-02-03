@@ -588,15 +588,14 @@ Int32 main( Int32 argc, char const *argv[] ) {
                                 Vec3(0.0f, 0.0f, 1.0f));
    //scenMan
 
+   Vec3 axis_rotations { 0.0f, 0.0f, 0.0f };
+   Float32 fov_rad = config::fov_rad; // 90 degrees
+
    Viewport myView { Vec3(0.0f, 0.0f, -40.0f),
                      Vec3(0.0f, 0.0f,  -1.0f),
-                     config::fov_rad};
+                     fov_rad };
    myView.bind_shader_program(*shaProg);
    
-   Vec3 axis_rotations { 0.0f, 0.0f, 0.0f };
-<<<<<<< HEAD
-   Float32 fov_rad = 1.570f; // 90 degrees
-=======
    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
    
