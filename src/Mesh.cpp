@@ -69,8 +69,10 @@ void Mesh::_draw(ShaderProgram &shader_program) {
    //glUniform1f(glGetUniformLocation(shader_program.getProgramLoc(), "material.shininess"), 16.0f);
 
    glBindVertexArray(this->_vao);
-   glDrawElements(GL_TRIANGLES, this->index_list.size(), GL_UNSIGNED_INT, 0);
-
+   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->_ebo);
+   glDrawElements(GL_TRIANGLES,this->index_list.size(), GL_UNSIGNED_INT, 0);
+   //glDrawArrays(GL_TRIANGLES, this->vertex_list[0].position.x, GL_UNSIGNED_INT);
+   
    ////Bind OpenGL till standard värderna...
    glBindVertexArray(0);
    //for (GLuint i = 0; i < this->texture_list.size(); i++) {
