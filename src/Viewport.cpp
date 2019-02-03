@@ -24,7 +24,7 @@ Viewport::Viewport(Vec3 position, Float32 fov_rad) :
    //tillfällig
    _model = Mat4( 1.0f );
    _model = glm::translate(_model, glm::vec3(0.0f, 10.0f, 0.0f)); // Translate it down a bit so it's at the center of the scene
-   _model = glm::scale(_model, glm::vec3(0.02f, 0.02f, 0.02f));   // It's a bit too big for our scene, so scale it down
+   _model = glm::scale(_model, glm::vec3(.1f, .1f, .1f));   // It's a bit too big for our scene, so scale it down
    
    _write_to_buffer();
 
@@ -77,9 +77,9 @@ void Viewport::_update_view_matrix() {
    glm::quat rotation_quaternion {Vec4( _rotation, 0.0f) };
 
    _view       = glm::toMat4(rotation_quaternion);;
-   _view[0][3] = _position.x;
-   _view[1][3] = _position.y;
-   _view[2][3] = _position.z;
+   _view[3][0] = _position.x;
+   _view[3][1] = _position.y;
+   _view[3][2] = _position.z;
 //*/
    _write_to_buffer();
 }

@@ -486,9 +486,9 @@ void draw_camera_debug_window( Vec3    &position,
       // add some vertical spacing:
       ImGui::Spacing();
       // read in the camera position:
-      ImGui::InputFloat( "X pos", &position.x );
-      ImGui::InputFloat( "Y pos", &position.y );
-      ImGui::InputFloat( "Z pos", &position.z );
+      ImGui::SliderFloat( "X pos", &position.x, -255, +255 );
+      ImGui::SliderFloat( "Y pos", &position.y, -255, +255 );
+      ImGui::SliderFloat( "Z pos", &position.z, -255, +255 );
       // add some vertical spacing:
       ImGui::Spacing();
       // FOV slider:
@@ -590,7 +590,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    auto shaProg = shaMan.create_program({fraShader, vertShader});
 
    AssetManager assMan{};
-   SharedPtr<Model> myModel = assMan.load_model("12330_Statue_v1_L2.obj");
+   SharedPtr<Model> myModel = assMan.load_model("chair.obj");
    
    SceneManager scenMan{};
    SharedPtr<ModelInstance> modelInstance = 
