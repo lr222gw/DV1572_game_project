@@ -15,7 +15,7 @@ Uint32 load_texture_from_file( FilePath path ) {
    if (image_data) {
 
       GLenum format;
-      if (1 == channel_count)
+      if      (1 == channel_count)
          format = GL_RED;
       else if (3 == channel_count)
          format = GL_RGB;
@@ -98,7 +98,7 @@ void Model::draw( ShaderProgram &shader_program ) {
 
 Mesh Model::_process_mesh( aiMesh *mesh, aiScene const *scene ) {
    Vector<Vertex>   vertices;
-   Vector<Uint32>   indices;
+   Vector<GLuint>   indices;
    Vector<Texture>  textures;
 
    const Uint32  face_count = mesh->mNumFaces;

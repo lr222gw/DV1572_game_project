@@ -11,7 +11,7 @@ struct Vertex {
 };
 
 struct Texture {
-   Uint32 id;
+   GLuint id;
    String type;
    String path;
 };
@@ -22,10 +22,10 @@ class Mesh {
 
 public:
    Vector<Vertex>    vertex_list;
-   Vector<Uint32>    index_list;
+   Vector<GLuint>    index_list;
    Vector<Texture>   texture_list;
 
-   Mesh(Vector<Vertex> vert_list, Vector<Uint32> index_list, Vector<Texture> texture_list) :
+   Mesh(Vector<Vertex> vert_list, Vector<GLuint> index_list, Vector<Texture> texture_list) :
       vertex_list(vert_list), index_list(index_list), texture_list(texture_list) {
          _initialize_mesh();
    };
