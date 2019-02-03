@@ -671,5 +671,5 @@ Int32 main( Int32 argc, char const *argv[] ) {
 	glfwTerminate(); // close OpenGL window & terminate GLFW
 
 	return 0; // successful exit   
-   scenMan
+
 }
