@@ -9,11 +9,13 @@ Viewport::Viewport(Vec3 position, Float32 fov_rad) :
    //_model = Mat4(1.0f);
 
    // validera
+   _view = Mat4(1.0f);
    _view = glm::lookAt( position,
                         position + Vec3{ 0, 0, -1 },
                         Vec3{ 0, 1, 0 } );
 
    // validera
+   _model = Mat4(1.0f);
    _projection = glm::perspective( _fov,
                                    Float32(config::width) / Float32(config::height), // config::aspect_ratio,
                                    config::near_plane,
