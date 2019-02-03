@@ -106,29 +106,35 @@ Mesh Model::_process_mesh(aiMesh *mesh, aiScene const *scene) {
    const Uint32 nmrVertices = mesh->mNumVertices;
    //Vi förallokerar Lika många vertricer i a_vertex_lsit
    //för lika många vertricer som finns i "mesh->mNumVertices"   
-   a_vertex_list.reserve(nmrVertices); 
+   //a_vertex_list.reserve(nmrVertices); 
 
    for (Uint32 i = 0; i < nmrVertices; i++) {
 
       // vi binder en referens till en av de vertricerna vi
       // förallkorat; 
       Vertex vertex;
-      
+      glm::vec3 vect;
       // sen sätter vi värden för Position, Normal och uv
       // på den Vertexen i Listan...
-      vertex.normal.x = mesh->mNormals[i].x;
-      vertex.normal.y = mesh->mNormals[i].y;
-      vertex.normal.z = mesh->mNormals[i].z;
 
-      vertex.position.x = mesh->mVertices[i].x;
-      vertex.position.y = mesh->mVertices[i].y;
-      vertex.position.z = mesh->mVertices[i].z;
+      vect.x = mesh->mVertices[i].x;
+      vect.y = mesh->mVertices[i].y;
+      vect.z = mesh->mVertices[i].z;
+      vertex.position = vect;
+
+
+      vect.x = mesh->mNormals[i].x;
+      vect.y = mesh->mNormals[i].y;
+      vect.z = mesh->mNormals[i].z;
+      vertex.normal = vect;
       
       //Innehåller vår mesh textures över huvudtaget?
       if (mesh->mTextureCoords[0]) {
-         
-         vertex.uv.x = mesh->mTextureCoords[0][i].x;
-         vertex.uv.y = mesh->mTextureCoords[0][i].y;
+         glm::vec2 vec2d;
+         vec2d.x = mesh->mTextureCoords[0][i].x;
+         vec2d.y = mesh->mTextureCoords[0][i].y;
+
+         vertex.uv = vec2d;
       }
       else {
          vertex.uv.x = 0.0f;
@@ -141,43 +147,54 @@ Mesh Model::_process_mesh(aiMesh *mesh, aiScene const *scene) {
    //En loop som går igenom Totala antalet Indicies
    //Vi behöver veta då vi vill förallokera storleken av vår
    // a_index_list
-   Uint32 nmrOfIndiciesTotal = 0;
-   for (Uint32 i = 0; i < nmrFaces; i++) {
-      for (Uint32 j = 0; j < mesh->mFaces[i].mNumIndices; j++) {
-         nmrOfIndiciesTotal++;
-      }
-   }
+   //Uint32 nmrOfIndiciesTotal = 0;
+   //for (Uint32 i = 0; i < nmrFaces; i++) {
+   //   for (Uint32 j = 0; j < mesh->mFaces[i].mNumIndices; j++) {
+   //      nmrOfIndiciesTotal++;
+   //   }
+   //}
    
-   a_index_list.reserve(nmrOfIndiciesTotal);
-   Uint32 counter = 0; 
+   //a_index_list.reserve(nmrOfIndiciesTotal);
+   //Uint32 counter = 0; 
    for (Uint32 i = 0; i < nmrFaces; i++) {
+
       for (Uint32 j = 0; j < mesh->mFaces[i].mNumIndices; j++) {
          //Då vi allokerat index-listan kan vi köra följande rad         
          a_index_list.push_back(mesh->mFaces[i].mIndices[j]);
       }
    }
    
-   aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
-   Vector<Texture> diffuseMaps = _load_material_textures(material, 
-                                                         aiTextureType_DIFFUSE,
-                                                         "tex_diff");
-   Vector<Texture> specularMaps = _load_material_textures(material,
-                                                         aiTextureType_SPECULAR,
-                                                         "tex_spec");
-   Vector<Texture> normalMaps = _load_material_textures(material,
-                                                         aiTextureType_NORMALS,
-                                                         "tex_norm");
+   if (mesh->mMaterialIndex >= 0) {
+      aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
+      Vector<Texture> diffuseMaps = _load_material_textures(material,
+                                                            aiTextureType_DIFFUSE,
+                                                            "tex_diff");
+      a_texture_list.insert(a_texture_list.end(), diffuseMaps.begin(), diffuseMaps.end());
+
+      Vector<Texture> specularMaps = _load_material_textures(material,
+                                                             aiTextureType_SPECULAR,
+                                                             "tex_spec");
+      a_texture_list.insert(a_texture_list.end(), specularMaps.begin(), specularMaps.end());
+
+      Vector<Texture> normalMaps = _load_material_textures(material,
+                                                            aiTextureType_NORMALS,
+                                                            "tex_norm");
+      a_texture_list.insert(a_texture_list.end(), normalMaps.begin(), normalMaps.end());
+   }
+
+   
+   
    //Resevera allt en gång istället för, för varje map
-   a_texture_list.reserve(diffuseMaps.size() + specularMaps.size() + normalMaps.size());
-   for(auto &e :diffuseMaps){
-      a_texture_list.push_back(e);
-   }
-   for (auto &e : specularMaps){
-      a_texture_list.push_back(e);
-   }
-   for (auto &e : normalMaps){
-      a_texture_list.push_back(e);
-   }   
+   //a_texture_list.reserve(diffuseMaps.size() + specularMaps.size() + normalMaps.size());
+   //for(auto &e :diffuseMaps){
+   //   a_texture_list.push_back(e);
+   //}
+   //for (auto &e : specularMaps){
+   //   a_texture_list.push_back(e);
+   //}
+   //for (auto &e : normalMaps){
+   //   a_texture_list.push_back(e);
+   //}   
 
    //Implement more MaterialMaps based on ASSIMP's aiTextureType's (Enums) 
    return Mesh(a_vertex_list, a_index_list,a_texture_list);
@@ -192,6 +209,8 @@ Vector<Texture> Model::_load_material_textures(aiMaterial *material, aiTextureTy
 
       aiString str;
       material->GetTexture(type, i, &str);      
+
+      GLboolean skip = false;
 
       String path_to_file = config::model_path + String(str.C_Str());
       FilePath path{ FileType::texture, String(str.C_Str()) };
