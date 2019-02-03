@@ -14,13 +14,15 @@ Viewport::Viewport(Vec3 position, Float32 fov_rad) :
                         Vec3{ 0, 1, 0 } );
 
    // validera
-   _projection = glm::perspective( fov_rad,
-                                   config::aspect_ratio,
+   _projection = glm::perspective( _fov,
+                                   (float)config::width / (float)config::height, // config::aspect_ratio,
                                    config::near_plane,
                                    config::far_plane);
    
    //tillfällig
-   _model = Mat4( 1.0f );
+   //_model = Mat4( 1.0f );
+   _model = glm::translate(_model, glm::vec3(0.0f, 0.0f, 0.0f)); // Translate it down a bit so it's at the center of the scene
+   _model = glm::scale(_model, glm::vec3(1.0f, 1.0f, 1.0f));   // It's a bit too big for our scene, so scale it down
    
    _write_to_buffer();
 
@@ -42,7 +44,8 @@ void Viewport::transform(Mat4 transformation) {
 }
 
 void Viewport::set_fov(Float32 fov_rad) {
-   _projection = glm::perspective( fov_rad,
+   _fov = fov_rad;
+   _projection = glm::perspective( _fov,
                                    config::aspect_ratio,
                                    config::near_plane,
                                    config::far_plane );
@@ -50,7 +53,7 @@ void Viewport::set_fov(Float32 fov_rad) {
 }
 
 void Viewport::bind_shader_program(ShaderProgram &shapro) {
-   _location = glGetUniformLocation(shapro.getProgramLoc(), "viewport_transform");
+   _location = shapro.getProgramLoc();
    _write_to_buffer();
 }
 
@@ -62,13 +65,13 @@ void Viewport::_update_view_matrix() {
    // _rotation.y = hur många radianer roterar vi kring Y-axeln
    // _rotation.z = hur många radianer roterar vi kring Z-axeln
 
-/* // den här använder inte rotation
+/ // den här använder inte rotation
       _view = glm::lookAt( _position,
                            _position + Vec3{ 0, 0, -1 },
                            Vec3{ 0, 1, 0 } );
 //*/
 
-//* // den här roterar med kvatern
+/* // den här roterar med kvatern
    glm::quat rotation_quaternion {Vec4( _rotation, 0.0f) };
 
    _view       = glm::toMat4(rotation_quaternion);;

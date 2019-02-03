@@ -576,8 +576,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
    //Gör Instans av AssetManager
 
 	// activate depth test and stencil test for openGL
-	//glEnable(GL_DEPTH_TEST);
-	//glEnable(GL_STENCIL_TEST);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_STENCIL_TEST);
 
    //testa   vår AssetManager TODO: heh 
    ShaderManager shaMan{};
@@ -620,7 +620,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-      draw_camera_debug_window( cam_rotations, cam_positions, fov_rad );
+      draw_camera_debug_window( cam_positions, cam_rotations, fov_rad );
       myView.set_rotation( cam_rotations );
       myView.set_position( cam_positions );
       myView.set_fov( fov_rad );
@@ -636,23 +636,21 @@ Int32 main( Int32 argc, char const *argv[] ) {
 		glViewport(0, 0, display_w, display_h);
       
       glClearColor(0.2f, 0.2f, 0.2f, 1.0f);//glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 // programkod här
       //myMinstance->ttranceform(aTransformMatris)
       //myMinstance->render(&*shaProg);
 
-//glm::mat4 projection = glm::perspective(fov_rad, (float)config::width / (float)config::height, 0.1f, 100.0f);
-//glm::mat4 view = glm::lookAt(glm::vec3(0.0f, 0.0f, 30.0f), glm::vec3(0.0f, 0.0f, 30.0f) + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-//
-//glUniformMatrix4fv(glGetUniformLocation(shaProg->getProgramLoc(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-//glUniformMatrix4fv(glGetUniformLocation(shaProg->getProgramLoc(), "view"), 1, GL_FALSE, glm::value_ptr(view));
-//
-//glm::mat4 model;
-//model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // Translate it down a bit so it's at the center of the scene
-//model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// It's a bit too big for our scene, so scale it down
-//glUniformMatrix4fv(glGetUniformLocation(shaProg->getProgramLoc(), "model"), 1, GL_FALSE, glm::value_ptr(model));
+glm::mat4 projection = glm::perspective(fov_rad, (float)config::width / (float)config::height, 0.1f, 100.0f);
+glm::mat4 view = glm::lookAt(glm::vec3(0.0f, 0.0f, 30.0f), glm::vec3(0.0f, 0.0f, 30.0f) + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+glUniformMatrix4fv(glGetUniformLocation(shaProg->getProgramLoc(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+glUniformMatrix4fv(glGetUniformLocation(shaProg->getProgramLoc(), "view"), 1, GL_FALSE, glm::value_ptr(view));
+glm::mat4 model;
+model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // Translate it down a bit so it's at the center of the scene
+model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// It's a bit too big for our scene, so scale it down
+glUniformMatrix4fv(glGetUniformLocation(shaProg->getProgramLoc(), "model"), 1, GL_FALSE, glm::value_ptr(model));
 
       //myModel->draw(*shaProg);
       
@@ -663,8 +661,6 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
 
 		float dt_time_s = ImGui::GetIO().DeltaTime;
-		// glBindBuffer(GL_UNIFORM_BUFFER, gUniformBuffer);
-		// Render();
 
 		glfwMakeContextCurrent(window);
 		glfwSwapBuffers(window);
