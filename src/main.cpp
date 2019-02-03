@@ -616,7 +616,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-      draw_camera_debug_window( axis_rotations.x, axis_rotations.y, axis_rotations.z, fov );
+      draw_camera_debug_window( axis_rotations.x, axis_rotations.y, axis_rotations.z, fov_rad );
       myView.set_rotation( axis_rotations );
       myView.set_fov( fov_rad );
 
