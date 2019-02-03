@@ -1,8 +1,8 @@
 #include "Viewport.h"
 // TODO: l�s ViewPort -> Viewport
 
-Viewport::Viewport(Vec3 position , Vec3 rotation, Float32 fov) :
-   _fov(fov)
+Viewport::Viewport(Vec3 position , Vec3 rotation, Float32 fov_rad) :
+   _fov (fov_rad)
 {
    // TODO: bind _camera och uniform buffer f�r Mat4
 
@@ -10,11 +10,11 @@ Viewport::Viewport(Vec3 position , Vec3 rotation, Float32 fov) :
 
    // validera
    _view = glm::lookAt( position,
-                        Vec3{ 0, 0,  0 },
-                        Vec3{ 0, 1,  0 } );
+                        Vec3{ 0, 0, 0 },
+                        Vec3{ 0, 1, 0 } );
 
    // validera
-   _projection = glm::perspective( fov,
+   _projection = glm::perspective( fov_rad,
                                    config::aspect_ratio,
                                    config::near_plane,
                                    config::far_plane);

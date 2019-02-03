@@ -472,12 +472,20 @@ private:
 
 
 
-void draw_camera_debug_window( Float32 &rot_x, Float32 &rot_y, Float32 &rot_z, Float32 &fov_rad ) {
+void draw_camera_debug_window( Vec3    &position,
+                               Vec3    &rotation,
+                               Float32 &fov_rad ) {
    ImGui::Begin( "Camera:" ); // begin our Camera window:
    {  // draw our window GUI components and do I/O:
-      ImGui::SliderAngle( "X-axis", &rot_x );
-      ImGui::SliderAngle( "Y-axis", &rot_y );
-      ImGui::SliderAngle( "Z-axis", &rot_z );
+      ImGui::SliderAngle( "X-axis", &rotation.x );
+      ImGui::SliderAngle( "Y-axis", &rotation.y );
+      ImGui::SliderAngle( "Z-axis", &rotation.z );
+      // add some vertical spacing:
+      ImGui::Spacing();
+      // read in the camera position:
+      InputFloat( "X pos", &position.x );
+      InputFloat( "Y pos", &position.y );
+      InputFloat( "Z pos", &position.z );
       // add some vertical spacing:
       ImGui::Spacing();
       // FOV slider:
@@ -588,7 +596,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
                                 Vec3(0.0f, 0.0f, 1.0f));
    //scenMan
 
-   Vec3 axis_rotations { 0.0f, 0.0f, 0.0f };
+   Vec3 cam_rotations { 0.0f, 0.0f, 0.0f };
+   Vec3 cam_positions { 0.0f, 0.0f, 0.0f };
    Float32 fov_rad = config::fov_rad; // 90 degrees
 
    Viewport myView { Vec3(0.0f, 0.0f, -40.0f),
@@ -613,8 +622,9 @@ Int32 main( Int32 argc, char const *argv[] ) {
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-      draw_camera_debug_window( axis_rotations.x, axis_rotations.y, axis_rotations.z, fov_rad );
-      myView.set_rotation( axis_rotations );
+      draw_camera_debug_window( cam_rotations, cam_positions, fov_rad );
+      myView.set_rotation( cam_rotations );
+      myView.set_position( cam_positions );
       myView.set_fov( fov_rad );
 
       ImGui::Render();
