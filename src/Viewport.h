@@ -17,6 +17,8 @@ public:
 
    void set_rotation(Vec3 new_rotation);
 
+   void set_fov(Float32 fov_rad);
+
 
 private:
    void _update_view_matrix();

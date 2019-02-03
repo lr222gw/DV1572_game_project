@@ -41,6 +41,13 @@ void Viewport::transform(Mat4 transformation) {
    _write_to_buffer();
 }
 
+void Viewport::set_fov(Float32 fov_rad) {
+   _projection = glm::perspective( fov,
+                                   config::aspect_ratio,
+                                   config::near_plane,
+                                   config::far_plane );
+}
+
 void Viewport::bind_shader_program(ShaderProgram &shapro) {
    _location = glGetUniformLocation(shapro.getProgramLoc(), "viewport_transform");
    _write_to_buffer();
