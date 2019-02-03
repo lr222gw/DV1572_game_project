@@ -69,7 +69,7 @@ void Model::_load_model( String const &filename ) {
 
    bool encounteredError = !scene || (scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) || !scene->mRootNode;
    if (encounteredError) {// if is Not Zero
-      assert(f alse && String("Error; Assimp: " + String(importer.GetErrorString()) + "\n").c_str() );            
+      assert( false && String("Error; Assimp: " + String(importer.GetErrorString()) + "\n").c_str() );            
    }
 
    _process_node(scene->mRootNode, scene);
