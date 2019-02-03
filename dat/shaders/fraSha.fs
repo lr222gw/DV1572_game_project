@@ -4,8 +4,8 @@ out vec4 FragColor;
 in  vec2 uv_fs;
 
 uniform sampler2D tex_diff1;
-uniform sampler2D tex_spec1;
-uniform sampler2D tex_norm1;
+//uniform sampler2D tex_spec1;
+//uniform sampler2D tex_norm1;
 
 void main() {    
     vec4 ambient = vec4(0.20, 0.20, 0.20, 1.0);
