@@ -577,7 +577,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
 	// activate depth test and stencil test for openGL
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_STENCIL_TEST);
+	// glEnable(GL_STENCIL_TEST);
 
    //testa   vår AssetManager TODO: heh 
    ShaderManager shaMan{};
@@ -635,7 +635,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 		glfwGetFramebufferSize(window, &display_w, &display_h);
 		glViewport(0, 0, display_w, display_h);
       
-      glClearColor(0.2f, 0.2f, 0.2f, 1.0f);//glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+      glClearColor(1.0f, 0.2f, 0.2f, 1.0f);//glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
