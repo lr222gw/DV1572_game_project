@@ -483,9 +483,9 @@ void draw_camera_debug_window( Vec3    &position,
       // add some vertical spacing:
       ImGui::Spacing();
       // read in the camera position:
-      InputFloat( "X pos", &position.x );
-      InputFloat( "Y pos", &position.y );
-      InputFloat( "Z pos", &position.z );
+      ImGui::InputFloat( "X pos", &position.x );
+      ImGui::InputFloat( "Y pos", &position.y );
+      ImGui::InputFloat( "Z pos", &position.z );
       // add some vertical spacing:
       ImGui::Spacing();
       // FOV slider:
@@ -596,13 +596,11 @@ Int32 main( Int32 argc, char const *argv[] ) {
                                 Vec3(0.0f, 0.0f, 1.0f));
    //scenMan
 
-   Vec3 cam_rotations { 0.0f, 0.0f, 0.0f };
-   Vec3 cam_positions { 0.0f, 0.0f, 0.0f };
+   Vec3 cam_rotations { 0.0f, 0.0f,  0.0f };
+   Vec3 cam_positions { 0.0f, 0.0f, 30.0f };
    Float32 fov_rad = config::fov_rad; // 90 degrees
 
-   Viewport myView { Vec3(0.0f, 0.0f, -40.0f),
-                     Vec3(0.0f, 0.0f,  -1.0f),
-                     fov_rad };
+   Viewport myView { cam_positions, fov_rad };
    myView.bind_shader_program(*shaProg);
    
    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -645,16 +643,17 @@ Int32 main( Int32 argc, char const *argv[] ) {
       //myMinstance->ttranceform(aTransformMatris)
       //myMinstance->render(&*shaProg);
 
-      glm::mat4 projection = glm::perspective(fov_rad, (float)config::width / (float)config::height, 0.1f, 100.0f);
-      glm::mat4 view = glm::lookAt(glm::vec3(0.0f, 0.0f, 30.0f), glm::vec3(0.0f, 0.0f, 30.0f) + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+//glm::mat4 projection = glm::perspective(fov_rad, (float)config::width / (float)config::height, 0.1f, 100.0f);
+//glm::mat4 view = glm::lookAt(glm::vec3(0.0f, 0.0f, 30.0f), glm::vec3(0.0f, 0.0f, 30.0f) + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
-      glUniformMatrix4fv(glGetUniformLocation(shaProg->getProgramLoc(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-      glUniformMatrix4fv(glGetUniformLocation(shaProg->getProgramLoc(), "view"), 1, GL_FALSE, glm::value_ptr(view));
+//glUniformMatrix4fv(glGetUniformLocation(shaProg->getProgramLoc(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+//glUniformMatrix4fv(glGetUniformLocation(shaProg->getProgramLoc(), "view"), 1, GL_FALSE, glm::value_ptr(view));
 
-      glm::mat4 model;
-      model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // Translate it down a bit so it's at the center of the scene
-      model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// It's a bit too big for our scene, so scale it down
-     glUniformMatrix4fv(glGetUniformLocation(shaProg->getProgramLoc(), "model"), 1, GL_FALSE, glm::value_ptr(model));
+//glm::mat4 model;
+//model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // Translate it down a bit so it's at the center of the scene
+//model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// It's a bit too big for our scene, so scale it down
+//glUniformMatrix4fv(glGetUniformLocation(shaProg->getProgramLoc(), "model"), 1, GL_FALSE, glm::value_ptr(model));
+
       //myModel->draw(*shaProg);
       
       
