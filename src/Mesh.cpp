@@ -39,7 +39,7 @@ void Mesh::_draw(ShaderProgram &shader_program) {
    GLuint specularNr = 1;
    GLuint normalNr = 1;
    glUseProgram(shader_program.getProgramLoc());
-   for (GLuint i = 0; i < this->texture_list.size(); i++) {
+   for (Uint32 i = 0; i < this->texture_list.size(); i++) {
       
       //ställa in vilken Textur vi jobbar på, vi kan högst ha 32 (eller 16?)
       glActiveTexture(GL_TEXTURE0 + i); 
@@ -75,12 +75,12 @@ void Mesh::_draw(ShaderProgram &shader_program) {
    
    ////Bind OpenGL till standard värderna...
    glBindVertexArray(0);
-   //for (GLuint i = 0; i < this->texture_list.size(); i++) {
-   //
-   //   glActiveTexture(GL_TEXTURE0+i);
-   //   glBindTexture(GL_TEXTURE_2D,0);
-   //
-   //}
+   for (GLuint i = 0; i < this->texture_list.size(); i++) {
+   
+      glActiveTexture(GL_TEXTURE0+i);
+      glBindTexture(GL_TEXTURE_2D,0);
+   
+   }
 
 }
 

@@ -12,6 +12,8 @@
 #include "Viewport.h"
 #include "SceneManager.h"
 
+#include "aMesh.h"
+
 void processInput(GLFWwindow *window);
 
 //#include "misc/stb_image.h" //TODO: ska denna  vara här?
@@ -607,6 +609,11 @@ Int32 main( Int32 argc, char const *argv[] ) {
    
    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+   char const *he = "dat/models/12330_Statue_v1_L2.obj";
+   aMesh a_Mesh(he);
+
+
+
 
  // main loop:
 	while (!glfwWindowShouldClose(window)) {
@@ -623,6 +630,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
+      myView.bind_shader_program(*shaProg);
+
       draw_camera_debug_window( cam_positions, cam_rotations, fov_rad );
       myView.set_rotation( cam_rotations );
       myView.set_position( cam_positions );
@@ -631,7 +640,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
       
 		glClearColor(1.0f, 0.2f, 0.2f, 1.0f);//glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+      
 // programkod här
       //myMinstance->ttranceform(aTransformMatris)
       //myMinstance->render(&*shaProg);
@@ -648,8 +657,9 @@ Int32 main( Int32 argc, char const *argv[] ) {
       //myModel->draw(*shaProg);
       
       
-      scenMan.draw(); // undersök om buffer binds
-
+      //scenMan.draw(); // undersök om buffer binds
+      glUseProgram(shaProg->getProgramLoc());
+      a_Mesh.render();
 
 
 	  ImGui::Render();

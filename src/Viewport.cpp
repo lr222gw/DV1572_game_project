@@ -15,14 +15,14 @@ Viewport::Viewport(Vec3 position, Float32 fov_rad) :
 
    // validera
    _projection = glm::perspective( _fov,
-                                   (float)config::width / (float)config::height, // config::aspect_ratio,
+                                   Float32(config::width) / Float32(config::height), // config::aspect_ratio,
                                    config::near_plane,
                                    config::far_plane);
    
    //tillfällig
-   //_model = Mat4( 1.0f );
-   _model = glm::translate(_model, glm::vec3(0.0f, 0.0f, 0.0f)); // Translate it down a bit so it's at the center of the scene
-   _model = glm::scale(_model, glm::vec3(1.0f, 1.0f, 1.0f));   // It's a bit too big for our scene, so scale it down
+   _model = Mat4( 1.0f );
+   _model = glm::translate(_model, glm::vec3(0.0f, 10.0f, 0.0f)); // Translate it down a bit so it's at the center of the scene
+   _model = glm::scale(_model, glm::vec3(0.02f, 0.02f, 0.02f));   // It's a bit too big for our scene, so scale it down
    
    _write_to_buffer();
 
@@ -86,7 +86,11 @@ void Viewport::_update_view_matrix() {
 void Viewport::_write_to_buffer() {
    // _camera = _projection * _view; // * _model; // validera?
    // glUniformMatrix4fv( _location, 1, GL_FALSE, glm::value_ptr(_camera) );
-   glUniformMatrix4fv( glGetUniformLocation(_location, "model"),      1, GL_FALSE, glm::value_ptr(_model)      );
-   glUniformMatrix4fv( glGetUniformLocation(_location, "view"),       1, GL_FALSE, glm::value_ptr(_view)       );
-   glUniformMatrix4fv( glGetUniformLocation(_location, "projection"), 1, GL_FALSE, glm::value_ptr(_projection) );
+   //glUniformMatrix4fv( glGetUniformLocation(_location, "model"),      1, GL_FALSE, glm::value_ptr(_model)      );
+   glUniformMatrix4fv( glGetUniformLocation(_location, "model"),      1, GL_FALSE, &_model[0][0]      );
+   //glUniformMatrix4fv( glGetUniformLocation(_location, "view"),       1, GL_FALSE, glm::value_ptr(_view)       );
+   glUniformMatrix4fv( glGetUniformLocation(_location, "view"),       1, GL_FALSE, &_view[0][0]       );
+   //glUniformMatrix4fv( glGetUniformLocation(_location, "projection"), 1, GL_FALSE, glm::value_ptr(_projection) );
+   glUniformMatrix4fv( glGetUniformLocation(_location, "projection"), 1, GL_FALSE, &_projection[0][0] );
+   
 }
