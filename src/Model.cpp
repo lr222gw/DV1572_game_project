@@ -21,6 +21,7 @@ Uint32 load_texture_from_file( FilePath path ) {
          format = GL_RGB;
       else if (4 == channel_count)
          format = GL_RGBA;
+      else assert( false && "Unexpected texture format channel count." );
 
       glBindTexture( GL_TEXTURE_2D, texture_id );
 
@@ -203,7 +204,7 @@ Vector<Texture> Model::_load_material_textures( aiMaterial *material, aiTextureT
       aiString str;
       material->GetTexture( type, i, &str );      
 
-      GLboolean skip = false;
+//    GLboolean skip = false; // V: oanvänd, så bortkommenterad
 
       String path_to_file = config::model_path + String(str.C_Str());
       FilePath path { FileType::texture, String(str.C_Str()) };

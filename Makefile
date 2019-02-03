@@ -30,7 +30,11 @@ SOURCES     := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 OBJECTS     := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.$(OBJEXT)))
 
 # default make
-all: resources $(TARGET)
+all: compiledb
+
+# generate compile database (compile_commands.json)
+compiledb:
+	@compiledb make resources $(TARGET)
 
 # remake
 remake: fullclean all
@@ -49,7 +53,7 @@ clean:
 	@$(RM) -rf $(BUILDDIR)
 
 # full clean (objects and binaries)
-cleanall: clean
+fullclean: clean
 	@$(RM) -rf $(TARGETDIR)
 
 # pull in dependency info for existing object files

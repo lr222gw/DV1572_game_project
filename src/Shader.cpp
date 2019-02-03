@@ -10,7 +10,7 @@ Shader::Shader( char const *shader_str, Type const type ) {
       case Type::vertex:   _shader_location = glCreateShader( GL_VERTEX_SHADER   ); break;
       case Type::geometry: _shader_location = glCreateShader( GL_GEOMETRY_SHADER ); break;
       case Type::fragment: _shader_location = glCreateShader( GL_FRAGMENT_SHADER ); break;
-      default: assert(false && "Todo: lägg till ny Shadertyp för Shader.cpp"); // TODO: exception?
+      default: assert( false && "TODO: add new ShaderType for Shader.cpp" ); // TODO: exception?
    }
 
    // ask GL to use this string a shader code source
@@ -38,3 +38,6 @@ GLuint Shader::get_location() const {
    return _shader_location;
 }
 
+Shader::Type Shader::get_type() const {
+   return _type;
+}

@@ -660,7 +660,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
 
 
-		float dt_time_s = ImGui::GetIO().DeltaTime;
+	//	float dt_time_s = ImGui::GetIO().DeltaTime; // UNUSED
 
 		glfwMakeContextCurrent(window);
 		glfwSwapBuffers(window);

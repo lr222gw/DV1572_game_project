@@ -19,10 +19,9 @@ public:
 
 private:
    // i ShaderInstance har vi två klassfält   
-   Mat4 _transform;
-   SharedPtr<ShaderProgram> _shader_program;
-   SharedPtr<Model>  _model;
-
+   SharedPtr<Model>          _model;
+   SharedPtr<ShaderProgram>  _shader_program;
+    Mat4                      _transform;
 };
 
 

@@ -1,4 +1,4 @@
-#pragma once;
+#pragma once
 #include "misc/defs.h"
 
 namespace config {
