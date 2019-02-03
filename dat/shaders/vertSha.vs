@@ -23,7 +23,7 @@ uniform mat4 model;
 uniform mat4 projection;
 
 void main() {
-   Mat4 does_nothing = model_transform * mat4( 0.0f );
+   mat4 does_nothing = model_transform;
 
    uv_fs = uv_vs;    	
 	gl_Position = projection * view * model * vec4( position, 1.0f );
