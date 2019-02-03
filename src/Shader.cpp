@@ -1,6 +1,8 @@
 #include "Shader.h"
 
-Shader::Shader( char const *shader_str, Type const type ) {
+Shader::Shader( char const *shader_str, Type const type ):
+   _type ( type )
+{
    // local buffer to store error strings when compiling.
    char buffer[1024];
    memset( buffer, 0, 1024 );
