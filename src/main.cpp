@@ -564,8 +564,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
    //Gör Instans av AssetManager
 
 	// activate depth test and stencil test for openGL
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_STENCIL_TEST);
+	//glEnable(GL_DEPTH_TEST);
+	//glEnable(GL_STENCIL_TEST);
 
    //testa   vår AssetManager TODO: heh 
    ShaderManager shaMan{};
@@ -590,7 +590,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    myView.bind_shader_program(*shaProg);
    
    Vec3 axis_rotations { 0.0f, 0.0f, 0.0f };
-
+   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
  // main loop:
 	while (!glfwWindowShouldClose(window)) {
 		// poll & handle events such as window resizing and input from the keyboard or mouse
