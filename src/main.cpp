@@ -568,15 +568,15 @@ Int32 main( Int32 argc, char const *argv[] ) {
    //Gör Instans av AssetManager
 
 	// activate depth test and stencil test for openGL
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_STENCIL_TEST);
+	//glEnable(GL_DEPTH_TEST);
+	//glEnable(GL_STENCIL_TEST);
 
    //testa   vår AssetManager TODO: heh 
    ShaderManager shaMan{};
-   auto fragShader = shaMan.load_shader("fraSha.fs");
+   auto fraShader = shaMan.load_shader("fraSha.fs");
    auto vertShader = shaMan.load_shader("vertSha.vs");
 
-   auto shaProg = shaMan.create_program({fragShader, vertShader});
+   auto shaProg = shaMan.create_program({fraShader, vertShader});
 
    AssetManager assMan{};
    SharedPtr<Model> myModel = assMan.load_model("12330_Statue_v1_L2.obj");
@@ -588,13 +588,20 @@ Int32 main( Int32 argc, char const *argv[] ) {
                                 Vec3(0.0f, 0.0f, 1.0f));
    //scenMan
 
-   Viewport myView { Vec3(0.0f, 0.0f, -4.0f),
-                     Vec3(0.0f, 0.0f,  1.0f),
+   Viewport myView { Vec3(0.0f, 0.0f, -40.0f),
+                     Vec3(0.0f, 0.0f,  -1.0f),
                      config::fov_rad};
    myView.bind_shader_program(*shaProg);
    
    Vec3 axis_rotations { 0.0f, 0.0f, 0.0f };
+<<<<<<< HEAD
    Float32 fov_rad = 1.570f; // 90 degrees
+=======
+   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+   
+
+>>>>>>> c79b5f7c7d6c95007e6f3e4c902cd456ebd70661
 
  // main loop:
 	while (!glfwWindowShouldClose(window)) {
@@ -624,15 +631,31 @@ Int32 main( Int32 argc, char const *argv[] ) {
 		glfwGetFramebufferSize(window, &display_w, &display_h);
 		glViewport(0, 0, display_w, display_h);
       
-      glClearColor(0.2f, 0.2f, 0.2f, 1.0f);//glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
-		glClear(GL_COLOR_BUFFER_BIT);
+      //glClearColor(0.2f, 0.2f, 0.2f, 1.0f);//glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+		//glClear(GL_COLOR_BUFFER_BIT);
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 // programkod här
       //myMinstance->ttranceform(aTransformMatris)
       //myMinstance->render(&*shaProg);
 
+      glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)config::width / (float)config::height, 0.1f, 100.0f);
+      glm::mat4 view = glm::lookAt(glm::vec3(0.0f, 0.0f, 30.0f), glm::vec3(0.0f, 0.0f, 30.0f) + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
+      glUniformMatrix4fv(glGetUniformLocation(shaProg->getProgramLoc(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+      glUniformMatrix4fv(glGetUniformLocation(shaProg->getProgramLoc(), "view"), 1, GL_FALSE, glm::value_ptr(view));
+
+      glm::mat4 model;
+      model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // Translate it down a bit so it's at the center of the scene
+      model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// It's a bit too big for our scene, so scale it down
+      glUniformMatrix4fv(glGetUniformLocation(shaProg->getProgramLoc(), "model"), 1, GL_FALSE, glm::value_ptr(model));
+      //myModel->draw(*shaProg);
+      
+      
       scenMan.draw(); // undersök om buffer binds
+
+
+
 
 		float dt_time_s = ImGui::GetIO().DeltaTime;
 		// glBindBuffer(GL_UNIFORM_BUFFER, gUniformBuffer);

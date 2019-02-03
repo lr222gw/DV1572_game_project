@@ -21,15 +21,15 @@ void Mesh::_initialize_mesh() {
    //Attributes för Vertex Strukten; Position, Normal och TexturKoordinat
    //Position
    glEnableVertexAttribArray(0);
-   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)0);
                       //0 indicates that this is the first Element of a Struct, 
    //Normal
    glEnableVertexAttribArray(1);
-   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, normal));
                       //1 indicates that this is the second element of  the struct
    //TextureKoordinat
    glEnableVertexAttribArray(2);
-   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, uv));
+   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, uv));
                      //2 indicates that this is the third element of  the struct
    glBindVertexArray(0);
 }
@@ -38,7 +38,7 @@ void Mesh::_draw(ShaderProgram &shader_program) {
    GLuint diffuseNr = 1;
    GLuint specularNr = 1;
    GLuint normalNr = 1;
-
+   glUseProgram(shader_program.getProgramLoc());
    for (GLuint i = 0; i < this->texture_list.size(); i++) {
       
       //ställa in vilken Textur vi jobbar på, vi kan högst ha 32 (eller 16?)

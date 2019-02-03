@@ -1,6 +1,6 @@
 #version 440 core
 
-layout (location = 0) in vec3 pos_vs;
+layout (location = 0) in vec3 position;
 layout (location = 1) in vec3 normal_vs;
 layout (location = 2) in vec2 uv_vs;
 
@@ -14,8 +14,14 @@ uniform mat4 model_transform; // för ModelInstances;
 // model_transform konverterar alla koordinaterna från
 // local space till global space relativt instansen.
 
+
+uniform mat4 view;
+uniform mat4 model;
+uniform mat4 projection;
+
 void main()
 {
     uv_fs = uv_vs;    	
-    gl_Position = viewport_transform * model_transform * vec4(pos_vs, 1.0);
+	gl_Position = projection * view * model * vec4( position, 1.0f );
+    //gl_Position = viewport_transform * model_transform * vec4(pos_vs, 1.0);
 }
