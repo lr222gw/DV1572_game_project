@@ -472,12 +472,16 @@ private:
 
 
 
-void draw_camera_debug_window( Float32 &rot_x, Float32 &rot_y, Float32 &rot_z ) {
+void draw_camera_debug_window( Float32 &rot_x, Float32 &rot_y, Float32 &rot_z, Float32 &fov_rad ) {
    ImGui::Begin( "Camera:" ); // begin our Camera window:
    {  // draw our window GUI components and do I/O:
       ImGui::SliderAngle( "X-axis", &rot_x );
       ImGui::SliderAngle( "Y-axis", &rot_y );
       ImGui::SliderAngle( "Z-axis", &rot_z );
+      // add some vertical spacing:
+      ImGui::Spacing();
+      // FOV slider:
+      ImGui::SliderAngle( "FOV", &fov_rad );
       // add some vertical spacing:
       ImGui::Spacing();
       // print our current framerate:
@@ -569,10 +573,10 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
    //testa   vår AssetManager TODO: heh 
    ShaderManager shaMan{};
-   auto fraShader = shaMan.load_shader("fraSha.fs");
+   auto fragShader = shaMan.load_shader("fraSha.fs");
    auto vertShader = shaMan.load_shader("vertSha.vs");
 
-   auto shaProg = shaMan.create_program({fraShader, vertShader});
+   auto shaProg = shaMan.create_program({fragShader, vertShader});
 
    AssetManager assMan{};
    SharedPtr<Model> myModel = assMan.load_model("12330_Statue_v1_L2.obj");
@@ -590,6 +594,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    myView.bind_shader_program(*shaProg);
    
    Vec3 axis_rotations { 0.0f, 0.0f, 0.0f };
+   Float32 fov_rad = 1.570f; // 90 degrees
 
  // main loop:
 	while (!glfwWindowShouldClose(window)) {
@@ -605,8 +610,9 @@ Int32 main( Int32 argc, char const *argv[] ) {
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-      draw_camera_debug_window( axis_rotations.x, axis_rotations.y, axis_rotations.z );
+      draw_camera_debug_window( axis_rotations.x, axis_rotations.y, axis_rotations.z, fov );
       myView.set_rotation( axis_rotations );
+      myView.set_fov( fov_rad );
 
       ImGui::Render();
 		// !! ImGui kod här !!
@@ -645,5 +651,6 @@ Int32 main( Int32 argc, char const *argv[] ) {
 	glfwDestroyWindow(window);
 	glfwTerminate(); // close OpenGL window & terminate GLFW
 
-	return 0; // successful exit
+	return 0; // successful exit   
+   scenMan
 }
