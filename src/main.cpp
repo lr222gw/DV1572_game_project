@@ -12,6 +12,8 @@
 #include "Viewport.h"
 #include "SceneManager.h"
 
+void processInput(GLFWwindow *window);
+
 //#include "misc/stb_image.h" //TODO: ska denna  vara här?
 
 //Temporära bibliotek (och sånt) för temporära lösningar
@@ -608,6 +610,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
  // main loop:
 	while (!glfwWindowShouldClose(window)) {
+		processInput(window);
 		// poll & handle events such as window resizing and input from the keyboard or mouse
 		// use io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if imgui wants to use the user's input
 		// - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
@@ -625,19 +628,9 @@ Int32 main( Int32 argc, char const *argv[] ) {
       myView.set_position( cam_positions );
       myView.set_fov( fov_rad );
 
-      ImGui::Render();
-		// !! ImGui kod här !!
-
-		// rendering
-
-		Int32 display_w, display_h;
-		glfwMakeContextCurrent(window);
-		glfwGetFramebufferSize(window, &display_w, &display_h);
-		glViewport(0, 0, display_w, display_h);
       
-      glClearColor(1.0f, 0.2f, 0.2f, 1.0f);//glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+		glClearColor(1.0f, 0.2f, 0.2f, 1.0f);//glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 // programkod här
       //myMinstance->ttranceform(aTransformMatris)
@@ -659,6 +652,16 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
 
 
+	  ImGui::Render();
+	  // !! ImGui kod här !!
+
+	  // rendering
+
+	  Int32 display_w, display_h;
+	  glfwMakeContextCurrent(window);
+	  glfwGetFramebufferSize(window, &display_w, &display_h);
+	  glViewport(0, 0, display_w, display_h);
+	  ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 	//	float dt_time_s = ImGui::GetIO().DeltaTime; // UNUSED
 
@@ -677,4 +680,17 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
 	return 0; // successful exit   
 
+}
+
+void processInput(GLFWwindow *window)
+{
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	{
+		glfwSetWindowShouldClose(window, true);
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
