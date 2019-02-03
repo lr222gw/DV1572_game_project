@@ -11,7 +11,7 @@ out vec2 uv_fs;
 
 //uniform mat4 viewport_transform;   // för Viewport
 
-uniform mat4 model_transform; // för ModelInstances;
+//uniform mat4 model_transform; // för ModelInstances;
 // ModelInstance har en _model av typ SharedPtr<Model>
 // alla vertriser i _model är i local space (origo)
 // model_transform konverterar alla koordinaterna från
@@ -23,7 +23,7 @@ uniform mat4 model;
 uniform mat4 projection;
 
 void main() {
-   Mat4 does_nothing = model_transform * mat4( 0.0f );
+   //Mat4 does_nothing = model_transform * mat4( 0.0f );
 
    uv_fs = uv_vs;    	
 	gl_Position = projection * view * model * vec4( position, 1.0f );
