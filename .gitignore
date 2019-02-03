@@ -263,4 +263,5 @@ __pycache__/
 # Ignore some of the unix specific files and folders
 /tmp
 /bin
-makefile.o
+/src/imgui.ini
+imgui.ini
