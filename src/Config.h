@@ -5,8 +5,8 @@ namespace config {
    static constexpr Int32     height =  768,
                               width  = 1024;
 
-   static constexpr Float32   near_plane   =   0.0100f,
-                              far_plane    = 100.0000f,
+   static constexpr Float32   near_plane   =   0.001f,
+                              far_plane    = 999.0000f,
                               fov_rad      =   1.5708f, // 90 grader i radianer
                               aspect_ratio = (Float32)height / (Float32)width;
 
