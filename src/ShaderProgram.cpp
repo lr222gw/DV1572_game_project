@@ -23,7 +23,7 @@ ShaderProgram::ShaderProgram( Vector<SharedPtr<Shader>> const &shader_ptrs):
    if (compile_result == GL_FALSE) {
       // query information about the compilation (nothing if compilation went fine!)
       memset(buffer, 0, 1024);
-      glGetProgramInfoLog(_program_location, 1024, nullptr, buffer);
+      glGetProgramInfoLog( _program_location, 1024, nullptr, buffer );
       // print to Visual Studio debug console output
       assert(false && buffer);// TODO: ersätt med assert(...)
       // OutputDebugStringA(buffer);
