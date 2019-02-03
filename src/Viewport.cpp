@@ -23,8 +23,8 @@ Viewport::Viewport(Vec3 position, Float32 fov_rad) :
    
    //tillfällig
    _model = Mat4( 1.0f );
-   _model = glm::translate(_model, glm::vec3(0.0f, 10.0f, 0.0f)); // Translate it down a bit so it's at the center of the scene
-   _model = glm::scale(_model, glm::vec3(.1f, .1f, .1f));   // It's a bit too big for our scene, so scale it down
+   _model = glm::translate(_model, glm::vec3(0.0f, 0.0f, 0.0f)); // Translate it down a bit so it's at the center of the scene
+   _model = glm::scale(_model, glm::vec3(0.1f, 0.1f, 0.1f));   // It's a bit too big for our scene, so scale it down
    
    _write_to_buffer();
 

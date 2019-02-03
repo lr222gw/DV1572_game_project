@@ -580,7 +580,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
 	// activate depth test and stencil test for openGL
 	glEnable(GL_DEPTH_TEST);
-	// glEnable(GL_STENCIL_TEST);
+	glEnable(GL_STENCIL_TEST);
 
    //testa   vår AssetManager TODO: heh 
    ShaderManager shaMan{};
@@ -590,7 +590,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    auto shaProg = shaMan.create_program({fraShader, vertShader});
 
    AssetManager assMan{};
-   SharedPtr<Model> myModel = assMan.load_model("chair.obj");
+   SharedPtr<Model> myModel = assMan.load_model("test.obj");
    
    SceneManager scenMan{};
    SharedPtr<ModelInstance> modelInstance = 
@@ -606,7 +606,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    Viewport myView { cam_positions, fov_rad };
    myView.bind_shader_program(*shaProg);
    
-   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+   //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 
 
@@ -633,8 +633,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
       myView.set_fov( fov_rad );
 
       
-		glClearColor(0.2, 0.2f, 0.2f, 1.0f);//glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClearColor(1.2, 0.2f, 0.2f, 1.0f);//glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
       
 // programkod här
       //myMinstance->ttranceform(aTransformMatris)
