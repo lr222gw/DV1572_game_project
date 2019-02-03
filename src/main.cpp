@@ -633,7 +633,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
       myView.set_fov( fov_rad );
 
       
-		glClearColor(1.0f, 0.2f, 0.2f, 1.0f);//glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+		glClearColor(0.2, 0.2f, 0.2f, 1.0f);//glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       
 // programkod här
