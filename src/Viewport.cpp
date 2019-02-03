@@ -65,7 +65,7 @@ void Viewport::_update_view_matrix() {
    // _rotation.y = hur många radianer roterar vi kring Y-axeln
    // _rotation.z = hur många radianer roterar vi kring Z-axeln
 
-/ // den här använder inte rotation
+ // den här använder inte rotation
       _view = glm::lookAt( _position,
                            _position + Vec3{ 0, 0, -1 },
                            Vec3{ 0, 1, 0 } );

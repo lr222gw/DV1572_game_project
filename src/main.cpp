@@ -643,14 +643,14 @@ Int32 main( Int32 argc, char const *argv[] ) {
       //myMinstance->ttranceform(aTransformMatris)
       //myMinstance->render(&*shaProg);
 
-glm::mat4 projection = glm::perspective(fov_rad, (float)config::width / (float)config::height, 0.1f, 100.0f);
-glm::mat4 view = glm::lookAt(glm::vec3(0.0f, 0.0f, 30.0f), glm::vec3(0.0f, 0.0f, 30.0f) + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-glUniformMatrix4fv(glGetUniformLocation(shaProg->getProgramLoc(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-glUniformMatrix4fv(glGetUniformLocation(shaProg->getProgramLoc(), "view"), 1, GL_FALSE, glm::value_ptr(view));
-glm::mat4 model;
-model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // Translate it down a bit so it's at the center of the scene
-model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// It's a bit too big for our scene, so scale it down
-glUniformMatrix4fv(glGetUniformLocation(shaProg->getProgramLoc(), "model"), 1, GL_FALSE, glm::value_ptr(model));
+//glm::mat4 projection = glm::perspective(fov_rad, (float)config::width / (float)config::height, 0.1f, 100.0f);
+//glm::mat4 view = glm::lookAt(glm::vec3(0.0f, 0.0f, 30.0f), glm::vec3(0.0f, 0.0f, 30.0f) + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+//glUniformMatrix4fv(glGetUniformLocation(shaProg->getProgramLoc(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+//glUniformMatrix4fv(glGetUniformLocation(shaProg->getProgramLoc(), "view"), 1, GL_FALSE, glm::value_ptr(view));
+//glm::mat4 model;
+//model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // Translate it down a bit so it's at the center of the scene
+//model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// It's a bit too big for our scene, so scale it down
+//glUniformMatrix4fv(glGetUniformLocation(shaProg->getProgramLoc(), "model"), 1, GL_FALSE, glm::value_ptr(model));
 
       //myModel->draw(*shaProg);
       
