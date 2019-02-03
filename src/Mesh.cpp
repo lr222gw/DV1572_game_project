@@ -9,19 +9,19 @@ void Mesh::_initialize_mesh() {
    glGenVertexArrays(1, &_vao);
    glGenBuffers(1, &_vbo);
    glGenBuffers(1, &_ebo);
-
+   
    glBindVertexArray(_vao);
    glBindBuffer(GL_ARRAY_BUFFER, _vbo);
 
    glBufferData(GL_ARRAY_BUFFER, vertex_list.size() * sizeof(Vertex), &vertex_list[0], GL_STATIC_DRAW);
    
    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ebo);
-   glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_list.size() * sizeof(Uint32), &index_list[0], GL_STATIC_DRAW);
+   glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_list.size() * sizeof(GLuint), &index_list[0], GL_STATIC_DRAW);
 
    //Attributes för Vertex Strukten; Position, Normal och TexturKoordinat
    //Position
    glEnableVertexAttribArray(0);
-   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)0);
+   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, position));
                       //0 indicates that this is the first Element of a Struct, 
    //Normal
    glEnableVertexAttribArray(1);
@@ -71,14 +71,14 @@ void Mesh::_draw(ShaderProgram &shader_program) {
    glBindVertexArray(this->_vao);
    glDrawElements(GL_TRIANGLES, this->index_list.size(), GL_UNSIGNED_INT, 0);
 
-   //Bind OpenGL till standard värderna...
+   ////Bind OpenGL till standard värderna...
    glBindVertexArray(0);
-   for (GLuint i = 0; i < this->texture_list.size(); i++) {
-
-      glActiveTexture(GL_TEXTURE0+i);
-      glBindTexture(GL_TEXTURE_2D,0);
-
-   }
+   //for (GLuint i = 0; i < this->texture_list.size(); i++) {
+   //
+   //   glActiveTexture(GL_TEXTURE0+i);
+   //   glBindTexture(GL_TEXTURE_2D,0);
+   //
+   //}
 
 }
 
