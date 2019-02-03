@@ -42,7 +42,7 @@ void Viewport::transform(Mat4 transformation) {
 }
 
 void Viewport::set_fov(Float32 fov_rad) {
-   _projection = glm::perspective( fov,
+   _projection = glm::perspective( fov_rad,
                                    config::aspect_ratio,
                                    config::near_plane,
                                    config::far_plane );
