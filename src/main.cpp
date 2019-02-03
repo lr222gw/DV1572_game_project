@@ -575,7 +575,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    auto shaProg = shaMan.create_program({fraShader, vertShader});
 
    AssetManager assMan{};
-   SharedPtr<Model> myModel = assMan.load_model("12330_Statue_v1_L2.obj");
+   SharedPtr<Model> myModel = assMan.load_model("test2.obj");
    
    SceneManager scenMan{};
    SharedPtr<ModelInstance> modelInstance = 
@@ -590,7 +590,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    myView.bind_shader_program(*shaProg);
    
    Vec3 axis_rotations { 0.0f, 0.0f, 0.0f };
-   //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
    
 
@@ -630,15 +630,15 @@ Int32 main( Int32 argc, char const *argv[] ) {
       //myMinstance->ttranceform(aTransformMatris)
       //myMinstance->render(&*shaProg);
 
-      glm::mat4 projection = glm::perspective(45.0f, (float)config::width / (float)config::height, 0.1f, 100.0f);
-      glm::mat4 view = glm::lookAt(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, 3.0f) + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+      glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)config::width / (float)config::height, 0.1f, 100.0f);
+      glm::mat4 view = glm::lookAt(glm::vec3(0.0f, 0.0f, 30.0f), glm::vec3(0.0f, 0.0f, 30.0f) + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
       glUniformMatrix4fv(glGetUniformLocation(shaProg->getProgramLoc(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
       glUniformMatrix4fv(glGetUniformLocation(shaProg->getProgramLoc(), "view"), 1, GL_FALSE, glm::value_ptr(view));
 
       glm::mat4 model;
-      model = glm::translate(model, glm::vec3(0.0f, -1.75f, -60.0f)); // Translate it down a bit so it's at the center of the scene
-      model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));	// It's a bit too big for our scene, so scale it down
+      model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // Translate it down a bit so it's at the center of the scene
+      model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// It's a bit too big for our scene, so scale it down
       glUniformMatrix4fv(glGetUniformLocation(shaProg->getProgramLoc(), "model"), 1, GL_FALSE, glm::value_ptr(model));
       //myModel->draw(*shaProg);
       
