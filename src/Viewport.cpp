@@ -10,7 +10,7 @@ Viewport::Viewport(Vec3 position, Float32 fov_rad) :
    //_model = Mat4(1.0f);
 
    // validera
-   _view ( position );
+   _view = Transform( position );
 
    // validera
    _projection = Mat4(1.0f);
