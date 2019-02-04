@@ -7,7 +7,7 @@ public:
    Mat4 const &matrix;
 
    Transform( Vec3 position = Vec3( 0.0f ),
-              Vec3 rotation = Vec3( 1.0f ),
+              Vec3 rotation = Vec3( 0.0f ),
               Vec3    scale = Vec3( 1.0f ) )
    :
       _position ( position ),
@@ -34,8 +34,7 @@ public:
    void rotate(Vec3 const &rotation);
    // void rotate(Vec3 const &, Float32);
    // void rotate_deg(Vec3 const &axis, Float32 angle_deg);
-
-   void look_at( Vec3 const &position, Vec3 const up={0,1,0} );
+   // void look_at( Vec3 const &position, Vec3 const up={0,1,0} );
 
    void scale( Vec3 const &scale );
    void translate( Vec3 const &offset);

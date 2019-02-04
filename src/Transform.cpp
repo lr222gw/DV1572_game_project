@@ -46,7 +46,7 @@ void Transform::set_scale(Vec3 const &scale) {
 
 void Transform::rotate(Vec3 const &rotation) {
    // generera mat4 via quad
-   _rotation += glm::toMat4(rotation);
+   _rotation += rotation; //?
    _update_matrix();
 }
 
@@ -70,13 +70,13 @@ void Transform::translate(Vec3 const &offset) {
    _update_matrix();
 }
 
-void Transform::look_at(Vec3 const &position, Vec3 const up) {
-   _rotation = glm::lookAt( _position, position, up );
-   _rotation[3][0] = 0;
-   _rotation[3][1] = 0; // TODO: verifiera att ordningen är rätt på matrisaccessen
-   _rotation[3][2] = 0;
-   _update_matrix();
-}
+// void Transform::look_at(Vec3 const &position, Vec3 const up) {
+//    _rotation = glm::lookAt( _position, position, up );
+//    _rotation[3][0] = 0;
+//    _rotation[3][1] = 0; // TODO: verifiera att ordningen är rätt på matrisaccessen
+//    _rotation[3][2] = 0;
+//    _update_matrix();
+// }
 
 Transform Transform::make_translation( Vec3 const &offset ) {
    return Transform( offset );
@@ -108,7 +108,7 @@ void Transform::_update_matrix() {
    // omvandlar skala och position till mat4 transformer
    // och uppdaterar sedan klasstransformen till en kombination
    // av dessa och rotationsmatrisen
-   _matrix = _rotation                                     // 3
+   _matrix = glm::toMat4(Quat(Vec4(_rotation, 1.0f)))      // 3
            * glm::translate( _identity_matrix, _position ) // 2
            * glm::scale( _identity_matrix, _scale );       // 1
 }

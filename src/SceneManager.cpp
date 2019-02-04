@@ -50,25 +50,39 @@ void SceneManager::draw_debug_scene_inspection() {
       {  // draw our window GUI components and do I/O:
          Uint32 i = 0;
          for ( auto &e : _instances ) {
-            auto transform   = e.get_transform();
-            Vec3 rotation    = transform.get_rotation();
-            Vec3 position    = transform.get_position();
-            Vec3 scale       = transform.get_scale();
-            ImGui::InputText( "%-32s%u", e->get_model()->get_name().c_str(), i );
-            ImGui::NewLine();
-            ImGui::InputFloat3("Position", &position[0] )
-            ImGui::InputText( "Rotation:", );
-            ImGui::SameLine();
-            ImGui::SliderAngle( "  X", &rotation.x );
-            ImGui::SameLine();
-            ImGui::SliderAngle( "  Y", &rotation.y );
-            ImGui::SameLine();
-            ImGui::SliderAngle( "  Z", &rotation.z );
-            ImGui::NewLine();
-            ImGui::SliderFloat3( "Scale", &scale[0] );
-            ImGui::Separator();
-            Transform new_transform ( position, rotation, scale );
-            e.set_transform( new_transform );
+            if ( !e.expired() ) {
+               char buffer[256];
+               auto instance = e.lock();
+               auto transform   = instance->get_transform();
+               Vec3 rotation    = transform.get_rotation();
+               Vec3 position    = transform.get_position();
+               Vec3 scale       = transform.get_scale();
+
+               //fulhack
+               String id = instance->get_model()->get_name()+"_"+std::to_string(i);
+
+               ImGui::PushID( id.c_str() );
+               ImGui::NewLine();
+               ImGui::Text( "%s:", id.c_str() );
+
+               ImGui::Text( "Position:" );
+               ImGui::InputFloat3("", &position[0], -255.0f, 255.0f );
+
+               ImGui::Text( "Rotation:" );
+               ImGui::SliderAngle( "X", &rotation.x );
+               ImGui::SliderAngle( "Y", &rotation.y );
+               ImGui::SliderAngle( "Z", &rotation.z );
+
+               ImGui::Text( "Scale:" );
+               ImGui::SliderFloat3( "", &scale[0], 0.0f, 100.0f );
+               ImGui::NewLine();
+
+               ImGui::Separator();
+               ImGui::PopID();
+               Transform new_transform ( position, rotation, scale );
+               instance->set_transform( new_transform );
+            }
+            ++i; // increment counter
          }
       } ImGui::End(); // end our Inspection window
    }
