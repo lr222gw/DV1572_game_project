@@ -6,7 +6,7 @@ Mat4 Transform::get_transform() const {
    return Mat4();
 }
 
-Transform& Transform::operator*( Transform const &right_hand_side ) const {
+Transform Transform::operator*( Transform const &right_hand_side ) const {
    return Transform( this->_matrix * right_hand_side._matrix );
 }
 
@@ -44,8 +44,8 @@ void Transform::translate(Vec3 const &offset) {
 }
 
 void Transform::look_at(Vec3 const &position, Vec3 const up) {
-   Vec3 my_position { _matrix[3][0] ,
-                      _matrix[3][1] , 
-                      _matrix[3][2] };
+   Vec3 my_position { _matrix[3][0],
+                      _matrix[3][1], 
+                      _matrix[3][2]  };
    _matrix = glm::lookAt( my_position, position, up );
 }
