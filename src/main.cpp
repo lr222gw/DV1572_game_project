@@ -621,7 +621,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
  // main loop:
 	while (!glfwWindowShouldClose(window)) {
       Float32 delta_time_s = ImGui::GetIO().DeltaTime; // UNUSED
-		processInput(window, myView, delta_time_s);
+		
 		// poll & handle events such as window resizing and input from the keyboard or mouse
 		// use io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if imgui wants to use the user's input
 		// - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
@@ -637,11 +637,12 @@ Int32 main( Int32 argc, char const *argv[] ) {
       myView.bind_shader_program(*shaProg);
 
       draw_camera_debug_window( cam_position, cam_rotations, fov_rad );
-      cam_transform.set_rotation( cam_rotations );
-      cam_transform.set_position( cam_position );
-      myView.set_view( cam_transform );
+      //cam_transform.set_rotation( cam_rotations );
+      //cam_transform.set_position( cam_position );
+      //myView.set_view( cam_transform );
       myView.set_fov( fov_rad );
 
+      processInput(window, myView, delta_time_s);
       
 		glClearColor(1.2, 0.2f, 0.2f, 1.0f);//glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
@@ -711,23 +712,33 @@ void processInput(GLFWwindow *window, Viewport &cam, Float32 delta  )
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 
-   float camspeed = 2.5* delta;
+   Float32 camspeed = 50 * delta;
    Vec3 camPos(1.0f);
 
-   //Transform transform;
-   //cam.transform_view()
-   //cam.get_view().matrix;
+   Transform offset;
 
    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-      
-   }
-   if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-
+      offset = Transform::make_translation(camspeed*Vec3(0.0, 0.0, camspeed));
+      cam.transform( offset);
    }
    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-
+      offset = Transform::make_translation(camspeed*Vec3(0.0, 0.0, -camspeed));
+      cam.transform(offset);
+   }
+   if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+      offset = Transform::make_translation(camspeed*Vec3(camspeed, 0.0, 0.0));
+      cam.transform(offset);
    }
    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-
+      offset = Transform::make_translation(camspeed*Vec3(-camspeed, 0.0, 0.0));
+      cam.transform(offset);
+   }
+   if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
+      offset = Transform::make_translation(camspeed*Vec3(0.0, camspeed, 0.0));
+      cam.transform(offset);
+   }
+   if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+      offset = Transform::make_translation(camspeed*Vec3(0.0, -camspeed, 0.0));
+      cam.transform(offset);
    }
 }
