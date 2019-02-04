@@ -26,22 +26,19 @@ public:
    Transform& operator*( Transform const &right_hand_side ) const;
    void operator*=( Transform const &right_hand_side );
 
-   void make(Vec3 position, Mat4 rotation_matris, Float32 scale);
-
-   void set_rotation(Vec3 rotation);
-   void set_position(Vec3 rotation);
+   void set_rotation(Vec3 const &rotation);
+   void set_position(Vec3 const &rotation);
    void set_scale(Float32 scale);
 
-   void rotate(Quat rotation);
-   void rotate(Vec3, Float32);
-   void rotate_deg(Vec3 axis, Float32 angle_deg);
+   void rotate(Quat const &rotation);
+   void rotate(Vec3 const &, Float32);
+   void rotate_deg(Vec3 const &axis, Float32 angle_deg);
 
-   void look_at( Vec3 position);
+   void look_at( Vec3 const &position, Vec3 const up={0,1,0} );
 
-   void scale( Float32 scale);
-   void translate( Vec3 offset);
+   void scale( Float32 scale );
+   void translate( Vec3 const &offset);
 
 private:
    Mat4 _matrix;
-
 };
