@@ -8,9 +8,10 @@ public:
               Mat4 rotation = ( 0.0f ),
               Vec3    scale = ( 1.0f ) )
    :
-      _scale    ( position ),
-      _position ( rotation ),
-      _rotation ( scale    )
+      _position ( position ),
+      _rotation ( rotation ),
+      _scale    ( scale    )
+
    {
       _update_matrix();
    }

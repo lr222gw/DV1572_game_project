@@ -7,15 +7,15 @@ Mat4 Transform::get_transform() const {
 }
 
 Transform Transform::operator*( Transform const &right_hand_side ) const {
-   return Transform( this->_position + right_hand_side._position(),
-                     this->_rotation * right_hand_side.rotation(),
-                     this->_scale    * right_hand_side.scale );
+   return Transform( this->_position + right_hand_side._position,
+                     this->_rotation * right_hand_side._rotation,
+                     this->_scale    * right_hand_side._scale );
 }
 
 void Transform::operator*=( Transform const &right_hand_side ) {
-   this->_position += right_hand_side._position(),
-   this->_rotation *= right_hand_side.rotation(),
-   this->_scale    *= right_hand_side.scale;
+   this->_position += right_hand_side._position,
+   this->_rotation *= right_hand_side._rotation,
+   this->_scale    *= right_hand_side._scale;
    _update_matrix();
 }
 
