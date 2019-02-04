@@ -30,6 +30,7 @@ void Transform::rotate(Quat rotation)
 
 void Transform::rotate(Vec3 axis, Float32 angle)
 {
+   _matrix = glm::rotate(_matrix, angle, axis);
 }
 
 void Transform::scale(Float32 scale)
