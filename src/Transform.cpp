@@ -8,10 +8,10 @@ Mat4 Transform::get_transform()
 }
 
 Transform& Transform::operator*( Transform const &right_hand_side ) {
-   return this->_matrix * right_hand_side._matrix;
+   return Transform( this->_matrix * right_hand_side._matrix );
 }
 
-void operator*=( Transform const &right_hand_side ) {
+void Transform::operator*=( Transform const &right_hand_side ) {
    this->_matrix *= right_hand_side._matrix;
 }
 
