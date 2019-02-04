@@ -590,7 +590,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    auto shaProg = shaMan.create_program({fraShader, vertShader});
 
    AssetManager assMan{};
-   SharedPtr<Model> myModel = assMan.load_model("Pokemon.obj");
+   SharedPtr<Model> myModel = assMan.load_model("Dog.dae");
    
    SceneManager scenMan{};
    SharedPtr<ModelInstance> modelInstance = 

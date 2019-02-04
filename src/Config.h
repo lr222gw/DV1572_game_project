@@ -5,25 +5,25 @@ namespace config {
    static constexpr Int32     height =  768,
                               width  = 1024;
 
-   static constexpr Float32   near_plane   =    0.0001f,
-                              far_plane    = 9999.0000f,
+   static constexpr Float32   near_plane   =    0.01f,
+                              far_plane    =	100.0000f,
                               fov_rad      =    1.5708f, // 90 grader i radianer
                               aspect_ratio = (Float32)height / (Float32)width;
 
    String const shader_path  { "dat/shaders/" };
    String const model_path   { "dat/models/"  };
-   String const texture_path { "dat/models/"  }; //TODO: behöver vi en Texture mapp?
+   String const texture_path { "dat/models/"  }; //TODO: behï¿½ver vi en Texture mapp?
 };
 
 enum class FileType { model, texture };
 
 struct FilePath {
-   // konstruktor och sådant
+   // konstruktor och sï¿½dant
    FilePath( FileType type, String filename ):
       _type     ( type     ),
       _filename ( filename )
    {}
-   // TODO: fundera över att spara som c-sträng istället... 
+   // TODO: fundera ï¿½ver att spara som c-strï¿½ng istï¿½llet... 
    String relative_path() const {    
       String path;
       switch (_type) {         
@@ -38,7 +38,7 @@ struct FilePath {
       return _filename;
    }
 private:
-   // TODO: två pekare till samma Cstring
+   // TODO: tvï¿½ pekare till samma Cstring
    FileType _type;
    String   _filename;
 };

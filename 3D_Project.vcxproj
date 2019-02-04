@@ -62,8 +62,8 @@
     <ClInclude Include="src\Viewport.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="dat\shaders\fraSha.fs" />
-    <None Include="dat\shaders\vertSha.vs" />
+    <None Include="dat\shaders\fraSha.frag" />
+    <None Include="dat\shaders\vertSha.vert" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
