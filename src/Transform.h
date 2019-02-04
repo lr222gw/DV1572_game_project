@@ -20,6 +20,7 @@ public:
    Mat4 get_transform();
 
    Transform& operator*( Transform const &right_hand_side );
+   void operator*=( Transform const &right_hand_side );
 
    void make(Vec3 position, Mat4 rotation_matris, Float32 scale);
    void set_rotation(Vec3 rotation);
