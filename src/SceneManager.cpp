@@ -54,7 +54,7 @@ void SceneManager::draw_debug_scene_inspection() {
          if ( !e.expired() ) {
             auto instance = e.lock();
 
-            auto transform   = instance->get_transform();
+            auto transform   = instance->model_transform();
 
             Vec3 rotation  = transform.get_rotation();
             Vec3 position  = transform.get_position();

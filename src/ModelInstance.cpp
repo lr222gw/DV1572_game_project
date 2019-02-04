@@ -20,6 +20,3 @@ SharedPtr<Model const> ModelInstance::get_model() const {
    return _model;
 }
 
-Transform ModelInstance::get_transform() const {
-   return _transform;
-}
