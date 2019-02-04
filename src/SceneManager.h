@@ -10,9 +10,7 @@ public:
    SharedPtr<ModelInstance> instantiate_model(
       SharedPtr<Model>               model,
       SharedPtr<ShaderProgram>       shader_program,
-      Vec3                           global_position={0,0,0},
-      Vec3                           scale = { 0,0,0 },
-      Vec3                           rotation = { 0,0,0 });
+      Transform const &                 transform);
 
 
    void draw();

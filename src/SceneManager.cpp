@@ -3,21 +3,23 @@
 SharedPtr<ModelInstance> SceneManager::instantiate_model(
    SharedPtr<Model>          model,
    SharedPtr<ShaderProgram>  shader_program,
-   Vec3                      global_position,
-   Vec3                      scale,
-   Vec3                      rotation_axis)
+   Transform const&          transform)
 {
    // SharedPtr<Model>, SharedPtr<ShaderProgram>
    // r r r t   |  1 0 0 x
    // r r r t   |  0 1 0 y
    // r r r t   |  0 0 1 z
    // 0 0 0 h   |  0 0 0 1
-   Mat4 transform       = Mat4(1.0f);
-        transform[0][3] = global_position.x;
-        transform[1][3] = global_position.y;
-        transform[2][3] = global_position.z;
+   //Mat4 transform       = Mat4(1.0f);
+   //     transform[0][3] = global_position.x;
+   //     transform[1][3] = global_position.y;
+   //     transform[2][3] = global_position.z;
+
+        
 
         //transform = glm::rotate(transform,angle, axisTouse)
+
+
 
         //transform[0][2] = scale.x;
         //transform[1][2] = scale.y;
