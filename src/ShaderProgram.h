@@ -33,6 +33,6 @@ public:
 
 private:
    GLuint                     _program_location;
-   //GLuint                     _transform_location;
+   GLuint                     _transform_location;
    Vector<SharedPtr<Shader>>  _shader_ptrs;
 };

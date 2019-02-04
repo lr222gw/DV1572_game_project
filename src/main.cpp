@@ -597,9 +597,12 @@ Int32 main( Int32 argc, char const *argv[] ) {
    SharedPtr<ModelInstance> modelInstance = 
       scenMan.instantiate_model(myModel,
                                 shaProg, 
-                                Vec3(0.0f, 0.0f, 1.0f));
+                                Transform(Vec3(0.0f, 0.0f, 1.0f),Mat4(1.0f), Vec3(0.2, 0.2, 0.2)));
 
-   SharedPtr<ModelInstance> modelInstance2 = scenMan.instantiate_model(myModel2, shaProg, Vec3(5.0f, 10.0f, 0.0f));
+   SharedPtr<ModelInstance> modelInstance2 = 
+      scenMan.instantiate_model( myModel2,
+                                 shaProg, 
+                                 Transform(Vec3(0.0f, 5.0f, 1.0f), Mat4(1.0f), Vec3(2.0f, 2.0f, 2.0f)));
    //scenMan
 
    Vec3 cam_rotations { 0.0f, 0.0f,  0.0f };
@@ -631,7 +634,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
       myView.bind_shader_program(*shaProg);
 
-      draw_camera_debug_window( cam_positions, cam_rotations, fov_rad );
+      //draw_camera_debug_window( cam_positions, cam_rotations, fov_rad );
       //myView.set_rotation( cam_rotations );
       //myView.set_position( cam_positions );
       myView.set_fov( fov_rad );

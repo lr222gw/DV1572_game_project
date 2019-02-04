@@ -30,7 +30,7 @@ ShaderProgram::ShaderProgram( Vector<SharedPtr<Shader>> const &shader_ptrs):
    }   
 
    // förvarar en modellinstans transform
-   //_transform_location = glGetUniformLocation(_program_location, "model_transform");
+   _transform_location = glGetUniformLocation(_program_location, "model_transform");
 
 
   // auto id = _generate_shader_program_id();
@@ -42,8 +42,8 @@ GLuint ShaderProgram::getProgramLoc() const {
 }
 
 GLuint ShaderProgram::get_transform_location() const {
-   assert( false && "Stygg!" );
-   return 0; // används i ModelInstance::draw() för att föra över instansens
+   
+   return _transform_location; // används i ModelInstance::draw() för att föra över instansens
    // lokals transform till shader programmen så att modellen kan transformeras till korrekt
    // globala position samt rotation osv. i slutändan.
 }
