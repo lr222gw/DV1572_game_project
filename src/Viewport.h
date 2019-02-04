@@ -32,8 +32,8 @@ private:
 
    Float32 _fov;
 
-   Transform _model;
-   Mat4 _projection, _view;
+   Transform _view;
+   Mat4 _projection;
    // TODO: (låg prioritet) använd transform för projection?
 
    GLuint _location;

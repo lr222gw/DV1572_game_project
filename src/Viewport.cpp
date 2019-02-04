@@ -10,10 +10,7 @@ Viewport::Viewport(Vec3 position, Float32 fov_rad) :
    //_model = Mat4(1.0f);
 
    // validera
-   _view = Mat4(1.0f);
-   _view = glm::lookAt( position,
-                        position + Vec3{ 0, 0, -1 },
-                        Vec3{ 0, 1, 0 } );
+   _view ( position );
 
    // validera
    _projection = Mat4(1.0f);
@@ -36,18 +33,18 @@ Viewport::Viewport(Vec3 position, Float32 fov_rad) :
 //    _update_view_matrix();
 // }
 
-void Viewport::transform_model( Transform const &transform ) {
-   _model *= transform;
+void Viewport::transform_view( Transform const &transform ) {
+   _view *= transform;
    _write_to_buffer();
 }
 
-void Viewport::set_model( Transform const &transform ) {
-   _model = transform;
+void Viewport::set_view( Transform const &transform ) {
+   _view = transform;
    _write_to_buffer();
 }
 
-Transform Viewport::get_model() const {
-   return _model;
+Transform Viewport::get_view() const {
+   return _view;
 }
 
 void Viewport::set_fov(Float32 fov_rad) {
@@ -94,9 +91,9 @@ void Viewport::_write_to_buffer() {
    // _camera = _projection * _view; // * _model; // validera?
    // glUniformMatrix4fv( _location, 1, GL_FALSE, glm::value_ptr(_camera) );
    //glUniformMatrix4fv( glGetUniformLocation(_location, "model"),      1, GL_FALSE, glm::value_ptr(_model)      );
-   glUniformMatrix4fv( glGetUniformLocation(_location, "model"),      1, GL_FALSE, &(_model.get_transform()[0][0]) );
+   //glUniformMatrix4fv( glGetUniformLocation(_location, "model"),      1, GL_FALSE, &(_model.get_transform()[0][0]) );
    //glUniformMatrix4fv( glGetUniformLocation(_location, "view"),       1, GL_FALSE, glm::value_ptr(_view)       );
-   glUniformMatrix4fv( glGetUniformLocation(_location, "view"),       1, GL_FALSE, &_view[0][0] );
+   glUniformMatrix4fv( glGetUniformLocation(_location, "view"),       1, GL_FALSE, &(_view.matrix[0][0]) );
    //glUniformMatrix4fv( glGetUniformLocation(_location, "projection"), 1, GL_FALSE, glm::value_ptr(_projection) );
    glUniformMatrix4fv( glGetUniformLocation(_location, "projection"), 1, GL_FALSE, &_projection[0][0] );
    
