@@ -13,7 +13,7 @@
 #include "SceneManager.h"
 
 
-void processInput(GLFWwindow *window);
+void processInput(GLFWwindow *window, Viewport &, Float32);
 
 //#include "misc/stb_image.h" //TODO: ska denna  vara här?
 
@@ -620,7 +620,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
  // main loop:
 	while (!glfwWindowShouldClose(window)) {
-		processInput(window);
+      Float32 delta_time_s = ImGui::GetIO().DeltaTime; // UNUSED
+		processInput(window, myView, delta_time_s);
 		// poll & handle events such as window resizing and input from the keyboard or mouse
 		// use io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if imgui wants to use the user's input
 		// - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
@@ -678,7 +679,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 	  glViewport(0, 0, display_w, display_h);
 	  ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-	//	float dt_time_s = ImGui::GetIO().DeltaTime; // UNUSED
+	//	
 
 		glfwMakeContextCurrent(window);
 		glfwSwapBuffers(window);
@@ -697,7 +698,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
 }
 
-void processInput(GLFWwindow *window, Viewport &cam, float delta  )
+void processInput(GLFWwindow *window, Viewport &cam, Float32 delta  )
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 	{
