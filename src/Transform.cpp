@@ -20,9 +20,14 @@ void Transform::rotate(Quat rotation)
 {
 }
 
-void Transform::rotate(Vec3 axis, Float32 angle)
+void Transform::rotate(Vec3 axis, Float32 angle_rad)
 {
-   _matrix = glm::rotate(_matrix, angle, axis);
+   _matrix = glm::rotate(_matrix, angle_rad, axis);
+}
+
+void Transform::rotate_deg(Vec3 axis, Float32 angle_deg)
+{
+   _matrix = glm::rotate(_matrix, glm::radians(angle_deg), axis);
 }
 
 void Transform::scale(Float32 scale)

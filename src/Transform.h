@@ -25,6 +25,7 @@ public:
    void set_rotation(Vec3 rotation);
    void rotate(Quat rotation);
    void rotate(Vec3, Float32);
+   void rotate_deg(Vec3 axis, Float32 angle_deg);
    void scale( Float32 scale);
    void translate( Vec3 offset);
    void look_at( Vec3 position);
