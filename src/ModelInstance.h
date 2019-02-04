@@ -10,12 +10,14 @@ public:
                  SharedPtr<ShaderProgram> shader_program,
                  Transform const& transform)
    :
-      _model(model),
-      _shader_program(shader_program),
-      _transform(transform)
+      _model          (model),
+      _shader_program (shader_program),
+      _transform      (transform),
+      transform       (_transform)
    {}
    void draw();
-   void transform(Transform const &transform);
+   void transform( Transform const &transform ); // TODO: move semantics
+   void set_transform( Transform const &transform ); // TODO: move semantics
 
 
 private:
@@ -23,6 +25,9 @@ private:
    SharedPtr<Model>          _model;
    SharedPtr<ShaderProgram>  _shader_program;
    Transform                 _transform;
+
+public:
+   Transform const &transform; // read-only exposure
 };
 
 

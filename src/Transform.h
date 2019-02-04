@@ -6,8 +6,8 @@ class Transform {
 public:
    Mat4 const &matrix;
 
-   Transform( Vec3 position = Vec3( 1.0f ),
-              Mat4 rotation = Mat4( 0.0f ),
+   Transform( Vec3 position = Vec3( 0.0f ),
+              Mat4 rotation = _identity_matrix,
               Vec3    scale = Vec3( 1.0f ) )
    :
       _position ( position ),
@@ -41,6 +41,11 @@ public:
    void scale( Vec3 const &scale );
    void translate( Vec3 const &offset);
 
+   // creates Transforms that exclusively translates, rotates, or scales
+   static Transform make_translation( Vec3 const &offset );
+   static Transform make_rotation( Vec3 const &scales );
+   static Transform make_scale( Vec3 const &rotations_rad );
+
 private:
    void _update_matrix();
 
@@ -49,6 +54,16 @@ private:
    Vec3   _scale;
    Mat4   _rotation;
    Vec3   _position;
+
+   static Mat4 const _identity_matrix ( 1.0f );
 };
 
 // TODO: lerp, slerp
+
+
+// Transform move_up = Transform::make_translation(...);
+// myView.transform( rotation );
+// 
+// auto view = myView.get_view();
+// view.translate(...);
+// myView.set_view(view);

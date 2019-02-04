@@ -9,3 +9,7 @@ void ModelInstance::draw() {
 void ModelInstance::transform(Transform const &transform) {
    _transform *= transform;
 }
+
+void ModelInstance::set_transform(Transform const &transform) {
+   _transform = transform;
+}

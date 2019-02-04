@@ -33,7 +33,7 @@ Viewport::Viewport(Vec3 position, Float32 fov_rad) :
 //    _update_view_matrix();
 // }
 
-void Viewport::transform_view( Transform const &transform ) {
+void Viewport::transform( Transform const &transform ) {
    _view *= transform;
    _write_to_buffer();
 }

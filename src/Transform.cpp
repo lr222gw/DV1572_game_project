@@ -76,13 +76,23 @@ void Transform::look_at(Vec3 const &position, Vec3 const up) {
    _update_matrix();
 }
 
+static Transform Transform::make_translation( Vec3 const &offset ) {
+   return Transform( offset );
+}
+
+static Transform Transform::make_rotation( Vec3 const &scales ) {
+   return Transform( _identity_matrix, scales );
+}
+
+static Transform Transform::make_scale( Vec3 const &rotations_rad ) {
+   return Transform( _identity_matrix, _identity_matrix, rotations_rad );
+}
+
 void Transform::_update_matrix() {
    // omvandlar skala och position till mat4 transformer
    // och uppdaterar sedan klasstransformen till en kombination
    // av dessa och rotationsmatrisen
-   static Mat4 const identity_matrix ( 1.0f );
-
-   _matrix = _rotation                                    // 3
-           * glm::translate( identity_matrix, _position ) // 2
-           * glm::scale( identity_matrix, _scale );       // 1
+   _matrix = _rotation                                     // 3
+           * glm::translate( _identity_matrix, _position ) // 2
+           * glm::scale( _identity_matrix, _scale );       // 1
 }
