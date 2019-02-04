@@ -4,23 +4,15 @@
 
 class Transform {
 public:
-   Transform():
-      _matrix( 1.0f )
-   {}
-
-   Transform( Mat4 const &matrix ):
-      _matrix( matrix )
-   {}
-
-   Transform( Mat4 &&matrix ):
-      _matrix( std::move(matrix) )
-   {}
-
-   Transform( Vec3 position,
-              Mat4 rotation,
-              Float32 scale )
+   Transform( Vec3 position = ( 1.0f ),
+              Mat4 rotation = ( 0.0f ),
+              Vec3    scale = ( 1.0f ) )
+   :
+      _scale    ( position ),
+      _position ( rotation ),
+      _rotation ( scale    )
    {
-      // TODO: generera _matrix
+      _update_matrix();
    }
 
    ~Transform() {}
@@ -52,3 +44,5 @@ private:
    Mat4   _rotation;
    Vec3   _position;
 };
+
+// TODO: lerp, slerp

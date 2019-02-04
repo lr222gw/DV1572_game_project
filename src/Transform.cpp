@@ -7,11 +7,16 @@ Mat4 Transform::get_transform() const {
 }
 
 Transform Transform::operator*( Transform const &right_hand_side ) const {
-   return Transform( this->_matrix * right_hand_side._matrix );
+   return Transform( this->_position + right_hand_side._position(),
+                     this->_rotation * right_hand_side.rotation(),
+                     this->_scale    * right_hand_side.scale );
 }
 
 void Transform::operator*=( Transform const &right_hand_side ) {
-   this->_matrix *= right_hand_side._matrix;
+   this->_position += right_hand_side._position(),
+   this->_rotation *= right_hand_side.rotation(),
+   this->_scale    *= right_hand_side.scale;
+   _update_matrix();
 }
 
 void Transform::set_rotation(Vec3 const &rotation) {
