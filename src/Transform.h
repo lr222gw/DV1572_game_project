@@ -4,8 +4,22 @@
 
 class Transform {
 public:
+   Transform():
+      _matrix( 1.0f )
+   {}
+
+   Transform( Vec3 position,
+              Mat4 rotation,
+              Float32 scale )
+   {
+      // TODO: generera _matrix
+   }
+
+   ~Transform() {}
 
    Mat4 get_transform();
+
+   Transform& operator*( Transform const &right_hand_side );
 
    void make(Vec3 position, Mat4 rotation_matris, Float32 scale);
    void set_rotation(Vec3 rotation);
