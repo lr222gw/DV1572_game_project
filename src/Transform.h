@@ -7,7 +7,7 @@ public:
    Mat4 const &matrix;
 
    Transform( Vec3 position = Vec3( 0.0f ),
-              Mat4 rotation = _identity_matrix,
+              Mat4 rotation = Mat4( 1.0f),
               Vec3    scale = Vec3( 1.0f ) )
    :
       _position ( position ),
@@ -55,7 +55,7 @@ private:
    Mat4   _rotation;
    Vec3   _position;
 
-   static Mat4 const _identity_matrix ( 1.0f );
+   static Mat4 const _identity_matrix = Mat4( 1.0f );
 };
 
 // TODO: lerp, slerp
