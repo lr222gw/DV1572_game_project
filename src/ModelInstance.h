@@ -2,27 +2,27 @@
 
 #include "misc/defs.h"
 #include "Model.h"
-
+#include "Transform.h"
 
 class ModelInstance{
 public:
-   ModelInstance(    SharedPtr<Model> model,
-                     SharedPtr<ShaderProgram> shader_program,                                          
-                     Mat4 transform = Mat4(1.0f))
+   ModelInstance(SharedPtr<Model> model,
+                 SharedPtr<ShaderProgram> shader_program,
+                 Transform const& transform)
    :
       _model(model),
       _shader_program(shader_program),
-      _transform(transform)      
+      _transform(transform)
    {}
    void draw();
-   void transform(Mat4 transform);   
+   void transform(Transform const &transform);
 
 
 private:
    // i ShaderInstance har vi två klassfält   
    SharedPtr<Model>          _model;
    SharedPtr<ShaderProgram>  _shader_program;
-    Mat4                      _transform;
+   Transform                 _transform;
 };
 
 
