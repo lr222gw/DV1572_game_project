@@ -21,29 +21,30 @@ Viewport::Viewport(Vec3 position, Float32 fov_rad) :
                                    config::near_plane,
                                    config::far_plane);
    
-   //tillf�llig
-   _model = Mat4( 1.0f );
-   _model = glm::translate(_model, glm::vec3(0.0f, 0.0f, 0.0f)); // Translate it down a bit so it's at the center of the scene
-   _model = glm::scale(_model, glm::vec3(.15f, 0.15f, .15f));   // It's a bit too big for our scene, so scale it down
-   
    _write_to_buffer();
 
 }
 
-void Viewport::set_position(Vec3 new_position) {
-   _position = new_position;
-   _update_view_matrix();
-}
+// void Viewport::set_position(Vec3 new_position) {
+//    _position = new_position;
+//    _update_view_matrix();
+// }
+// 
+// void Viewport::set_rotation(Vec3 new_rotation) {
+//    _rotation = new_rotation;
+//    _update_view_matrix();
+// }
 
-void Viewport::set_rotation(Vec3 new_rotation) {
-   _rotation = new_rotation;
-   _update_view_matrix();
-}
-
-void Viewport::transform(Mat4 transformation) {
-   _view *= transformation; // validera
+void Viewport::transform( Transform const &transform ) {
+   _model *= transform;
    _write_to_buffer();
 }
+
+void Viewport::set_transform( Transform const &transform ) {
+   _model = transform;
+   _write_to_buffer();
+}
+
 
 void Viewport::set_fov(Float32 fov_rad) {
    _fov = fov_rad;
@@ -59,7 +60,7 @@ void Viewport::bind_shader_program(ShaderProgram &shapro) {
    _write_to_buffer();
 }
 
-void Viewport::_update_view_matrix() {
+// void Viewport::_update_view_matrix() {
    // _position = vec3 med x,y,z
    // _rotation = vec3 med rotation kring x, y, z i radianer
    // dvs.
@@ -74,24 +75,24 @@ void Viewport::_update_view_matrix() {
 //*/
 
 /// den h�r roterar med kvatern
-   glm::quat rotation_quaternion {Vec4( _rotation, 0.0f) };
-
-   _view       = glm::toMat4(rotation_quaternion);;
-   _view[3][0] = _position.x;
-   _view[3][1] = _position.y;
-   _view[3][2] = _position.z;
-//*/
-   _write_to_buffer();
-}
+//    glm::quat rotation_quaternion {Vec4( _rotation, 0.0f) };
+// 
+//    _view       = glm::toMat4(rotation_quaternion);;
+//    _view[3][0] = _position.x;
+//    _view[3][1] = _position.y;
+//    _view[3][2] = _position.z;
+// //*/
+//    _write_to_buffer();
+// }
 
 
 void Viewport::_write_to_buffer() {
    // _camera = _projection * _view; // * _model; // validera?
    // glUniformMatrix4fv( _location, 1, GL_FALSE, glm::value_ptr(_camera) );
    //glUniformMatrix4fv( glGetUniformLocation(_location, "model"),      1, GL_FALSE, glm::value_ptr(_model)      );
-   glUniformMatrix4fv( glGetUniformLocation(_location, "model"),      1, GL_FALSE, &_model[0][0]      );
+   glUniformMatrix4fv( glGetUniformLocation(_location, "model"),      1, GL_FALSE, &(_model.get_transform()[0][0]) );
    //glUniformMatrix4fv( glGetUniformLocation(_location, "view"),       1, GL_FALSE, glm::value_ptr(_view)       );
-   glUniformMatrix4fv( glGetUniformLocation(_location, "view"),       1, GL_FALSE, &_view[0][0]       );
+   glUniformMatrix4fv( glGetUniformLocation(_location, "view"),       1, GL_FALSE, &_view[0][0] );
    //glUniformMatrix4fv( glGetUniformLocation(_location, "projection"), 1, GL_FALSE, glm::value_ptr(_projection) );
    glUniformMatrix4fv( glGetUniformLocation(_location, "projection"), 1, GL_FALSE, &_projection[0][0] );
    
