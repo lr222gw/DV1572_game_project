@@ -591,12 +591,15 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
    AssetManager assMan{};
    SharedPtr<Model> myModel = assMan.load_model("Small Tropical Island.obj");
+   SharedPtr<Model> myModel2 = assMan.load_model("Cat.obj");
    
    SceneManager scenMan{};
    SharedPtr<ModelInstance> modelInstance = 
       scenMan.instantiate_model(myModel,
                                 shaProg, 
                                 Vec3(0.0f, 0.0f, 1.0f));
+
+   SharedPtr<ModelInstance> modelInstance2 = scenMan.instantiate_model(myModel2, shaProg, Vec3(5.0f, 10.0f, 0.0f));
    //scenMan
 
    Vec3 cam_rotations { 0.0f, 0.0f,  0.0f };

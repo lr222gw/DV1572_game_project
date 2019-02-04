@@ -33,6 +33,7 @@
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\ShaderManager.cpp" />
     <ClCompile Include="src\ShaderProgram.cpp" />
+    <ClCompile Include="src\Transform.cpp" />
     <ClCompile Include="src\Viewport.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -59,6 +60,7 @@
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\ShaderManager.h" />
     <ClInclude Include="src\ShaderProgram.h" />
+    <ClInclude Include="src\Transform.h" />
     <ClInclude Include="src\Viewport.h" />
   </ItemGroup>
   <ItemGroup>
