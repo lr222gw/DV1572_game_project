@@ -27,11 +27,11 @@ public:
 
    Mat4 get_transform() const;
 
-   Transform& operator*( Transform const &right_hand_side ) const;
+   Transform operator*( Transform const &right_hand_side ) const;
    void operator*=( Transform const &right_hand_side );
 
    void set_rotation(Vec3 const &rotation);
-   void set_position(Vec3 const &rotation);
+   void set_position(Vec3 const &position);
    void set_scale(Float32 scale);
 
    void rotate(Quat const &rotation);
@@ -44,5 +44,12 @@ public:
    void translate( Vec3 const &offset);
 
 private:
+   void _update_matrix() {
+      _matrix = _rotation * _*scale
+   }
    Mat4 _matrix;
+
+   Float32 _scale;
+   Mat4    _rotation;
+   Vec3    _position;
 };
