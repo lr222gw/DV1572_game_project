@@ -590,19 +590,19 @@ Int32 main( Int32 argc, char const *argv[] ) {
    auto shaProg = shaMan.create_program({fraShader, vertShader});
 
    AssetManager assMan{};
-   SharedPtr<Model> myModel = assMan.load_model("Small Tropical Island.obj");
+   SharedPtr<Model> myModel = assMan.load_model("Dog.dae");
    SharedPtr<Model> myModel2 = assMan.load_model("Cat.obj");
    
    SceneManager scenMan{};
    SharedPtr<ModelInstance> modelInstance = 
       scenMan.instantiate_model(myModel,
                                 shaProg, 
-                                Transform(Vec3(0.0f, 0.0f, 1.0f),Mat4(1.0f), Vec3(0.2, 0.2, 0.2)));
+                                Transform(Vec3(0.0f, 0.0f, 1.0f),Mat4(1.0f), Vec3(16.0f, 16.0f, 16.0f)));
 
    SharedPtr<ModelInstance> modelInstance2 = 
       scenMan.instantiate_model( myModel2,
                                  shaProg, 
-                                 Transform(Vec3(0.0f, 5.0f, 1.0f), Mat4(1.0f), Vec3(2.0f, 2.0f, 2.0f)));
+                                 Transform(Vec3(0.0f, 5.0f, 1.0f), Mat4(1.0f), Vec3(0.2f, 0.2f,0.2f)));
    //scenMan
 
    Vec3 cam_rotations { 0.0f, 0.0f,  0.0f };
