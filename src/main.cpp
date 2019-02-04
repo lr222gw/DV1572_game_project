@@ -547,6 +547,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
 	// ensure we can capture the escape key being pressed below
 	//glfwSetInputMode( window, GLFW_STICKY_KEYS, GL_TRUE );
+  // glfwSetCursorPosCallback(window, callback_mouse); // TODO: make a call back matching template that calls on our process_mouse();
    glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
    
