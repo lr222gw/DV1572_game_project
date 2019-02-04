@@ -8,6 +8,10 @@ public:
       _matrix( 1.0f )
    {}
 
+   Transform( Mat4 matrix ):
+      _matrix( matrix )
+   {}
+
    Transform( Vec3 position,
               Mat4 rotation,
               Float32 scale )
@@ -24,6 +28,7 @@ public:
 
    void make(Vec3 position, Mat4 rotation_matris, Float32 scale);
    void set_rotation(Vec3 rotation);
+   void set_position(Vec3 rotation);
    void rotate(Quat rotation);
    void rotate(Vec3, Float32);
    void rotate_deg(Vec3 axis, Float32 angle_deg);
