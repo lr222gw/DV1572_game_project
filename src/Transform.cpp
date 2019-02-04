@@ -6,7 +6,7 @@ Mat4 Transform::get_transform() const {
    return Mat4();
 }
 
-Transform& Transform::operator*( Transform const &right_hand_side ) {
+Transform& Transform::operator*( Transform const &right_hand_side ) const {
    return Transform( this->_matrix * right_hand_side._matrix );
 }
 
