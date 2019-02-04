@@ -64,17 +64,11 @@ void SceneManager::draw_debug_scene_inspection() {
                ImGui::PushID( id.c_str() );
                ImGui::NewLine();
                ImGui::Text( "%s:", id.c_str() );
-
-               ImGui::Text( "Position:" );
-               ImGui::InputFloat3("", &position[0], -255.0f, 255.0f );
-
-               ImGui::Text( "Rotation:" );
-               ImGui::SliderAngle( "X", &rotation.x );
-               ImGui::SliderAngle( "Y", &rotation.y );
-               ImGui::SliderAngle( "Z", &rotation.z );
-
-               ImGui::Text( "Scale:" );
-               ImGui::SliderFloat3( "", &scale[0], 0.0f, 100.0f );
+               ImGui::InputFloat3("Position", &position[0], -255.0f, 255.0f );
+               ImGui::SliderAngle( "X rotation", &rotation.x );
+               ImGui::SliderAngle( "Y rotation", &rotation.y );
+               ImGui::SliderAngle( "Z rotation", &rotation.z );
+               ImGui::SliderFloat3( "Scale", &scale[0], 0.0f, 100.0f );
                ImGui::NewLine();
 
                ImGui::Separator();
