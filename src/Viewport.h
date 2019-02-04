@@ -1,6 +1,7 @@
 #include "misc/defs.h"
 #include "Config.h"
 #include "ShaderProgram.h"
+#include "Viewport.h"
 
 // TODO: (låg prioritet) lägg till en  void make_active(); som i princip bara kallar på _write_to_buffer();
 // TODO: fundera över multi-views och hur man ska hantera det
@@ -9,8 +10,9 @@ class Viewport {
 public:
    Viewport(Vec3 position, Float32 fov = config::fov_rad);
 
-   void transform( Transform const &transform );
-   void set_transform( Transform const &transform );
+   void transform_model( Transform const &transform );
+   void set_model( Transform const &transform );
+   Transform get_model() const;
 
    void bind_shader_program(ShaderProgram &shapro);
 
