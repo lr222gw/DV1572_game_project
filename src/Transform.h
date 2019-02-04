@@ -4,13 +4,16 @@
 
 class Transform {
 public:
+   Mat4 const &matrix;
+
    Transform( Vec3 position = Vec3( 1.0f ),
               Mat4 rotation = Mat4( 0.0f ),
               Vec3    scale = Vec3( 1.0f ) )
    :
       _position ( position ),
       _rotation ( rotation ),
-      _scale    ( scale    )
+      _scale    ( scale    ),
+      matrix    ( _matrix  )
 
    {
       _update_matrix();
