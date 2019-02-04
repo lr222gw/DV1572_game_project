@@ -18,13 +18,16 @@ public:
 
    Vector<Mesh> &get_mesh_list() {
       return _mesh_list;
-   }   
+   }
+
+   String get_name() const;
 
    void draw(ShaderProgram &shaderProgram);
 
 private:
+   String const    _name;
    Vector<Texture> _texture_list;
-   Vector<Mesh> _mesh_list;
+   Vector<Mesh>    _mesh_list;
 
    void _process_node(aiNode *node, const aiScene *scene);
    Mesh _process_mesh(aiMesh *mesh, const aiScene *scene);

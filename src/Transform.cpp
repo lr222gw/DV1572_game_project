@@ -30,7 +30,7 @@ void Transform::operator*=( Transform const &right_hand_side ) {
 }
 
 void Transform::set_rotation(Vec3 const &rotation) {
-   _rotation = glm::toMat4( Quat(Vec4(rotation, 1.0f)) );
+   _rotation = rotation;
    _update_matrix();
 }
 
@@ -44,21 +44,21 @@ void Transform::set_scale(Vec3 const &scale) {
    _update_matrix();
 }
 
-void Transform::rotate(Quat const &rotation) {
+void Transform::rotate(Vec3 const &rotation) {
    // generera mat4 via quad
-   _rotation *= glm::toMat4(rotation);
+   _rotation += glm::toMat4(rotation);
    _update_matrix();
 }
 
-void Transform::rotate(Vec3 const &axis, Float32 angle_rad) {
-   _rotation *= glm::rotate(_rotation, angle_rad, axis);
-   _update_matrix();
-}
+// void Transform::rotate(Vec3 const &axis, Float32 angle_rad) {
+//    _rotation *= glm::rotate(_rotation, angle_rad, axis);
+//    _update_matrix();
+// }
 
-void Transform::rotate_deg(Vec3 const &axis, Float32 angle_deg) {
-   _rotation *= glm::rotate(_rotation, glm::radians(angle_deg), axis);
-   _update_matrix();
-}
+// void Transform::rotate_deg(Vec3 const &axis, Float32 angle_deg) {
+//    _rotation *= glm::rotate(_rotation, glm::radians(angle_deg), axis);
+//    _update_matrix();
+// }
 
 void Transform::scale(Vec3 const &scale) {
    _scale *= scale;
@@ -83,12 +83,25 @@ Transform Transform::make_translation( Vec3 const &offset ) {
 }
 
 Transform Transform::make_rotation( Vec3 const &rotations_rad ) {
-   return Transform( Vec3(0.0f), glm::toMat4(Quat(Vec4(rotations_rad, 0.0f))) ); // 1.0f?
+   return Transform( Vec3(0.0f), rotations_rad ); // 1.0f?
 }
 
 Transform Transform::make_scale( Vec3 const &scales ) {
-   return Transform( Vec3(0.0f), Transform::_identity_matrix, scales );
+   return Transform( Vec3(0.0f), Vec3(1.0f), scales );
 }
+
+Vec3 Transform::get_position() const {
+   return _position;
+}
+
+Vec3 Transform::get_rotation() const {
+   return _rotation;
+}
+
+Vec3 Transform::get_scale() const {
+   return _scale;
+}
+
 
 
 void Transform::_update_matrix() {

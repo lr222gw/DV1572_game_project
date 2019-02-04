@@ -39,9 +39,37 @@ SharedPtr<ModelInstance> SceneManager::instantiate_model(
 void SceneManager::draw() {
    // TODO: sortera instanserna efter ShaderProgram m.h.a. std::partition()
    for ( auto &instance : _instances ) {
-      
       if (!instance.expired()) {
          instance.lock()->draw();
       }      
    }
 }
+
+void SceneManager::draw_debug_scene_inspection() {
+      ImGui::Begin( "Instances:" ); // begin our Inspection window:
+      {  // draw our window GUI components and do I/O:
+         Uint32 i = 0;
+         for ( auto &e : _instances ) {
+            auto transform   = e.get_transform();
+            Vec3 rotation    = transform.get_rotation();
+            Vec3 position    = transform.get_position();
+            Vec3 scale       = transform.get_scale();
+            ImGui::InputText( "%-32s%u", e->get_model()->get_name().c_str(), i );
+            ImGui::NewLine();
+            ImGui::InputFloat3("Position", &position[0] )
+            ImGui::InputText( "Rotation:", );
+            ImGui::SameLine();
+            ImGui::SliderAngle( "  X", &rotation.x );
+            ImGui::SameLine();
+            ImGui::SliderAngle( "  Y", &rotation.y );
+            ImGui::SameLine();
+            ImGui::SliderAngle( "  Z", &rotation.z );
+            ImGui::NewLine();
+            ImGui::SliderFloat3( "Scale", &scale[0] );
+            ImGui::Separator();
+            Transform new_transform ( position, rotation, scale );
+            e.set_transform( new_transform );
+         }
+      } ImGui::End(); // end our Inspection window
+   }
+

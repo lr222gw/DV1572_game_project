@@ -13,3 +13,11 @@ void ModelInstance::transform(Transform const &transform) {
 void ModelInstance::set_transform(Transform const &transform) {
    _transform = transform;
 }
+
+SharedPtr<Model const> ModelInstance::get_model() const {
+   return _model;
+}
+
+Transform ModelInstance::get_transform() const {
+   return _transform;
+}

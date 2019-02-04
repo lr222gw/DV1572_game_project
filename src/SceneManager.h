@@ -15,6 +15,8 @@ public:
 
    void draw();
 
+   void draw_debug_scene_inspection();
+
 private:
    Vector<WeakPtr<ModelInstance>> _instances;
 };

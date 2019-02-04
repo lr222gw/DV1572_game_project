@@ -2,9 +2,14 @@
 
 //#include "misc/defs.h"
 
+Model::Model( String const &filename ):
+   _name ( filename )
+{
+    _load_model( filename );
+}
+
 
 Uint32 load_texture_from_file( FilePath path ) {
-
    Uint32  texture_id;
    glGenTextures( 1, &texture_id) ;
 
@@ -52,14 +57,8 @@ Uint32 load_texture_from_file( FilePath path ) {
    return texture_id;
 }
 
-Model::Model( String const &filename ) {
-   
-    _load_model( filename );
-  
-}
 
 void Model::_load_model( String const &filename ) {
-
    // Använder Assimps Importer klass för att importera en Modelfil.
    Assimp::Importer importer;
    //Vi får en Scene, den innehåller alla data för modellen; Normaler, Vertricer, matrial, etc
@@ -76,6 +75,7 @@ void Model::_load_model( String const &filename ) {
    _process_node(scene->mRootNode, scene);
 }
 
+
 void Model::_process_node( aiNode *node,  aiScene const *scene ) {
    //Gå igenom varje Node (eller childNodes) Mesh, ProcessMesh för varje mesh
    for ( Uint32 i = 0;  i < node->mNumMeshes;  ++i ) {      
@@ -87,14 +87,15 @@ void Model::_process_node( aiNode *node,  aiScene const *scene ) {
    for ( Uint32 i = 0;  i < node->mNumChildren;  ++i ) {
       _process_node(node->mChildren[i], scene);
    }
-   
 }
+
 
 void Model::draw( ShaderProgram &shader_program ) {
    for ( auto &e : get_mesh_list() ) {
       e._draw( shader_program );
    }
 }
+
 
 Mesh Model::_process_mesh( aiMesh *mesh, aiScene const *scene ) {
    Vector<Vertex>   vertices;
@@ -108,7 +109,6 @@ Mesh Model::_process_mesh( aiMesh *mesh, aiScene const *scene ) {
    vertices.reserve(vert_count); 
 
    for ( Uint32 i = 0;  i < vert_count;  ++i ) {
-
       // vi binder en referens till en av de vertricerna vi
       // förallkorat; 
       Vertex vertex;
@@ -194,13 +194,18 @@ Mesh Model::_process_mesh( aiMesh *mesh, aiScene const *scene ) {
    return Mesh( vertices, indices, textures );
 }
 
+
+String Model::get_name() const {
+   return _name;
+}
+
+
 //TODO: Bryta ut "_load_material_textures" och "load_texture_from_file" till TextureHandler
 // Undvik att ladda in en textur som redan är inladdad... 
 Vector<Texture> Model::_load_material_textures( aiMaterial *material, aiTextureType type, String type_name ) {
    Vector<Texture> texture_list;
    
    for ( Uint32 i = 0;  i < material->GetTextureCount(type);  ++i ) {
-
       aiString str;
       material->GetTexture( type, i, &str );      
 

@@ -18,7 +18,8 @@ public:
    void draw();
    void transform( Transform const &transform ); // TODO: move semantics
    void set_transform( Transform const &transform ); // TODO: move semantics
-
+   Transform get_transform() const;
+   SharedPtr<Model const> get_model() const;
 
 private:
    // i ShaderInstance har vi två klassfält   

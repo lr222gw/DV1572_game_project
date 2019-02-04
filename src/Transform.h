@@ -7,7 +7,7 @@ public:
    Mat4 const &matrix;
 
    Transform( Vec3 position = Vec3( 0.0f ),
-              Mat4 rotation = _identity_matrix,
+              Vec3 rotation = Vec3( 1.0f ),
               Vec3    scale = Vec3( 1.0f ) )
    :
       _position ( position ),
@@ -31,9 +31,9 @@ public:
    void set_position(Vec3 const &position);
    void set_scale(Vec3 const &scale);
 
-   void rotate(Quat const &rotation);
-   void rotate(Vec3 const &, Float32);
-   void rotate_deg(Vec3 const &axis, Float32 angle_deg);
+   void rotate(Vec3 const &rotation);
+   // void rotate(Vec3 const &, Float32);
+   // void rotate_deg(Vec3 const &axis, Float32 angle_deg);
 
    void look_at( Vec3 const &position, Vec3 const up={0,1,0} );
 
@@ -45,13 +45,17 @@ public:
    static Transform make_scale( Vec3 const &rotations_rad );
    static Transform make_rotation( Vec3 const &scales );
 
+   Vec3 get_position() const;
+   Vec3 get_rotation() const;
+   Vec3 get_scale()    const;
+
 private:
    void _update_matrix();
 
    Mat4   _matrix;
 
    Vec3   _position;
-   Mat4   _rotation;
+   Vec3   _rotation;
    Vec3   _scale;
 
    static Mat4 const _identity_matrix;
