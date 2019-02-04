@@ -72,7 +72,10 @@ void Transform::_update_matrix() {
    // omvandlar skala och position till mat4 transformer
    // och uppdaterar sedan klasstransformen till en kombination
    // av dessa och rotationsmatrisen
-   constexpr Mat4 identity_matrix ( 1.0f );
+   constexpr Mat4 identity_matrix { 1.0f, 0.0f, 0.0f, 0.0f, 
+                                    0.0f, 1.0f, 0.0f, 0.0f, 
+                                    0.0f, 0.0f, 1.0f, 0.0f, 
+                                    0.0f, 0.0f, 0.0f, 1.0f  };
    _matrix = _rotation                                    // 3
            * glm::translate( identity_matrix, _position ) // 2
            * glm::scale( identity_matrix, _scale );       // 1
