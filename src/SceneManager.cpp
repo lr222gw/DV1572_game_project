@@ -55,17 +55,18 @@ void SceneManager::draw_debug_scene_inspection() {
             auto instance = e.lock();
 
             auto transform   = instance->get_transform();
-            Vec3 rotation    = transform.get_rotation();
-            Vec3 e_position  = transform.get_position();
-            Vec3 e_scale     = transform.get_scale();
 
-            Float32 position[3]   { e_position.x,
-                                    e_position.y,
-                                    e_position.z }; // fulhack
+            Vec3 rotation  = transform.get_rotation();
+            Vec3 position  = transform.get_position();
+            Vec3 scale     = transform.get_scale();
 
-            Float32 scale[3]      { e_scale.x,
-                                    e_scale.y,
-                                    e_scale.z }; // fulhack
+            Float32 position_array[3]   { position.x,
+                                          position.y,
+                                          position.z }; // fulhack
+
+            Float32 scale_array[3] { scale.x,
+                                     scale.y,
+                                     scale.z }; // fulhack
 
             // fulhack
             String id = instance->get_model()->get_name() +"::"+ std::to_string(i);
@@ -73,19 +74,23 @@ void SceneManager::draw_debug_scene_inspection() {
             ImGui::PushID( id.c_str() );
             ImGui::NewLine();
             ImGui::Text( "%s:", id.c_str() );
-            ImGui::InputFloat3( "Position", position, "%.1f");
+            ImGui::InputFloat3( "Position", position_array, "%.1f");
             ImGui::SliderAngle( "X rotation", &rotation.x );
             ImGui::SliderAngle( "Y rotation", &rotation.y );
             ImGui::SliderAngle( "Z rotation", &rotation.z );
-            ImGui::SliderFloat3( "Scale", scale, 0.001f, 100.0f, "%.2f" );
+            ImGui::SliderFloat3( "Scale", scale_array, 0.001f, 100.0f, "%.2f" );
             ImGui::NewLine();
 
             ImGui::Separator();
             ImGui::PopID();
 
-            Transform new_transform( Vec3( position[0], position[1], position[2] ),
+            Transform new_transform( Vec3( position_array[0],
+                                           position_array[1],
+                                           position_array[2] ),
                                      rotation,
-                                     Vec3( scale[0], scale[1], scale[2] ) );
+                                     Vec3( scale_array[0],
+                                           scale_array[1],
+                                           scale_array[2] ) );
 
             instance->set_transform( new_transform );
          }

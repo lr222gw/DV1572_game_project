@@ -8,6 +8,7 @@ Transform &Transform::operator=( Transform const &other ) {
       this->_rotation = other._rotation;
       this->_scale    = other._scale;
       this->_matrix   = other._matrix;
+      _update_matrix();
    }
    return *this;
 }
