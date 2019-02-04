@@ -12,14 +12,8 @@
 #include "Viewport.h"
 #include "SceneManager.h"
 
-
-<<<<<<< HEAD
-void processInput(GLFWwindow *window);
-=======
-
 void process_input(GLFWwindow *window, Viewport &, Float32);
 void process_mouse(GLFWwindow *window, Viewport &cam, Float32 delta);
->>>>>>> 080c8cb9ce842a5bbcbd20cfbc644439c65ea94e
 
 //#include "misc/stb_image.h" //TODO: ska denna  vara här?
 
@@ -630,12 +624,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
  // main loop:
 	while (!glfwWindowShouldClose(window)) {
-<<<<<<< Updated upstream
       Float32 delta_time_s = ImGui::GetIO().DeltaTime; // UNUSED
 		
-=======
-		processInput(window);
->>>>>>> Stashed changes
 		// poll & handle events such as window resizing and input from the keyboard or mouse
 		// use io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if imgui wants to use the user's input
 		// - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
@@ -715,11 +705,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
 }
 
-<<<<<<< HEAD
-void processInput(GLFWwindow *window, Viewport &cam, float delta  )
-=======
+
 void process_input(GLFWwindow *window, Viewport &cam, Float32 delta  )
->>>>>>> 080c8cb9ce842a5bbcbd20cfbc644439c65ea94e
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 	{
