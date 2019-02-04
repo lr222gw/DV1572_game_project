@@ -20,8 +20,16 @@ void Transform::make(Vec3 position, Mat4 rotation_matris, Float32 scale)
 
 }
 
-void Transform::set_rotation(Vec3 rotation)
-{
+void Transform::set_rotation(Vec3 rotation) {
+   
+}
+
+void Transform::set_position(Vec3 rotation) {
+
+}
+
+void Transform::set_scale(Float32 scale) {
+
 }
 
 void Transform::rotate(Quat rotation)
