@@ -697,7 +697,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
 }
 
-void processInput(GLFWwindow *window)
+void processInput(GLFWwindow *window, Viewport &cam, float delta  )
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 	{
@@ -708,4 +708,25 @@ void processInput(GLFWwindow *window)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+
+   float camspeed = 2.5* delta;
+   Vec3 camPos(1.0f);
+
+   //Transform transform;
+   //cam.transform_view()
+   //cam.get_view().matrix;
+
+   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+      
+   }
+   if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+
+   }
+   if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+
+   }
+   if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+
+   }
 }
