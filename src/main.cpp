@@ -584,13 +584,13 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
    //testa   vår AssetManager TODO: heh 
    ShaderManager shaMan{};
-   auto fraShader = shaMan.load_shader("fraSha.fs");
-   auto vertShader = shaMan.load_shader("vertSha.vs");
+   auto fraShader = shaMan.load_shader("fraSha.frag");
+   auto vertShader = shaMan.load_shader("vertSha.vert");
 
    auto shaProg = shaMan.create_program({fraShader, vertShader});
 
    AssetManager assMan{};
-   SharedPtr<Model> myModel = assMan.load_model("OBJ.obj");
+   SharedPtr<Model> myModel = assMan.load_model("Small Tropical Island.obj");
    
    SceneManager scenMan{};
    SharedPtr<ModelInstance> modelInstance = 

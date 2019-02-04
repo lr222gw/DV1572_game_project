@@ -98,11 +98,11 @@ SharedPtr<ShaderProgram> ShaderManager::create_program( Vector<SharedPtr<Shader>
  
 Shader::Type ShaderManager::_extract_type( StringView filename ) const {
       auto extension = filename.substr( filename.find_last_of(".") + 1) ;
-      if      ( extension == "vs" )
+      if      ( extension == "vert" )
           return Shader::Type::vertex;
-      else if ( extension == "gs" )
+      else if ( extension == "geom" )
           return Shader::Type::geometry;
-      else if ( extension == "fs" )
+      else if ( extension == "frag" )
           return Shader::Type::fragment;
       else assert(false && "Unaccounted for Shader-extension"); return Shader::Type::error; // TODO: exceptions
   }

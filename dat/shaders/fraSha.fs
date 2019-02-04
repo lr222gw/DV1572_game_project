@@ -16,7 +16,7 @@ void main() {
     vec4 a =texture2D(tex_diff1, uv_fs);
     vec4 b =texture2D(tex_diff2, uv_fs);
     vec4 result = mix(a,b ,0.5); 
-    FragColor =      result  + ambient ;
+    FragColor =      a  + ambient ;
                     //vec4(1.0f,1.0,0.0f,1.0f);
                     //texture( tex_diff1, uv_fs )
                     //+ texture( tex_spec1, uv_fs )
