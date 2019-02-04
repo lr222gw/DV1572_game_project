@@ -611,6 +611,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
    
    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+   glMatrixMode(GL_PROJECTION);
+   glLoadIdentity();
 
 
  // main loop:
