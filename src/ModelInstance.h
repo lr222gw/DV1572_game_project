@@ -13,7 +13,7 @@ public:
       _model          (model),
       _shader_program (shader_program),
       _transform      (transform),
-      transform       (_transform)
+      model_transform (_transform)
    {}
    void draw();
    void transform( Transform const &transform ); // TODO: move semantics
@@ -27,7 +27,7 @@ private:
    Transform                 _transform;
 
 public:
-   Transform const &transform; // read-only exposure
+   Transform const &model_transform; // read-only exposure
 };
 
 

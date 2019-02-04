@@ -1,5 +1,7 @@
 #include "Transform.h"
 
+Mat4 const Transform::_identity_matrix ( 1.0f );
+
 Transform &Transform::operator=( Transform const &other ) {
    if ( &other != this ) {
       this->_position = other._position;
@@ -76,17 +78,18 @@ void Transform::look_at(Vec3 const &position, Vec3 const up) {
    _update_matrix();
 }
 
-static Transform Transform::make_translation( Vec3 const &offset ) {
+Transform Transform::make_translation( Vec3 const &offset ) {
    return Transform( offset );
 }
 
-static Transform Transform::make_rotation( Vec3 const &scales ) {
-   return Transform( _identity_matrix, scales );
+Transform Transform::make_rotation( Vec3 const &rotations_rad ) {
+   return Transform( Vec3(0.0f), glm::toMat4(Quat(Vec4(rotations_rad, 0.0f))) ); // 1.0f?
 }
 
-static Transform Transform::make_scale( Vec3 const &rotations_rad ) {
-   return Transform( _identity_matrix, _identity_matrix, rotations_rad );
+Transform Transform::make_scale( Vec3 const &scales ) {
+   return Transform( Vec3(0.0f), Transform::_identity_matrix, scales );
 }
+
 
 void Transform::_update_matrix() {
    // omvandlar skala och position till mat4 transformer

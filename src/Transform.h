@@ -7,14 +7,13 @@ public:
    Mat4 const &matrix;
 
    Transform( Vec3 position = Vec3( 0.0f ),
-              Mat4 rotation = Mat4( 1.0f),
+              Mat4 rotation = _identity_matrix,
               Vec3    scale = Vec3( 1.0f ) )
    :
       _position ( position ),
       _rotation ( rotation ),
       _scale    ( scale    ),
       matrix    ( _matrix  )
-
    {
       _update_matrix();
    }
@@ -43,19 +42,19 @@ public:
 
    // creates Transforms that exclusively translates, rotates, or scales
    static Transform make_translation( Vec3 const &offset );
-   static Transform make_rotation( Vec3 const &scales );
    static Transform make_scale( Vec3 const &rotations_rad );
+   static Transform make_rotation( Vec3 const &scales );
 
 private:
    void _update_matrix();
 
    Mat4   _matrix;
 
-   Vec3   _scale;
-   Mat4   _rotation;
    Vec3   _position;
+   Mat4   _rotation;
+   Vec3   _scale;
 
-   static Mat4 const _identity_matrix = Mat4( 1.0f );
+   static Mat4 const _identity_matrix;
 };
 
 // TODO: lerp, slerp
