@@ -632,8 +632,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
       myView.bind_shader_program(*shaProg);
 
       draw_camera_debug_window( cam_positions, cam_rotations, fov_rad );
-      myView.set_rotation( cam_rotations );
-      myView.set_position( cam_positions );
+      //myView.set_rotation( cam_rotations );
+      //myView.set_position( cam_positions );
       myView.set_fov( fov_rad );
 
       
