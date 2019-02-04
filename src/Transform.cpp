@@ -2,7 +2,7 @@
 #include "Transform.h"
 
 
-Mat4 Transform::get_transform()
+Mat4 Transform::get_transform() const
 {
    return Mat4();
 }
@@ -15,13 +15,8 @@ void Transform::operator*=( Transform const &right_hand_side ) {
    this->_matrix *= right_hand_side._matrix;
 }
 
-void Transform::make(Vec3 position, Mat4 rotation_matris, Float32 scale)
-{
-
-}
-
 void Transform::set_rotation(Vec3 rotation) {
-   
+
 }
 
 void Transform::set_position(Vec3 rotation) {
