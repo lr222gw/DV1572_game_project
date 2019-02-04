@@ -3,6 +3,7 @@
 #include "misc/defs.h"
 #include "ModelInstance.h"
 #include "ShaderProgram.h"
+#include "Transform.h"
 
 class SceneManager {
 public:
