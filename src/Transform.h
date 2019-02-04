@@ -8,7 +8,7 @@ public:
       _matrix( 1.0f )
    {}
 
-   Transform( Mat4 matrix ):
+   Transform( Mat4 const &matrix ):
       _matrix( matrix )
    {}
 
