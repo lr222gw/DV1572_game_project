@@ -23,15 +23,7 @@ public:
 
    Mat4 get_transform() const;
 
-   Transform &operator=( Transform const &other ) {
-      if ( &other != this ) {
-         this->_position = other._position;
-         this->_rotation = other._rotation;
-         this->_scale    = other._scale;
-         this->_matrix   = other._matrix;
-      }
-      return *this;
-   }
+   Transform &operator=( Transform const &other );
 
    Transform operator*( Transform const &right_hand_side ) const;
    void operator*=( Transform const &right_hand_side );
