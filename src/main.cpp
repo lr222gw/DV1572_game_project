@@ -652,7 +652,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
       process_input(window, myView, delta_time_s);
       process_mouse(window, myView, delta_time_s);
       
-		glClearColor(1.2, 0.2f, 0.2f, 1.0f);//glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+		glClearColor(0.4, 0.6f, 1.0f, 1.0f);//glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
       
 // programkod här
