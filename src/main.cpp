@@ -611,8 +611,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    
    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-   glMatrixMode(GL_PROJECTION);
-   glLoadIdentity();
+
 
 
  // main loop:
@@ -656,7 +655,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
       //myModel->draw(*shaProg);
       
-      
+      //glMatrixMode(GL_PROJECTION);
+      //glLoadIdentity();
       scenMan.draw(); // undersök om buffer binds
       //glUseProgram(shaProg->getProgramLoc());
       //a_Mesh.render();

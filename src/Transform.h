@@ -45,7 +45,7 @@ public:
 
 private:
    void _update_matrix() {
-      _matrix = _rotation * _*scale
+      //_matrix = _rotation * _*scale
    }
    Mat4 _matrix;
 

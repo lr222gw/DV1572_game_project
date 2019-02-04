@@ -17,7 +17,7 @@ SharedPtr<ModelInstance> SceneManager::instantiate_model(
         transform[1][3] = global_position.y;
         transform[2][3] = global_position.z;
 
-        transform = glm::rotate(transform,angle, axisTouse)
+        //transform = glm::rotate(transform,angle, axisTouse)
 
         //transform[0][2] = scale.x;
         //transform[1][2] = scale.y;
