@@ -36,16 +36,19 @@ Viewport::Viewport(Vec3 position, Float32 fov_rad) :
 //    _update_view_matrix();
 // }
 
-void Viewport::transform( Transform const &transform ) {
+void Viewport::transform_model( Transform const &transform ) {
    _model *= transform;
    _write_to_buffer();
 }
 
-void Viewport::set_transform( Transform const &transform ) {
+void Viewport::set_model( Transform const &transform ) {
    _model = transform;
    _write_to_buffer();
 }
 
+void Viewport::get_model() const {
+   return _model;
+}
 
 void Viewport::set_fov(Float32 fov_rad) {
    _fov = fov_rad;
