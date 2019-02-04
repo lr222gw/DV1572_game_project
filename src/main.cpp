@@ -607,6 +607,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
    Vec3 cam_rotations { 0.0f, 0.0f,  0.0f };
    Vec3 cam_positions { 0.0f, 0.0f, -15.0f };
+   Transform cam_transform;
    Float32 fov_rad = config::fov_rad; // 90 degrees
 
    Viewport myView { cam_positions, fov_rad };
@@ -634,9 +635,10 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
       myView.bind_shader_program(*shaProg);
 
-      //draw_camera_debug_window( cam_positions, cam_rotations, fov_rad );
-      //myView.set_rotation( cam_rotations );
-      //myView.set_position( cam_positions );
+      draw_camera_debug_window( cam_positions, cam_rotations, fov_rad );
+      cam_transform.set_rotation( cam_rotations );
+      cam_transform.set_position( cam_position );
+      myView.set_view( cam_transform );
       myView.set_fov( fov_rad );
 
       
