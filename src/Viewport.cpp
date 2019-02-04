@@ -46,7 +46,7 @@ void Viewport::set_model( Transform const &transform ) {
    _write_to_buffer();
 }
 
-void Viewport::get_model() const {
+Transform Viewport::get_model() const {
    return _model;
 }
 
