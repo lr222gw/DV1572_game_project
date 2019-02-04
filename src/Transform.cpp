@@ -1,6 +1,14 @@
-
 #include "Transform.h"
 
+Transform &Transform::operator=( Transform const &other ) {
+   if ( &other != this ) {
+      this->_position = other._position;
+      this->_rotation = other._rotation;
+      this->_scale    = other._scale;
+      this->_matrix   = other._matrix;
+   }
+   return *this;
+}
 
 Mat4 Transform::get_transform() const {
    return _matrix;
