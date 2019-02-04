@@ -12,6 +12,10 @@ public:
       _matrix( matrix )
    {}
 
+   Transform( Mat4 &&matrix ):
+      _matrix( std::move(matrix) )
+   {}
+
    Transform( Vec3 position,
               Mat4 rotation,
               Float32 scale )
