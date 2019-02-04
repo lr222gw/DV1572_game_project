@@ -13,7 +13,9 @@
 #include "SceneManager.h"
 
 
-void processInput(GLFWwindow *window, Viewport &, Float32);
+
+void process_input(GLFWwindow *window, Viewport &, Float32);
+void process_mouse(GLFWwindow *window, Viewport &cam, Float32 delta);
 
 //#include "misc/stb_image.h" //TODO: ska denna  vara här?
 
@@ -546,7 +548,11 @@ Int32 main( Int32 argc, char const *argv[] ) {
 	}
 
 	// ensure we can capture the escape key being pressed below
-	glfwSetInputMode( window, GLFW_STICKY_KEYS, GL_TRUE );
+	//glfwSetInputMode( window, GLFW_STICKY_KEYS, GL_TRUE );
+   glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+
+   
+   glfwSetCursorPosCallback(window, process_mouse);
 
 	// ImGui context setup
 	IMGUI_CHECKVERSION();
@@ -642,7 +648,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
       //myView.set_view( cam_transform );
       myView.set_fov( fov_rad );
 
-      processInput(window, myView, delta_time_s);
+      process_input(window, myView, delta_time_s);
       
 		glClearColor(1.2, 0.2f, 0.2f, 1.0f);//glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
@@ -699,7 +705,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
 }
 
-void processInput(GLFWwindow *window, Viewport &cam, Float32 delta  )
+void process_input(GLFWwindow *window, Viewport &cam, Float32 delta  )
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 	{
@@ -741,4 +747,8 @@ void processInput(GLFWwindow *window, Viewport &cam, Float32 delta  )
       offset = Transform::make_translation(camspeed*Vec3(0.0, -camspeed, 0.0));
       cam.transform(offset);
    }
+}
+
+void process_mouse(GLFWwindow *window, Viewport &cam, Float32 delta) {
+
 }
