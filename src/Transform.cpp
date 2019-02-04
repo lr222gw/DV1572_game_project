@@ -20,7 +20,7 @@ void Transform::rotate(Quat rotation)
 {
 }
 
-void Transform::rotate(Vec3, Float32)
+void Transform::rotate(Vec3 axis, Float32 angle)
 {
 }
 
