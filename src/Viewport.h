@@ -11,9 +11,9 @@ class Viewport {
 public:
    Viewport(Vec3 position, Float32 fov = config::fov_rad);
 
-   void transform_model( Transform const &transform );
-   void set_model( Transform const &transform );
-   Transform get_model() const;
+   void transform_view( Transform const &transform );
+   void set_view( Transform const &transform );
+   Transform get_view() const;
 
    void bind_shader_program(ShaderProgram &shapro);
 
