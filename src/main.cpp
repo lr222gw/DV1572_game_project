@@ -547,7 +547,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
 	// ensure we can capture the escape key being pressed below
 	//glfwSetInputMode( window, GLFW_STICKY_KEYS, GL_TRUE );
-  // glfwSetCursorPosCallback(window, callback_mouse); // TODO: make a call back matching template that calls on our process_mouse();
+   //glfwSetCursorPosCallback(window, mouse_callback); // TODO: make a call back matching template that calls on our process_mouse();
    glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
    
@@ -650,6 +650,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
       scenMan.draw_debug_scene_inspection();
 
       process_input(window, myView, delta_time_s);
+      process_mouse(window, myView, delta_time_s);
       
 		glClearColor(1.2, 0.2f, 0.2f, 1.0f);//glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
@@ -751,6 +752,53 @@ void process_input(GLFWwindow *window, Viewport &cam, Float32 delta  )
    }
 }
 
+bool firstMouse = true;
+float yaw = -90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
+float pitch = 0.0f;
+float lastX = 800.0f / 2.0;
+float lastY = 600.0 / 2.0;
+float fov = 45.0f;
+
 void process_mouse(GLFWwindow *window, Viewport &cam, Float32 delta) {
+
+   Float64 xPos, yPos;
+   glfwGetCursorPos(window, &xPos, &yPos);
+
+   //COPY PASTE leanopengl
+   if (firstMouse)
+   {
+      lastX = xPos;
+      lastY = yPos;
+      firstMouse = false;
+   }
+
+   float xoffset = xPos - lastX;
+   float yoffset = lastY - yPos;
+   lastX = xPos;
+   lastY = yPos;
+
+   float sensitivity = 0.05;
+   xoffset *= sensitivity;
+   yoffset *= sensitivity;
+
+   yaw += xoffset;
+   pitch += yoffset;
+
+   if (pitch > 89.0f)
+      pitch = 89.0f;
+   if (pitch < -89.0f)
+      pitch = -89.0f;
+
+   glm::vec3 front;
+
+   //cam.transform(Transform::make_rotation());
+
+
+   front.x = cos((yaw)) * cos((pitch));
+   front.y = sin((pitch));
+   front.z = sin((yaw)) * cos((pitch));
+   cam.transform(Transform::make_rotation(front));
+   //cameraFront = glm::normalize(front);
+
 
 }
