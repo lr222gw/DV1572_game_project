@@ -5,10 +5,10 @@
 class Transform {
 public:
    Transform( Vec3 const &position = Vec3(0.0f) ):
-      _position ( position     ),
-      _rotation ( Mat4( 1.0f ) ),
-      _scale    ( Vec3( 1.0f ) ),
-      matrix    ( _matrix      )
+      _position ( position         ),
+      _rotation ( _identity_matrix ),
+      _scale    ( Vec3( 1.0f )     ),
+      matrix    ( _matrix          )
    {
       _update_matrix();
    }
@@ -74,6 +74,7 @@ public:
    Mat4 get_transform() const;
 
    Transform &operator=( Transform const &other );
+   Transform &operator=( Transform      &&other ) = delete;
 
    Transform operator*( Transform const &right_hand_side ) const;
    void operator*=(     Transform const &right_hand_side );
@@ -119,7 +120,6 @@ private:
 public:
    Mat4 const &matrix;
 };
-
 // TODO: lerp, slerp
 
 
