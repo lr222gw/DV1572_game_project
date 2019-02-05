@@ -712,6 +712,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
 static bool mouse_look = false;
 void process_input(GLFWwindow *window, Viewport &cam, Float32 delta  )
 {
+   
+
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) 
 		glfwSetWindowShouldClose(window, true);
 	if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS)
@@ -726,6 +728,10 @@ void process_input(GLFWwindow *window, Viewport &cam, Float32 delta  )
          glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
    }
    
+   //If movement is disabled
+   if (!mouse_look)
+      return;
+
    Float32 camspeed = 50 * delta;
    Transform offset;
 
