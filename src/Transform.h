@@ -70,7 +70,7 @@ public:
 private:
    void _update_matrix();
 
-   void _extract_vectors( Mat4 const &transformation_matrix );
+   void _extract_data( Mat4 const &transformation_matrix );
 
    Mat4   _matrix;
 
