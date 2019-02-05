@@ -104,6 +104,8 @@ public:
    Mat4 get_rotation() const;
    Vec3 get_scale()    const;
 
+   Vec3 get_euler_angles() const;
+
 private:
    void _update_matrix();
    void _extract_data( Mat4 const &transformation_matrix );

@@ -143,6 +143,11 @@ Vec3 Transform::get_scale() const {
    return _scale;
 }
 
+Vec3 Transform::get_euler_angles() const {
+   // TODO
+   return Vec3( 0.0f );
+}
+
 void Transform::_extract_data( Mat4 const &mat ) {
    _position = Vec3( mat[3][0],
                      mat[3][1],

@@ -78,7 +78,7 @@ void SceneManager::draw_debug_scene_inspection() {
             // ImGui::SliderAngle( "X rotation", &rotation.x );
             // ImGui::SliderAngle( "Y rotation", &rotation.y );
             // ImGui::SliderAngle( "Z rotation", &rotation.z );
-            ImGui::SliderFloat3( "Scale", scale_array, 0.1f, 10.0f, "%.2f" );
+            ImGui::InputFloat3( "Scale", scale_array, "%.2f" );
             ImGui::NewLine();
 
             ImGui::Separator();
