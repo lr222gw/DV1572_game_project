@@ -103,6 +103,41 @@ Vec3 Transform::get_scale() const {
    return _scale;
 }
 
+void Transform::_extract_data( Mat4 const &mat ) {
+   _position = Vec3( mat[3][0],
+                     mat[3][1],
+                     mat[3][2] );
+
+   _scale = Vec3( glm::normalize( Vec3( mat[0][0] ),
+                                  Vec3( mat[0][1] ),
+                                  Vec3( mat[0][2] ) ),
+
+                  glm::normalize( Vec3( mat[1][0] ),
+                                  Vec3( mat[1][1] ),
+                                  Vec3( mat[1][2] ) ),
+
+                  glm::normalize( Vec3( mat[2][0] ),
+                                  Vec3( mat[2][1] ),
+                                  Vec3( mat[2][2] ) ) );
+
+   Mat4 rot_mat ( 1.0f );
+   rot_mat[0][0] = mat[0][0] / _scale[0];
+   rot_mat[0][1] = mat[0][1] / _scale[0];
+   rot_mat[0][2] = mat[0][2] / _scale[0];
+
+   rot_mat[1][0] = mat[1][0] / _scale[1];
+   rot_mat[1][1] = mat[1][1] / _scale[1];
+   rot_mat[1][2] = mat[1][2] / _scale[1];
+
+   rot_mat[2][0] = mat[2][0] / _scale[2];
+   rot_mat[2][1] = mat[2][1] / _scale[2];
+   rot_mat[2][2] = mat[2][2] / _scale[2];
+
+   _rotation = ... // TODO: bryt ut vec3 från mat4
+
+   _update_matrix();
+}
+
 
 
 void Transform::_update_matrix() {
