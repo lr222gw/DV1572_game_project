@@ -22,6 +22,7 @@ public:
 
    void set_fov(Float32 fov_rad);
 
+   void update() const;
 
 private:
    // void _update_view_matrix();

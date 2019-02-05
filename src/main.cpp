@@ -641,7 +641,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
       myView.bind_shader_program(*shaProg);
 
-      draw_camera_debug_window( cam_position, cam_rotations, fov_rad );
+      // draw_camera_debug_window( cam_position, cam_rotations, fov_rad );
       //cam_transform.set_rotation( cam_rotations );
       //cam_transform.set_position( cam_position );
       //myView.set_view( cam_transform );
@@ -655,6 +655,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
 		glClearColor(0.4, 0.6f, 1.0f, 1.0f);//glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
       
+      myView.update();
+
 // programkod här
       //myMinstance->ttranceform(aTransformMatris)
       //myMinstance->render(&*shaProg);
@@ -710,34 +712,21 @@ Int32 main( Int32 argc, char const *argv[] ) {
 static bool mouse_look = false;
 void process_input(GLFWwindow *window, Viewport &cam, Float32 delta  )
 {
-   
-
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-	{
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) 
 		glfwSetWindowShouldClose(window, true);
-	}
-
 	if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	if (glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-   
    if (glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS) {
       mouse_look = !mouse_look;
-
-      if (mouse_look) {
+      if (mouse_look)
          glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-      }
-      else {
+      else
          glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-      }
    }
    
-
-
    Float32 camspeed = 50 * delta;
-   Vec3 camPos(1.0f);
-
    Transform offset;
 
    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
@@ -766,7 +755,7 @@ void process_input(GLFWwindow *window, Viewport &cam, Float32 delta  )
    }
 }
 
-bool firstMouse = true;
+bool  firstMouse = true;
 float yaw = -90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
 float pitch = 0.0f;
 float lastX = 800.0f / 2.0;
@@ -774,15 +763,16 @@ float lastY = 600.0 / 2.0;
 float fov = 45.0f;
 
 void process_mouse(GLFWwindow *window, Viewport &cam, Float32 delta) {
-   if (!mouse_look) {
+   static glm::vec3 front;
+
+   if (!mouse_look)
       return;
-   }
+
    Float64 xPos, yPos;
    glfwGetCursorPos(window, &xPos, &yPos);
 
    //COPY PASTE leanopengl
-   if (firstMouse)
-   {
+   if (firstMouse) {
       lastX = xPos;
       lastY = yPos;
       firstMouse = false;
@@ -799,15 +789,13 @@ void process_mouse(GLFWwindow *window, Viewport &cam, Float32 delta) {
    xoffset *= sensitivity;
    yoffset *= sensitivity;
 
-   yaw += xoffset;
+   yaw   += xoffset;
    pitch += yoffset;
 
    if (pitch > 89.0f)
       pitch = 89.0f;
    if (pitch < -89.0f)
       pitch = -89.0f;
-
-   glm::vec3 front;
 
    //cam.transform(Transform::make_rotation());
 
@@ -817,19 +805,13 @@ void process_mouse(GLFWwindow *window, Viewport &cam, Float32 delta) {
       front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
       glm::normalize(front);
 
+      // Transform rotation;
+      // rotation.look_at(front);
+      // cam.transform( rotation );
+
       auto view = cam.get_view(); // get pos, rot, scale
-      Mat4 looky(1.0f);
-
-      looky = glm::lookAt(view.get_position(), front, Vec3(0.0f, 1.0f, 0.0f));
-      //Transform
-      //view *= looky;
-      view.look_at(front);   // set rot
+      view.look_at(front);        // set rot
       cam.set_view(view);         // set view to cam view
-      // cam.transform(Transform::make_rotation(front));
    }
-
-   
    //cameraFront = glm::normalize(front);
-
-
 }

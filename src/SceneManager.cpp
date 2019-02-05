@@ -98,3 +98,4 @@ void SceneManager::draw_debug_scene_inspection() {
       }
    } ImGui::End(); // end our Inspection window
 }
+

@@ -5,6 +5,10 @@
 #include "ShaderProgram.h"
 #include "Transform.h"
 
+#include "misc/ImGui/imgui.h"
+#include "misc/ImGui/imgui_impl_glfw.h"
+#include "misc/ImGui/imgui_impl_opengl3.h"
+
 class SceneManager {
 public:
    SharedPtr<ModelInstance> instantiate_model(

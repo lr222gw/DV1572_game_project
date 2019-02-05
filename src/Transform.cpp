@@ -1,4 +1,5 @@
 #include "Transform.h"
+#include "debug.h"
 
 Mat4 const Transform::_identity_matrix ( 1.0f );
 
@@ -89,6 +90,7 @@ void Transform::translate(Vec3 const &offset) {
 
 void Transform::look_at(Vec3 const &forward, Vec3 const up) {
    _rotation = glm::lookAt( _position, _position+forward, up );
+   //debug::view_mat4( _rotation, "Transform::look_at(...) -- _rotation:" );
    _update_matrix();
 }
 
@@ -185,3 +187,5 @@ void Transform::_update_matrix() {
            * glm::translate( _identity_matrix, _position )  // 2
            * glm::scale(     _identity_matrix, _scale    ); // 1
 }
+
+

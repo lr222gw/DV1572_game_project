@@ -1,4 +1,5 @@
 #include "Viewport.h"
+#include "debug.h"
 
 // TODO: l�s ViewPort -> Viewport
 
@@ -18,9 +19,7 @@ Viewport::Viewport(Vec3 position, Float32 fov_rad) :
                                    Float32(config::width) / Float32(config::height), // config::aspect_ratio,
                                    config::near_plane,
                                    config::far_plane);
-   
    _write_to_buffer();
-
 }
 
 // void Viewport::set_position(Vec3 new_position) {
@@ -86,6 +85,9 @@ void Viewport::bind_shader_program(ShaderProgram &shapro) {
 //    _write_to_buffer();
 // }
 
+void Viewport::update() const {
+   debug::view_mat4( _view.matrix, "Viewport->_view");
+}
 
 void Viewport::_write_to_buffer() {
    // _camera = _projection * _view; // * _model; // validera?
