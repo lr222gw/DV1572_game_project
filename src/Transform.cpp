@@ -25,7 +25,7 @@ Transform Transform::operator*( Transform const &right_hand_side ) const {
 
 void Transform::operator*=( Transform const &right_hand_side ) {
    this->_position += right_hand_side._position,
-   this->_rotation *= right_hand_side._rotation,
+   this->_rotation += right_hand_side._rotation,
    this->_scale    *= right_hand_side._scale;
    _update_matrix();
 }
