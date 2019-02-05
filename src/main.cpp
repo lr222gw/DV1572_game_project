@@ -546,7 +546,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 	}
 
 	// ensure we can capture the escape key being pressed below
-	//glfwSetInputMode( window, GLFW_STICKY_KEYS, GL_TRUE );
+	glfwSetInputMode( window, GLFW_STICKY_KEYS, GL_TRUE );
    //glfwSetCursorPosCallback(window, mouse_callback); // TODO: make a call back matching template that calls on our process_mouse();
    glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
@@ -707,18 +707,32 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
 }
 
-
+static bool mouse_look = false;
 void process_input(GLFWwindow *window, Viewport &cam, Float32 delta  )
 {
+   
+
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 	{
 		glfwSetWindowShouldClose(window, true);
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+   
+   if (glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS) {
+      mouse_look = !mouse_look;
+
+      if (mouse_look) {
+         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+      }
+      else {
+         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+      }
+   }
+   
 
 
    Float32 camspeed = 50 * delta;
@@ -760,7 +774,9 @@ float lastY = 600.0 / 2.0;
 float fov = 45.0f;
 
 void process_mouse(GLFWwindow *window, Viewport &cam, Float32 delta) {
-
+   if (!mouse_look) {
+      return;
+   }
    Float64 xPos, yPos;
    glfwGetCursorPos(window, &xPos, &yPos);
 
@@ -774,12 +790,12 @@ void process_mouse(GLFWwindow *window, Viewport &cam, Float32 delta) {
 
    bool changed = lastX != xPos;
 
-   float xoffset = xPos - lastX;
-   float yoffset = lastY - yPos;
+   Float64 xoffset = xPos - lastX;
+   Float64 yoffset = lastY - yPos;
    lastX = xPos;
    lastY = yPos;   
 
-   float sensitivity = 0.05;
+   Float64 sensitivity = 0.05;
    xoffset *= sensitivity;
    yoffset *= sensitivity;
 
