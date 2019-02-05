@@ -589,8 +589,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
    
    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-
-
+   glEnable(GL_CULL_FACE);
+   glCullFace(GL_BACK);
 
  // main loop:
 	while (!glfwWindowShouldClose(window)) {
