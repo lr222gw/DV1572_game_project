@@ -11,7 +11,13 @@ class Viewport {
 public:
    Vec3 front;
    
-   Viewport(Vec3 position, GLFWwindow const &window, Float32 fov = config::fov_rad);
+   Viewport(Vec3 position, GLFWwindow *window, Float32 fov = config::fov_rad);
+   Viewport( Viewport  const &) = delete;
+   Viewport( Viewport && )      = delete;
+   Viewport& operator=( Viewport const & ) = delete;
+   Viewport& operator=( Viewport && )      = delete;
+
+
 
    void transform( Transform const &transform );
    void set_view( Transform const &transform );
@@ -38,7 +44,7 @@ private:
    Transform  _view;
    Mat4       _projection;
 
-   GLFWwindow const &_window;
+   GLFWwindow *_window;
    // TODO: (låg prioritet) använd transform för projection?
 
    GLuint _location;
