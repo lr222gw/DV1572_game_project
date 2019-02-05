@@ -9,6 +9,8 @@
 // TODO: uppåt vektorn baserat på normalen av ytan spelaren står på
 class Viewport {
 public:
+   Vec3 front;
+   
    Viewport(Vec3 position, Float32 fov = config::fov_rad);
 
    void transform( Transform const &transform );

@@ -4,7 +4,8 @@
 // TODO: l�s ViewPort -> Viewport
 
 Viewport::Viewport(Vec3 position, Float32 fov_rad) :
-   _fov (fov_rad)
+   _fov (fov_rad),
+   front(1.0f,1.0f,1.0f)
 {
    // TODO: bind _camera och uniform buffer f�r Mat4
 
