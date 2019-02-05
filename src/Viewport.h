@@ -35,11 +35,14 @@ public:
 private:
    // void _update_view_matrix();
    void _write_to_buffer();
+   void _update_aspect_ratio();
+   void _generate_perspective();
 
    // Vec3 _position,
    //      _rotation;
 
-   Float32 _fov;
+   Float32  _fov;
+   Float32  _aspect;
 
    Transform  _view;
    Mat4       _projection;

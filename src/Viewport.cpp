@@ -15,8 +15,24 @@ Viewport::Viewport(Vec3 position, GLFWwindow *window, Float32 fov_rad):
    // validera
    _view = Transform( position );
 
-   update(); // will generate _projection matrix
+   _update_aspect_ratio();
 
+   _write_to_buffer();
+}
+
+void Viewport::_update_aspect_ratio() {
+   Int32 width, height;
+   glfwGetWindowSize( _window, &width, &height );
+   Float32 aspect = Float32(width) / Float32(height);
+   if ( aspect != _aspect )
+      _generate_perspective();
+}
+
+void Viewport::_generate_perspective() {
+   _projection = glm::perspective( _fov,
+                                   _aspect,
+                                   config::near_plane,
+                                   config::far_plane );
    _write_to_buffer();
 }
 
@@ -83,19 +99,12 @@ void Viewport::bind_shader_program(ShaderProgram &shapro) {
 //    _write_to_buffer();
 // }
 
+
+
 void Viewport::update() {
    debug::view_mat4( _view.matrix, "viewport._view");
+   _update_aspect_ratio();
 
-   Int32 width, height;
-   glfwGetWindowSize( _window, &width, &height );
-   Float32  aspect = Float32(width) / Float32(height);
-
-   // TODO: gör så att projection bara uppdateras när aspect ration ändras
-   _projection = glm::perspective( _fov,
-                                   aspect,
-                                   config::near_plane,
-                                   config::far_plane );
-   _write_to_buffer();
 }
 
 void Viewport::_write_to_buffer() {

@@ -614,7 +614,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
       //cam_transform.set_rotation( cam_rotations );
       //cam_transform.set_position( cam_position );
       //myView.set_view( cam_transform );
-      myView.set_fov( fov_rad );
+      //myView.set_fov( fov_rad );
       
       scenMan.draw_debug_scene_inspection();
 

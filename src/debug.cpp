@@ -5,8 +5,8 @@
 #include "misc/ImGui/imgui_impl_opengl3.h"
 
 void debug::view_mat4( Mat4 const &m, String name ) {
-   String id = std::to_string(Uint64(&m));
-   ImGui::PushID(id.c_str());
+   String id = std::to_string( (Uint64)(&m) );
+   ImGui::PushID( id.c_str() );
    ImGui::Begin( "Analysis:" ); // begin our Rotation window:
    {  // draw our window GUI components and do I/O:
       ImGui::Text( "%s:", name.c_str() );
