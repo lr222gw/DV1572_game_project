@@ -4,52 +4,52 @@
 
 class Transform {
 public:
-   Mat4 const &matrix;
+   Transform( Vec3 const &position = Vec3(0.0f) ):
+      _position ( position     ),
+      _rotation ( Mat4( 1.0f ) ),
+      _scale    ( Vec3( 1.0f ) ),
+      matrix    ( _matrix      )
+   {
+      _update_matrix();
+   }
 
-   Transform( Vec3 position     = Vec3( 0.0f ),
-              Vec3 euler_angles = Vec3( 0.0f ),
-              Vec3    scale     = Vec3( 1.0f ) )
+
+   explicit Transform( Vec3 const &position,
+                       Vec3 const &euler_angles,
+                       Vec3 const &scale = Vec3( 1.0f ) )
    :
       _position ( position ),
       _scale    ( scale    ),
       matrix    ( _matrix  )
    {
       set_rotation( euler_angles );
-      _update_matrix();
    }
 
-   Transform( Vec3 position        = Vec3( 0.0f ),
-              Mat4 rotation_matrix = Mat4( 1.0f ),
-              Vec3    scale        = Vec3( 1.0f ) )
+
+   explicit Transform( Vec3 const &position,
+                       Mat4 const &rotation_matrix,
+                       Vec3 const &scale = Vec3( 1.0f ) )
    :
       _position ( position ),
       _scale    ( scale    ),
       matrix    ( _matrix  )
    {
       set_rotation( rotation_matrix );
-      _update_matrix();
    }
 
-   Transform( Vec3    position  = Vec3( 0.0f ),
-              Float32 angle_rad = 0.0f,
-              Vec3    axis      = Vec3( 0.0f ),
-              Vec3    scale     = Vec3( 1.0f ) )
+
+   explicit Transform( Vec3 const &position,
+                       Float32     angle_rad,
+                       Vec3 const &axis,
+                       Vec3 const &scale = Vec3( 1.0f ) )
    :
       _position ( position ),
       _scale    ( scale    ),
       matrix    ( _matrix  )
    {
       set_rotation( axis, angle_rad );
-      _update_matrix();
    }
 
-
-   Transform( Mat4 transform_matrix )
-   :
-      matrix( _matrix )
-   {
-      _extract_data( transform_matrix );
-   }
 
    Transform( Transform const &other ):
       _position ( other._position ),
@@ -74,13 +74,13 @@ public:
 
    void set_position( Vec3 const &euler_angles );
    void set_rotation( Mat4 const &rotation_matrix );
-   void set_rotation( Vec3 const &axis, Float32 deg_rad );
+   void set_rotation( Vec3 const &axis, Float32 angle_rad );
    void set_rotation( Vec3 const &rotation );
    void set_scale(    Vec3 const &scale );
 
    void rotate(     Vec3 const &euler_angles );
    void rotate(     Mat4 const &rotation_matrix );
-   void rotate(     Vec3 const &axis, Float32 degree_rad );
+   void rotate(     Vec3 const &axis, Float32 angle_rad );
    void rotate_deg( Vec3 const &axis, Float32 angle_deg);
    void look_at(    Vec3 const &position, Vec3 const up={0,1,0} );
 
@@ -90,10 +90,10 @@ public:
    // creates Transforms that exclusively translates, rotates, or scales
    // basically alternative constructors
    static Transform make_translation( Vec3 const &offset );
-   static Transform make_rotation( Vec3 const &euler_angles );
-   static Transform make_rotation( Mat4 const &rotation_matrix );
-   static Transform make_rotation( Vec3 const &axis, Float32 deg_rad );
-   static Transform make_scale( Vec3 const &scale );
+   static Transform make_rotation(    Vec3 const &euler_angles );
+   static Transform make_rotation(    Mat4 const &rotation_matrix );
+   static Transform make_rotation(    Vec3 const &axis, Float32 angle_rad );
+   static Transform make_scale(       Vec3 const &scale );
 
    Vec3 get_position() const;
    Mat4 get_rotation() const;
@@ -101,16 +101,17 @@ public:
 
 private:
    void _update_matrix();
-
    void _extract_data( Mat4 const &transformation_matrix );
-
-   Mat4   _matrix;
 
    Vec3   _position;
    Mat4   _rotation;
    Vec3   _scale;
+   Mat4   _matrix;
 
    static Mat4 const _identity_matrix;
+
+public:
+   Mat4 const &matrix;
 };
 
 // TODO: lerp, slerp

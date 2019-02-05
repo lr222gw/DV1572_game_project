@@ -56,7 +56,7 @@ void SceneManager::draw_debug_scene_inspection() {
 
             auto transform   = instance->model_transform;
 
-            Vec3 rotation  = transform.get_rotation();
+            // Vec3 rotation  = transform.get_rotation();
             Vec3 position  = transform.get_position();
             Vec3 scale     = transform.get_scale();
 
@@ -75,9 +75,9 @@ void SceneManager::draw_debug_scene_inspection() {
             ImGui::NewLine();
             ImGui::Text( "%s:", id.c_str() );
             ImGui::InputFloat3( "Position", position_array, "%.1f");
-            ImGui::SliderAngle( "X rotation", &rotation.x );
-            ImGui::SliderAngle( "Y rotation", &rotation.y );
-            ImGui::SliderAngle( "Z rotation", &rotation.z );
+            // ImGui::SliderAngle( "X rotation", &rotation.x );
+            // ImGui::SliderAngle( "Y rotation", &rotation.y );
+            // ImGui::SliderAngle( "Z rotation", &rotation.z );
             ImGui::SliderFloat3( "Scale", scale_array, 0.1f, 10.0f, "%.2f" );
             ImGui::NewLine();
 
@@ -87,7 +87,7 @@ void SceneManager::draw_debug_scene_inspection() {
             Transform new_transform( Vec3( position_array[0],
                                            position_array[1],
                                            position_array[2] ),
-                                     rotation,
+                                /* temp */ transform.get_rotation(),
                                      Vec3( scale_array[0],
                                            scale_array[1],
                                            scale_array[2] ) );

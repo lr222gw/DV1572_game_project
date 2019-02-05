@@ -41,8 +41,8 @@ void Transform::set_rotation( Mat4 const &rotation_matrix ) {
    _update_matrix();
 }
 
-void Transform::set_rotation( Vec3 const &axis, Float32 deg_rad ) {
-   _rotation = glm::rotate(_rotation, glm::radians(angle_deg), axis);
+void Transform::set_rotation( Vec3 const &axis, Float32 angle_rad ) {
+   _rotation = glm::rotate(_rotation, glm::radians(angle_rad), axis);
    _update_matrix();
 }
 
@@ -114,9 +114,9 @@ Transform Transform::make_rotation( Mat4 const &rotation_matrix ) {
    return product;
 }
 
-Transform Transform::make_rotation( Vec3 const &axis, Float32 deg_rad ) {
+Transform Transform::make_rotation( Vec3 const &axis, Float32 angle_rad ) {
    Transform product;
-   product.rotate( axis, deg_rad );
+   product.rotate( axis, angle_rad );
    return product;
 }
 
@@ -184,7 +184,7 @@ void Transform::_update_matrix() {
    // omvandlar skala och position till mat4 transformer
    // och uppdaterar sedan klasstransformen till en kombination
    // av dessa och rotationsmatrisen
-   _matrix = glm::toMat4(Quat(Vec4(_rotation, 1.0f)))      // 3
-           * glm::translate( _identity_matrix, _position ) // 2
-           * glm::scale( _identity_matrix, _scale );       // 1
+   _matrix = _rotation,                                     // 3
+           * glm::translate( &_identity_matrix, _position ), // 2
+           * glm::scale(     &_identity_matrix, _scale    ); // 1
 }
