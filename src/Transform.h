@@ -57,9 +57,7 @@ public:
       _scale    ( other._scale    ),
       _matrix   ( other._matrix   ),
       matrix    ( _matrix         )
-   {
-      _update_matrix();
-   }
+   {}
 
    Transform( Transform &&other ):
       _position ( std::move(other._position) ),
@@ -74,7 +72,7 @@ public:
    Mat4 get_transform() const;
 
    Transform &operator=( Transform const &other );
-   Transform &operator=( Transform      &&other ) = delete;
+   Transform &operator=( Transform      &&other );
 
    Transform operator*( Transform const &right_hand_side ) const;
    void operator*=(     Transform const &right_hand_side );

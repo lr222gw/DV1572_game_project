@@ -9,8 +9,17 @@ Transform &Transform::operator=( Transform const &other ) {
       this->_rotation = other._rotation;
       this->_scale    = other._scale;
       this->_matrix   = other._matrix;
-      _update_matrix();
    }
+   return *this;
+}
+
+Transform &Transform::operator=( Transform &&other ) {
+   // if ( &other != this ) {
+      this->_position = std::move( other._position );
+      this->_rotation = std::move( other._rotation );
+      this->_scale    = std::move( other._scale    );
+      this->_matrix   = std::move( other._matrix   );
+   // }
    return *this;
 }
 
@@ -26,7 +35,7 @@ Transform Transform::operator*( Transform const &right_hand_side ) const {
 
 void Transform::operator*=( Transform const &right_hand_side ) {
    this->_position += right_hand_side._position,
-   this->_rotation += right_hand_side._rotation,
+   this->_rotation *= right_hand_side._rotation,
    this->_scale    *= right_hand_side._scale;
    _update_matrix();
 }
@@ -89,8 +98,7 @@ void Transform::translate(Vec3 const &offset) {
 }
 
 void Transform::look_at(Vec3 const &forward, Vec3 const up) {
-   _rotation = glm::lookAt( _position, _position+forward, up );
-   //debug::view_mat4( _rotation, "Transform::look_at(...) -- _rotation:" );
+   _rotation = glm::lookAt( Vec3(0.0f), forward, up );
    _update_matrix();
 }
 
@@ -186,6 +194,10 @@ void Transform::_update_matrix() {
    _matrix = _rotation                                      // 3
            * glm::translate( _identity_matrix, _position )  // 2
            * glm::scale(     _identity_matrix, _scale    ); // 1
+
+   // handle W // _matrix[3][3]
+   if ( _matrix[3][3] != 1.0f )
+      _matrix /= _matrix[3][3];
 }
 
 
