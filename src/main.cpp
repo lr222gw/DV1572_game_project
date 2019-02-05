@@ -802,6 +802,11 @@ void process_mouse(GLFWwindow *window, Viewport &cam, Float32 delta) {
    glm::normalize(front);
    if (changed) {
       auto view = cam.get_view(); // get pos, rot, scale
+      Mat4 looky(1.0f);
+
+      looky = glm::lookAt(view.get_position(), front, Vec3(0.0f, 1.0f, 0.0f));
+      //Transform
+      //view *= looky;
       view.set_rotation(front);   // set rot
       cam.set_view(view);         // set view to cam view
       // cam.transform(Transform::make_rotation(front));
