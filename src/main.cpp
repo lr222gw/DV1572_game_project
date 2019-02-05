@@ -811,12 +811,12 @@ void process_mouse(GLFWwindow *window, Viewport &cam, Float32 delta) {
 
    //cam.transform(Transform::make_rotation());
 
-
-   front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-   front.y = sin(glm::radians(pitch));
-   front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-   glm::normalize(front);
    if (changed) {
+      front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+      front.y = sin(glm::radians(pitch));
+      front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+      glm::normalize(front);
+
       auto view = cam.get_view(); // get pos, rot, scale
       Mat4 looky(1.0f);
 
