@@ -86,7 +86,7 @@ void Viewport::bind_shader_program(ShaderProgram &shapro) {
 // }
 
 void Viewport::update() const {
-   debug::view_mat4( _view.matrix, "Viewport->_view");
+   debug::view_mat4( _view.matrix, "viewport._view");
 }
 
 void Viewport::_write_to_buffer() {
