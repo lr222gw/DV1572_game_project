@@ -734,23 +734,23 @@ void process_input(GLFWwindow *window, Viewport &cam, Float32 delta  )
       cam.transform( offset);
    }
    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-      offset = Transform::make_translation(camspeed*Vec3(1.0, 1.0, -camspeed)* -cam.front);
+      offset = Transform::make_translation(camspeed*Vec3(-1.0, -1.0, -camspeed)* -cam.front);
       cam.transform(offset);
    }
    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-      offset = Transform::make_translation(camspeed*Vec3(camspeed, 1.0, 1.0)* cam.front);
+      offset = Transform::make_translation(camspeed*Vec3(camspeed, 1.0, 1.0)* -cam.front);
       cam.transform(offset);
    }
    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-      offset = Transform::make_translation(camspeed*Vec3(-camspeed, 1.0, 1.0)* cam.front);
+      offset = Transform::make_translation(camspeed*Vec3(-camspeed, 1.0, 1.0)* -cam.front);
       cam.transform(offset);
    }
    if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
-      offset = Transform::make_translation(camspeed*Vec3(0.0, camspeed, 0.0) );
+      offset = Transform::make_translation(camspeed*Vec3(0.0, camspeed, 1.0) );
       cam.transform(offset);
    }
    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-      offset = Transform::make_translation(camspeed*Vec3(0.0, -camspeed, 0.0));
+      offset = Transform::make_translation(camspeed*Vec3(1.0, -camspeed, 1.0));
       cam.transform(offset);
    }
 }
