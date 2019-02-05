@@ -61,7 +61,13 @@ public:
       _update_matrix();
    }
 
-   Transform( Transform && ) = delete;
+   Transform( Transform &&other ):
+      _position ( std::move(other._position) ),
+      _rotation ( std::move(other._rotation) ),
+      _scale    ( std::move(other._scale)    ),
+      _matrix   ( std::move(other._matrix)   ),
+      matrix    ( _matrix                    )
+   {}
 
    ~Transform() {}
 
