@@ -332,36 +332,6 @@ void create_demo_scene( /*AssetHandler &assets, Scene &scene, RenderHandler &ren
    }
 }
 
-// generates a 4x4 world matrix
-inline glm::mat4  generate_model_matrix() {
-   return  glm::mat4{ 1.0f }; // 4x4 identity matrix
-}
-
-
-// generates a 4x4 view matrix
-inline glm::mat4  generate_view_matrix
-(   // function args:
-   glm::vec3  camera_pos    = { 0.0f,  0.0f, -2.0f },
-   glm::vec3  camera_target = { 0.0f,  0.0f,  0.0f },
-   glm::vec3  camera_up_vec = { 0.0f,  1.0f,  0.0f }
-) { // function body
-   
-   return glm::lookAt(camera_pos, camera_target, camera_up_vec);
-}
-
-// generates a 4x4 perspective matrix
-inline glm::mat4  generate_perspective_matrix
-(   // function args:
-   Float32  near_plane = config::near_plane,
-   Float32  far_plane  = config::far_plane,
-   Float32  fov_rad    = config::fov_rad
-) { // function body
-   Float32  aspect = (Float32)config::width / (Float32)config::height;
-   return glm::perspective(config::fov_rad, aspect, config::near_plane, config::far_plane);
-}
- 
-
-
 
 /*
 // alternativ till scene graph som verkar vara mer förekommande och korrekt
@@ -615,7 +585,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    Transform cam_transform;
    Float32 fov_rad = config::fov_rad; // 90 degrees
 
-   Viewport myView { cam_position, fov_rad };
+   Viewport myView { cam_position, *window, fov_rad };
    myView.bind_shader_program(*shaProg);
    
    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

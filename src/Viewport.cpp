@@ -3,8 +3,9 @@
 
 // TODO: lï¿½s ViewPort -> Viewport
 
-Viewport::Viewport(Vec3 position, Float32 fov_rad) :
-   _fov (fov_rad),
+Viewport::Viewport(Vec3 position, GLFWwindow const &window, Float32 fov_rad):
+   _fov    ( fov_rad ),
+   _window ( window  ),
    front(1.0f,1.0f,1.0f)
 {
    // TODO: bind _camera och uniform buffer fï¿½r Mat4
@@ -14,12 +15,8 @@ Viewport::Viewport(Vec3 position, Float32 fov_rad) :
    // validera
    _view = Transform( position );
 
-   // validera
-   _projection = Mat4(1.0f);
-   _projection = glm::perspective( _fov,
-                                   Float32(config::width) / Float32(config::height), // config::aspect_ratio,
-                                   config::near_plane,
-                                   config::far_plane);
+   update(); // will generate _projection matrix
+
    _write_to_buffer();
 }
 
@@ -88,6 +85,17 @@ void Viewport::bind_shader_program(ShaderProgram &shapro) {
 
 void Viewport::update() const {
    debug::view_mat4( _view.matrix, "viewport._view");
+
+   Int32 width, height;
+   glfwGetWindowSize( _window, width, height );
+   Float32  aspect = Float32(width) / Float32(height);
+
+   // TODO: gör så att projection bara uppdateras när aspect ration ändras
+   _projection = glm::perspective( _fov,
+                                   aspect,
+                                   config::near_plane,
+                                   config::far_plane );
+   _write_to_buffer();
 }
 
 void Viewport::_write_to_buffer() {
