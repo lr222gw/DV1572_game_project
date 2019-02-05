@@ -772,10 +772,12 @@ void process_mouse(GLFWwindow *window, Viewport &cam, Float32 delta) {
       firstMouse = false;
    }
 
+   bool changed = lastX != xPos;
+
    float xoffset = xPos - lastX;
    float yoffset = lastY - yPos;
    lastX = xPos;
-   lastY = yPos;
+   lastY = yPos;   
 
    float sensitivity = 0.05;
    xoffset *= sensitivity;
@@ -794,10 +796,15 @@ void process_mouse(GLFWwindow *window, Viewport &cam, Float32 delta) {
    //cam.transform(Transform::make_rotation());
 
 
-   front.x = cos((yaw)) * cos((pitch));
-   front.y = sin((pitch));
-   front.z = sin((yaw)) * cos((pitch));
-   cam.transform(Transform::make_rotation(front));
+   front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+   front.y = sin(glm::radians(pitch));
+   front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+   glm::normalize(front);
+   if (changed) {
+      cam.transform(Transform::make_rotation(front));
+   }
+
+   
    //cameraFront = glm::normalize(front);
 
 
