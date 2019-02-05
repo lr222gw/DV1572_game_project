@@ -585,7 +585,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    Transform cam_transform;
    Float32 fov_rad = config::fov_rad; // 90 degrees
 
-   Viewport myView { cam_position, *window, fov_rad };
+   Viewport myView { cam_position, window, fov_rad };
    myView.bind_shader_program(*shaProg);
    
    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

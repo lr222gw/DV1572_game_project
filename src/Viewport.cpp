@@ -3,7 +3,7 @@
 
 // TODO: lï¿½s ViewPort -> Viewport
 
-Viewport::Viewport(Vec3 position, GLFWwindow const &window, Float32 fov_rad):
+Viewport::Viewport(Vec3 position, GLFWwindow &window, Float32 fov_rad):
    _fov    ( fov_rad ),
    _window ( window  ),
    front(1.0f,1.0f,1.0f)
@@ -83,11 +83,11 @@ void Viewport::bind_shader_program(ShaderProgram &shapro) {
 //    _write_to_buffer();
 // }
 
-void Viewport::update() const {
+void Viewport::update() {
    debug::view_mat4( _view.matrix, "viewport._view");
 
    Int32 width, height;
-   glfwGetWindowSize( _window, width, height );
+   glfwGetWindowSize( &_window, width, height );
    Float32  aspect = Float32(width) / Float32(height);
 
    // TODO: gör så att projection bara uppdateras när aspect ration ändras
