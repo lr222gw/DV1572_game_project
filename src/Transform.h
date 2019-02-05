@@ -18,6 +18,18 @@ public:
       _update_matrix();
    }
 
+   Transform( Transform const &other ):
+      _position ( other._position ),
+      _rotation ( other._rotation ),
+      _scale    ( other._scale    ),
+      _matrix   ( other._matrix   ),
+      matrix    ( _matrix         )
+   {
+      _update_matrix();
+   }
+
+   Transform( Transform       && ) = delete;
+
    ~Transform() {}
 
    Mat4 get_transform() const;
