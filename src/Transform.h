@@ -88,7 +88,7 @@ public:
    void rotate(     Mat4 const &rotation_matrix );
    void rotate(     Vec3 const &axis, Float32 angle_rad );
    void rotate_deg( Vec3 const &axis, Float32 angle_deg);
-   void look_at(    Vec3 const &position, Vec3 const up={0,1,0} );
+   void look_at(    Vec3 const &target_position, Vec3 const up={0,1,0} );
 
    void scale(     Vec3 const &scale );
    void translate( Vec3 const &offset);

@@ -87,11 +87,8 @@ void Transform::translate(Vec3 const &offset) {
    _update_matrix();
 }
 
-void Transform::look_at(Vec3 const &position, Vec3 const up) {
-   _rotation = glm::lookAt( _position, position, up );
-   _rotation[3][0] = 0;
-   _rotation[3][1] = 0; // TODO: verifiera att ordningen är rätt på matrisaccessen
-   _rotation[3][2] = 0;
+void Transform::look_at(Vec3 const &forward, Vec3 const up) {
+   _rotation = glm::lookAt( _position, _position+forward, up );
    _update_matrix();
 }
 
