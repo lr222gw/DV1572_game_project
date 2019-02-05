@@ -822,3 +822,51 @@ void process_mouse(GLFWwindow *window, Viewport &cam, Float32 delta) {
    }
    //cameraFront = glm::normalize(front);
 }
+
+/*
+static bool mouse_look = false;
+
+void process_input( GLFWwindow *window, Viewport &cam, Float32 time_delta_s ) {
+   static move_speed = 50.0f;
+
+   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) 
+      glfwSetWindowShouldClose(window, true);
+   if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS)
+      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+   if (glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS)
+      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+   if (glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS) {
+      mouse_look = !mouse_look;
+      if (mouse_look)
+         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+      else
+         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+   }
+   
+   Float32 move_distance = move_speed * time_delta_s;
+
+   if ( glfwGetKey(window, GLFW_KEY_W)     == GLFW_PRESS ) {  // forward
+      cam.transform( move_distance * forward );
+   }
+   if ( glfwGetKey(window, GLFW_KEY_S)     == GLFW_PRESS ) { // backward
+      auto backward = forward * Transform::make_rotation( Vec3(   0,  179,  0 ) );
+      cam.transform( move_distance * backward );
+   }
+   if ( glfwGetKey(window, GLFW_KEY_A)     == GLFW_PRESS ) { // left
+      auto left     = forward * Transform::make_rotation( Vec3(   0,  -89,  0 ) );
+      cam.transform( move_distance * left );
+   }
+   if ( glfwGetKey(window, GLFW_KEY_D)     == GLFW_PRESS ) { // right
+      auto right    = forward * Transform::make_rotation( Vec3(   0,   89,  0 ) );
+      cam.transform( move_distance * right );
+   }
+   if ( glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS ) { // up
+      auto up       = forward * Transform::make_rotation( Vec3( -89,    0,  0 ) );
+      cam.transform( move_distance * up );
+   }
+   if ( glfwGetKey(window, GLFW_KEY_CTRL)  == GLFW_PRESS ) { // down
+      auto down     = forward * Transform::make_rotation( Vec3( -89,    0,  0 ) );
+      cam.transform( move_distance * down );
+   }
+}
+*/
