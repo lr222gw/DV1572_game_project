@@ -30,36 +30,52 @@ void Transform::operator*=( Transform const &right_hand_side ) {
    _update_matrix();
 }
 
-void Transform::set_rotation(Vec3 const &rotation) {
-   _rotation = rotation;
+void Transform::set_rotation( Vec3 const &euler_angles ) {
+   _rotation = glm::toMat4(Quat(Vec4(euler_angles, 1.0f)));
    _update_matrix();
 }
 
-void Transform::set_position(Vec3 const &position ) {
+void Transform::set_rotation( Mat4 const &rotation_matrix ) {
+   // TODO: verify veracity of matrix
+   _rotation = rotation_matrix;
+   _update_matrix();
+}
+
+void Transform::set_rotation( Vec3 const &axis, Float32 deg_rad ) {
+   _rotation = glm::rotate(_rotation, glm::radians(angle_deg), axis);
+   _update_matrix();
+}
+
+void Transform::set_position( Vec3 const &position ) {
    _position = position;
    _update_matrix();
 }
 
-void Transform::set_scale(Vec3 const &scale) {
+void Transform::set_scale( Vec3 const &scale ) {
    _scale = scale;
    _update_matrix();
 }
 
-void Transform::rotate(Vec3 const &rotation) {
-   // generera mat4 via quad
-   _rotation += rotation; //?
+void Transform::rotate(Vec3 const &euler_angles) {
+   _rotation *= glm::toMat4(Quat(Vec4(euler_angles, 1.0f)));
    _update_matrix();
 }
 
-// void Transform::rotate(Vec3 const &axis, Float32 angle_rad) {
-//    _rotation *= glm::rotate(_rotation, angle_rad, axis);
-//    _update_matrix();
-// }
+void Transform::rotate( Mat4 const &rotation_matrix ) {
+   // TODO: verify veracity of matrix
+   _rotation *= rotation_matrix;
+   _update_matrix();
+}
 
-// void Transform::rotate_deg(Vec3 const &axis, Float32 angle_deg) {
-//    _rotation *= glm::rotate(_rotation, glm::radians(angle_deg), axis);
-//    _update_matrix();
-// }
+void Transform::rotate(Vec3 const &axis, Float32 angle_rad) {
+   _rotation *= glm::rotate(_rotation, angle_rad, axis);
+   _update_matrix();
+}
+
+void Transform::rotate_deg(Vec3 const &axis, Float32 angle_deg) {
+   _rotation *= glm::rotate(_rotation, glm::radians(angle_deg), axis);
+   _update_matrix();
+}
 
 void Transform::scale(Vec3 const &scale) {
    _scale *= scale;
@@ -71,20 +87,37 @@ void Transform::translate(Vec3 const &offset) {
    _update_matrix();
 }
 
-// void Transform::look_at(Vec3 const &position, Vec3 const up) {
-//    _rotation = glm::lookAt( _position, position, up );
-//    _rotation[3][0] = 0;
-//    _rotation[3][1] = 0; // TODO: verifiera att ordningen är rätt på matrisaccessen
-//    _rotation[3][2] = 0;
-//    _update_matrix();
-// }
-
-Transform Transform::make_translation( Vec3 const &offset ) {
-   return Transform( offset );
+void Transform::look_at(Vec3 const &position, Vec3 const up) {
+   _rotation = glm::lookAt( _position, position, up );
+   _rotation[3][0] = 0;
+   _rotation[3][1] = 0; // TODO: verifiera att ordningen är rätt på matrisaccessen
+   _rotation[3][2] = 0;
+   _update_matrix();
 }
 
-Transform Transform::make_rotation( Vec3 const &rotations_rad ) {
-   return Transform( Vec3(0.0f), rotations_rad ); // 1.0f?
+Transform Transform::make_translation( Vec3 const &offset ) {
+   Transform product;
+   product.translate( offset );
+   return product;
+}
+
+Transform Transform::make_rotation( Vec3 const &euler_angles ) {
+   Transform product;
+   product.rotate( euler_angles );
+   return product;
+}
+
+Transform Transform::make_rotation( Mat4 const &rotation_matrix ) {
+   // TODO: verify veracity of matrix
+   Transform product;
+   product.rotate( rotation_matrix );
+   return product;
+}
+
+Transform Transform::make_rotation( Vec3 const &axis, Float32 deg_rad ) {
+   Transform product;
+   product.rotate( axis, deg_rad );
+   return product;
 }
 
 Transform Transform::make_scale( Vec3 const &scales ) {
@@ -95,7 +128,7 @@ Vec3 Transform::get_position() const {
    return _position;
 }
 
-Vec3 Transform::get_rotation() const {
+Mat4 Transform::get_rotation() const {
    return _rotation;
 }
 
