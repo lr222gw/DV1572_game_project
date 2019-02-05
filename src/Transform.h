@@ -40,8 +40,8 @@ public:
 
    explicit Transform( Vec3 const &position,
                        Float32     angle_rad,
-                       Vec3 const &axis,
-                       Vec3 const &scale = Vec3( 1.0f ) )
+                       Vec3 const  &axis,
+                       Vec3 const  &scale = Vec3( 1.0f ) )
    :
       _position ( position ),
       _scale    ( scale    ),
@@ -71,26 +71,27 @@ public:
 
    Mat4 get_transform() const;
 
-   Transform &operator=( Transform const &other );
-   Transform &operator=( Transform      &&other );
+   Transform &operator=( Transform const  &other );
+   Transform &operator=( Transform       &&other );
 
    Transform operator*( Transform const &right_hand_side ) const;
    void operator*=(     Transform const &right_hand_side );
 
-   void set_position( Vec3 const &euler_angles );
+   void set_position( Vec3 const &offset );
+   void translate(    Vec3 const &offset);
+
    void set_rotation( Mat4 const &rotation_matrix );
    void set_rotation( Vec3 const &axis, Float32 angle_rad );
-   void set_rotation( Vec3 const &rotation );
-   void set_scale(    Vec3 const &scale );
+   void set_rotation( Vec3 const &euler_angles );
+   void rotate(       Vec3 const &euler_angles );
+   void rotate(       Mat4 const &rotation_matrix );
+   void rotate(       Vec3 const &axis, Float32 angle_rad );
+   void rotate_deg(   Vec3 const &axis, Float32 angle_deg);
+   void look_at(      Vec3 const &target_position, Vec3 const up={0,1,0} );
 
-   void rotate(     Vec3 const &euler_angles );
-   void rotate(     Mat4 const &rotation_matrix );
-   void rotate(     Vec3 const &axis, Float32 angle_rad );
-   void rotate_deg( Vec3 const &axis, Float32 angle_deg);
-   void look_at(    Vec3 const &target_position, Vec3 const up={0,1,0} );
-
+   void set_scale( Vec3 const &scale );
    void scale(     Vec3 const &scale );
-   void translate( Vec3 const &offset);
+ 
 
    // creates Transforms that exclusively translates, rotates, or scales
    // basically alternative constructors
