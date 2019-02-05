@@ -738,11 +738,11 @@ void process_input(GLFWwindow *window, Viewport &cam, Float32 delta  )
       cam.transform(offset);
    }
    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-      offset = Transform::make_translation(camspeed*Vec3(camspeed, 1.0, 1.0)* -cam.front);
+      offset = Transform::make_translation(Vec3(camspeed , 1.0, 1.0)*glm::cross(cam.front, Vec3(0.0, 1.0f, 0.0f)));
       cam.transform(offset);
    }
    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-      offset = Transform::make_translation(camspeed*Vec3(-camspeed, 1.0, 1.0)* -cam.front);
+      offset = Transform::make_translation(Vec3(-camspeed, -1.0, -1.0)* glm::cross( cam.front, Vec3(0.0, 1.0f, 0.0f)));
       cam.transform(offset);
    }
    if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
