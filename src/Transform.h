@@ -18,6 +18,13 @@ public:
       _update_matrix();
    }
 
+   Transform( Mat4 transform_matrix )
+   :
+      matrix( _matrix )
+   {
+      _extract_data( transform_matrix );
+   }
+
    Transform( Transform const &other ):
       _position ( other._position ),
       _rotation ( other._rotation ),
@@ -28,7 +35,7 @@ public:
       _update_matrix();
    }
 
-   Transform( Transform       && ) = delete;
+   Transform( Transform && ) = delete;
 
    ~Transform() {}
 
@@ -62,6 +69,8 @@ public:
 
 private:
    void _update_matrix();
+
+   void _extract_vectors( Mat4 const &transformation_matrix );
 
    Mat4   _matrix;
 
