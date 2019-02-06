@@ -5,7 +5,7 @@
 
 out vec4 FragColor;
 
-in vec2 TexCoords;
+in vec2 uv_fs;
 
 uniform sampler2D g_tex_pos;
 uniform sampler2D g_tex_norm;
@@ -34,10 +34,10 @@ float Radius = 5;
 void main()
 {             
     // retrieve data from gbuffer
-    vec3 FragPos = texture(g_tex_pos, TexCoords).rgb;
-    vec3 Normal = texture(g_tex_norm, TexCoords).rgb;
-    vec3 albedo = texture(g_tex_albedo, TexCoords).rgb;
-    float spec = texture(g_tex_spec, TexCoords).a;
+    vec3 FragPos = texture(g_tex_pos, uv_fs).rgb;
+    vec3 Normal = texture(g_tex_norm, uv_fs).rgb;
+    vec3 albedo = texture(g_tex_albedo, uv_fs).rgb;
+    float spec = texture(g_tex_spec, uv_fs).a;
     
     // then calculate lighting as usual
     vec3 lighting  = albedo * 0.1; // hard-coded ambient component
