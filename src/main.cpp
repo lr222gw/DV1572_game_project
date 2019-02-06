@@ -611,6 +611,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
    glUniform1i((glGetUniformLocation(lightProg->getProgramLoc(), "g_tex_spec")), 2);
    glUniform1i((glGetUniformLocation(lightProg->getProgramLoc(), "g_tex_albedo")), 3);
    
+   unsigned int quadVAO = 0;
+   unsigned int quadVBO;
 
  // main loop:
 	while (!glfwWindowShouldClose(window)) {
@@ -651,7 +653,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
       scenMan.draw(myView); // undersök om buffer binds
       //glUseProgram(shaProg->getProgramLoc());
       //a_Mesh.render();
-
+      glClearColor(0.4f, 0.6, 1.0, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       gBufferIds g_buffer_ids = myView.get_g_buffer();
       
@@ -665,8 +667,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
       glActiveTexture(GL_TEXTURE2);
       glBindTexture(GL_TEXTURE_2D, g_buffer_ids.g_albedo_rgba_texture);
 
-      unsigned int quadVAO = 0;
-      unsigned int quadVBO;
+      
 
       if (quadVAO == 0)
       {
