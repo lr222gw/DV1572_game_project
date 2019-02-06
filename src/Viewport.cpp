@@ -182,7 +182,7 @@ void Viewport::_g_buffer_init(float width, float height) {
    // albedo_rgba color texture for gBuffer
    glBindTexture(GL_TEXTURE_2D, this->_gbuffer_ids.g_albedo_rgba_texture);
    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-   //Setting Spec's magnifier and minifier behavior
+   //Setting albedo's magnifier and minifier behavior
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
    //attatch the texture id for spec to Currently bound g_buffer
