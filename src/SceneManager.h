@@ -9,9 +9,9 @@
 #include "misc/ImGui/imgui_impl_glfw.h"
 #include "misc/ImGui/imgui_impl_opengl3.h"
 
-#include "lights.h"
+#include "Light.h"
 
-constexpr light_capacity = 1024;
+constexpr Uint32 light_capacity = 1024;
 
 class SceneManager {
 public:
@@ -30,7 +30,7 @@ public:
    // NOTE! should only be used by Light's destructor (TODO: private+friend?)
    void remove_light( Uint64 id );
 
-   void draw();
+   void draw( Viewport const &view );
 
    void draw_debug_scene_inspection();
 
