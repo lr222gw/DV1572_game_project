@@ -654,23 +654,24 @@ Int32 main( Int32 argc, char const *argv[] ) {
       //glUseProgram(shaProg->getProgramLoc());
       //a_Mesh.render();
       glClearColor(0.4f, 0.6, 1.0, 1.0f);
-      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-      gBufferIds g_buffer_ids = myView.get_g_buffer();
+      glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+      auto g_buffer_data = myView.get_g_buffer();
       
       
-      glUseProgram(lightProg->getProgramLoc());
+      glUseProgram( lightProg->getProgramLoc() );
 
-      glActiveTexture(GL_TEXTURE0);
-      glBindTexture(GL_TEXTURE_2D, g_buffer_ids.g_pos_texture);
+      glActiveTexture( GL_TEXTURE0 );
+      glBindTexture( GL_TEXTURE_2D, g_buffer_data.pos_tex_loc );
       glActiveTexture(GL_TEXTURE1);
-      glBindTexture(GL_TEXTURE_2D, g_buffer_ids.g_norm_texture);
+      glBindTexture( GL_TEXTURE_2D, g_buffer_data.nor_tex_loc );
       glActiveTexture(GL_TEXTURE2);
-      glBindTexture(GL_TEXTURE_2D, g_buffer_ids.g_albedo_rgba_texture);
+      glBindTexture( GL_TEXTURE_2D, g_buffer_data.spe_tex_loc );
+      glActiveTexture(GL_TEXTURE3);
+      glBindTexture( GL_TEXTURE_2D, g_buffer_data.alb_tex_loc );
 
       
 
-      if (quadVAO == 0)
-      {
+      if (quadVAO == 0) {
          float quadVertices[] = {
             // positions        // texture Coords
             -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
@@ -695,8 +696,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
       
       
 
-      glBindFramebuffer(GL_READ_FRAMEBUFFER, g_buffer_ids.g_buffer);
-      glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+      glBindFramebuffer( GL_READ_FRAMEBUFFER, g_buffer_data.buffer_loc );
+      glBindFramebuffer( GL_DRAW_FRAMEBUFFER, 0 );
 
       glUseProgram(quadProg->getProgramLoc());
       

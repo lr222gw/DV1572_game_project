@@ -36,14 +36,39 @@ SharedPtr<ModelInstance> SceneManager::instantiate_model(
    return instance_ptr;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 void SceneManager::draw( Viewport const &view ) {
    auto &g_buffer = view.get_g_buffer();
-// 1. Geometry Pass:
 
-   glBindFramebuffer(GL_FRAMEBUFFER, g_buffer.g_buffer);
-   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-   
+   glBindFramebuffer( GL_FRAMEBUFFER, g_buffer.buffer_loc );
+   glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
+   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+// 1. Geometry Pass:
    // TODO: sortera instanserna efter ShaderProgram m.h.a. std::partition()
    for ( auto &instance : _instances ) {
       if (!instance.expired())
@@ -55,9 +80,29 @@ void SceneManager::draw( Viewport const &view ) {
    // TODO
       // _light_data + _num_lights till lighting shader
 
-
-
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 void SceneManager::draw_debug_scene_inspection() {

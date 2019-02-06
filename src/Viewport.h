@@ -6,13 +6,13 @@
 
 #include "Transform.h"
 
-struct gBufferIds {
-   bool     is_set = false;
-   Uint32   g_buffer;
-   Uint32   g_pos_texture;
-   Uint32   g_norm_texture;
-   Uint32   g_spec_texture;
-   Uint32   g_albedo_rgba_texture;
+struct GBufferData {
+   bool    is_set = false;
+   GLuint  buffer_loc;
+   GLuint  pos_tex_loc;
+   GLuint  nor_tex_loc;
+   GLuint  spe_tex_loc;
+   GLuint  alb_tex_loc;
 };
 
 // TODO: (låg prioritet) lägg till en  void make_active(); som i princip bara kallar på _write_to_buffer();
@@ -28,13 +28,13 @@ public:
    Viewport& operator=( Viewport const & ) = delete;
    Viewport& operator=( Viewport && )      = delete;
 
-   void              transform( Transform const &transform );
-   void              set_view( Transform const &transform );
-   Transform         get_view() const;
-   gBufferIds const& get_g_buffer() const;
-   void              bind_shader_program( ShaderProgram & );
-   void              set_fov( Float32 fov_rad );
-   void              update();
+   void               transform( Transform const &transform );
+   void               set_view( Transform const &transform );
+   Transform          get_view() const;
+   GBufferData const& get_g_buffer() const;
+   void               bind_shader_program( ShaderProgram & );
+   void               set_fov( Float32 fov_rad );
+   void               update();
 
 private:
    // void _update_view_matrix();
@@ -44,7 +44,7 @@ private:
    void _g_buffer_init( Float32 width, Float32 height );
 
    // TODO: (låg prioritet) använd transform för projection?
-   gBufferIds  _gbuffer_ids;
+   GBufferData _g_buffer;
    Float32     _fov;
    Float32     _aspect;
    Transform   _view;

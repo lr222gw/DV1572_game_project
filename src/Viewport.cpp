@@ -70,10 +70,11 @@ void Viewport::set_view( Transform const &transform ) {
 Transform Viewport::get_view() const {
    return _view;
 }
-gBufferIds const &Viewport::get_g_buffer() const
-{
+
+GBufferData const &Viewport::get_g_buffer() const {
    return _g_buffer;
 }
+
 void Viewport::set_fov(Float32 fov_rad) {
    _fov = fov_rad;
    _projection = glm::perspective( _fov,
@@ -150,7 +151,7 @@ void Viewport::_g_buffer_init(float width, float height) {
    }
 
    glBindFramebuffer( GL_FRAMEBUFFER,
-                      this->_g_buffer.g_buffer);
+                      this->_g_buffer.buffer_loc );
 
 // position texture for g-buffer:
    glBindTexture( GL_TEXTURE_2D,
@@ -277,7 +278,7 @@ void Viewport::_g_buffer_init(float width, float height) {
                            0 );
 
 // Describe for fragment shader to write to these buffers (?)
-   Uint32 attachments[4] = { GL_COLOR_ATTACHMENT0,
+   GLuint attachments[4] = { GL_COLOR_ATTACHMENT0,
                              GL_COLOR_ATTACHMENT1,
                              GL_COLOR_ATTACHMENT2,
                              GL_COLOR_ATTACHMENT3 };
@@ -285,7 +286,7 @@ void Viewport::_g_buffer_init(float width, float height) {
    glDrawBuffers( 4, attachments );
 
    // Create a render buffer object for depth buffer
-   GLuint32 depth_render_buffer_obj;
+   GLuint depth_render_buffer_obj;
 
    glGenRenderbuffers( 1, &depth_render_buffer_obj );
 
