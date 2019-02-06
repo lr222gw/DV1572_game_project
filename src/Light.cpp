@@ -1,4 +1,4 @@
-#include "Lights.h"
+#include "Light.h"
 
 LightData Light::get_data() const {
    return scene.get_data(_id);

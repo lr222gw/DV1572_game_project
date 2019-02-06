@@ -622,9 +622,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
       process_mouse(window, myView, delta_time_s);
       
 		glClearColor(0.0, 0.0f, 0.0f, 1.0f);//glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
-      
-      myView.update();
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );    
 
 // programkod här
       //myMinstance->ttranceform(aTransformMatris)
@@ -643,7 +641,9 @@ Int32 main( Int32 argc, char const *argv[] ) {
       
       //glMatrixMode(GL_PROJECTION);
       //glLoadIdentity();
-      scenMan.draw(); // undersök om buffer binds
+
+      myView.update();
+      scenMan.draw(myView); // undersök om buffer binds
       //glUseProgram(shaProg->getProgramLoc());
       //a_Mesh.render();
 
@@ -653,10 +653,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
 	  // rendering
 
-	  Int32 display_w, display_h;
-	  glfwMakeContextCurrent(window);
-	  glfwGetFramebufferSize(window, &display_w, &display_h);
-	  glViewport(0, 0, display_w, display_h);
+
 	  ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 	//	float dt_time_s = ImGui::GetIO().DeltaTime; // UNUSED
