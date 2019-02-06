@@ -566,9 +566,13 @@ Int32 main( Int32 argc, char const *argv[] ) {
    auto geo_f_Shader = shaMan.load_shader("g_buffer.frag");
    auto geo_v_Shader = shaMan.load_shader("g_buffer.vert");
 
+   auto quad_FShader = shaMan.load_shader("quad.frag");
+   auto quad_VShader = shaMan.load_shader("quad.vert");
+
    auto shaProg = shaMan.create_program({fraShader, vertShader});
    auto geoProg = shaMan.create_program({ geo_f_Shader, geo_v_Shader });
    auto lightProg = shaMan.create_program({ light_f_Shader, light_v_Shader });
+   auto quadProg = shaMan.create_program({ quad_FShader, quad_VShader });
 
    AssetManager assMan{};
    SharedPtr<Model> myModel = assMan.load_model("Dog.dae");
@@ -688,7 +692,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
       glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
       glBindVertexArray(0);
       
-
+      
+      glUseProgram(quadProg->getProgramLoc());
 
 
 
