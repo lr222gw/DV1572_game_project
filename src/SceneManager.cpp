@@ -37,13 +37,29 @@ SharedPtr<ModelInstance> SceneManager::instantiate_model(
 }
 
 void SceneManager::draw() {
+// 1. Geometry Pass:
    // TODO: sortera instanserna efter ShaderProgram m.h.a. std::partition()
    for ( auto &instance : _instances ) {
-      if (!instance.expired()) {
+      if (!instance.expired())
          instance.lock()->draw();
-      }      
    }
+// 2. Lighting pass:
+   // TODO
+      // _light_data + _num_lights till lighting shader
 }
+
+void SceneManager::add_light( WeakPtr<DirLight>  &light ) {
+
+}
+
+void SceneManager::add_light( WeakPtr<SpotLight> &light ) {
+
+}
+
+void SceneManager::add_light( WeakPtr<PointLight> &light ) {
+
+}
+
 
 
 void SceneManager::draw_debug_scene_inspection() {
@@ -99,3 +115,44 @@ void SceneManager::draw_debug_scene_inspection() {
    } ImGui::End(); // end our Inspection window
 }
 
+
+
+// NOTE! should only be used by Light's constructor (TODO: private+friend?)
+void SceneManager::add_light( Uint64 id, LightData data ) {
+   _light_data[_num_lights] = data;
+   _ids[_num_lights]        = id;
+   ++_num_lights; // increment counter
+}
+
+LightData SceneManager::get_light( Uint64 id ) const {
+   auto index = _find_light_index(id);
+   return _light_data[index];
+}
+
+void SceneManager::get_light( Uint64 id, LightData data ) {
+   auto index = _find_light_index(id);
+   _light_data[index] = data;
+}
+
+// NOTE! should only be used by Light's destructor (TODO: private+friend?)
+void SceneManager::remove_light( Uint64 id ) {
+   auto index = _find_light_index(id);
+
+   --_num_lights; // decrement counter
+
+   // swap target element with last element
+   // (the removed item will be moved out of the active partition of the array)
+   std::swap( _light_data[index], _light_data[_num_lights] );
+   std::swap(        _ids[index],        _ids[_num_lights] );
+}
+
+
+Uint32 SceneManager::_find_light_index( Uint64 id ) const {
+   auto index = -1;
+   // find index of target id
+   for ( auto i = 0;  index < _num_lights;  ++index )
+      if ( _ids[i] == id)
+         index = i;
+   assert( index != -1 && "Bug! There should only be one entry point and exit point for every light instance" );
+   return index;
+}
