@@ -613,7 +613,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    
    unsigned int quadVAO = 0;
    unsigned int quadVBO;
-
+   //glDisable(GL_BLEND);
  // main loop:
 	while (!glfwWindowShouldClose(window)) {
       Float32 delta_time_s = ImGui::GetIO().DeltaTime; 

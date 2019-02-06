@@ -269,7 +269,7 @@ void Viewport::_g_buffer_init(float width, float height) {
                     GL_TEXTURE_MAG_FILTER,
                     GL_NEAREST );
 
-   // attach the texture id for spec to Currently bound g-buffer
+   // attach the texture id to currently bound g-buffer
    glFramebufferTexture2D( GL_FRAMEBUFFER,
                            GL_COLOR_ATTACHMENT3,
                            GL_TEXTURE_2D,
@@ -285,7 +285,7 @@ void Viewport::_g_buffer_init(float width, float height) {
    glDrawBuffers( 4, attachments );
 
    // Create a render buffer object for depth buffer
-   Uint32 depth_render_buffer_obj;
+   GLuint32 depth_render_buffer_obj;
 
    glGenRenderbuffers( 1, &depth_render_buffer_obj );
 
@@ -302,5 +302,4 @@ void Viewport::_g_buffer_init(float width, float height) {
 
    // Bind to default buffer
    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
-
 }
