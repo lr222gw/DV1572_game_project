@@ -47,8 +47,14 @@ private:
    GBufferData _g_buffer;
    Float32     _fov;
    Float32     _aspect;
+   GLint       _width;
+   GLint       _height;
    Transform   _view;
    Mat4        _projection;
    GLFWwindow *_window;
    GLuint      _location;
+
+public:
+   GLint const &width  = _width;
+   GLint const &height = _height;
 };

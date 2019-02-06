@@ -7,7 +7,7 @@ Viewport::Viewport(Vec3 position, GLFWwindow *window, Float32 fov_rad):
    _fov    ( fov_rad ),
    _aspect ( -1.0f   ),
    _window ( window  ),
-   front(1.0f,1.0f,1.0f)
+   front   (1.0f,1.0f,1.0f)
 {
    // TODO: bind _camera och uniform buffer f�r Mat4
 
@@ -22,9 +22,8 @@ Viewport::Viewport(Vec3 position, GLFWwindow *window, Float32 fov_rad):
 }
 
 void Viewport::_update_aspect_ratio() {
-   Int32 width, height;
-   glfwGetWindowSize( _window, &width, &height );
-   Float32 aspect = Float32(width) / Float32(height);
+   glfwGetWindowSize( _window, &_width, &_height );
+   Float32 aspect = Float32(_width) / Float32(_height);
    if ( aspect != _aspect ) {
       _aspect = aspect;
 
@@ -33,8 +32,8 @@ void Viewport::_update_aspect_ratio() {
 
       //TODO: Does this work? 
       glfwMakeContextCurrent(this->_window);
-      glfwGetFramebufferSize(this->_window, &width, &height);
-      glViewport(0, 0, width, height);
+      glfwGetFramebufferSize(this->_window, &_width, &_height);
+      glViewport(0, 0, _width, _height);
    }
 
 }
