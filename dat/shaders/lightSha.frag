@@ -23,7 +23,7 @@ struct Light {
 };
 //const int NR_LIGHTS = 32;
 //uniform Light lights[NR_LIGHTS];
-vec3 viewPos = vec3(0.0f, 5.0f, -10.0f);
+vec3 viewPos = vec3(0.0f, 0.0f, -15.0f);
 
 vec3 light_pos = vec3(3.0f, 5.0f, 0.0f);
 vec3 light_col = vec3(0.3f, 0.7, 0.1);

@@ -694,7 +694,12 @@ Int32 main( Int32 argc, char const *argv[] ) {
       glBindVertexArray(0);
       
       
+
+      glBindFramebuffer(GL_READ_FRAMEBUFFER, g_buffer_ids.g_buffer);
+      glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+
       glUseProgram(quadProg->getProgramLoc());
+      
 
 
 
