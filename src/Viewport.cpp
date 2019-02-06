@@ -72,7 +72,7 @@ Transform Viewport::get_view() const {
 }
 gBufferIds const &Viewport::get_g_buffer() const
 {
-   return _gbuffer_ids;
+   return _g_buffer;
 }
 void Viewport::set_fov(Float32 fov_rad) {
    _fov = fov_rad;
@@ -134,27 +134,27 @@ void Viewport::_write_to_buffer() {
 
 void Viewport::_g_buffer_init(float width, float height) {
   
-   //g_specular =  specular RGB (=xyz) + specular intensity (=w)
-   //g_albedo = albedo RGBA(= xyzw)
+   // specular  =  specular RGB (=xyz) + specular intensity (=w)
+   // albedo    =  albedo RGBA(= xyzw)
 
    //TODO: extract Magnifier and minifier behavior to be changed in options
   
-   if (this->_gbuffer_ids.is_set == false) {
+   if ( true == this->_g_buffer.is_set ) {
       //gBuffer init
-      glGenFramebuffers( 1, &(this->_gbuffer_ids.g_buffer) );
+      glGenFramebuffers( 1, &(this->_g_buffer.buffer_loc) );
       //gBuffer Texture attatchments init
-      glGenTextures( 1, &(this->_gbuffer_ids.g_pos_texture)         );
-      glGenTextures( 1, &(this->_gbuffer_ids.g_norm_texture)        );
-      glGenTextures( 1, &(this->_gbuffer_ids.g_spec_texture)        );
-      glGenTextures( 1, &(this->_gbuffer_ids.g_albedo_rgba_texture) );
+      glGenTextures( 1, &(this->_g_buffer.pos_tex_loc) );
+      glGenTextures( 1, &(this->_g_buffer.nor_tex_loc) );
+      glGenTextures( 1, &(this->_g_buffer.spe_tex_loc) );
+      glGenTextures( 1, &(this->_g_buffer.alb_tex_loc) );
    }
 
    glBindFramebuffer( GL_FRAMEBUFFER,
-                      this->_gbuffer_ids.g_buffer);
+                      this->_g_buffer.g_buffer);
 
-   //position texture for gbuffer
+// position texture for g-buffer:
    glBindTexture( GL_TEXTURE_2D,
-                  this->_gbuffer_ids.g_pos_texture );
+                  this->_g_buffer.pos_tex_loc );
 
    glTexImage2D( GL_TEXTURE_2D,
                  0,
@@ -166,11 +166,12 @@ void Viewport::_g_buffer_init(float width, float height) {
                  GL_FLOAT,
                  NULL );
 
-   // Setting pos's magnifier and minifier behavior
+   // setting minifier:
    glTexParameteri( GL_TEXTURE_2D,
                     GL_TEXTURE_MIN_FILTER,
                     GL_NEAREST );
 
+   // setting magnifier:
    glTexParameteri( GL_TEXTURE_2D,
                     GL_TEXTURE_MAG_FILTER,
                     GL_NEAREST );
@@ -179,12 +180,12 @@ void Viewport::_g_buffer_init(float width, float height) {
    glFramebufferTexture2D( GL_FRAMEBUFFER,
                            GL_COLOR_ATTACHMENT0,
                            GL_TEXTURE_2D,
-                           this->_gbuffer_ids.g_pos_texture,
+                           this->_g_buffer.pos_tex_loc,
                            0 );
 
-   // normal texture for g-buffer
+// normal texture for g-buffer:
    glBindTexture( GL_TEXTURE_2D,
-                  this->_gbuffer_ids.g_norm_texture );
+                  this->_g_buffer.nor_tex_loc );
 
    glTexImage2D( GL_TEXTURE_2D,
                  0,
@@ -196,25 +197,26 @@ void Viewport::_g_buffer_init(float width, float height) {
                  GL_FLOAT,
                  NULL );
 
-   // Setting Norm's magnifier and minifier behavior
+   // setting minifier:
    glTexParameteri( GL_TEXTURE_2D,
                     GL_TEXTURE_MIN_FILTER,
                     GL_NEAREST );
 
+   // setting magnifier:
    glTexParameteri( GL_TEXTURE_2D,
                     GL_TEXTURE_MAG_FILTER,
                     GL_NEAREST );
 
-   //describe and attatch the texture id for norm to Currently bound g-buffer
+   // describe and attatch the texture id for norm to Currently bound g-buffer
    glFramebufferTexture2D( GL_FRAMEBUFFER,
                            GL_COLOR_ATTACHMENT1,
                            GL_TEXTURE_2D,
-                           this->_gbuffer_ids.g_norm_texture,
+                           this->_g_buffer.nor_tex_loc,
                            0 );
 
-   // spec intense and spec color texture for g-buffer
+// specularity (specularity color + specularity intensity) for g-buffer:
    glBindTexture( GL_TEXTURE_2D,
-                  this->_gbuffer_ids.g_spec_texture );
+                  this->_g_buffer.spe_tex_loc );
 
    glTexImage2D( GL_TEXTURE_2D,
                  0,
@@ -226,11 +228,12 @@ void Viewport::_g_buffer_init(float width, float height) {
                  GL_UNSIGNED_BYTE,
                  NULL );
 
-   // Setting Spec's magnifier and minifier behavior
+   // sitting minifier:
    glTexParameteri( GL_TEXTURE_2D,
                     GL_TEXTURE_MIN_FILTER,
                     GL_NEAREST );
 
+   // setting magnifier:
    glTexParameteri( GL_TEXTURE_2D,
                     GL_TEXTURE_MAG_FILTER,
                     GL_NEAREST );
@@ -239,12 +242,12 @@ void Viewport::_g_buffer_init(float width, float height) {
    glFramebufferTexture2D( GL_FRAMEBUFFER,
                            GL_COLOR_ATTACHMENT2,
                            GL_TEXTURE_2D,
-                           this->_gbuffer_ids.g_spec_texture,
+                           this->_g_buffer.spe_tex_loc,
                            0 );
    
-   // albedo_rgba color texture for g-buffer
+// albedo (RGBA) color texture for g-buffer
    glBindTexture( GL_TEXTURE_2D,
-                  this->_gbuffer_ids.g_albedo_rgba_texture );
+                  this->_g_buffer.alb_tex_loc );
 
    glTexImage2D( GL_TEXTURE_2D,
                  0,
@@ -256,11 +259,12 @@ void Viewport::_g_buffer_init(float width, float height) {
                  GL_UNSIGNED_BYTE,
                  NULL );
 
-   // Setting Spec's magnifier and minifier behavior
+   // setting minifier:
    glTexParameteri( GL_TEXTURE_2D,
                     GL_TEXTURE_MIN_FILTER,
                     GL_NEAREST );
 
+   // setting magnifier:
    glTexParameteri( GL_TEXTURE_2D,
                     GL_TEXTURE_MAG_FILTER,
                     GL_NEAREST );
@@ -269,10 +273,10 @@ void Viewport::_g_buffer_init(float width, float height) {
    glFramebufferTexture2D( GL_FRAMEBUFFER,
                            GL_COLOR_ATTACHMENT3,
                            GL_TEXTURE_2D,
-                           this->_gbuffer_ids.g_albedo_rgba_texture,
+                           this->_g_buffer.alb_tex_loc,
                            0 );
 
-   // Describe for fragment shader to write to these buffers (?)
+// Describe for fragment shader to write to these buffers (?)
    Uint32 attachments[4] = { GL_COLOR_ATTACHMENT0,
                              GL_COLOR_ATTACHMENT1,
                              GL_COLOR_ATTACHMENT2,
@@ -281,11 +285,11 @@ void Viewport::_g_buffer_init(float width, float height) {
    glDrawBuffers( 4, attachments );
 
    // Create a render buffer object for depth buffer
-   Uint32 depth_renderBufferObj;
+   Uint32 depth_render_buffer_obj;
 
-   glGenRenderbuffers( 1, &depth_renderBufferObj );
+   glGenRenderbuffers( 1, &depth_render_buffer_obj );
 
-   glBindRenderbuffer( GL_RENDERBUFFER, depth_renderBufferObj );
+   glBindRenderbuffer( GL_RENDERBUFFER, depth_render_buffer_obj );
 
    glRenderbufferStorage( GL_RENDERBUFFER,
                           GL_DEPTH_COMPONENT,
@@ -294,7 +298,7 @@ void Viewport::_g_buffer_init(float width, float height) {
 
    // control the status of the frame buffer
    if ( glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE )
-      assert( false && "G-buffer status is not complete" );
+      assert( false && "G-buffer status is not complete. " );
 
    // Bind to default buffer
    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
