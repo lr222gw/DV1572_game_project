@@ -130,7 +130,6 @@ void Viewport::_write_to_buffer() {
    glUniformMatrix4fv( glGetUniformLocation(_location, "view"),       1, GL_FALSE, &(_view.matrix[0][0]) );
    //glUniformMatrix4fv( glGetUniformLocation(_location, "projection"), 1, GL_FALSE, glm::value_ptr(_projection) );
    glUniformMatrix4fv( glGetUniformLocation(_location, "projection"), 1, GL_FALSE, &_projection[0][0] );
-   
 }
 
 void Viewport::_g_buffer_init(float width, float height) {
@@ -142,68 +141,162 @@ void Viewport::_g_buffer_init(float width, float height) {
   
    if (this->_gbuffer_ids.is_set == false) {
       //gBuffer init
-      glGenFramebuffers(1, &this->_gbuffer_ids.g_buffer);
+      glGenFramebuffers( 1, &(this->_gbuffer_ids.g_buffer) );
       //gBuffer Texture attatchments init
-      glGenTextures(1, &this->_gbuffer_ids.g_pos_texture);
-      glGenTextures(1, &this->_gbuffer_ids.g_norm_texture);
-      glGenTextures(1, &this->_gbuffer_ids.g_spec_texture);
-      glGenTextures(1, &this->_gbuffer_ids.g_albedo_rgba_texture);
+      glGenTextures( 1, &(this->_gbuffer_ids.g_pos_texture)         );
+      glGenTextures( 1, &(this->_gbuffer_ids.g_norm_texture)        );
+      glGenTextures( 1, &(this->_gbuffer_ids.g_spec_texture)        );
+      glGenTextures( 1, &(this->_gbuffer_ids.g_albedo_rgba_texture) );
    }
 
-   glBindFramebuffer(GL_FRAMEBUFFER, this->_gbuffer_ids.g_buffer);
+   glBindFramebuffer( GL_FRAMEBUFFER,
+                      this->_gbuffer_ids.g_buffer);
 
    //position texture for gbuffer
-   glBindTexture(GL_TEXTURE_2D, this->_gbuffer_ids.g_pos_texture);
-   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, NULL);
-      //Setting pos's magnifier and minifier behavior
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-      //descrube and attatch the texture id for pos to Currently bound g_buffer
-   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this->_gbuffer_ids.g_pos_texture, 0);
+   glBindTexture( GL_TEXTURE_2D,
+                  this->_gbuffer_ids.g_pos_texture );
 
-   //normal texture for gbuffer
-   glBindTexture(GL_TEXTURE_2D, this->_gbuffer_ids.g_norm_texture);
-   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16, width, height, 0, GL_RGB, GL_FLOAT, NULL);
-      //Setting Norm's magnifier and minifier behavior
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-      //describe and attatch the texture id for norm to Currently bound g_buffer
-   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, this->_gbuffer_ids.g_norm_texture, 0);
+   glTexImage2D( GL_TEXTURE_2D,
+                 0,
+                 GL_RGB16F,
+                 width,
+                 height,
+                 0,
+                 GL_RGB,
+                 GL_FLOAT,
+                 NULL );
 
-   // spec intense and spec color texture for gBuffer
-   glBindTexture(GL_TEXTURE_2D, this->_gbuffer_ids.g_spec_texture);
-   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-      //Setting Spec's magnifier and minifier behavior
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-      //attatch the texture id for spec to Currently bound g_buffer
-   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, this->_gbuffer_ids.g_spec_texture, 0);
+   // Setting pos's magnifier and minifier behavior
+   glTexParameteri( GL_TEXTURE_2D,
+                    GL_TEXTURE_MIN_FILTER,
+                    GL_NEAREST );
+
+   glTexParameteri( GL_TEXTURE_2D,
+                    GL_TEXTURE_MAG_FILTER,
+                    GL_NEAREST );
+
+   // describe and attach the texture id for pos to currently bound g-buffer
+   glFramebufferTexture2D( GL_FRAMEBUFFER,
+                           GL_COLOR_ATTACHMENT0,
+                           GL_TEXTURE_2D,
+                           this->_gbuffer_ids.g_pos_texture,
+                           0 );
+
+   // normal texture for g-buffer
+   glBindTexture( GL_TEXTURE_2D,
+                  this->_gbuffer_ids.g_norm_texture );
+
+   glTexImage2D( GL_TEXTURE_2D,
+                 0,
+                 GL_RGB16,
+                 width,
+                 height,
+                 0,
+                 GL_RGB,
+                 GL_FLOAT,
+                 NULL );
+
+   // Setting Norm's magnifier and minifier behavior
+   glTexParameteri( GL_TEXTURE_2D,
+                    GL_TEXTURE_MIN_FILTER,
+                    GL_NEAREST );
+
+   glTexParameteri( GL_TEXTURE_2D,
+                    GL_TEXTURE_MAG_FILTER,
+                    GL_NEAREST );
+
+   //describe and attatch the texture id for norm to Currently bound g-buffer
+   glFramebufferTexture2D( GL_FRAMEBUFFER,
+                           GL_COLOR_ATTACHMENT1,
+                           GL_TEXTURE_2D,
+                           this->_gbuffer_ids.g_norm_texture,
+                           0 );
+
+   // spec intense and spec color texture for g-buffer
+   glBindTexture( GL_TEXTURE_2D,
+                  this->_gbuffer_ids.g_spec_texture );
+
+   glTexImage2D( GL_TEXTURE_2D,
+                 0,
+                 GL_RGBA,
+                 width,
+                 height,
+                 0,
+                 GL_RGBA,
+                 GL_UNSIGNED_BYTE,
+                 NULL );
+
+   // Setting Spec's magnifier and minifier behavior
+   glTexParameteri( GL_TEXTURE_2D,
+                    GL_TEXTURE_MIN_FILTER,
+                    GL_NEAREST );
+
+   glTexParameteri( GL_TEXTURE_2D,
+                    GL_TEXTURE_MAG_FILTER,
+                    GL_NEAREST );
+
+   // attach the texture id for spec to Currently bound g-buffer
+   glFramebufferTexture2D( GL_FRAMEBUFFER,
+                           GL_COLOR_ATTACHMENT2,
+                           GL_TEXTURE_2D,
+                           this->_gbuffer_ids.g_spec_texture,
+                           0 );
    
-   // albedo_rgba color texture for gBuffer
-   glBindTexture(GL_TEXTURE_2D, this->_gbuffer_ids.g_albedo_rgba_texture);
-   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-   //Setting Spec's magnifier and minifier behavior
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-   //attatch the texture id for spec to Currently bound g_buffer
-   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, this->_gbuffer_ids.g_albedo_rgba_texture, 0);
+   // albedo_rgba color texture for g-buffer
+   glBindTexture( GL_TEXTURE_2D,
+                  this->_gbuffer_ids.g_albedo_rgba_texture );
 
-   //Describe for fragmentshader to write to these buffers (?)
-   Uint32 attatchments[4] = {GL_COLOR_ATTACHMENT0,GL_COLOR_ATTACHMENT1 ,GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
-   glDrawBuffers(3, attatchments);
+   glTexImage2D( GL_TEXTURE_2D,
+                 0,
+                 GL_RGBA,
+                 width,
+                 height,
+                 0,
+                 GL_RGBA,
+                 GL_UNSIGNED_BYTE,
+                 NULL );
 
-   //Create a renderbufferobject for Depthbuffer
+   // Setting Spec's magnifier and minifier behavior
+   glTexParameteri( GL_TEXTURE_2D,
+                    GL_TEXTURE_MIN_FILTER,
+                    GL_NEAREST );
+
+   glTexParameteri( GL_TEXTURE_2D,
+                    GL_TEXTURE_MAG_FILTER,
+                    GL_NEAREST );
+
+   // attach the texture id for spec to Currently bound g-buffer
+   glFramebufferTexture2D( GL_FRAMEBUFFER,
+                           GL_COLOR_ATTACHMENT3,
+                           GL_TEXTURE_2D,
+                           this->_gbuffer_ids.g_albedo_rgba_texture,
+                           0 );
+
+   // Describe for fragment shader to write to these buffers (?)
+   Uint32 attachments[4] = { GL_COLOR_ATTACHMENT0,
+                             GL_COLOR_ATTACHMENT1,
+                             GL_COLOR_ATTACHMENT2,
+                             GL_COLOR_ATTACHMENT3 };
+
+   glDrawBuffers( 4, attachments );
+
+   // Create a render buffer object for depth buffer
    Uint32 depth_renderBufferObj;
-   glGenRenderbuffers(1, &depth_renderBufferObj);
-   glBindRenderbuffer(GL_RENDERBUFFER, depth_renderBufferObj);
-   glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
 
-   //controll the status of the framebuffer
-   if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-      assert(false && "gBuffer status is not complete");
-   }
+   glGenRenderbuffers( 1, &depth_renderBufferObj );
 
-   //Bind to default buffer
-   glBindFramebuffer(GL_FRAMEBUFFER, 0);
+   glBindRenderbuffer( GL_RENDERBUFFER, depth_renderBufferObj );
+
+   glRenderbufferStorage( GL_RENDERBUFFER,
+                          GL_DEPTH_COMPONENT,
+                          width,
+                          height );
+
+   // control the status of the frame buffer
+   if ( glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE )
+      assert( false && "G-buffer status is not complete" );
+
+   // Bind to default buffer
+   glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
 }

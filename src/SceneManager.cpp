@@ -49,7 +49,7 @@ void SceneManager::draw( Viewport const &view ) {
       if (!instance.expired())
          instance.lock()->draw();
    }
-   
+
 // 2. Lighting pass:
    glBindFramebuffer(GL_FRAMEBUFFER, 0);
    // TODO
