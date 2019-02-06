@@ -73,6 +73,8 @@
     <None Include="dat\shaders\g_buffer.vert" />
     <None Include="dat\shaders\lightSha.frag" />
     <None Include="dat\shaders\lightSha.vert" />
+    <None Include="dat\shaders\quad.frag" />
+    <None Include="dat\shaders\quad.vert" />
     <None Include="dat\shaders\vertSha.vert" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
