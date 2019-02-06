@@ -1,3 +1,5 @@
+#pragma once
+
 #include "misc/defs.h"
 #include "Config.h"
 #include "ShaderProgram.h"

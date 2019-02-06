@@ -114,12 +114,12 @@ void SceneManager::add_light( Uint64 id, LightData data ) {
    ++_num_lights; // increment counter
 }
 
-LightData SceneManager::get_light( Uint64 id ) const {
+LightData SceneManager::get_light_data( Uint64 id ) const {
    auto index = _find_light_index(id);
    return _light_data[index];
 }
 
-void SceneManager::set_light( Uint64 id, LightData data ) {
+void SceneManager::set_light_data( Uint64 id, LightData data ) {
    auto index = _find_light_index(id);
    _light_data[index] = data;
 }

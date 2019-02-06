@@ -62,21 +62,14 @@ public:
 
    Light& operator=( Light && ) = delete;
 
-   LightData get_data() const {
-      return _scene.get_light(_id);
-   }
+   LightData get_data() const;
 
-   void set_data( LightData const &data ) {
-      _scene.set_light( _id, data ); 
-   }
+   void set_data( LightData const &data );
 
    Uint64 get_id() const;
 
 private:
-   Uint64 _generate_id() const {
-      static Uint64 next_id = 0;
-      return next_id++;
-   }
+   Uint64 _generate_id() const;
 
    Uint64        _id;
    SceneManager &_scene;
