@@ -10,8 +10,6 @@
 #include "misc/ImGui/imgui_impl_opengl3.h"
 #include "Viewport.h"
 
-#include "Light.h"
-
 constexpr Uint32 light_capacity = 1024;
 
 //TODO: extract to own file
@@ -37,9 +35,9 @@ public:
    // NOTE! should only be used by Light's constructor (TODO: private+friend?)
    void add_light( Uint64 id, LightData data );
 
-   LightData get_light( Uint64 id ) const;
+   LightData get_light_data( Uint64 id ) const;
 
-   void set_light( Uint64 id, LightData data );
+   void set_light_data( Uint64 id, LightData data );
 
    // NOTE! should only be used by Light's destructor (TODO: private+friend?)
    void remove_light( Uint64 id );

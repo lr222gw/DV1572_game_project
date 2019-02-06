@@ -1,3 +1,5 @@
+#pragma once
+
 #include "misc/defs.h"
 #include "Config.h"
 #include "ShaderProgram.h"
@@ -31,6 +33,7 @@ public:
    void transform( Transform const &transform );
    void set_view( Transform const &transform );
    Transform get_view() const;
+   gBufferIds const& get_g_buffer() const;
 
    void bind_shader_program(ShaderProgram &shapro);
 
