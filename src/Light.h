@@ -63,7 +63,7 @@ public:
    Light& operator=( Light && ) = delete;
 
    LightData get_data() const {
-      return _scene.get_data(_id);
+      return _scene.get_light(_id);
    }
 
    void set_data( LightData const &data ) {

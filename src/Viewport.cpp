@@ -70,7 +70,10 @@ void Viewport::set_view( Transform const &transform ) {
 Transform Viewport::get_view() const {
    return _view;
 }
-
+gBufferIds const &Viewport::get_g_buffer() const
+{
+   return _gbuffer_ids;
+}
 void Viewport::set_fov(Float32 fov_rad) {
    _fov = fov_rad;
    _projection = glm::perspective( _fov,
