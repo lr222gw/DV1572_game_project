@@ -25,7 +25,7 @@ public:
 
    LightData get_light( Uint64 id ) const;
 
-   void get_light( Uint64 id, LightData data );
+   void set_light( Uint64 id, LightData data );
 
    // NOTE! should only be used by Light's destructor (TODO: private+friend?)
    void remove_light( Uint64 id );

@@ -39,28 +39,17 @@ SharedPtr<ModelInstance> SceneManager::instantiate_model(
 void SceneManager::draw( Viewport const &view ) {
    auto &g_buffer = view.get_g_buffer();
 // 1. Geometry Pass:
+
    // TODO: sortera instanserna efter ShaderProgram m.h.a. std::partition()
    for ( auto &instance : _instances ) {
       if (!instance.expired())
          instance.lock()->draw();
    }
+
 // 2. Lighting pass:
    // TODO
       // _light_data + _num_lights till lighting shader
 }
-
-void SceneManager::add_light( WeakPtr<DirLight>  &light ) {
-
-}
-
-void SceneManager::add_light( WeakPtr<SpotLight> &light ) {
-
-}
-
-void SceneManager::add_light( WeakPtr<PointLight> &light ) {
-
-}
-
 
 
 void SceneManager::draw_debug_scene_inspection() {
@@ -130,7 +119,7 @@ LightData SceneManager::get_light( Uint64 id ) const {
    return _light_data[index];
 }
 
-void SceneManager::get_light( Uint64 id, LightData data ) {
+void SceneManager::set_light( Uint64 id, LightData data ) {
    auto index = _find_light_index(id);
    _light_data[index] = data;
 }
