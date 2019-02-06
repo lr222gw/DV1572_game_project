@@ -566,7 +566,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
    AssetManager assMan{};
    SharedPtr<Model> myModel = assMan.load_model("Dog.dae");
-   SharedPtr<Model> myModel2 = assMan.load_model("Cat.obj");
+   SharedPtr<Model> myModel2 = assMan.load_model("nanosuit.obj");
    
    SceneManager scenMan{};
    SharedPtr<ModelInstance> modelInstance = 
