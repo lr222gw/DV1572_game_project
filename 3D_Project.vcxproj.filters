@@ -175,5 +175,17 @@
     <None Include="dat\shaders\vertSha.vert">
       <Filter>Resource Files\Shaders</Filter>
     </None>
+    <None Include="dat\shaders\g_buffer.frag">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="dat\shaders\g_buffer.vert">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="dat\shaders\lightSha.frag">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="dat\shaders\lightSha.vert">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
