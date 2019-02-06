@@ -82,6 +82,8 @@ public:
       scene.set_data( _id, data );
    }
 
+   Uint64 get_id() const;
+
 private:
    Uint64 _generate_id() const {
       static next_id = 0;
