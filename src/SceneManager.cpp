@@ -40,15 +40,23 @@ void SceneManager::draw( Viewport const &view ) {
    auto &g_buffer = view.get_g_buffer();
 // 1. Geometry Pass:
 
+   glBindFramebuffer(GL_FRAMEBUFFER, g_buffer.g_buffer);
+   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+   
    // TODO: sortera instanserna efter ShaderProgram m.h.a. std::partition()
    for ( auto &instance : _instances ) {
       if (!instance.expired())
          instance.lock()->draw();
    }
-
+   
 // 2. Lighting pass:
+   glBindFramebuffer(GL_FRAMEBUFFER, 0);
    // TODO
       // _light_data + _num_lights till lighting shader
+
+
+
 }
 
 
