@@ -44,6 +44,7 @@ struct LightData {
             specularity;
 };
 
+// TODO: use SceneManager pointer instead to allow assignment operator?
 
 class Light {
 public:
@@ -65,16 +66,20 @@ public:
       scene.add_light( _id, other.get_data() );
    }
 
+   ~Light() {
+      scene.remove_light( _id );
+   }
+
+   Light& operator=( Light const & ) = delete; // TODO?
+
+   Light& operator=( Light && ) = delete;
+
    LightData get_data() const {
       return scene.get_data(_id);
    }
 
    void set_data( LightData const &data ) {
       scene.set_data( _id, data );
-   }
-
-   ~Light() {
-      scene.remove_light( _id );
    }
 
 private:

@@ -16,9 +16,9 @@ constexpr light_capacity = 1024;
 class SceneManager {
 public:
    SharedPtr<ModelInstance> instantiate_model(
-      SharedPtr<Model>               model,
-      SharedPtr<ShaderProgram>       shader_program,
-      Transform const &              transform);
+      SharedPtr<Model>          model,
+      SharedPtr<ShaderProgram>  shader_program,
+      Transform const &         transform);
 
    // NOTE! should only be used by Light's constructor (TODO: private+friend?)
    void add_light( Uint64 id, LightData data );
