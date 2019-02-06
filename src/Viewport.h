@@ -4,6 +4,15 @@
 
 #include "Transform.h"
 
+struct gBufferIds {
+   bool     is_set = false;
+   Uint32   g_buffer;
+   Uint32   g_pos_texture;
+   Uint32   g_norm_texture;
+   Uint32   g_spec_texture;
+   Uint32   g_albedo_rgba_texture;
+};
+
 // TODO: (låg prioritet) lägg till en  void make_active(); som i princip bara kallar på _write_to_buffer();
 // TODO: fundera över multi-views och hur man ska hantera det
 // TODO: uppåt vektorn baserat på normalen av ytan spelaren står på
@@ -37,9 +46,12 @@ private:
    void _write_to_buffer();
    void _update_aspect_ratio();
    void _generate_perspective();
+   void _g_buffer_init(float width, float height);
 
    // Vec3 _position,
    //      _rotation;
+
+   gBufferIds _gbuffer_ids;
 
    Float32  _fov;
    Float32  _aspect;
