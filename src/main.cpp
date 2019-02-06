@@ -561,6 +561,10 @@ Int32 main( Int32 argc, char const *argv[] ) {
    ShaderManager shaMan{};
    auto fraShader = shaMan.load_shader("fraSha.frag");
    auto vertShader = shaMan.load_shader("vertSha.vert");
+   auto light_f_Shader = shaMan.load_shader("fraSha.frag");
+   auto light_v_Shader = shaMan.load_shader("vertSha.vert");
+   auto geo_f_Shader = shaMan.load_shader("fraSha.frag");
+   auto geo_v_Shader = shaMan.load_shader("vertSha.vert");
 
    auto shaProg = shaMan.create_program({fraShader, vertShader});
 
