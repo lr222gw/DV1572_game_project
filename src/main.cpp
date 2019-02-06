@@ -191,20 +191,20 @@ Int32 main( Int32 argc, char const *argv[] ) {
    
    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-   glEnable(GL_CULL_FACE);
-   glCullFace(GL_BACK);
+   glEnable( GL_CULL_FACE );
+   glCullFace( GL_BACK );
 
 
 
-   glUseProgram(lightProg->getProgramLoc());
+   glUseProgram( lightProg->getProgramLoc() );
    
    glUniform1i( glGetUniformLocation(lightProg->getProgramLoc(),"g_tex_pos"), 0);
    glUniform1i( glGetUniformLocation(lightProg->getProgramLoc(),"g_tex_norm"), 1);
    glUniform1i( glGetUniformLocation(lightProg->getProgramLoc(),"g_tex_spec"), 2);
    glUniform1i( glGetUniformLocation(lightProg->getProgramLoc(),"g_tex_albedo"), 3);
    
-   unsigned int quadVAO = 0;
-   unsigned int quadVBO;
+   unsigned int quad_vao = 0;
+   unsigned int quad_vbo;
    //glDisable(GL_BLEND);
  // main loop:
 	while (!glfwWindowShouldClose(window)) {
@@ -223,61 +223,58 @@ Int32 main( Int32 argc, char const *argv[] ) {
 		ImGui::NewFrame();
 
       myView.bind_shader_program(*shaProg);
-
       // draw_camera_debug_window( cam_position, cam_rotations, fov_rad );
       // cam_transform.set_rotation( cam_rotations );
       // cam_transform.set_position( cam_position );
       // myView.set_view( cam_transform );
       // myView.set_fov( fov_rad );
-      
       scenMan.draw_debug_scene_inspection();
 
-      process_input(window, myView, delta_time_s);
-      process_mouse(window, myView, delta_time_s);
-      		 		
-
-// programkod här
+      process_input( window, myView, delta_time_s );
+      process_mouse( window, myView, delta_time_s );
       
       // glMatrixMode(GL_PROJECTION);
       // glLoadIdentity();
       myView.update();
-      scenMan.draw(myView); // undersök om buffer binds
+      scenMan.draw( myView ); // undersök om buffer binds
       // glUseProgram(shaProg->getProgramLoc());
       // a_Mesh.render();
-      glClearColor(0.4f, 0.6, 1.0, 1.0f);
+      glClearColor( 0.4f, 0.6, 1.0, 1.0f );
       glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
       auto g_buffer_data = myView.get_g_buffer();
-      
       
       glUseProgram( lightProg->getProgramLoc() );
 
       glActiveTexture( GL_TEXTURE0 );
       glBindTexture( GL_TEXTURE_2D, g_buffer_data.pos_tex_loc );
-      glActiveTexture(GL_TEXTURE1);
+      glActiveTexture( GL_TEXTURE1 );
       glBindTexture( GL_TEXTURE_2D, g_buffer_data.nor_tex_loc );
-      glActiveTexture(GL_TEXTURE2);
+      glActiveTexture( GL_TEXTURE2 );
       glBindTexture( GL_TEXTURE_2D, g_buffer_data.spe_tex_loc );
-      glActiveTexture(GL_TEXTURE3);
+      glActiveTexture( GL_TEXTURE3 );
       glBindTexture( GL_TEXTURE_2D, g_buffer_data.alb_tex_loc );
 
-      
-
-      if (quadVAO == 0) {
-         float quadVertices[] = {
-            // positions        // texture Coords
-            -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
-            -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-             1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-             1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+      if ( 0 == quad_vao ) {
+         Float32 quad_verts[] = {
+         //   X      Y     Z       U     V
+            -1.0f,  1.0f, 0.0f,   0.0f, 1.0f,
+            -1.0f, -1.0f, 0.0f,   0.0f, 0.0f,
+             1.0f,  1.0f, 0.0f,   1.0f, 1.0f,
+             1.0f, -1.0f, 0.0f,   1.0f, 0.0f,
          };
+
          // setup plane VAO
-         glGenVertexArrays( 1, &quadVAO );
-         glGenBuffers( 1, &quadVBO );
-         glBindVertexArray(quadVAO );
-         glBindBuffer( GL_ARRAY_BUFFER, quadVBO );
+         glGenVertexArrays( 1, &quad_vao );
+
+         glGenBuffers( 1, &quad_vbo );
+
+         glBindVertexArray( quad_vao );
+
+         glBindBuffer( GL_ARRAY_BUFFER, quad_vbo );
+
          glBufferData( GL_ARRAY_BUFFER,
-                       sizeof(quadVertices),
-                       &quadVertices,
+                       sizeof(quad_verts),
+                       &quad_verts,
                        GL_STATIC_DRAW );
 
          glEnableVertexAttribArray(0);
@@ -286,7 +283,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
                                 3,
                                 GL_FLOAT,
                                 GL_FALSE,
-                                5 * sizeof(float),
+                                5 * sizeof(Float32),
                                 (void*)0 );
 
          glEnableVertexAttribArray(1);
@@ -295,17 +292,16 @@ Int32 main( Int32 argc, char const *argv[] ) {
                                 2,
                                 GL_FLOAT,
                                 GL_FALSE,
-                                5 * sizeof(float),
-                                (void*)(3 * sizeof(float)) );
+                                5 * sizeof(Float32),
+                                (void*)(3 * sizeof(Float32)) );
       }
-      glBindVertexArray( quadVAO );
+      glBindVertexArray( quad_vao );
+
       glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
+
       glBindVertexArray(0);
       
       
-
-
-
 
       glBindFramebuffer( GL_READ_FRAMEBUFFER,
                          g_buffer_data.buffer_loc );
@@ -324,21 +320,15 @@ Int32 main( Int32 argc, char const *argv[] ) {
                          GL_NEAREST );
 
       glUseProgram( quadProg->getProgramLoc() );
-      
 
 
 
-	  ImGui::Render();
-
-
-	  ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-	//	float dt_time_s = ImGui::GetIO().DeltaTime; // UNUSED
-
-		glfwMakeContextCurrent(window);
-		glfwSwapBuffers(window);
-	}
-// main loop end
+      ImGui::Render();
+      ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );
+      // float dt_time_s = ImGui::GetIO().DeltaTime; // UNUSED
+      glfwMakeContextCurrent( window );
+      glfwSwapBuffers( window );
+	} // main loop end
 
    // cleanup:
 	ImGui_ImplOpenGL3_Shutdown();
