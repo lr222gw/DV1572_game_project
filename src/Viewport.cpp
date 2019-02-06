@@ -30,7 +30,13 @@ void Viewport::_update_aspect_ratio() {
 
       _g_buffer_init(width, height);
       _generate_perspective();
+
+      //TODO: Does this work? 
+      glfwMakeContextCurrent(this->_window);
+      glfwGetFramebufferSize(this->_window, &width, &height);
+      glViewport(0, 0, width, height);
    }
+
 }
 
 void Viewport::_generate_perspective() {

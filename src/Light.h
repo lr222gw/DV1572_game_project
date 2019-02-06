@@ -1,7 +1,7 @@
 #pragma once
 
-#include "defs.h"
-
+#include "misc/defs.h"
+#include "SceneManager.h"
 /*
 struct DirLight {
    Vec3  direction,
@@ -31,18 +31,6 @@ struct PointLight {
             specular;
 };*/
 
-enum LightType : Uint32 { point=0, spot=1, directional=2 };
-
-struct LightData {
-   LightType  type;
-   Vec3  direction,
-         position,
-         color;
-   Float32  intensity,
-            radius,
-            degree,
-            specularity;
-};
 
 // TODO: use SceneManager pointer instead to allow assignment operator?
 
@@ -51,10 +39,10 @@ public:
    Light() = delete;
 
    Light( SceneManager &scene, LightData light ):
-      _id    ( _generate_id ),
+      _id    ( _generate_id() ),
       _scene ( scene        )
    {
-      scene.add_light( _id, _light );
+      scene.add_light( _id, light );
    }
 
    Light( Light &&other ) = delete;
@@ -63,11 +51,11 @@ public:
       _id    ( other._id    ),
       _scene ( other._scene )
    {
-      scene.add_light( _id, other.get_data() );
+      _scene.add_light( _id, other.get_data() );
    }
 
    ~Light() {
-      scene.remove_light( _id );
+      _scene.remove_light( _id );
    }
 
    Light& operator=( Light const & ) = delete; // TODO?
@@ -75,21 +63,21 @@ public:
    Light& operator=( Light && ) = delete;
 
    LightData get_data() const {
-      return scene.get_data(_id);
+      return _scene.get_data(_id);
    }
 
    void set_data( LightData const &data ) {
-      scene.set_data( _id, data );
+      _scene.set_light( _id, data ); 
    }
 
    Uint64 get_id() const;
 
 private:
    Uint64 _generate_id() const {
-      static next_id = 0;
+      static Uint64 next_id = 0;
       return next_id++;
    }
 
    Uint64        _id;
-   SceneManager &_scene
+   SceneManager &_scene;
 };
