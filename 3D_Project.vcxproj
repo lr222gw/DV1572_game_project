@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="src\AssetManager.cpp" />
     <ClCompile Include="src\debug.cpp" />
+    <ClCompile Include="src\Light.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\misc\ImGui\imgui.cpp" />
@@ -41,6 +42,7 @@
     <ClInclude Include="src\AssetManager.h" />
     <ClInclude Include="src\Config.h" />
     <ClInclude Include="src\debug.h" />
+    <ClInclude Include="src\Light.h" />
     <ClInclude Include="src\lop_mesh.h" />
     <ClInclude Include="src\lop_Model.h" />
     <ClInclude Include="src\lop_shader.h" />
