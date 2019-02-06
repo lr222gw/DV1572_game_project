@@ -561,12 +561,14 @@ Int32 main( Int32 argc, char const *argv[] ) {
    ShaderManager shaMan{};
    auto fraShader = shaMan.load_shader("fraSha.frag");
    auto vertShader = shaMan.load_shader("vertSha.vert");
-   auto light_f_Shader = shaMan.load_shader("fraSha.frag");
-   auto light_v_Shader = shaMan.load_shader("vertSha.vert");
-   auto geo_f_Shader = shaMan.load_shader("fraSha.frag");
-   auto geo_v_Shader = shaMan.load_shader("vertSha.vert");
+   auto light_f_Shader = shaMan.load_shader("lightSha.frag");
+   auto light_v_Shader = shaMan.load_shader("lightSha.vert");
+   auto geo_f_Shader = shaMan.load_shader("g_buffer.frag");
+   auto geo_v_Shader = shaMan.load_shader("g_buffer.vert");
 
    auto shaProg = shaMan.create_program({fraShader, vertShader});
+   auto geoProg = shaMan.create_program({ geo_f_Shader, geo_v_Shader });
+   auto lightProg = shaMan.create_program({ light_f_Shader, light_v_Shader });
 
    AssetManager assMan{};
    SharedPtr<Model> myModel = assMan.load_model("Dog.dae");
@@ -596,9 +598,19 @@ Int32 main( Int32 argc, char const *argv[] ) {
    glEnable(GL_CULL_FACE);
    glCullFace(GL_BACK);
 
+
+
+   glUseProgram(lightProg->getProgramLoc());
+   
+   glUniform1i((glGetUniformLocation(lightProg->getProgramLoc(), "g_tex_pos")), 0);
+   glUniform1i((glGetUniformLocation(lightProg->getProgramLoc(), "g_tex_norm")), 1);
+   glUniform1i((glGetUniformLocation(lightProg->getProgramLoc(), "g_tex_spec")), 2);
+   glUniform1i((glGetUniformLocation(lightProg->getProgramLoc(), "g_tex_albedo")), 3);
+   
+
  // main loop:
 	while (!glfwWindowShouldClose(window)) {
-      Float32 delta_time_s = ImGui::GetIO().DeltaTime; // UNUSED
+      Float32 delta_time_s = ImGui::GetIO().DeltaTime; 
 		
 		// poll & handle events such as window resizing and input from the keyboard or mouse
 		// use io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if imgui wants to use the user's input
@@ -635,6 +647,49 @@ Int32 main( Int32 argc, char const *argv[] ) {
       scenMan.draw(myView); // undersök om buffer binds
       //glUseProgram(shaProg->getProgramLoc());
       //a_Mesh.render();
+
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+      gBufferIds g_buffer_ids = myView.get_g_buffer();
+      
+      
+      glUseProgram(lightProg->getProgramLoc());
+
+      glActiveTexture(GL_TEXTURE0);
+      glBindTexture(GL_TEXTURE_2D, g_buffer_ids.g_pos_texture);
+      glActiveTexture(GL_TEXTURE1);
+      glBindTexture(GL_TEXTURE_2D, g_buffer_ids.g_norm_texture);
+      glActiveTexture(GL_TEXTURE2);
+      glBindTexture(GL_TEXTURE_2D, g_buffer_ids.g_albedo_rgba_texture);
+
+      unsigned int quadVAO = 0;
+      unsigned int quadVBO;
+
+      if (quadVAO == 0)
+      {
+         float quadVertices[] = {
+            // positions        // texture Coords
+            -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+            -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+             1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+             1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+         };
+         // setup plane VAO
+         glGenVertexArrays(1, &quadVAO);
+         glGenBuffers(1, &quadVBO);
+         glBindVertexArray(quadVAO);
+         glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+         glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+         glEnableVertexAttribArray(0);
+         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+         glEnableVertexAttribArray(1);
+         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+      }
+      glBindVertexArray(quadVAO);
+      glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+      glBindVertexArray(0);
+      
+
+
 
 
 	  ImGui::Render();
