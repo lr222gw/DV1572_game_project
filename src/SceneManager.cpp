@@ -36,7 +36,7 @@ SharedPtr<ModelInstance> SceneManager::instantiate_model(
    return instance_ptr;
 }
 
-void SceneManager::draw( gBufferIds const &g_buffer ) {
+void SceneManager::draw( Viewport const &g_buffer ) {
 // 1. Geometry Pass:
    // TODO: sortera instanserna efter ShaderProgram m.h.a. std::partition()
    for ( auto &instance : _instances ) {

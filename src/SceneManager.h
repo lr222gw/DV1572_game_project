@@ -30,7 +30,7 @@ public:
    // NOTE! should only be used by Light's destructor (TODO: private+friend?)
    void remove_light( Uint64 id );
 
-   void draw();
+   void draw( gBufferIds const &g_buffer );
 
    void draw_debug_scene_inspection();
 
