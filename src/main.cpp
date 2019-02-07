@@ -173,12 +173,12 @@ Int32 main( Int32 argc, char const *argv[] ) {
    SceneManager scenMan{};
    SharedPtr<ModelInstance> modelInstance = 
       scenMan.instantiate_model(myModel,
-                                shaProg, 
+         shaProg,
                                 Transform(Vec3(0.0f, 0.0f, 1.0f), Vec3(0.0f), Vec3(14.0f, 14.0f, 14.0f)));
 
    SharedPtr<ModelInstance> modelInstance2 = 
       scenMan.instantiate_model( myModel2,
-                                 shaProg, 
+         shaProg,
                                  Transform(Vec3(0.0f, 6.0f, 3.0f), Vec3(0.0f), Vec3(1.3f, 1.3f,1.3f)));
    //scenMan
 
