@@ -30,10 +30,10 @@ void Viewport::_update_aspect_ratio() {
       _g_buffer_init( _width, _height );
       _generate_perspective();
 
-      //TODO: Does this work? 
-      glfwMakeContextCurrent(this->_window);
-      glfwGetFramebufferSize(this->_window, &_width, &_height);
-      glViewport(0, 0, _width, _height);
+      // TODO: Does this work? 
+      glfwMakeContextCurrent( this->_window );
+      glfwGetFramebufferSize( this->_window, &_width, &_height );
+      glViewport( 0, 0, _width, _height );
    }
 
 }
@@ -109,7 +109,7 @@ void Viewport::bind_shader_program(ShaderProgram &shapro) {
 //    _view[3][0] = _position.x;
 //    _view[3][1] = _position.y;
 //    _view[3][2] = _position.z;
-// //*/
+// // */
 //    _write_to_buffer();
 // }
 
