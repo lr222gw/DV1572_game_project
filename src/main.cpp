@@ -103,7 +103,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 	// use OpenGL core profile
 	glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
 
-	// open a window and create its OpenGL context/
+	// open a window and create its OpenGL context
 	GLFWwindow *window;
 
    //TODO: handle Window Resize!
