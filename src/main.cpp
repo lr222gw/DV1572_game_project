@@ -222,7 +222,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-      myView.bind_shader_program(*shaProg);
+//myView.bind_shader_program(*shaProg);
       // draw_camera_debug_window( cam_position, cam_rotations, fov_rad );
       // cam_transform.set_rotation( cam_rotations );
       // cam_transform.set_position( cam_position );
