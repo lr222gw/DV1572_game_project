@@ -5,20 +5,26 @@ layout (location = 1) out vec3 g_normal;
 layout (location = 2) out vec4 g_spec;
 layout (location = 3) out vec4 g_albedo;
 
-in vec3 pos_fs;
-in vec3 norm_fs;
+//out vec4 FragColor;
 in vec2 uv_fs;
+in vec3 pos_fs;
+in vec3 nor_fs;
 
-uniform sampler2D tex_spec1;
 uniform sampler2D tex_diff1;
+uniform sampler2D tex_diff2;
+uniform sampler2D tex_spec1;
+uniform sampler2D tex_spec2;
+uniform sampler2D tex_norm1;
+uniform sampler2D tex_norm2;
 
 void main()
 {
 	
 	g_position = pos_fs;
-	g_normal = normalize(norm_fs);
-	g_spec = texture(tex_diff1, uv_fs);
-	g_albedo = texture(tex_spec1, uv_fs);
+	//g_normal = normalize(norm_fs);
+	g_normal = texture(tex_norm1, uv_fs).rgb;
+	g_spec = texture(tex_spec1, uv_fs);
+	g_albedo = texture(tex_diff1, uv_fs);
 
 
 

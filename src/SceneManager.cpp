@@ -67,6 +67,7 @@ void SceneManager::draw( Viewport &view ) {
    glCullFace(GL_BACK);
    glEnable(GL_DEPTH_TEST);
    glEnable(GL_STENCIL_TEST);
+   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
    glBindFramebuffer( GL_FRAMEBUFFER, g_buffer.buffer_loc );
    
    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);

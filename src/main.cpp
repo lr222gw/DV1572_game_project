@@ -151,20 +151,20 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
    //testa   vår AssetManager TODO: heh 
    ShaderManager shaMan{};
-   auto fraShader = shaMan.load_shader("fraSha.frag");
-   auto vertShader = shaMan.load_shader("vertSha.vert");
+   //auto fraShader = shaMan.load_shader("fraSha.frag");
+   //auto vertShader = shaMan.load_shader("vertSha.vert");
    auto light_f_Shader = shaMan.load_shader("lightSha.frag");
    auto light_v_Shader = shaMan.load_shader("lightSha.vert");
    auto geo_f_Shader = shaMan.load_shader("g_buffer.frag");
    auto geo_v_Shader = shaMan.load_shader("g_buffer.vert");
 
-   auto quad_FShader = shaMan.load_shader("quad.frag");
-   auto quad_VShader = shaMan.load_shader("quad.vert");
+   //auto quad_FShader = shaMan.load_shader("quad.frag");
+   //auto quad_VShader = shaMan.load_shader("quad.vert");
 
-   auto shaProg = shaMan.create_program({fraShader, vertShader});
+   //auto shaProg = shaMan.create_program({fraShader, vertShader});
    auto geoProg = shaMan.create_program({ geo_f_Shader, geo_v_Shader });
    auto lightProg = shaMan.create_program({ light_f_Shader, light_v_Shader });
-   auto quadProg = shaMan.create_program({ quad_FShader, quad_VShader });
+   //auto quadProg = shaMan.create_program({ quad_FShader, quad_VShader });
 
    AssetManager assMan{};
    SharedPtr<Model> myModel2 = assMan.load_model("nanosuit.obj");
@@ -176,12 +176,12 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
    SharedPtr<ModelInstance> modelInstance2 =
       scenMan.instantiate_model(myModel2,
-         shaProg,
+         geoProg,
          Transform(Vec3(0.0f, 6.0f, 3.0f), Vec3(0.0f), Vec3(1.3f, 1.3f, 1.3f)));
 
    SharedPtr<ModelInstance> modelInstance = 
       scenMan.instantiate_model( myModel,
-         shaProg,
+         geoProg,
                                  Transform(Vec3(0.0f, 0.0f, 1.0f), Vec3(0.0f), Vec3(14.0f, 14.0f, 14.0f)));
 
 
@@ -192,7 +192,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    Transform cam_transform;
    Float32 fov_rad = config::fov_rad; // 90 degrees
    Viewport myView { cam_position, window, fov_rad };
-   myView.bind_shader_program(*shaProg);
+   myView.bind_shader_program(*geoProg);
    
    //TODO: remove when we dont want to se dogass
    Transform rotate_deg180 = myView.get_view();
@@ -325,7 +325,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
       // glMatrixMode(GL_PROJECTION);
       // glLoadIdentity();
 
-      glUseProgram(shaProg->getProgramLoc());
+      glUseProgram(geoProg->getProgramLoc());
       //TODO:P Vi måste binda shaProg ID till glUseProgram innan vi skickar upp viewPos...
       myView.update();
       auto view_pos = myView.get_view().get_position();
@@ -343,9 +343,10 @@ Int32 main( Int32 argc, char const *argv[] ) {
       
       // glUseProgram( lightProg->getProgramLoc() );
       glClearColor( 0.4f, 0.6, 1.0, 1.0f );
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       glUseProgram(lightProg->getProgramLoc());
 
-      glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+      
       glActiveTexture( GL_TEXTURE0 );
       glBindTexture( GL_TEXTURE_2D, g_buffer_data.pos_tex_loc );
       glActiveTexture( GL_TEXTURE1 );
@@ -431,24 +432,24 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
       glBindVertexArray(0);
       
-      glClearColor(0.4f, 0.6, 1.0, 1.0f);
-
-      glBindFramebuffer( GL_READ_FRAMEBUFFER,
-                         g_buffer_data.buffer_loc );
-
-      glBindFramebuffer( GL_DRAW_FRAMEBUFFER, 0 );
-
-      glBlitFramebuffer( 0,
-                         0,
-                         myView.width,
-                         myView.height,
-                         0,
-                         0,
-                         myView.width,
-                         myView.height,
-                         GL_DEPTH_BUFFER_BIT,
-                         GL_NEAREST );
-
+     //glClearColor(0.4f, 0.6, 1.0, 1.0f);
+     //
+     //glBindFramebuffer( GL_READ_FRAMEBUFFER,
+     //                   g_buffer_data.buffer_loc );
+     //
+     //glBindFramebuffer( GL_DRAW_FRAMEBUFFER, 0 );
+     //
+     //glBlitFramebuffer( 0,
+     //                   0,
+     //                   myView.width,
+     //                   myView.height,
+     //                   0,
+     //                   0,
+     //                   myView.width,
+     //                   myView.height,
+     //                   GL_DEPTH_BUFFER_BIT,
+     //                   GL_NEAREST );
+     //glBindFramebuffer(GL_FRAMEBUFFER, 0);
       //glUseProgram( quadProg->getProgramLoc() );
 
 
