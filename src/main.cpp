@@ -173,12 +173,12 @@ Int32 main( Int32 argc, char const *argv[] ) {
    SceneManager scenMan{};
    SharedPtr<ModelInstance> modelInstance = 
       scenMan.instantiate_model( myModel,
-                                 geoProg,
+         shaProg,
                                  Transform(Vec3(0.0f, 0.0f, 1.0f), Vec3(0.0f), Vec3(14.0f, 14.0f, 14.0f)));
 
    SharedPtr<ModelInstance> modelInstance2 = 
       scenMan.instantiate_model( myModel2,
-                                 geoProg,
+         shaProg,
                                  Transform(Vec3(0.0f, 6.0f, 3.0f), Vec3(0.0f), Vec3(1.3f, 1.3f,1.3f)));
    //scenMan
 
@@ -203,12 +203,107 @@ Int32 main( Int32 argc, char const *argv[] ) {
    glUniform1i( glGetUniformLocation(lightProg->getProgramLoc(),"g_tex_spec"), 2);
    glUniform1i( glGetUniformLocation(lightProg->getProgramLoc(),"g_tex_albedo"), 3);
    
+   int const numlight = 8;
+   glUniform1i(lightProg->getProgramLoc(), numlight);
+
+   LightData lights[numlight];
+
+   lights[0] = LightData{ LightType::point, 
+                           Vec3(0.0f), 
+                           Vec3(10.f,10.f,10.f),
+                           Vec3(1.0f,0.f,0.f), 
+                           1.0,
+                           14.0, 
+                           0.0,
+                           1.0};
+   lights[1] = LightData{ LightType::point,
+                           Vec3(0.0f),
+                           Vec3(1.f,4.f,5.f),
+                           Vec3(1.0f,1.f,0.f),
+                           1.0,
+                           7.0,
+                           0.0,
+                           1.0 };
+   lights[2] = LightData{ LightType::point,
+                           Vec3(0.0f),
+                           Vec3(2.f,1.f,5.f),
+                           Vec3(1.0f,0.f,1.f),
+                           1.0,
+                           17.0,
+                           0.0,
+                           1.0 };
+   lights[3] = LightData{ LightType::point,
+                           Vec3(0.0f),
+                           Vec3(1.f,5.f,6.f),
+                           Vec3(.0f,1.f,0.f),
+                           1.0,
+                           11.0,
+                           0.0,
+                           1.0 };
+   lights[4] = LightData{ LightType::point,
+                           Vec3(0.0f),
+                           Vec3(3.f,3.f,1.f),
+                           Vec3(.0f,1.f,1.f),
+                           1.0,
+                           2.0,
+                           0.0,
+                           1.0 };
+   lights[5] = LightData{ LightType::point,
+                           Vec3(0.0f),
+                           Vec3(1.f,2.f,10.f),
+                           Vec3(.0f,0.f,1.f),
+                           1.0,
+                           1.0,
+                           0.0,
+                           1.0 };
+   lights[6] = LightData{ LightType::point,
+                           Vec3(0.0f),
+                           Vec3(10.f,0.f,5.f),
+                           Vec3(1.0f,1.f,1.f),
+                           1.0,
+                           7.0,
+                           0.0,
+                           1.0 };
+   lights[7] = LightData{ LightType::point,
+                           Vec3(0.0f),
+                           Vec3(10.f,5.f,10.f),
+                           Vec3(1.0f,0.3f,0.5f),
+                           1.0,
+                           17.0,
+                           0.0,
+                           1.0 };
+   
+   
+   
+
    unsigned int quad_vao = 0;
    unsigned int quad_vbo;
    //glDisable(GL_BLEND);
  // main loop:
 	while (!glfwWindowShouldClose(window)) {
       Float32 delta_time_s = ImGui::GetIO().DeltaTime; 
+
+
+      for (int i = 0; i < numlight; i++) {
+         int lightType = lights[i].type;
+         Vec3 &dir = lights[i].direction;
+         Vec3 &pos = lights[i].position;
+         Vec3 &col = lights[i].color;
+         Float32 intensity = lights[i].intensity;
+         Float32 radius = lights[i].radius;
+         Float32 degree = lights[i].degree;
+         Float32 spec = lights[i].specularity;
+
+
+         glUniform1i(glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].type").c_str()), lightType);
+         glUniform1fv(glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].dir").c_str()), 1, glm::value_ptr(dir));
+         glUniform1fv(glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].pos").c_str()), 1, glm::value_ptr(pos));
+         glUniform1fv(glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].rgb").c_str()), 1, glm::value_ptr(col));
+         glUniform1f(glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].intensity").c_str()), intensity);
+         glUniform1f(glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].radius").c_str()), radius);
+         glUniform1f(glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].degree").c_str()), degree);
+         glUniform1f(glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].specularity").c_str()), spec);
+      }
 		
 		// poll & handle events such as window resizing and input from the keyboard or mouse
 		// use io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if imgui wants to use the user's input
@@ -237,6 +332,9 @@ Int32 main( Int32 argc, char const *argv[] ) {
       // glMatrixMode(GL_PROJECTION);
       // glLoadIdentity();
       myView.update();
+      auto view_pos = myView.get_view().get_position();
+      glUniform3fv(lightProg->getProgramLoc(), 1, &view_pos[0]);
+      
 
       scenMan.draw( myView ); // undersök om buffer binds
       // glUseProgram(shaProg->getProgramLoc());
@@ -326,7 +424,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
                          GL_DEPTH_BUFFER_BIT,
                          GL_NEAREST );
 
-      glUseProgram( quadProg->getProgramLoc() );
+      //glUseProgram( quadProg->getProgramLoc() );
 
 
 

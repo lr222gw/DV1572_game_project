@@ -3,7 +3,7 @@
 // This is just to test using their shader
 // TODO: Make our own version of this shader
 
-out vec4 FragColor;
+out vec4 rgba_rasterizer;
 
 in vec2 uv_fs;
 
@@ -12,55 +12,63 @@ uniform sampler2D g_tex_norm;
 uniform sampler2D g_tex_spec;
 uniform sampler2D g_tex_albedo;
 
-
 struct Light {
-    vec3 Position;
-    vec3 Color;
+	int type;
+	vec3 dir;
+    vec3 pos;
+    vec3 rgb;
     
-    float Linear;
-    float Quadratic;
-    float Radius;
+	float intensity;
+    float radius;
+	float degree;
+	float specularity;
 };
 //const int NR_LIGHTS = 32;
 //uniform Light lights[NR_LIGHTS];
-vec3 viewPos = vec3(0.0f, 0.0f, -15.0f);
 
-vec3 light_pos = vec3(3.0f, 5.0f, 0.0f);
-vec3 light_col = vec3(0.3f, 0.7, 0.1);
-float Linear = 0.7f;
-float Quadratic = 1.8f;
-float Radius = 5;
+float linear = 0.7f;
+float quadratic = 1.8f;
+
+const int lights_cap = 32;
+uniform Light lights[lights_cap];
+uniform int num_lights;
+uniform vec3 view_pos;
 
 void main()
 {             
     // retrieve data from gbuffer
-    vec3 FragPos = texture(g_tex_pos, uv_fs).rgb;
-    vec3 Normal = texture(g_tex_norm, uv_fs).rgb;
+    vec3 pos = texture(g_tex_pos, uv_fs).rgb;
+    vec3 norm = texture(g_tex_norm, uv_fs).rgb;
     vec3 albedo = texture(g_tex_albedo, uv_fs).rgb;
-    float spec = texture(g_tex_spec, uv_fs).a;
+	//float albedo_alpha = texture(g_tex_albedo, uv_fs).a;
+    vec4 spec = texture(g_tex_spec, uv_fs).rgba;
     
     // then calculate lighting as usual
-    vec3 lighting  = albedo * 0.1; // hard-coded ambient component
-    vec3 viewDir  = normalize(viewPos - FragPos);
-//    for(int i = 0; i < NR_LIGHTS; ++i)
-//    {
-//        // calculate distance between light source and current fragment
-//        if(distance < lights[i].Radius)
-//        {
-//        }
-//    }    
-   float distance = length(light_pos - FragPos);
-   // diffuse
-   vec3 lightDir = normalize(light_pos - FragPos);
-   vec3 diffuse = max(dot(Normal, lightDir), 0.0) * albedo * light_col;
-   // specular
-   vec3 halfwayDir = normalize(lightDir + viewDir);  
-   float spec1 = pow(max(dot(Normal, halfwayDir), 0.0), 16.0);
-   vec3 specular = light_col * spec1 * spec;
-   // attenuation
-   float attenuation = 1.0 / (1.0 + Linear * distance + Quadratic * distance * distance);
-   diffuse *= attenuation;
-   specular *= attenuation;
-   lighting += diffuse + specular;
-   FragColor = vec4(lighting, 1.0);
+    vec3 lighting  = albedo + 0.2; // hard-coded ambient component
+    vec3 view_dir  = normalize(view_pos - pos);
+   for(int i = 0; i < num_lights; ++i)
+   {
+       // calculate distance between light source and current fragment
+       //if(distance < lights[i].Radius)
+       //{
+       //}
+	   Light light = lights[i];
+	   float light_dist = length(light.pos - pos);
+		// diffuse
+		vec3 light_dir = normalize(light.pos - pos);
+		vec3 diffuse = max(dot(norm, light.dir), 0.0) * albedo * light.rgb;
+		// spec something
+		vec3 halfway_dir = normalize(light_dir + view_dir);  
+
+		//TODO: modify, make simple
+		float spec_modulation = pow(max(dot(norm, halfway_dir), 0.0), 16.0);
+		vec3 specular = mix(light.rgb, spec.rgb, 0.5) * spec_modulation * spec.a;
+		// attenuation
+		float attenuation = 1.0 / (1.0 + linear * light_dist + quadratic * light_dist * light_dist);
+		diffuse *= attenuation;
+		specular *= attenuation;
+		lighting += diffuse + specular;
+   }    
+		
+   rgba_rasterizer = vec4(lighting, 1.0);
 }

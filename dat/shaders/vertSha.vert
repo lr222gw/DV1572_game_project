@@ -8,12 +8,15 @@ layout (location = 2) in vec2 uv_vs;
 //layout (location = 2) in vec2 uv_vs;
 
 out vec2 uv_fs;
+out vec3 pos_fs;
+out vec3 nor_fs;
+
 
 //uniform mat4 viewport_transform;   // för Viewport
 
 uniform mat4 model_transform; // för ModelInstances;
 // ModelInstance har en _model av typ SharedPtr<Model>
-// alla vertriser i _model är i local space (origo)
+// alla vertriser i _model är i local space (origo) 
 // model_transform konverterar alla koordinaterna från
 // local space till global space relativt instansen.
 
@@ -24,6 +27,11 @@ uniform mat4 projection;
 
 void main() {
    //mat4 nothing = model_transform * mat4(0.0f);
+
+   pos_fs = (model_transform * vec4(position, 1.0)).xyz;
+    
+   nor_fs = (transpose(inverse(mat3(model_transform)))) * normal_vs;
+    
 
    uv_fs = uv_vs;    	
 	gl_Position = projection * view * model_transform * vec4( position, 1.0f );

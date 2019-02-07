@@ -109,7 +109,7 @@ void Viewport::bind_shader_program(ShaderProgram &shapro) {
 
 
 void Viewport::update() {
-   debug::view_mat4( _view.matrix, "viewport._view");
+   debug::view_mat4( _view.matrix, "viewport._view");  
    _update_aspect_ratio();
    _write_to_buffer();
 

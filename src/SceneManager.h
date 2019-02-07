@@ -15,14 +15,15 @@ constexpr Uint32 light_capacity = 1024;
 //TODO: extract to own file
 enum LightType : Uint32 { point = 0, spot = 1, directional = 2 };
 struct LightData {
-   LightType  type;
-   Vec3  direction,
-      position,
-      color;
-   Float32  intensity,
-      radius,
-      degree,
-      specularity;
+   LightType   type;
+   Vec3        direction,
+               position,
+               color;
+
+   Float32     intensity,
+               radius,
+               degree,
+               specularity;
 };
 
 class SceneManager {
