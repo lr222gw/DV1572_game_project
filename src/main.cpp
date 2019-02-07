@@ -167,18 +167,18 @@ Int32 main( Int32 argc, char const *argv[] ) {
    auto quadProg = shaMan.create_program({ quad_FShader, quad_VShader });
 
    AssetManager assMan{};
-   SharedPtr<Model> myModel = assMan.load_model("Dog.dae");
+   SharedPtr<Model> myModel  = assMan.load_model("Dog.dae");
    SharedPtr<Model> myModel2 = assMan.load_model("nanosuit.obj");
    
    SceneManager scenMan{};
    SharedPtr<ModelInstance> modelInstance = 
-      scenMan.instantiate_model(myModel,
-         shaProg,
-                                Transform(Vec3(0.0f, 0.0f, 1.0f), Vec3(0.0f), Vec3(14.0f, 14.0f, 14.0f)));
+      scenMan.instantiate_model( myModel,
+                                 geoProg,
+                                 Transform(Vec3(0.0f, 0.0f, 1.0f), Vec3(0.0f), Vec3(14.0f, 14.0f, 14.0f)));
 
    SharedPtr<ModelInstance> modelInstance2 = 
       scenMan.instantiate_model( myModel2,
-         shaProg,
+                                 geoProg,
                                  Transform(Vec3(0.0f, 6.0f, 3.0f), Vec3(0.0f), Vec3(1.3f, 1.3f,1.3f)));
    //scenMan
 
@@ -243,7 +243,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
       // a_Mesh.render();
       auto g_buffer_data = myView.get_g_buffer();
       
-      glUseProgram( lightProg->getProgramLoc() );
+      // glUseProgram( lightProg->getProgramLoc() );
       glClearColor( 0.4f, 0.6, 1.0, 1.0f );
 
       glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
