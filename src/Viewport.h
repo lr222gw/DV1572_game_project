@@ -35,13 +35,13 @@ public:
    void               bind_shader_program( ShaderProgram & );
    void               set_fov( Float32 fov_rad );
    void               update();
+   void _g_buffer_init();
 
 private:
    // void _update_view_matrix();
    void _write_to_buffer();
    void _update_aspect_ratio();
    void _generate_perspective();
-   void _g_buffer_init();
 
    // TODO: (låg prioritet) använd transform för projection?
    GBufferData _g_buffer;
