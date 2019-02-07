@@ -1,5 +1,5 @@
 #version 440 core
-
+// vs filer finnes
 layout (location = 0) in vec3 pos_vs;
 layout (location = 1) in vec2 uv_vs;
 
