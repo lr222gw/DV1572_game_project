@@ -7,7 +7,6 @@
 #include "Transform.h"
 
 struct GBufferData {
-   bool    is_set = false;
    GLuint  buffer_loc;
    GLuint  pos_tex_loc;
    GLuint  nor_tex_loc;
