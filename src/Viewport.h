@@ -12,6 +12,7 @@ struct GBufferData {
    GLuint  nor_tex_loc;
    GLuint  spe_tex_loc;
    GLuint  alb_tex_loc;
+   GLuint  depth_loc;
 };
 
 // TODO: (låg prioritet) lägg till en  void make_active(); som i princip bara kallar på _write_to_buffer();

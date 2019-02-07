@@ -28,6 +28,16 @@ void main() {
 	
 	gAlbedo.rgba = texture(tex_diff1, uv_fs).rgba;
 	gSpec.rgba = texture(tex_spec1, uv_fs).rgba;
+
+
+	//TODO:P om vi inte sätter till vec4, får vi då konstiga Alpha värden?
+	//gNormal = vec4(texture(tex_norm1,uv_fs).rgb,1);
+	//
+	//gAlbedo = vec4( texture(tex_diff1, uv_fs).rgb, 1);
+	//gSpec =  vec4(texture(tex_spec1, uv_fs).rgb, 1);
+
+
+
     //vec4 a =texture2D(tex_diff1, uv_fs);
     //vec4 b =texture2D(tex_diff2, uv_fs);
     //vec4 result = mix(a,b ,0.5); 
