@@ -10,14 +10,10 @@ Viewport::Viewport( Vec3 position, GLFWwindow *window, Float32 fov_rad ):
    front   (1.0f,1.0f,1.0f)
 {
    // TODO: bind _camera och uniform buffer f�r Mat4
-
    //_model = Mat4(1.0f);
-
    // validera
    _view = Transform( position );
-
    _update_aspect_ratio();
-
    _write_to_buffer();
 }
 
@@ -27,7 +23,7 @@ void Viewport::_update_aspect_ratio() {
    if ( aspect != _aspect ) {
       _aspect = aspect;
 
-      _g_buffer_init( _width, _height );
+      _g_buffer_init();
       _generate_perspective();
 
       // TODO: Does this work? 
@@ -76,15 +72,12 @@ GBufferData const &Viewport::get_g_buffer() const {
 
 void Viewport::set_fov(Float32 fov_rad) {
    _fov = fov_rad;
-   _projection = glm::perspective( _fov,
-                                   config::aspect_ratio,
-                                   config::near_plane,
-                                   config::far_plane );
-   _write_to_buffer();
+   _generate_perspective();
 }
 
 void Viewport::bind_shader_program(ShaderProgram &shapro) {
    _location = shapro.getProgramLoc();
+   _generate_perspective();
    _write_to_buffer();
 }
 
@@ -133,7 +126,7 @@ void Viewport::_write_to_buffer() {
    glUniformMatrix4fv( glGetUniformLocation(_location, "projection"), 1, GL_FALSE, &_projection[0][0] );
 }
 
-void Viewport::_g_buffer_init(float width, float height) {
+void Viewport::_g_buffer_init() {
   
    // specular  =  specular RGB (=xyz) + specular intensity (=w)
    // albedo    =  albedo RGBA(= xyzw)

@@ -232,15 +232,18 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
       process_input( window, myView, delta_time_s );
       process_mouse( window, myView, delta_time_s );
-      
+
+
       // glMatrixMode(GL_PROJECTION);
       // glLoadIdentity();
       myView.update();
+
+      glClearColor( 0.4f, 0.6, 1.0, 1.0f );
+      glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+      
       scenMan.draw( myView ); // undersök om buffer binds
       // glUseProgram(shaProg->getProgramLoc());
       // a_Mesh.render();
-      glClearColor( 0.4f, 0.6, 1.0, 1.0f );
-      glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
       auto g_buffer_data = myView.get_g_buffer();
       
       glUseProgram( lightProg->getProgramLoc() );

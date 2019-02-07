@@ -61,12 +61,14 @@ SharedPtr<ModelInstance> SceneManager::instantiate_model(
 
 
 
-void SceneManager::draw( Viewport const &view ) {
-   auto &g_buffer = view.get_g_buffer();
+void SceneManager::draw( Viewport &view ) {
+   view._g_buffer_init();
+
+   auto &g_buffer = view.get_g_buffer(); // test
+   //glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
+   //glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
    glBindFramebuffer( GL_FRAMEBUFFER, g_buffer.buffer_loc );
-   glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
-   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
 // 1. Geometry Pass:
    // TODO: sortera instanserna efter ShaderProgram m.h.a. std::partition()
