@@ -238,16 +238,15 @@ Int32 main( Int32 argc, char const *argv[] ) {
       // glLoadIdentity();
       myView.update();
 
-      glClearColor( 0.4f, 0.6, 1.0, 1.0f );
-      glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-      
       scenMan.draw( myView ); // undersök om buffer binds
       // glUseProgram(shaProg->getProgramLoc());
       // a_Mesh.render();
       auto g_buffer_data = myView.get_g_buffer();
       
       glUseProgram( lightProg->getProgramLoc() );
+      glClearColor( 0.4f, 0.6, 1.0, 1.0f );
 
+      glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
       glActiveTexture( GL_TEXTURE0 );
       glBindTexture( GL_TEXTURE_2D, g_buffer_data.pos_tex_loc );
       glActiveTexture( GL_TEXTURE1 );
@@ -256,6 +255,11 @@ Int32 main( Int32 argc, char const *argv[] ) {
       glBindTexture( GL_TEXTURE_2D, g_buffer_data.spe_tex_loc );
       glActiveTexture( GL_TEXTURE3 );
       glBindTexture( GL_TEXTURE_2D, g_buffer_data.alb_tex_loc );
+
+      // also send light relevant uniforms
+      glUseProgram( lightProg->getProgramLoc() );
+      // SendAllLightUniformsToShader(shaderLightingPass);
+      // shaderLightingPass.setVec3("viewPos", camera.Position);
 
       if ( 0 == quad_vao ) {
          Float32 quad_verts[] = {
