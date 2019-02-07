@@ -55,28 +55,35 @@ void main() {
    vec3 lighting  = albedo * 0.2; // hard-coded ambient component
 
    for ( int i = 0;  i  < num_lights;  ++i ) {
-      Light light       = lights[i];
+      Light light = lights[i];
+      if ( light.type == light_type_point ) {
+      ////////////////////////////////////////////////////////////////////////////////////////
+         vec3  light_dir   = normalize( light.pos - pos );
+         float light_dist  = length(    light.pos - pos ) / light.radius;
+         vec3  halfway_dir = normalize( light_dir + view_dir );
+         vec3  diffuse     = max( dot(norm, light.dir), 0.0 )
+                             * light.rgb
+                             * light.intensity
+                             * albedo;
 
-      vec3 light_dir;
-      if ( light.type == light_type_point )
-         light_dir = normalize( light.pos - pos );
-      else
-         light_dir = light.dir;
-
-      float light_dist  = length(    light.pos - pos );
-      vec3  halfway_dir = normalize( light_dir + view_dir );
-      vec3  diffuse     = max( dot(norm, light.dir), 0.0 )
-                          * light.rgb
-                          * light.intensity
-                          * albedo;
-
-      //TODO: modify, make simple
-      float spec_modulation = pow( max( dot(norm, halfway_dir), 0.0 ), 16.0);
-      vec3  specular        = mix( light.rgb, spec_col, 0.5 ) * spec_modulation * spec_str;
-      // float attenuation     = 1.0 / (1.0 + linear * light_dist + quadratic * light_dist * light_dist);
-      diffuse  *= 1.0f; // attenuation;
-      specular *= 1.0f; // attenuation;
-      lighting += diffuse + specular;
+         //TODO: modify, make simple
+         float spec_modulation = pow( max( dot(norm, halfway_dir), 0.0 ), 16.0);
+         vec3  specular        = mix( light.rgb, spec_col, 0.5 ) * spec_modulation * spec_str;
+         float attenuation     = 100.0f * light.radius * 1.0 / (1.0 + linear * light_dist + quadratic * light_dist * light_dist);
+         diffuse  *= attenuation * light.intensity;
+         specular *= attenuation * light.specularity;
+         lighting += diffuse + specular;
+      ////////////////////////////////////////////////////////////////////////////////////////
+      }
+      else if ( light.type == light_type_spot ) {
+         lighting = vec3(1.0, 0.0, 1.0 ); // TODO
+      }
+      else if ( light.type == light_type_directional ) {
+         lighting = vec3(1.0, 0.0, 1.0 ); // TODO
+      }
+      else {
+         lighting = vec3(1.0, 0.0, 1.0 ); // TODO
+      }
    }
 
    rgba_rasterizer = vec4(lighting, 1.0);
