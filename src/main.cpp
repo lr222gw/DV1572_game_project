@@ -283,7 +283,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 	while (!glfwWindowShouldClose(window)) {
       Float32 delta_time_s = ImGui::GetIO().DeltaTime; 
 
-
+      glUseProgram(lightProg->getProgramLoc());
       for (int i = 0; i < numlight; i++) {
          int lightType = lights[i].type;
          Vec3 &dir = lights[i].direction;
@@ -305,6 +305,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
          glUniform1f(glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].specularity").c_str()), spec);
       }
 		
+      glUseProgram(shaProg->getProgramLoc());
+
 		// poll & handle events such as window resizing and input from the keyboard or mouse
 		// use io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if imgui wants to use the user's input
 		// - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
