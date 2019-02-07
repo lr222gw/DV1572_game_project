@@ -57,13 +57,13 @@ void main() {
    for ( int i = 0;  i  < num_lights;  ++i ) {
       Light light       = lights[i];
 
-      float light_dir;
+      vec3 light_dir;
       if ( light.type == light_type_point )
          light_dir = normalize( light.pos - pos );
       else
          light_dir = light.dir;
-         
-      vec3  light_dist  = length(    light.pos - pos );
+
+      float light_dist  = length(    light.pos - pos );
       vec3  halfway_dir = normalize( light_dir + view_dir );
       vec3  diffuse     = max( dot(norm, light.dir), 0.0 )
                           * light.rgb

@@ -17,15 +17,10 @@ uniform sampler2D tex_spec2;
 uniform sampler2D tex_norm1;
 uniform sampler2D tex_norm2;
 
-void main()
-{
-	
+void main() {
 	g_position = pos_fs;
-	g_normal = normalize(norm_fs);
+	g_normal = normalize(nor_fs);
 	// g_normal = texture(tex_norm1, uv_fs).rgb;
 	g_spec = texture(tex_spec1, uv_fs);
 	g_albedo = texture(tex_diff1, uv_fs);
-
-
-
 }
