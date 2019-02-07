@@ -41,7 +41,7 @@ private:
    void _write_to_buffer();
    void _update_aspect_ratio();
    void _generate_perspective();
-   void _g_buffer_init( Float32 width, Float32 height );
+   void _g_buffer_init();
 
    // TODO: (låg prioritet) använd transform för projection?
    GBufferData _g_buffer;
