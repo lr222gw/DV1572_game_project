@@ -167,41 +167,50 @@ Int32 main( Int32 argc, char const *argv[] ) {
    auto quadProg = shaMan.create_program({ quad_FShader, quad_VShader });
 
    AssetManager assMan{};
-   SharedPtr<Model> myModel  = assMan.load_model("Dog.dae");
    SharedPtr<Model> myModel2 = assMan.load_model("nanosuit.obj");
+   SharedPtr<Model> myModel  = assMan.load_model("Dog.dae");
+   
    
    SceneManager scenMan{};
+
+
+   SharedPtr<ModelInstance> modelInstance2 =
+      scenMan.instantiate_model(myModel2,
+         shaProg,
+         Transform(Vec3(0.0f, 6.0f, 3.0f), Vec3(0.0f), Vec3(1.3f, 1.3f, 1.3f)));
+
    SharedPtr<ModelInstance> modelInstance = 
       scenMan.instantiate_model( myModel,
          shaProg,
                                  Transform(Vec3(0.0f, 0.0f, 1.0f), Vec3(0.0f), Vec3(14.0f, 14.0f, 14.0f)));
 
-   SharedPtr<ModelInstance> modelInstance2 = 
-      scenMan.instantiate_model( myModel2,
-         shaProg,
-                                 Transform(Vec3(0.0f, 6.0f, 3.0f), Vec3(0.0f), Vec3(1.3f, 1.3f,1.3f)));
+
    //scenMan
 
-   Vec3 cam_rotations { 0.0f, 0.0f,  0.0f };
-   Vec3 cam_position  { 0.0f, 0.0f, -15.0f };
+   Vec3 cam_rotations { .0f, .0f,  .0f };
+   Vec3 cam_position  { 0.0f, -20.0f, 15.0f };
    Transform cam_transform;
    Float32 fov_rad = config::fov_rad; // 90 degrees
    Viewport myView { cam_position, window, fov_rad };
    myView.bind_shader_program(*shaProg);
    
+   //TODO: remove when we dont want to se dogass
+   Transform rotate_deg180 = myView.get_view();
+   rotate_deg180.rotate_deg(Vec3(0.0, 1.0, 0.0), 180.f);
+   myView.set_view(rotate_deg180);
+
    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-   glEnable( GL_CULL_FACE );
+   glEnable( GL_CULL_FACE );   
    glCullFace( GL_BACK );
-
-
 
    glUseProgram( lightProg->getProgramLoc() );
    
+   //TODO:P Bör skicka in riktiga värden så att färgen fungerar...
    glUniform1i( glGetUniformLocation(lightProg->getProgramLoc(),"g_tex_pos"), 0);
    glUniform1i( glGetUniformLocation(lightProg->getProgramLoc(),"g_tex_norm"), 1);
    glUniform1i( glGetUniformLocation(lightProg->getProgramLoc(),"g_tex_spec"), 2);
-   glUniform1i( glGetUniformLocation(lightProg->getProgramLoc(),"g_tex_albedo"), 3);
+   glUniform1i( glGetUniformLocation(lightProg->getProgramLoc(),"g_tex_albedo"), 3); //TODO:P Denna är den enda som används...
    
    int const numlight = 8;
    glUniform1i(lightProg->getProgramLoc(), numlight);
@@ -284,7 +293,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
       Float32 delta_time_s = ImGui::GetIO().DeltaTime; 
 
       glUseProgram(lightProg->getProgramLoc());
-      for (int i = 0; i < numlight; i++) {
+      for (int i = 0; i < 1; i++) { //TODO:P Endast en ljuskälla ger samma resultat som att använda alla...
          int lightType = lights[i].type;
          Vec3 &dir = lights[i].direction;
          Vec3 &pos = lights[i].position;
@@ -304,8 +313,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
          glUniform1f(glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].degree").c_str()), degree);
          glUniform1f(glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].specularity").c_str()), spec);
       }
-		
-      glUseProgram(shaProg->getProgramLoc());
+    
+      
 
 		// poll & handle events such as window resizing and input from the keyboard or mouse
 		// use io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if imgui wants to use the user's input
@@ -330,15 +339,20 @@ Int32 main( Int32 argc, char const *argv[] ) {
       process_input( window, myView, delta_time_s );
       process_mouse( window, myView, delta_time_s );
 
-
+      
       // glMatrixMode(GL_PROJECTION);
       // glLoadIdentity();
+
+      glUseProgram(shaProg->getProgramLoc());
+      //TODO:P Vi måste binda shaProg ID till glUseProgram innan vi skickar upp viewPos...
       myView.update();
       auto view_pos = myView.get_view().get_position();
       glUniform3fv(lightProg->getProgramLoc(), 1, &view_pos[0]);
-      
+            
+      scenMan.draw( myView ); 
 
-      scenMan.draw( myView ); // undersök om buffer binds
+
+
       // glUseProgram(shaProg->getProgramLoc());
       // a_Mesh.render();
       auto g_buffer_data = myView.get_g_buffer();
@@ -354,7 +368,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
       glActiveTexture( GL_TEXTURE2 );
       glBindTexture( GL_TEXTURE_2D, g_buffer_data.spe_tex_loc );
       glActiveTexture( GL_TEXTURE3 );
-      glBindTexture( GL_TEXTURE_2D, g_buffer_data.alb_tex_loc );
+      glBindTexture( GL_TEXTURE_2D, g_buffer_data.alb_tex_loc ); //TODO:P Denna är den enda som gör något...
 
       // also send light relevant uniforms
       glUseProgram( lightProg->getProgramLoc() );
@@ -408,7 +422,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
       glBindVertexArray(0);
       
-      
+      glClearColor(0.4f, 0.6, 1.0, 1.0f);
 
       glBindFramebuffer( GL_READ_FRAMEBUFFER,
                          g_buffer_data.buffer_loc );

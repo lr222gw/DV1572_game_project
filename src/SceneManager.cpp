@@ -63,10 +63,10 @@ SharedPtr<ModelInstance> SceneManager::instantiate_model(
 
 void SceneManager::draw( Viewport &view ) {
    auto &g_buffer = view.get_g_buffer(); // test
-   
-   
-
+         
    glBindFramebuffer( GL_FRAMEBUFFER, g_buffer.buffer_loc );
+   glEnable(GL_DEPTH_TEST);
+   glEnable(GL_STENCIL_TEST);
    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 // 1. Geometry Pass:

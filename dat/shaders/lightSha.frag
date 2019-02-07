@@ -69,6 +69,7 @@ void main()
 		specular *= attenuation;
 		lighting += diffuse + specular;
    }    
+
 		
    rgba_rasterizer = vec4(lighting, 1.0);
 }

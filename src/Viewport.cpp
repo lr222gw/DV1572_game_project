@@ -13,6 +13,7 @@ Viewport::Viewport( Vec3 position, GLFWwindow *window, Float32 fov_rad ):
    //_model = Mat4(1.0f);
    // validera
    _view = Transform( position );
+   
    _update_aspect_ratio();
    _write_to_buffer();
 }
@@ -140,7 +141,8 @@ void Viewport::_g_buffer_init() {
       glGenTextures( 1, &(this->_g_buffer.spe_tex_loc) );
       glGenTextures( 1, &(this->_g_buffer.alb_tex_loc) );
       initialized = true;
-   }
+  }
+  
 
    glBindFramebuffer( GL_FRAMEBUFFER,
                       this->_g_buffer.buffer_loc );
