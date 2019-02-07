@@ -49,7 +49,7 @@ void main()
    for(int i = 0; i < num_lights; ++i)
    {
        // calculate distance between light source and current fragment
-       //if(distance < lights[i].Radius)
+       //if(distance < light.radius)
        //{
        //}
 	   Light light = lights[i];

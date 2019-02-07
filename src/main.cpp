@@ -82,7 +82,7 @@ void draw_camera_debug_window( Vec3    &position,
 
 
 
-
+static bool mouse_look = false;
 Int32 main( Int32 argc, char const *argv[] ) {
 	// initialise GLFW
 	glewExperimental = true; // <- needed for core profile
@@ -206,7 +206,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
    glUseProgram( lightProg->getProgramLoc() );
    
-   //TODO:P Bör skicka in riktiga värden så att färgen fungerar...
+   //TODO:P Bör skicka in riktiga värden så att färgen fungerar...?
    glUniform1i( glGetUniformLocation(lightProg->getProgramLoc(),"g_tex_pos"), 0);
    glUniform1i( glGetUniformLocation(lightProg->getProgramLoc(),"g_tex_norm"), 1);
    glUniform1i( glGetUniformLocation(lightProg->getProgramLoc(),"g_tex_spec"), 2);
@@ -293,7 +293,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
       Float32 delta_time_s = ImGui::GetIO().DeltaTime; 
 
       glUseProgram(lightProg->getProgramLoc());
-      for (int i = 0; i < 1; i++) { //TODO:P Endast en ljuskälla ger samma resultat som att använda alla...
+      for (int i = 0; i < 2; i++) { //TODO:P Endast en ljuskälla ger samma resultat som att använda alla...
          int lightType = lights[i].type;
          Vec3 &dir = lights[i].direction;
          Vec3 &pos = lights[i].position;
@@ -336,8 +336,10 @@ Int32 main( Int32 argc, char const *argv[] ) {
       // myView.set_fov( fov_rad );
       scenMan.draw_debug_scene_inspection();
 
+
+      process_mouse( window, myView, delta_time_s);
       process_input( window, myView, delta_time_s );
-      process_mouse( window, myView, delta_time_s );
+      
 
       
       // glMatrixMode(GL_PROJECTION);
@@ -352,7 +354,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
       scenMan.draw( myView ); 
 
 
-
+      glUseProgram(lightProg->getProgramLoc());
       // glUseProgram(shaProg->getProgramLoc());
       // a_Mesh.render();
       auto g_buffer_data = myView.get_g_buffer();
@@ -371,7 +373,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
       glBindTexture( GL_TEXTURE_2D, g_buffer_data.alb_tex_loc ); //TODO:P Denna är den enda som gör något...
 
       // also send light relevant uniforms
-      glUseProgram( lightProg->getProgramLoc() );
+      
       // SendAllLightUniformsToShader(shaderLightingPass);
       // shaderLightingPass.setVec3("viewPos", camera.Position);
 
@@ -461,7 +463,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
 }
 
-static bool mouse_look = false;
+
 void process_input( GLFWwindow *window, Viewport &cam, Float32 delta ) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) 
 		glfwSetWindowShouldClose(window, true);
@@ -476,7 +478,7 @@ void process_input( GLFWwindow *window, Viewport &cam, Float32 delta ) {
       else
          glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
    }
-   
+  
    //If movement is disabled
    if ( !mouse_look )
       return;
@@ -510,19 +512,20 @@ void process_input( GLFWwindow *window, Viewport &cam, Float32 delta ) {
    }
 }
 
-bool  firstMouse = true;
-float yaw   = -90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
-float pitch =  0.0f;
-float lastX =  800.0f / 2.0;
+bool  firstMouse   = true;
+static float yaw   = -90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
+static float pitch =  0.0f;
+static float lastX =  800.0f / 2.0;
 float lastY =  600.0 / 2.0;
 float fov   =  45.0f;
 
 void process_mouse( GLFWwindow *window, Viewport &cam, Float32 delta_time_s  ) {
    static glm::vec3 front;
 
-   if ( !mouse_look )
+   if (!mouse_look) 
       return;
-
+   
+      
    Float64 xPos, yPos;
    glfwGetCursorPos( window, &xPos, &yPos );
 
