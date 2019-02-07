@@ -13,23 +13,23 @@ uniform sampler2D g_tex_spec;
 uniform sampler2D g_tex_albedo;
 
 struct Light {
-	int type;
-	vec3 dir;
-    vec3 pos;
-    vec3 rgb;
-    
-	float intensity;
-    float radius;
-	float degree;
-	float specularity;
-};
-//const int NR_LIGHTS = 32;
-//uniform Light lights[NR_LIGHTS];
+  uint type;
 
-float linear = 0.7f;
+  vec3 dir;
+  vec3 pos;
+  vec3 rgb;
+
+  float intensity;
+  float radius;
+  float degree;
+  float specularity;
+};
+
+float linear    = 0.7f;
 float quadratic = 1.8f;
 
 const int lights_cap = 32;
+
 uniform Light lights[lights_cap];
 uniform int num_lights;
 uniform vec3 view_pos;
@@ -37,8 +37,8 @@ uniform vec3 view_pos;
 void main()
 {             
     // retrieve data from gbuffer
-    vec3 pos = texture(g_tex_pos, uv_fs).rgb;
-    vec3 norm = texture(g_tex_norm, uv_fs).rgb;
+    vec3 pos    = texture(g_tex_pos, uv_fs).rgb;
+    vec3 norm   = texture(g_tex_norm, uv_fs).rgb;
     vec3 albedo = texture(g_tex_albedo, uv_fs).rgb;
 	//float albedo_alpha = texture(g_tex_albedo, uv_fs).a;
     vec4 spec = texture(g_tex_spec, uv_fs).rgba;
