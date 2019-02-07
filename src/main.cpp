@@ -334,7 +334,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
     
       
       scenMan.draw(myView);
-      glUseProgram(lightProg->getProgramLoc());
+      
       
 
       // glUseProgram(shaProg->getProgramLoc());
@@ -343,6 +343,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
       
       // glUseProgram( lightProg->getProgramLoc() );
       glClearColor( 0.4f, 0.6, 1.0, 1.0f );
+      glUseProgram(lightProg->getProgramLoc());
 
       glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
       glActiveTexture( GL_TEXTURE0 );
