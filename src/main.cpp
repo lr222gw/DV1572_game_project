@@ -173,12 +173,12 @@ Int32 main( Int32 argc, char const *argv[] ) {
    SceneManager scenMan{};
    SharedPtr<ModelInstance> modelInstance = 
       scenMan.instantiate_model(myModel,
-                                shaProg, 
+         shaProg,
                                 Transform(Vec3(0.0f, 0.0f, 1.0f), Vec3(0.0f), Vec3(14.0f, 14.0f, 14.0f)));
 
    SharedPtr<ModelInstance> modelInstance2 = 
       scenMan.instantiate_model( myModel2,
-                                 shaProg, 
+         shaProg,
                                  Transform(Vec3(0.0f, 6.0f, 3.0f), Vec3(0.0f), Vec3(1.3f, 1.3f,1.3f)));
    //scenMan
 
@@ -222,7 +222,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-      myView.bind_shader_program(*shaProg);
+//myView.bind_shader_program(*shaProg);
       // draw_camera_debug_window( cam_position, cam_rotations, fov_rad );
       // cam_transform.set_rotation( cam_rotations );
       // cam_transform.set_position( cam_position );
@@ -341,10 +341,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 }
 
 static bool mouse_look = false;
-void process_input(GLFWwindow *window, Viewport &cam, Float32 delta  )
-{
-   
-
+void process_input( GLFWwindow *window, Viewport &cam, Float32 delta ) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) 
 		glfwSetWindowShouldClose(window, true);
 	if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS)
@@ -360,56 +357,56 @@ void process_input(GLFWwindow *window, Viewport &cam, Float32 delta  )
    }
    
    //If movement is disabled
-   if (!mouse_look)
+   if ( !mouse_look )
       return;
 
    Float32 camspeed = 50 * delta;
    Transform offset;
 
-   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+   if ( glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS ) {
       offset = Transform::make_translation(Vec3(1.0, 1.0, camspeed )* -cam.front);
       cam.transform( offset);
    }
-   if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+   if ( glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS ) {
       offset = Transform::make_translation(Vec3(-1.0, -1.0, -camspeed)* -cam.front);
       cam.transform(offset);
    }
-   if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+   if ( glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS ) {
       offset = Transform::make_translation(Vec3(camspeed , 1.0, 1.0)*glm::cross(cam.front, Vec3(0.0, 1.0f, 0.0f)));
       cam.transform(offset);
    }
-   if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+   if ( glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS ) {
       offset = Transform::make_translation(Vec3(-camspeed, -1.0, -1.0)* glm::cross( cam.front, Vec3(0.0, 1.0f, 0.0f)));
       cam.transform(offset);
    }
-   if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
+   if ( glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS ) {
       offset = Transform::make_translation(Vec3(0.0, camspeed, 0.0) );
       cam.transform(offset);
    }
-   if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+   if ( glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS ) {
       offset = Transform::make_translation(Vec3(0.0, -camspeed, 0.0));
       cam.transform(offset);
    }
 }
 
 bool  firstMouse = true;
-float yaw = -90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
-float pitch = 0.0f;
-float lastX = 800.0f / 2.0;
-float lastY = 600.0 / 2.0;
-float fov = 45.0f;
+float yaw   = -90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
+float pitch =  0.0f;
+float lastX =  800.0f / 2.0;
+float lastY =  600.0 / 2.0;
+float fov   =  45.0f;
 
-void process_mouse(GLFWwindow *window, Viewport &cam, Float32 delta) {
+void process_mouse( GLFWwindow *window, Viewport &cam, Float32 delta_time_s  ) {
    static glm::vec3 front;
 
-   if (!mouse_look)
+   if ( !mouse_look )
       return;
 
    Float64 xPos, yPos;
-   glfwGetCursorPos(window, &xPos, &yPos);
+   glfwGetCursorPos( window, &xPos, &yPos );
 
    //COPY PASTE leanopengl
-   if (firstMouse) {
+   if ( firstMouse ) {
       lastX = xPos;
       lastY = yPos;
       firstMouse = false;
