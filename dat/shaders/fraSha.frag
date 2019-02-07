@@ -27,7 +27,7 @@ void main() {
 	gNormal = normalize(nor_fs);
 	
 	gAlbedo.rgba = texture(tex_diff1, uv_fs).rgba;
-	gSpec.rgba = texture(tex_spec1, uv_fs).rgba;
+	gSpec.rgba	 = texture(tex_spec1, uv_fs).rgba;
     //vec4 a =texture2D(tex_diff1, uv_fs);
     //vec4 b =texture2D(tex_diff2, uv_fs);
     //vec4 result = mix(a,b ,0.5); 
