@@ -12,6 +12,7 @@ Viewport::Viewport( Vec3 position, GLFWwindow *window, Float32 fov_rad ):
    // TODO: bind _camera och uniform buffer f�r Mat4
    //_model = Mat4(1.0f);
    // validera
+   _g_buffer = GBufferData{0,0,0,0,0,0};
    _view = Transform( position );
    
    _update_aspect_ratio();

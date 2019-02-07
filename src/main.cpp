@@ -198,11 +198,10 @@ Int32 main( Int32 argc, char const *argv[] ) {
    Transform rotate_deg180 = myView.get_view();
    rotate_deg180.rotate_deg(Vec3(0.0, 1.0, 0.0), 180.f);
    myView.set_view(rotate_deg180);
-
+   myView._g_buffer_init();
    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-   glEnable( GL_CULL_FACE );   
-   glCullFace( GL_BACK );
+   
 
    glUseProgram( lightProg->getProgramLoc() );
    
@@ -287,32 +286,13 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
    unsigned int quad_vao = 0;
    unsigned int quad_vbo;
+   
    //glDisable(GL_BLEND);
  // main loop:
 	while (!glfwWindowShouldClose(window)) {
       Float32 delta_time_s = ImGui::GetIO().DeltaTime; 
 
-      glUseProgram(lightProg->getProgramLoc());
-      for (int i = 0; i < 2; i++) { //TODO:P Endast en ljuskälla ger samma resultat som att använda alla...
-         int lightType = lights[i].type;
-         Vec3 &dir = lights[i].direction;
-         Vec3 &pos = lights[i].position;
-         Vec3 &col = lights[i].color;
-         Float32 intensity = lights[i].intensity;
-         Float32 radius = lights[i].radius;
-         Float32 degree = lights[i].degree;
-         Float32 spec = lights[i].specularity;
-
-
-         glUniform1i(glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].type").c_str()), lightType);
-         glUniform1fv(glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].dir").c_str()), 1, glm::value_ptr(dir));
-         glUniform1fv(glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].pos").c_str()), 1, glm::value_ptr(pos));
-         glUniform1fv(glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].rgb").c_str()), 1, glm::value_ptr(col));
-         glUniform1f(glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].intensity").c_str()), intensity);
-         glUniform1f(glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].radius").c_str()), radius);
-         glUniform1f(glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].degree").c_str()), degree);
-         glUniform1f(glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].specularity").c_str()), spec);
-      }
+      
     
       
 
@@ -349,12 +329,14 @@ Int32 main( Int32 argc, char const *argv[] ) {
       //TODO:P Vi måste binda shaProg ID till glUseProgram innan vi skickar upp viewPos...
       myView.update();
       auto view_pos = myView.get_view().get_position();
-      glUniform3fv(lightProg->getProgramLoc(), 1, &view_pos[0]);
-            
-      scenMan.draw( myView ); 
-
-
+     
+      
+    
+      
+      scenMan.draw(myView);
       glUseProgram(lightProg->getProgramLoc());
+      
+
       // glUseProgram(shaProg->getProgramLoc());
       // a_Mesh.render();
       auto g_buffer_data = myView.get_g_buffer();
@@ -372,10 +354,34 @@ Int32 main( Int32 argc, char const *argv[] ) {
       glActiveTexture( GL_TEXTURE3 );
       glBindTexture( GL_TEXTURE_2D, g_buffer_data.alb_tex_loc ); //TODO:P Denna är den enda som gör något...
 
+      
+      for (int i = 0; i < 2; i++) { //TODO:P Endast en ljuskälla ger samma resultat som att använda alla...
+         int lightType = lights[i].type;
+         Vec3 &dir = lights[i].direction;
+         Vec3 &pos = lights[i].position;
+         Vec3 &col = lights[i].color;
+         Float32 intensity = lights[i].intensity;
+         Float32 radius = lights[i].radius;
+         Float32 degree = lights[i].degree;
+         Float32 spec = lights[i].specularity;
+
+
+         glUniform1i(glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].type").c_str()), lightType);
+         glUniform1fv(glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].dir").c_str()), 1, glm::value_ptr(dir));
+         glUniform1fv(glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].pos").c_str()), 1, glm::value_ptr(pos));
+         glUniform1fv(glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].rgb").c_str()), 1, glm::value_ptr(col));
+         glUniform1f(glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].intensity").c_str()), intensity);
+         glUniform1f(glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].radius").c_str()), radius);
+         glUniform1f(glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].degree").c_str()), degree);
+         glUniform1f(glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].specularity").c_str()), spec);
+      }
+
       // also send light relevant uniforms
       
       // SendAllLightUniformsToShader(shaderLightingPass);
       // shaderLightingPass.setVec3("viewPos", camera.Position);
+
+      glUniform3fv(glGetUniformLocation(lightProg->getProgramLoc(), "view_pos"), 1, glm::value_ptr(view_pos));
 
       if ( 0 == quad_vao ) {
          Float32 quad_verts[] = {
