@@ -67,7 +67,7 @@ void main() {
                              * albedo;
 
          //TODO: modify, make simple
-         float spec_modulation = pow( max( dot(norm, halfway_dir), 0.0 ), 16.0);
+         float spec_modulation = 0.5; //pow( max( dot(norm, halfway_dir), 0.0 ), 16.0);
          vec3  specular        = mix( light.rgb, spec_col, 0.5 ) * spec_modulation * spec_str;
          float attenuation     = 100.0f * light.radius * 1.0 / (1.0 + linear * light_dist + quadratic * light_dist * light_dist);
          diffuse  *= attenuation * light.intensity;
