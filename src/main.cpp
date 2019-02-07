@@ -359,7 +359,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
       
       for ( Uint32 i = 0;  i < num_lights;  ++i ) { //TODO:P Endast en ljuskälla ger samma resultat som att använda alla...
          LightData &ld = lights[i];
-         glUniform1i(  glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].type").c_str()),        ld.light);
+         glUniform1i(  glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].type").c_str()),        ld.type);
          glUniform3fv( glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].dir").c_str()),         1, glm::value_ptr(ld.direction));
          glUniform3fv( glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].pos").c_str()),         1, glm::value_ptr(ld.position));
          glUniform3fv( glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].rgb").c_str()),         1, glm::value_ptr(ld.color));
