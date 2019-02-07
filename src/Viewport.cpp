@@ -3,7 +3,7 @@
 
 // TODO: l�s ViewPort -> Viewport
 
-Viewport::Viewport(Vec3 position, GLFWwindow *window, Float32 fov_rad):
+Viewport::Viewport( Vec3 position, GLFWwindow *window, Float32 fov_rad ):
    _fov    ( fov_rad ),
    _aspect ( -1.0f   ),
    _window ( window  ),
@@ -27,7 +27,7 @@ void Viewport::_update_aspect_ratio() {
    if ( aspect != _aspect ) {
       _aspect = aspect;
 
-      _g_buffer_init(width, height);
+      _g_buffer_init( _width, _height );
       _generate_perspective();
 
       //TODO: Does this work? 
@@ -118,6 +118,7 @@ void Viewport::bind_shader_program(ShaderProgram &shapro) {
 void Viewport::update() {
    debug::view_mat4( _view.matrix, "viewport._view");
    _update_aspect_ratio();
+   _write_to_buffer();
 
 }
 
