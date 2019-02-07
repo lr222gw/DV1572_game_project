@@ -358,24 +358,15 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
       
       for ( Uint32 i = 0;  i < num_lights;  ++i ) { //TODO:P Endast en ljuskälla ger samma resultat som att använda alla...
-         Uint32 light_type = (Uint32) lights[i].type;
-         Vec3 &dir = lights[i].direction;
-         Vec3 &pos = lights[i].position;
-         Vec3 &col = lights[i].color;
-         Float32 intensity = lights[i].intensity;
-         Float32 radius = lights[i].radius;
-         Float32 degree = lights[i].degree;
-         Float32 spec = lights[i].specularity;
-
-
-         glUniform1i(  glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].type").c_str()),        light_type);
-         glUniform1fv( glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].dir").c_str()),         1, glm::value_ptr(dir));
-         glUniform1fv( glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].pos").c_str()),         1, glm::value_ptr(pos));
-         glUniform1fv( glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].rgb").c_str()),         1, glm::value_ptr(col));
-         glUniform1f(  glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].intensity").c_str()),   intensity);
-         glUniform1f(  glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].radius").c_str()),      radius);
-         glUniform1f(  glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].degree").c_str()),      degree);
-         glUniform1f(  glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].specularity").c_str()), spec);
+         LightData &ld = lights[i];
+         glUniform1i(  glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].type").c_str()),        ld.light);
+         glUniform3fv( glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].dir").c_str()),         1, glm::value_ptr(ld.direction));
+         glUniform3fv( glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].pos").c_str()),         1, glm::value_ptr(ld.position));
+         glUniform3fv( glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].rgb").c_str()),         1, glm::value_ptr(ld.color));
+         glUniform1f(  glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].intensity").c_str()),   ld.intensity);
+         glUniform1f(  glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].radius").c_str()),      ld.radius);
+         glUniform1f(  glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].degree").c_str()),      ld.degree);
+         glUniform1f(  glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].specularity").c_str()), ld.specularity );
       }
       glUniform1i( glGetUniformLocation(lightProg->getProgramLoc(), "num_lights"), num_lights );
 
