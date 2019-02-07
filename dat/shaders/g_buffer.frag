@@ -21,8 +21,8 @@ void main()
 {
 	
 	g_position = pos_fs;
-	//g_normal = normalize(norm_fs);
-	g_normal = texture(tex_norm1, uv_fs).rgb;
+	g_normal = normalize(norm_fs);
+	// g_normal = texture(tex_norm1, uv_fs).rgb;
 	g_spec = texture(tex_spec1, uv_fs);
 	g_albedo = texture(tex_diff1, uv_fs);
 

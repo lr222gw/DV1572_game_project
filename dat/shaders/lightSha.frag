@@ -39,7 +39,7 @@ uniform Light lights[lights_cap];
 
 // TODO: separate arrays for separate types
 
-uniform int num_lights;
+uniform int  num_lights;
 uniform vec3 view_pos;
 
 void main() {             
@@ -56,8 +56,14 @@ void main() {
 
    for ( int i = 0;  i  < num_lights;  ++i ) {
       Light light       = lights[i];
-      float light_dist  = length(    light.pos - pos );
-      vec3  light_dir   = normalize( light.pos - pos );
+
+      float light_dir;
+      if ( light.type == light_type_point )
+         light_dir = normalize( light.pos - pos );
+      else
+         light_dir = light.dir;
+         
+      vec3  light_dist  = length(    light.pos - pos );
       vec3  halfway_dir = normalize( light_dir + view_dir );
       vec3  diffuse     = max( dot(norm, light.dir), 0.0 )
                           * light.rgb
@@ -67,9 +73,9 @@ void main() {
       //TODO: modify, make simple
       float spec_modulation = pow( max( dot(norm, halfway_dir), 0.0 ), 16.0);
       vec3  specular        = mix( light.rgb, spec_col, 0.5 ) * spec_modulation * spec_str;
-      float attenuation     = 1.0 / (1.0 + linear * light_dist + quadratic * light_dist * light_dist);
-      diffuse  *= attenuation;
-      specular *= attenuation;
+      // float attenuation     = 1.0 / (1.0 + linear * light_dist + quadratic * light_dist * light_dist);
+      diffuse  *= 1.0f; // attenuation;
+      specular *= 1.0f; // attenuation;
       lighting += diffuse + specular;
    }
 
