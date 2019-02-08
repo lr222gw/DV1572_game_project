@@ -1,11 +1,7 @@
 #version 440 core
 
-// This is just to test using their shader
-// TODO: Make our own version of this shader
-
 out vec4 rgba_rasterizer;
-
-in vec2 uv_fs;
+in  vec2 uv_fs;
 
 uniform sampler2D g_tex_pos;
 uniform sampler2D g_tex_norm;
@@ -13,34 +9,26 @@ uniform sampler2D g_tex_spec;
 uniform sampler2D g_tex_albedo;
 
 struct Light {
-  uint type;
-
-  vec3 dir;
-  vec3 pos;
-  vec3 rgb;
-
+  uint  type;
+  vec3  dir;
+  vec3  pos;
+  vec3  rgb;
   float intensity;
   float radius;
   float degree;
   float specularity;
 };
 
-//float linear    = 0.7f;
-//float quadratic = 1.8f;
+const uint       point_light_t = 0,
+                  spot_light_t = 1,
+           directional_light_t = 2;
 
 const int lights_cap = 32;
 
-const uint light_type_point       = 0,
-           light_type_spot        = 1,
-           light_type_directional = 2;
-
-
+// TODO: take one array of each light type and have a loop for each instead?
 uniform Light lights[lights_cap];
-
-// TODO: separate arrays for separate types
-
-uniform int  num_lights;
-uniform vec3 view_pos;
+uniform int   num_lights;
+uniform vec3  iew_pos;
 
 void main() {             
    // retrieve data from gbuffer
@@ -49,32 +37,34 @@ void main() {
    vec3  albedo   = texture(g_tex_albedo, uv_fs).rgb;
    vec3  spec_rgb = texture(g_tex_spec,   uv_fs).rgb;
    float spec_str = texture(g_tex_spec,   uv_fs).w;
+// vec3  emit_rgb = texture(g_tex_emit,   uv_fs).rgb; // TODO: emission
 
    vec3 view_dir  = normalize( view_pos - pos );
-   vec3 lighting  = albedo * 0.2; // hard-coded ambient component
+   vec3 lighting  = albedo * 0.2; // 20% of albedo as hard-coded ambient component
 
    for ( int i = 0;  i  < num_lights;  ++i ) {
       Light light = lights[i];
-      if ( light.type == light_type_point ) {
+      // TODO: take one array of each light type and have a loop for each instead?
+      if ( light.type == point_light_t ) {
       ////////////////////////////////////////////////////////////////////////////////////////
-         float radius      = light.radius * 2.0;
+         float radius      = light.radius * 10.0;
          float distance    = length( light.pos - pos );
          if ( distance < radius ) {
             vec3  light_dir        = normalize( light.pos - pos );
             vec3  halfway_dir      = normalize( light_dir + view_dir );
-            // calculate light falloff:
-            float linear_falloff   = (1.0 - distance / radius); // * light.intensity;
-            float quad_falloff     = linear_falloff * linear_falloff;
-            // calculate light impact:
-            float light_modulation = dot( norm, light_dir ) / 2.0 + 0.5;
-            vec3  light_impact     = albedo * light.rgb * (light_modulation * light.intensity * quad_falloff);
+            // calculate light effect falloff:
+            float linear_falloff   = (1.0 - distance / radius);       // yields a normalized value (within the range [0, 1.0])
+            float quad_falloff     = linear_falloff * linear_falloff; // quadratic falloff = linear falloff squared
+            // calculate light diffuse impact:
+            float light_modulation = max( dot(norm, light_dir), 0.0f ); // yields a normalized value (within the range [0, 1.0])
+            vec3  diffuse_impact   = albedo * light.rgb * (light_modulation * light.intensity * quad_falloff);
             // calculate specular impact:
-            float spec_modulation  = pow( dot(norm, halfway_dir) / 2.0 + 0.5, 16.0f );
+            float spec_modulation  = max( dot(norm, halfway_dir), 0.0f ); // yields a normalized value (within the range [0, 1.0])
             vec3  spec_impact      = (spec_modulation * spec_str * quad_falloff) * spec_rgb; // mix( spec_rgb, light.rgb, 0.5f );
-            //vec3  spec_impact      = (spec_modulation * spec_str * quad_falloff) * light_rgb;
-
+         // vec3  spec_impact      = (spec_modulation * spec_str * quad_falloff) * light_rgb;
             // update lighting:
-            lighting              += spec_impact; // * 0.01f);
+            lighting              += spec_impact + diffuse_impact; // TODO: emission (+ emit_rgb)
+            // TODO: HDR output?
          }
     //     lighting = spec_rgb;
          /*
@@ -101,15 +91,12 @@ void main() {
          */
       ////////////////////////////////////////////////////////////////////////////////////////
       }
-      else if ( light.type == light_type_spot ) {
+      else if ( light.type == spot_light_t ) {
          lighting = vec3(1.0, 0.0, 1.0 ); // TODO
       }
-      else if ( light.type == light_type_directional ) {
-         lighting = vec3(1.0, 0.0, 1.0 ); // TODO
-      }
-      else {
+      else { // light.type == directional_light_t 
          lighting = vec3(1.0, 0.0, 1.0 ); // TODO
       }
    }
-   rgba_rasterizer = vec4(lighting, 1.0);
+   rgba_rasterizer = vec4(lighting, 1.0); // DONE! output fragment color to rasterizer
 }
