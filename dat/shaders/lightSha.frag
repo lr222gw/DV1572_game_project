@@ -62,17 +62,21 @@ void main() {
          if ( distance < radius ) {
             vec3  light_dir        = normalize( light.pos - pos );
             vec3  halfway_dir      = normalize( light_dir + view_dir );
+            // calculate light falloff:
             float linear_falloff   = (1.0 - distance / radius); // * light.intensity;
             float quad_falloff     = linear_falloff * linear_falloff;
             // calculate light impact:
             float light_modulation = dot( norm, light_dir ) / 2.0 + 0.5;
             vec3  light_impact     = albedo * light.rgb * (light_modulation * light.intensity * quad_falloff);
             // calculate specular impact:
-            float spec_modulation  = dot(norm, halfway_dir) / 2.0 + 0.5;
-            vec3  spec_impact      = mix( spec_rgb, light.rgb, 0.5f ) * (spec_modulation * spec_str * quad_falloff);
+            float spec_modulation  = pow( dot(norm, halfway_dir) / 2.0 + 0.5, 16.0f );
+            vec3  spec_impact      = (spec_modulation * spec_str * quad_falloff) * spec_rgb; // mix( spec_rgb, light.rgb, 0.5f );
+            //vec3  spec_impact      = (spec_modulation * spec_str * quad_falloff) * light_rgb;
+
             // update lighting:
-            lighting              += light_impact + spec_impact; // * 0.01f);
+            lighting              += spec_impact; // * 0.01f);
          }
+    //     lighting = spec_rgb;
          /*
          vec3  light_dir   = normalize( light.pos - pos );
          float light_dist  = length(    light.pos - pos ) / radius;
@@ -107,6 +111,5 @@ void main() {
          lighting = vec3(1.0, 0.0, 1.0 ); // TODO
       }
    }
-
    rgba_rasterizer = vec4(lighting, 1.0);
 }
