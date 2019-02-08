@@ -1,12 +1,11 @@
 #version 440 core
 
-out vec4 rgba_rasterizer;
-in  vec2 uv_fs;
-
-uniform sampler2D g_tex_pos;
-uniform sampler2D g_tex_norm;
-uniform sampler2D g_tex_spec;
-uniform sampler2D g_tex_albedo;
+in       vec2       uv_fs;
+uniform  sampler2D  g_tex_pos;
+uniform  sampler2D  g_tex_norm;
+uniform  sampler2D  g_tex_spec;
+uniform  sampler2D  g_tex_albedo;
+out      vec4       rgba_rasterizer;
 
 struct Light {
   uint  type;

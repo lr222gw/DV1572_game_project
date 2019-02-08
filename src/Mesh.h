@@ -22,7 +22,7 @@ struct Texture {
 
 class Mesh {
    friend class Model; // gives Model access to Mesh's private members
-   
+
 /*--------------- class member functions & operators ------------*/
 public:
    Mesh(Vector<Vertex> vert_list, Vector<GLuint> index_list, Vector<Texture> texture_list) :
@@ -36,9 +36,9 @@ private:
 
 /*--------------- class member variables & constants ------------*/
 public:
-   Vector<Vertex>    vertex_list;
-   Vector<GLuint>    index_list;
-   Vector<Texture>   texture_list;
+   Vector<Vertex>    vertex_list;   // TODO: make private?
+   Vector<GLuint>    index_list;    // TODO: make private?
+   Vector<Texture>   texture_list;  // TODO: make private?
 
 private:
    GLuint  _vao,
