@@ -2,7 +2,12 @@
 
 #include "misc/defs.h"
 
-enum class RenderMode { albedo, normals, specular, emission, positional, composite };
+enum RenderMode : Uint32 { composite  = 0,
+                                 albedo     = 1,
+                                 normals    = 2,
+                                 specular   = 3,
+                                 positional = 4  }; // TODO: emission!
+
 enum class FileType   { model, texture };
 
 struct Config {
@@ -20,6 +25,7 @@ struct Config {
 
 /*------------------------------ global variables -------------------------------*/
    Bool is_wireframe_mode = false; // used in SceneManager::Draw()
+   RenderMode render_mode = RenderMode::composite;
 
 
 } extern config; // <- our global Config instance declaration, defined in Config.cpp

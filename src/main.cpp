@@ -108,7 +108,9 @@ void process_mouse( GLFWwindow *window, Viewport &cam, Float32 delta_time_s  ) {
 
 
 void process_input( GLFWwindow *window, Viewport &cam, Float32 time_delta_s ) {
-   if ( glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)  
+   glfwSetInputMode( window, GLFW_STICKY_KEYS, 1 );
+
+   if ( glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS )  
       glfwSetWindowShouldClose(window, true);
 
    if ( glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS ) {
@@ -121,6 +123,25 @@ void process_input( GLFWwindow *window, Viewport &cam, Float32 time_delta_s ) {
 
    if ( glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS )
       config.is_wireframe_mode = !config.is_wireframe_mode; // used in SceneManager::Draw()
+
+   if ( glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS )
+      config.render_mode = RenderMode::composite;
+
+   if ( glfwGetKey(window, GLFW_KEY_F4) == GLFW_PRESS )
+      config.render_mode = RenderMode::albedo;
+
+   if ( glfwGetKey(window, GLFW_KEY_F5) == GLFW_PRESS )
+      config.render_mode = RenderMode::normals;
+
+   if ( glfwGetKey(window, GLFW_KEY_F6) == GLFW_PRESS )
+      config.render_mode = RenderMode::specular;
+
+   if ( glfwGetKey(window, GLFW_KEY_F7) == GLFW_PRESS )
+      config.render_mode = RenderMode::positional;
+
+//   if ( glfwGetKey(window, GLFW_KEY_F8) == GLFW_PRESS )
+//      config.render_mode = RenderMode::emission; // TODO!
+
 
    
    Float32 move_distance = g_move_speed * time_delta_s;
@@ -311,7 +332,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 	}
 
 	// ensure we can capture the escape key being pressed below
-	glfwSetInputMode( window, GLFW_STICKY_KEYS, GL_TRUE );
+	glfwSetInputMode( window, GLFW_STICKY_KEYS, 1 );
    // glfwSetCursorPosCallback(window, mouse_callback); // TODO: make a call back matching template that calls on our process_mouse();
    glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
    // glfwSetCursorPosCallback(window, process_mouse);
@@ -531,7 +552,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
       for ( Uint32 i = 0;  i < num_lights;  ++i ) { //TODO:P Endast en ljuskälla ger samma resultat som att använda alla...
          LightData &ld = lights[i];
-         glUniform1i(  glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].type").c_str()),        ld.type);
+         glUniform1ui( glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].type").c_str()),        ld.type);
          glUniform3fv( glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].dir").c_str()),         1, glm::value_ptr(ld.direction));
          glUniform3fv( glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].pos").c_str()),         1, glm::value_ptr(ld.position));
          glUniform3fv( glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].rgb").c_str()),         1, glm::value_ptr(ld.color));
@@ -540,9 +561,9 @@ Int32 main( Int32 argc, char const *argv[] ) {
          glUniform1f(  glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].degree").c_str()),      ld.degree);
          glUniform1f(  glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].specularity").c_str()), ld.specularity );
       }
-      glUniform1i( glGetUniformLocation(lightProg->getProgramLoc(), "num_lights"), num_lights );
-
-      glUniform3fv(glGetUniformLocation(lightProg->getProgramLoc(), "view_pos"), 1, glm::value_ptr(view_pos));
+      glUniform1ui( glGetUniformLocation(lightProg->getProgramLoc(), "num_lights"), num_lights );
+      glUniform3fv( glGetUniformLocation(lightProg->getProgramLoc(), "view_pos"), 1, glm::value_ptr(view_pos));
+      glUniform1ui( glGetUniformLocation(lightProg->getProgramLoc(), "render_mode"), (Uint32)config.render_mode );
 
       if ( 0 == quad_vao ) {
          Float32 quad_verts[] = {
