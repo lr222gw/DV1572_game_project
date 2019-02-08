@@ -15,7 +15,7 @@
 // #include "misc/stb_image.h"
 // #include <range/v3/all.hpp>
 
-Float32 g_move_speed            = 5.0f; // TODO: refactor away ugly globalness
+Float32 g_move_speed            = 25.0f; // TODO: refactor away ugly globalness
 Bool    g_is_mouse_look_enabled = false;
 
 void create_demo_scene( /*...*/ ) {
@@ -108,19 +108,20 @@ void process_mouse( GLFWwindow *window, Viewport &cam, Float32 delta_time_s  ) {
 
 
 void process_input( GLFWwindow *window, Viewport &cam, Float32 time_delta_s ) {
-   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) 
+   if ( glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)  
       glfwSetWindowShouldClose(window, true);
-   if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS)
-      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-   if (glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS)
-      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-   if (glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS) {
+
+   if ( glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS ) {
       g_is_mouse_look_enabled = !g_is_mouse_look_enabled;
       if ( g_is_mouse_look_enabled )
          glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
       else
          glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
    }
+
+   if ( glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS )
+      config.is_wireframe_mode = !config.is_wireframe_mode; // used in SceneManager::Draw()
+
    
    Float32 move_distance = g_move_speed * time_delta_s;
    Transform offset;
@@ -287,7 +288,12 @@ Int32 main( Int32 argc, char const *argv[] ) {
 	// open a window and create its OpenGL context
 	GLFWwindow *window;
 
-	window = glfwCreateWindow( config::width, config::height, "3D Project -- WINDOW", NULL, NULL );
+	window = glfwCreateWindow( Config::start_width,
+                              Config::start_height,
+                              "3D Project -- WINDOW",
+                              NULL,
+                              NULL );
+
 	if ( window == NULL ) {
 		fprintf(stderr, "[ERROR] Failed to open GLFW window.\n"
 			             "        If you have an Intel GPU, they're not 4.4 compatible.\n" );
@@ -314,8 +320,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io; // wot?
- // io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
- // io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;   // Enable Gamepad Controls
+ // io.configFlags |= ImGuiconfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
+ // io.configFlags |= ImGuiconfigFlags_NavEnableGamepad;   // Enable Gamepad Controls
 
 	// setup ImGui style
 	ImGui::StyleColorsDark();
@@ -357,7 +363,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    /* TODO */ Vec3       cam_rotations {  .0f,    .0f,    .0f };
    /* TODO */ Vec3       cam_position  {  .0f, -20.0f,  15.0f };
    /* TODO */ Transform  cam_transform;
-   /* TODO */ Float32 fov_rad = config::fov_rad; // 90 degrees
+   /* TODO */ Float32 fov_rad = Config::fov_rad; // 90 degrees
    /* TODO */ Viewport myView { cam_position, window, fov_rad };
    /* TODO */ myView.bind_shader_program(*geoProg);
    /* TODO */ //TODO: remove when we dont want to se dogass
@@ -489,7 +495,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
       // myView.set_fov( fov_rad );
       scenMan.draw_debug_scene_inspection();
       ImGui::Begin("Settings:");
-      ImGui::SliderFloat( "Move speed", &g_move_speed, 0.0f, 20.0f );
+      ImGui::SliderFloat( "Move speed", &g_move_speed, .0f, 25.0f );
       ImGui::End();
 
       process_mouse( window, myView, delta_time_s);

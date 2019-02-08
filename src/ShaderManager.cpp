@@ -25,7 +25,7 @@ SharedPtr<Shader> ShaderManager::load_shader( String const &filename  ) {
       shader_file.exceptions( std::ifstream::failbit | std::ifstream::badbit );
 
       try {
-         shader_file.open( config::shader_path + filename ); // open file
+         shader_file.open( Config::shader_path + filename ); // open file
          shader_stream << shader_file.rdbuf();                // read content into stream
          shader_file.close();                                 // close file handle
          shader_code = shader_stream.str();      // convert to string

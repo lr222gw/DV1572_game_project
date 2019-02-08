@@ -2,7 +2,7 @@
 CC          := clang++-7
 
 # program target binary name
-TARGET      := binary
+TARGET      := program.bin
 
 # project structure
 SRCDIR      := src

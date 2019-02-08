@@ -1,13 +1,15 @@
 #pragma once
 
 #include "misc/defs.h"
-#include "ModelInstance.h"
-#include "ShaderProgram.h"
-#include "Transform.h"
+#include "Config.h"
 
 #include "misc/ImGui/imgui.h"
 #include "misc/ImGui/imgui_impl_glfw.h"
 #include "misc/ImGui/imgui_impl_opengl3.h"
+
+#include "ModelInstance.h"
+#include "ShaderProgram.h"
+#include "Transform.h"
 #include "Viewport.h"
 
 constexpr Uint32 light_capacity = 32;

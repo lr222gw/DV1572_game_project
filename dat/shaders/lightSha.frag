@@ -39,15 +39,15 @@ void main() {
 // vec3  emit_rgb = texture(g_tex_emit,   uv_fs).rgb; // TODO: emission
 
    vec3 view_dir  = normalize( view_pos - pos );
-   vec3 lighting  = albedo * 0.2; // 20% of albedo as hard-coded ambient component
+   vec3 lighting  = albedo * 0.2 + vec3(0.05); // start off with ambient light
 
    for ( int i = 0;  i  < num_lights;  ++i ) {
       Light light = lights[i];
       // TODO: take one array of each light type and have a loop for each instead?
       if ( light.type == point_light_t ) {
       ////////////////////////////////////////////////////////////////////////////////////////
-         float radius      = light.radius * 10.0;
-         float distance    = length( light.pos - pos );
+         float radius   = light.radius * 100.0;
+         float distance = length( light.pos - pos );
          if ( distance < radius ) {
             vec3  light_dir        = normalize( light.pos - pos );
             vec3  halfway_dir      = normalize( light_dir + view_dir );
@@ -59,8 +59,8 @@ void main() {
             vec3  diffuse_impact   = albedo * light.rgb * (light_modulation * light.intensity * quad_falloff);
             // calculate specular impact:
             float spec_modulation  = max( dot(norm, halfway_dir), 0.0f ); // yields a normalized value (within the range [0, 1.0])
-            vec3  spec_impact      = (spec_modulation * spec_str * quad_falloff) * spec_rgb; // mix( spec_rgb, light.rgb, 0.5f );
-         // vec3  spec_impact      = (spec_modulation * spec_str * quad_falloff) * light_rgb;
+            //vec3  spec_impact      = vec3(0.1)/num_lights;//(spec_modulation * spec_str * quad_falloff) * spec_rgb; // mix( spec_rgb, light.rgb, 0.5f );
+            vec3  spec_impact      = light.rgb * (spec_modulation * spec_str * quad_falloff);
             // update lighting:
             lighting              += spec_impact + diffuse_impact; // TODO: emission (+ emit_rgb)
             // TODO: HDR output?

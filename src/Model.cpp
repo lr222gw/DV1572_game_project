@@ -221,11 +221,11 @@ Vector<Texture> Model::_load_material_textures( aiMaterial *material, aiTextureT
 
 //    GLboolean skip = false; // V: oanvänd, så bortkommenterad
 
-      String path_to_file = config::model_path + String(str.C_Str());
+      String path_to_file = Config::model_path + String(str.C_Str());
       FilePath path { FileType::texture, String(str.C_Str()) };
       
       Texture texture;
-      texture.id = load_texture_from_file(path);
+      texture.id   = load_texture_from_file(path);
       texture.type = type_name;
       texture.path = path.relative_path();
       texture_list.push_back(texture);

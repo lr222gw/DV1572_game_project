@@ -37,38 +37,16 @@ SharedPtr<ModelInstance> SceneManager::instantiate_model(
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 void SceneManager::draw( Viewport &view ) {
    auto &g_buffer = view.get_g_buffer(); // test
-//   glEnable(GL_CULL_FACE);
-//   glCullFace(GL_BACK);
-//   glEnable(GL_DEPTH_TEST);
-//   glEnable(GL_STENCIL_TEST);
    glBindFramebuffer( GL_FRAMEBUFFER, g_buffer.buffer_loc );
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+   // toggle wireframe mode if config is set to true
+   if ( config.is_wireframe_mode )
+      glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+   else 
+      glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
    view.update();
 
@@ -79,33 +57,14 @@ void SceneManager::draw( Viewport &view ) {
          instance.lock()->draw();
    }
 
+   // disabling wireframe rendering so the quad will render after the lighting pass
+   if ( config.is_wireframe_mode )
+      glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+
 // 2. Lighting pass:
    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-   // TODO
-      // _light_data + _num_lights till lighting shader
-
+   // TODO: refactor lighting pass code here
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

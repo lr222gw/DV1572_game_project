@@ -4,13 +4,13 @@ layout (location = 0) in vec3 pos_vs;
 layout (location = 1) in vec3 nor_vs;
 layout (location = 2) in vec2 uv_vs;
 
-out                      vec3 pos_fs;
-out                      vec3 nor_fs;
-out                      vec2 uv_fs;
+uniform mat4 model_transform;
+uniform mat4 view;
+uniform mat4 projection;
 
-uniform                  mat4 model_transform;
-uniform                  mat4 view;
-uniform                  mat4 projection;
+out vec3 pos_fs;
+out vec3 nor_fs;
+out vec2 uv_fs;
 
 void main() {
 	uv_fs = uv_vs;

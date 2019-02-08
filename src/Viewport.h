@@ -21,7 +21,7 @@ struct GBufferData {
 class Viewport {
 /*--------------- class member functions & operators ------------*/
 public:
-   Viewport( Vec3 position, GLFWwindow *window, Float32 fov = config::fov_rad );
+   Viewport( Vec3 position, GLFWwindow *window, Float32 fov = Config::fov_rad );
    Viewport( Viewport  const &)            = delete;
    Viewport( Viewport && )                 = delete;
    Viewport& operator=( Viewport const & ) = delete;
