@@ -25,8 +25,8 @@ struct Light {
   float specularity;
 };
 
-float linear    = 0.7f;
-float quadratic = 1.8f;
+//float linear    = 0.7f;
+//float quadratic = 1.8f;
 
 const int lights_cap = 32;
 
@@ -47,32 +47,51 @@ void main() {
    vec3  pos      = texture(g_tex_pos,    uv_fs).rgb;
    vec3  norm     = texture(g_tex_norm,   uv_fs).rgb;
    vec3  albedo   = texture(g_tex_albedo, uv_fs).rgb;
-   vec3  spec_col = texture(g_tex_spec,   uv_fs).rgb;
+   vec3  spec_rgb = texture(g_tex_spec,   uv_fs).rgb;
    float spec_str = texture(g_tex_spec,   uv_fs).w;
 
    vec3 view_dir  = normalize( view_pos - pos );
 
    vec3 lighting  = albedo * 0.2; // hard-coded ambient component
 
-   for ( int i = 0;  i  < num_lights;  ++i ) {
+   for ( int i = 0;  i  < 1;  ++i ) {
       Light light = lights[i];
       if ( light.type == light_type_point ) {
       ////////////////////////////////////////////////////////////////////////////////////////
+         float radius      = light.radius * 20.0f;
+         float distance    = length( light.pos - pos );
+         if ( distance < radius ) {
+            // calculate light impact:
+            vec3  light_dir        = normalize( light.pos - pos );
+            float linear_falloff   = (1.0 - distance / radius); // * light.intensity;
+            float quad_falloff     = linear_falloff * linear_falloff;
+            float light_modulation = dot( norm, light_dir ) / 2.0 + 0.5;
+            lighting              += light.rgb * (light_modulation * quad_falloff);
+            // calculate specular:
+
+         }
+         /*
          vec3  light_dir   = normalize( light.pos - pos );
-         float light_dist  = length(    light.pos - pos ) / light.radius;
+         float light_dist  = length(    light.pos - pos ) / radius;
          vec3  halfway_dir = normalize( light_dir + view_dir );
          vec3  diffuse     = max( dot(norm, light.dir), 0.0 )
                              * light.rgb
                              * light.intensity
                              * albedo;
 
-         //TODO: modify, make simple
-         float spec_modulation = 0.5; //pow( max( dot(norm, halfway_dir), 0.0 ), 16.0);
-         vec3  specular        = mix( light.rgb, spec_col, 0.5 ) * spec_modulation * spec_str;
-         float attenuation     = 100.0f * light.radius * 1.0 / (1.0 + linear * light_dist + quadratic * light_dist * light_dist);
-         diffuse  *= attenuation * light.intensity;
-         specular *= attenuation * light.specularity;
-         lighting += diffuse + specular;
+         if ( radius > light_dist) {
+            float spec_modulation  = pow( max( dot(norm, halfway_dir), 0.0 ), 16.0);
+            float light_modulation = max( dot(norm, light_dir), 0.0 );
+            vec3  specular         = light.rgb * spec_modulation  * spec_str;
+            vec3  phong            = light.rgb * light_modulation * light.intensity;
+            float attenuation      = 1.0f;
+            //float attenuation      = light.rgb * light_modulation * light.intensity;
+            diffuse  *= attenuation; // * light.intensity;
+            specular *= attenuation; // * light.specularity;
+            phong    *= attenuation;
+            lighting += diffuse + specular + phong;
+         }
+         */
       ////////////////////////////////////////////////////////////////////////////////////////
       }
       else if ( light.type == light_type_spot ) {
