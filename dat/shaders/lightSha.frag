@@ -55,7 +55,6 @@ void main() {
       case mode_normals:     lighting = norm;     break;
       case mode_specular:    lighting = spec_rgb; break; // TODO: check texture channels
       case mode_positional:  lighting = pos;      break;
-
       case mode_composite:
          lighting = albedo * 0.2 + vec3(0.05); // start off with ambient light
          for ( int i = 0;  i  < num_lights;  ++i ) {
