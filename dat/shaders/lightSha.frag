@@ -28,7 +28,7 @@ const int lights_cap = 32;
 // TODO: take one array of each light type and have a loop for each instead?
 uniform Light lights[lights_cap];
 uniform int   num_lights;
-uniform vec3  iew_pos;
+uniform vec3  view_pos;
 
 void main() {             
    // retrieve data from gbuffer
