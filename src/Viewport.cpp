@@ -289,7 +289,7 @@ void Viewport::_g_buffer_init() {
                           GL_DEPTH_COMPONENT,
                           width,
                           height );
-
+   glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, this->_g_buffer.depth_loc);
    // control the status of the frame buffer
    if ( glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE )
       assert( false && "G-buffer status is not complete. " );
