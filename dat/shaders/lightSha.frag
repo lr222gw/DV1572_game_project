@@ -51,24 +51,27 @@ void main() {
    float spec_str = texture(g_tex_spec,   uv_fs).w;
 
    vec3 view_dir  = normalize( view_pos - pos );
-
    vec3 lighting  = albedo * 0.2; // hard-coded ambient component
 
-   for ( int i = 0;  i  < 1;  ++i ) {
+   for ( int i = 0;  i  < num_lights;  ++i ) {
       Light light = lights[i];
       if ( light.type == light_type_point ) {
       ////////////////////////////////////////////////////////////////////////////////////////
-         float radius      = light.radius * 20.0f;
+         float radius      = light.radius;
          float distance    = length( light.pos - pos );
          if ( distance < radius ) {
-            // calculate light impact:
             vec3  light_dir        = normalize( light.pos - pos );
+            vec3  halfway_dir      = normalize( light_dir + view_dir );
             float linear_falloff   = (1.0 - distance / radius); // * light.intensity;
             float quad_falloff     = linear_falloff * linear_falloff;
+            // calculate light impact:
             float light_modulation = dot( norm, light_dir ) / 2.0 + 0.5;
-            lighting              += light.rgb * (light_modulation * quad_falloff);
-            // calculate specular:
-
+            vec3  light_impact     = albedo * light.rgb * (light_modulation * light.intensity * quad_falloff);
+            // calculate specular impact:
+            float spec_modulation  = dot(norm, halfway_dir) / 2.0 + 0.5;
+            vec3  spec_impact      = mix( spec_rgb, light.rgb, 0.5f ) * (spec_modulation * spec_str * quad_falloff);
+            // update lighting:
+            lighting              += light_impact + spec_impact; // * 0.01f);
          }
          /*
          vec3  light_dir   = normalize( light.pos - pos );

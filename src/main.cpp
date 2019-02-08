@@ -167,23 +167,21 @@ Int32 main( Int32 argc, char const *argv[] ) {
    //auto quadProg = shaMan.create_program({ quad_FShader, quad_VShader });
 
    AssetManager assMan{};
-   SharedPtr<Model> myModel2 = assMan.load_model("nanosuit.obj");
-   SharedPtr<Model> myModel  = assMan.load_model("Dog.dae");
-   
+   SharedPtr<Model> myModel = assMan.load_model("nanosuit.obj");
    
    SceneManager scenMan{};
 
-
-   SharedPtr<ModelInstance> modelInstance2 =
-      scenMan.instantiate_model(myModel2,
-         geoProg,
-         Transform(Vec3(0.0f, 6.0f, 3.0f), Vec3(0.0f), Vec3(1.3f, 1.3f, 1.3f)));
-
-   SharedPtr<ModelInstance> modelInstance = 
-      scenMan.instantiate_model( myModel,
-         geoProg,
-                                 Transform(Vec3(0.0f, 0.0f, 1.0f), Vec3(0.0f), Vec3(14.0f, 14.0f, 14.0f)));
-
+   Vector<SharedPtr<ModelInstance>> model_instances;
+   model_instances.reserve(9);
+   for ( auto i=0;  i<9;  ++i ) {
+      Float32 n = 9;
+      model_instances.push_back(
+         scenMan.instantiate_model( myModel,
+                                    geoProg,
+                                    Transform( Vec3( n*(i/3),  0.0f, n*(i%3) ),
+                                               Vec3(  0.0f,  0.0f,  0.0f ),
+                                               Vec3(  1.3f,  1.3f,  1.3f ) ) ) );
+   }
 
    //scenMan
 
@@ -342,7 +340,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
       auto g_buffer_data = myView.get_g_buffer();
       
       // glUseProgram( lightProg->getProgramLoc() );
-      glClearColor( 0.4f, 0.6, 1.0, 1.0f );
+      glClearColor( 0,0,0,1 ); // ( 0.4f, 0.6, 1.0, 1.0f );
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       glUseProgram(lightProg->getProgramLoc());
 

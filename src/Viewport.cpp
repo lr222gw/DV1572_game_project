@@ -137,15 +137,11 @@ void Viewport::_g_buffer_init() {
       //gBuffer init
       glGenFramebuffers( 1, &(this->_g_buffer.buffer_loc) );
       //gBuffer Texture attatchments init
-      glGenTextures( 1, &(this->_g_buffer.pos_tex_loc) );
-      glGenTextures( 1, &(this->_g_buffer.nor_tex_loc) );
-      glGenTextures( 1, &(this->_g_buffer.spe_tex_loc) );
-      glGenTextures( 1, &(this->_g_buffer.alb_tex_loc) );
-
-      
-
-      glGenRenderbuffers(1, &(this->_g_buffer.depth_loc));
-
+      glGenTextures(      1, &(this->_g_buffer.pos_tex_loc) );
+      glGenTextures(      1, &(this->_g_buffer.nor_tex_loc) );
+      glGenTextures(      1, &(this->_g_buffer.spe_tex_loc) );
+      glGenTextures(      1, &(this->_g_buffer.alb_tex_loc) );
+      glGenRenderbuffers( 1, &(this->_g_buffer.depth_loc)   );
       initialized = true;
   }
   
@@ -287,8 +283,7 @@ void Viewport::_g_buffer_init() {
 
    // Create a render buffer object for depth buffer
 
-
-   glBindRenderbuffer( GL_RENDERBUFFER, this->_g_buffer.depth_loc);
+   glBindRenderbuffer( GL_RENDERBUFFER, this->_g_buffer.depth_loc );
 
    glRenderbufferStorage( GL_RENDERBUFFER,
                           GL_DEPTH_COMPONENT,
