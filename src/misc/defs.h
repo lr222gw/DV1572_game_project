@@ -11,7 +11,7 @@
 #include <cstddef>
 
 #include <cstring>
-#include <string> // TODO: replace?
+#include <string>
 #include <string_view>
 
 #include <sstream>
@@ -26,7 +26,8 @@
 #include <vector>
 #include <unordered_map>
 #include <map>
-#include <optional>
+
+//#include <optional>
 
 #include "enum.h"
 
@@ -35,13 +36,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
 #include <glm/gtx/quaternion.hpp>
 
 #include "stb_image.h" 
-//
 
-// #include <string_view>
 
 // unsigned integer types:
                             using Uint8        = uint8_t;
@@ -54,7 +52,7 @@
                             using Int32        = int32_t;
                             using Int64        = int64_t;
 // byte type:
-                            using Byte         = std::byte;
+                            using Byte         = Uint8;
 // glm vectors:
                             using Vec2         = glm::vec2;
                             using Vec3         = glm::vec3;
@@ -69,8 +67,8 @@
                             using Float32      = float;
                             using Float64      = double;
 // string types:
-                            using String       = std::basic_string<char>;
-                            using StringView   = std::basic_string_view<char>;
+                            using String       = std::string;
+                            using StringView   = std::string_view;
 // stream types:
                             using Ifstream     = std::ifstream;
                             using StringStream = std::stringstream;
@@ -91,7 +89,7 @@ template <class T>          using WeakPtr      = std::weak_ptr<T>;
 template <class K, class V> using Map          = std::map<K,V>;
 template <class K, class V> using HashMap      = std::unordered_map<K,V>;
 // optional type:
-template <class T>          using Optional     = std::optional<T>;
+// template <class T>          using Optional     = std::optional<T>;
 
 //constexpr Idx  const   invalid_idx = -1;
 constexpr char const * invalid_str = "ERROR";

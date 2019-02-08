@@ -31,7 +31,7 @@ SharedPtr<Shader> ShaderManager::load_shader( String const &filename  ) {
          shader_code = shader_stream.str();      // convert to string
       }
       catch ( std::ifstream::failure e ) {
-         std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
+         std::cout << "[ERROR] Unable to read shader code from file." << std::endl;
       }
 
       //-------------------------------------THEN COMPILE THE SHADER----------------------------------//
@@ -43,24 +43,11 @@ SharedPtr<Shader> ShaderManager::load_shader( String const &filename  ) {
 
       //----------------------------------------THEN RETURN-------------------------------------------//
       return shader_ptr;
-
-      /* gammal kod med index:
-      // om filen laddats in utan problem:
-      ShaderId id   = _generate_shader_id( type ); // generate unique Id
-      _shaders[id]  = shader_loc;
-      return id;
-      */
    }
 }
 
 SharedPtr<ShaderProgram> ShaderManager::create_program( Vector<SharedPtr<Shader>> shaders) {
-      //
-   return std::make_shared<ShaderProgram>(  shaders );   
-
-      //Alternativt detta sätt, men då det nästan inte ger oss någon skillnad för
-      //prestanda kör vi sättet över...
-         //return std::make_shared<ShaderProgram>( std::move( shaders ));
-   
+   return std::make_shared<ShaderProgram>( shaders );   
 }
 
 /*
@@ -106,6 +93,3 @@ Shader::Type ShaderManager::_extract_type( StringView filename ) const {
           return Shader::Type::fragment;
       else assert(false && "Unaccounted for Shader-extension"); return Shader::Type::error; // TODO: exceptions
   }
- 
-
-

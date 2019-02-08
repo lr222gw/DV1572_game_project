@@ -12,14 +12,13 @@
 #include "Viewport.h"
 #include "SceneManager.h"
 
-void process_input(GLFWwindow *window, Viewport &, Float32);
-void process_mouse(GLFWwindow *window, Viewport &cam, Float32 delta);
-
 // #include "misc/stb_image.h"
-//
 // #include <range/v3/all.hpp>
 
-Float32 g_move_speed = 5.0f;
+Float32 g_move_speed            = 5.0f; // TODO: refactor away ugly globalness
+Bool    g_is_mouse_look_enabled = false;
+
+
 
 void create_demo_scene( /*...*/ ) {
    // TODO: setup the viewport camera
@@ -38,18 +37,201 @@ void create_demo_scene( /*...*/ ) {
 }
 
 
+
 	
 [[nodiscard]] String lowercase( char const *base ) {
-   String s( base );
+   String s ( base );
    std::transform( s.begin(), s.end(), s.begin(), ::tolower );
    return s;
 }
 
 [[nodiscard]] String uppercase( char const *base ) {
-   String s = base;
+   String s ( base );
    std::transform( s.begin(), s.end(), s.begin(), ::toupper );
    return s;   
 }
+
+
+
+
+void process_mouse( GLFWwindow *window, Viewport &cam, Float32 delta_time_s  ) {
+   // yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a
+   // direction vector pointing to the right so we initially rotate a bit to the left.
+   static Float64 yaw         = -90.0f;
+   static Float64 pitch       =  0.0f;
+   static Float64 last_x      =  800.0f / 2.0;
+   static Float64 last_y      =  600.0 / 2.0;
+   static Bool    first_mouse = true;
+
+   Float64 x_pos, y_pos;
+
+   if ( !g_is_mouse_look_enabled ) 
+      return;
+   
+   glfwGetCursorPos( window, &x_pos, &y_pos );
+
+   if ( first_mouse ) {
+      last_x = x_pos;
+      last_y = y_pos;
+      first_mouse = false;
+   }
+
+   bool changed = last_x != x_pos;
+
+   Float64 x_offset = x_pos - last_x;
+   Float64 y_offset = last_y - y_pos;
+   last_x = x_pos;
+   last_y = y_pos;   
+
+   Float64 sensitivity = 0.05;
+   x_offset *= sensitivity;
+   y_offset *= sensitivity;
+
+   yaw   += x_offset;
+   pitch += y_offset;
+
+   if ( pitch > 89.0f )
+      pitch =  89.0f;
+   if ( pitch < -89.0f )
+      pitch = -89.0f;
+
+   if ( changed ) {
+      cam.forward.x = cos( glm::radians(yaw)) * cos(glm::radians(pitch) );
+      cam.forward.y = sin( glm::radians(pitch)                          );
+      cam.forward.z = sin( glm::radians(yaw)) * cos(glm::radians(pitch) );
+      glm::normalize( cam.forward );
+      auto view = cam.get_view();  // get view (pos, rot, scale)
+      view.look_at( cam.forward ); // rotate view
+      cam.set_view( view );        // update cam view
+   }
+}
+
+
+
+
+void process_input( GLFWwindow *window, Viewport &cam, Float32 time_delta_s ) {
+   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) 
+      glfwSetWindowShouldClose(window, true);
+   if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS)
+      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+   if (glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS)
+      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+   if (glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS) {
+      g_is_mouse_look_enabled = !g_is_mouse_look_enabled;
+      if ( g_is_mouse_look_enabled )
+         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+      else
+         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+   }
+   
+   Float32 move_distance = g_move_speed * time_delta_s;
+   Transform offset;
+
+   if ( glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS ) {
+      offset = Transform::make_translation(Vec3(1.0, 1.0, move_distance )* -cam.forward);
+      cam.transform( offset);
+   }
+   if ( glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS ) {
+      offset = Transform::make_translation(Vec3(-1.0, -1.0, -move_distance)* -cam.forward);
+      cam.transform(offset);
+   }
+   if ( glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS ) {
+      cam.transform(offset);
+   }
+   if ( glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS ) {
+      offset = Transform::make_translation(Vec3(-move_distance, -1.0, -1.0)* glm::cross( cam.forward, Vec3(0.0, 1.0f, 0.0f)));
+      cam.transform(offset);
+   }
+   if ( glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS ) {
+      offset = Transform::make_translation(Vec3(0.0, move_distance, 0.0) );
+      cam.transform(offset);
+   }
+   if ( glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS ) {
+      offset = Transform::make_translation(Vec3(0.0, -move_distance, 0.0));
+      cam.transform(offset);
+   }
+
+/*
+   if ( glfwGetKey(window, GLFW_KEY_W)            == GLFW_PRESS ) { // forward
+      cam.transform( translation * forward );
+   }
+   if ( glfwGetKey(window, GLFW_KEY_S)            == GLFW_PRESS ) { // backward
+      // auto backward = forward * Transform::make_rotation( Vec3(   0,  180,  0 ) );
+      // cam.transform( translation * backward );
+   }
+   if ( glfwGetKey(window, GLFW_KEY_A)            == GLFW_PRESS ) { // left
+      // auto left     = forward * Transform::make_rotation( Vec3(   0,  -90,  0 ) );
+      // cam.transform( translation * left );
+   }
+   if ( glfwGetKey(window, GLFW_KEY_D)            == GLFW_PRESS ) { // right
+      // auto right    = forward * Transform::make_rotation( Vec3(   0,   90,  0 ) );
+      // cam.transform( translation * right );
+   }
+   if ( glfwGetKey(window, GLFW_KEY_SPACE)        == GLFW_PRESS ) { // up
+      // auto up       = forward * Transform::make_rotation( Vec3( -90,    0,  0 ) );
+      // cam.transform( translation * up );
+   }
+   if ( glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS ) { // down
+      // auto down     = forward * Transform::make_rotation( Vec3( -90,    0,  0 ) );
+      // cam.transform( translation * down );
+   }
+*/
+}
+
+
+
+
+/*
+void process_input( GLFWwindow *window, Viewport &cam, Float32 delta ) {
+   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) 
+      glfwSetWindowShouldClose(window, true);
+   if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS)
+      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+   if (glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS)
+      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+   if (glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS) {
+      mouse_look = !mouse_look;
+      if (mouse_look)
+         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+      else
+         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+   }
+  
+   //If movement is disabled
+   if ( !mouse_look )
+      return;
+
+   // TODO: fix camera navigation
+   Float32 camspeed = g_move_speed * delta;
+   Transform offset;
+
+
+   if ( glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS ) {
+      offset = Transform::make_translation(Vec3(1.0, 1.0, camspeed )* -cam.front);
+      cam.transform( offset);
+   }
+   if ( glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS ) {
+      offset = Transform::make_translation(Vec3(-1.0, -1.0, -camspeed)* -cam.front);
+      cam.transform(offset);
+   }
+   if ( glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS ) {
+      offset = Transform::make_translation(Vec3(camspeed , 1.0, 1.0)*glm::cross(cam.front, Vec3(0.0, 1.0f, 0.0f)));
+      cam.transform(offset);
+   }
+   if ( glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS ) {
+      offset = Transform::make_translation(Vec3(-camspeed, -1.0, -1.0)* glm::cross( cam.front, Vec3(0.0, 1.0f, 0.0f)));
+      cam.transform(offset);
+   }
+   if ( glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS ) {
+      offset = Transform::make_translation(Vec3(0.0, camspeed, 0.0) );
+      cam.transform(offset);
+   }
+   if ( glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS ) {
+      offset = Transform::make_translation(Vec3(0.0, -camspeed, 0.0));
+      cam.transform(offset);
+   }
+}
+*/
 
 
 
@@ -83,7 +265,7 @@ void draw_camera_debug_window( Vec3    &position,
 
 
 
-static bool mouse_look = false;
+
 Int32 main( Int32 argc, char const *argv[] ) {
 	// initialise GLFW
 	glewExperimental = true; // <- needed for core profile
@@ -107,7 +289,6 @@ Int32 main( Int32 argc, char const *argv[] ) {
 	// open a window and create its OpenGL context
 	GLFWwindow *window;
 
-   //TODO: handle Window Resize!
 	window = glfwCreateWindow( config::width, config::height, "3D Project -- WINDOW", NULL, NULL );
 	if ( window == NULL ) {
 		fprintf(stderr, "[ERROR] Failed to open GLFW window.\n"
@@ -117,6 +298,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 		return -1;
 	}
 	glfwMakeContextCurrent( window ); // initialize GLEW
+
    // glfwSwapInterval(1); // enable vsync -- TODO: decide!
 
 	if ( glewInit() != GLEW_OK ) {
@@ -126,10 +308,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
 	// ensure we can capture the escape key being pressed below
 	glfwSetInputMode( window, GLFW_STICKY_KEYS, GL_TRUE );
-   //glfwSetCursorPosCallback(window, mouse_callback); // TODO: make a call back matching template that calls on our process_mouse();
+   // glfwSetCursorPosCallback(window, mouse_callback); // TODO: make a call back matching template that calls on our process_mouse();
    glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-
-   
    // glfwSetCursorPosCallback(window, process_mouse);
 
 	// ImGui context setup
@@ -146,31 +326,23 @@ Int32 main( Int32 argc, char const *argv[] ) {
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init(glsl_version);
 
-	// activate depth test and stencil test for openGL
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_STENCIL_TEST);
+	glEnable( GL_DEPTH_TEST   );
+	glEnable( GL_STENCIL_TEST );
 
-   //testa   vår AssetManager TODO: heh 
-   ShaderManager shaMan{};
-   //auto fraShader = shaMan.load_shader("fraSha.frag");
-   //auto vertShader = shaMan.load_shader("vertSha.vert");
-   auto light_f_Shader = shaMan.load_shader("lightSha.frag");
-   auto light_v_Shader = shaMan.load_shader("lightSha.vert");
-   auto geo_f_Shader   = shaMan.load_shader("g_buffer.frag");
-   auto geo_v_Shader   = shaMan.load_shader("g_buffer.vert");
+   ShaderManager shaMan  {};
+   AssetManager  assMan  {};
+   SceneManager  scenMan {};
 
-   //auto quad_FShader = shaMan.load_shader("quad.frag");
-   //auto quad_VShader = shaMan.load_shader("quad.vert");
+   auto light_f_Shader = shaMan.load_shader( "lightSha.frag" );
+   auto light_v_Shader = shaMan.load_shader( "lightSha.vert" );
+   auto geo_f_Shader   = shaMan.load_shader( "g_buffer.frag" );
+   auto geo_v_Shader   = shaMan.load_shader( "g_buffer.vert" );
 
-   //auto shaProg = shaMan.create_program({fraShader, vertShader});
-   auto geoProg   = shaMan.create_program({ geo_f_Shader, geo_v_Shader });
+   auto geoProg   = shaMan.create_program({   geo_f_Shader, geo_v_Shader   });
    auto lightProg = shaMan.create_program({ light_f_Shader, light_v_Shader });
-   //auto quadProg = shaMan.create_program({ quad_FShader, quad_VShader });
 
-   AssetManager assMan{};
-   SharedPtr<Model> myModel = assMan.load_model("nanosuit.obj");
-   
-   SceneManager scenMan{};
+
+   SharedPtr<Model> myModel = assMan.load_model( "nanosuit.obj" );
 
    Vector<SharedPtr<ModelInstance>> model_instances;
    model_instances.reserve(9);
@@ -179,36 +351,33 @@ Int32 main( Int32 argc, char const *argv[] ) {
       model_instances.push_back(
          scenMan.instantiate_model( myModel,
                                     geoProg,
-                                    Transform( Vec3( n*(i/3),  0.0f, n*(i%3) ),
-                                               Vec3(  0.0f,  0.0f,  0.0f ),
-                                               Vec3(  1.3f,  1.3f,  1.3f ) ) ) );
+                                    Transform( Vec3( n*(i/3),   .0f,  n*(i%3) ),
+                                               Vec3(     .0f,   .0f,      .0f ),
+                                               Vec3(    1.3f,  1.3f,     1.3f ) ) ) );
    }
 
-   //scenMan
-
-   Vec3 cam_rotations { .0f, .0f,  .0f };
-   Vec3 cam_position  { 0.0f, -20.0f, 15.0f };
-   Transform cam_transform;
-   Float32 fov_rad = config::fov_rad; // 90 degrees
-   Viewport myView { cam_position, window, fov_rad };
-   myView.bind_shader_program(*geoProg);
-   
-   //TODO: remove when we dont want to se dogass
-   Transform rotate_deg180 = myView.get_view();
-   rotate_deg180.rotate_deg(Vec3(0.0, 1.0, 0.0), 180.f);
-   myView.set_view(rotate_deg180);
-   myView._g_buffer_init();
-   //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+   /* TODO */ Vec3       cam_rotations {  .0f,    .0f,    .0f };
+   /* TODO */ Vec3       cam_position  {  .0f, -20.0f,  15.0f };
+   /* TODO */ Transform  cam_transform;
+   /* TODO */ Float32 fov_rad = config::fov_rad; // 90 degrees
+   /* TODO */ Viewport myView { cam_position, window, fov_rad };
+   /* TODO */ myView.bind_shader_program(*geoProg);
+   /* TODO */ //TODO: remove when we dont want to se dogass
+   /* TODO */ Transform rotate_deg180 = myView.get_view();
+   /* TODO */ rotate_deg180.rotate_deg(Vec3(0.0, 1.0, 0.0), 180.f);
+   /* TODO */ myView.set_view(rotate_deg180);
+   /* TODO */ myView._g_buffer_init();
+   /* TODO */ //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
    
 
    glUseProgram( lightProg->getProgramLoc() );
    
-   //TODO:P Bör skicka in riktiga värden så att färgen fungerar...?
-   glUniform1i( glGetUniformLocation(lightProg->getProgramLoc(),"g_tex_pos"), 0);
-   glUniform1i( glGetUniformLocation(lightProg->getProgramLoc(),"g_tex_norm"), 1);
-   glUniform1i( glGetUniformLocation(lightProg->getProgramLoc(),"g_tex_spec"), 2);
-   glUniform1i( glGetUniformLocation(lightProg->getProgramLoc(),"g_tex_albedo"), 3); //TODO:P Denna är den enda som används...
+   glUniform1i( glGetUniformLocation( lightProg->getProgramLoc(), "g_tex_pos"),    0 );
+   glUniform1i( glGetUniformLocation( lightProg->getProgramLoc(), "g_tex_norm"),   1 );
+   glUniform1i( glGetUniformLocation( lightProg->getProgramLoc(), "g_tex_spec"),   2 );
+   glUniform1i( glGetUniformLocation( lightProg->getProgramLoc(), "g_tex_albedo"), 3 );
+   // TODO: emission map
    
    Uint32 const num_lights = 8;
    glUniform1i(lightProg->getProgramLoc(), num_lights);
@@ -223,6 +392,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
                            14.0, 
                            0.0,
                            1.0};
+
    lights[1] = LightData{ LightType::point,
                            Vec3(0.0f),
                            Vec3(1.f,4.f,5.f),
@@ -231,6 +401,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
                            7.0,
                            0.0,
                            1.0 };
+
    lights[2] = LightData{ LightType::point,
                            Vec3(0.0f),
                            Vec3(2.f,1.f,5.f),
@@ -239,6 +410,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
                            17.0,
                            0.0,
                            1.0 };
+
    lights[3] = LightData{ LightType::point,
                            Vec3(0.0f),
                            Vec3(1.f,5.f,6.f),
@@ -247,6 +419,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
                            11.0,
                            0.0,
                            1.0 };
+
    lights[4] = LightData{ LightType::point,
                            Vec3(0.0f),
                            Vec3(3.f,3.f,1.f),
@@ -255,6 +428,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
                            2.0,
                            0.0,
                            1.0 };
+
    lights[5] = LightData{ LightType::point,
                            Vec3(0.0f),
                            Vec3(1.f,2.f,10.f),
@@ -263,6 +437,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
                            1.0,
                            0.0,
                            1.0 };
+
    lights[6] = LightData{ LightType::point,
                            Vec3(0.0f),
                            Vec3(10.f,0.f,5.f),
@@ -271,10 +446,11 @@ Int32 main( Int32 argc, char const *argv[] ) {
                            7.0,
                            0.0,
                            1.0 };
+
    lights[7] = LightData{ LightType::point,
-                           Vec3(0.0f),
-                           Vec3(10.f,5.f,10.f),
-                           Vec3(1.0f,0.3f,0.5f),
+                           Vec3(    .0f,   .0f,    .0f ),
+                           Vec3(  10.0f,  5.0f,  10.0f ),
+                           Vec3(  1.00f,  0.3f,    .5f ),
                            1.0,
                            17.0,
                            0.0,
@@ -307,7 +483,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-//myView.bind_shader_program(*shaProg);
+      //myView.bind_shader_program(*shaProg);
       // draw_camera_debug_window( cam_position, cam_rotations, fov_rad );
       // cam_transform.set_rotation( cam_rotations );
       // cam_transform.set_position( cam_position );
@@ -320,9 +496,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
       process_mouse( window, myView, delta_time_s);
       process_input( window, myView, delta_time_s );
-      
 
-      
       // glMatrixMode(GL_PROJECTION);
       // glLoadIdentity();
 
@@ -331,13 +505,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
       myView.update();
       auto view_pos = myView.get_view().get_position();
      
-      
-    
-      
       scenMan.draw(myView);
       
-      
-
       // glUseProgram(shaProg->getProgramLoc());
       // a_Mesh.render();
       auto g_buffer_data = myView.get_g_buffer();
@@ -347,7 +516,6 @@ Int32 main( Int32 argc, char const *argv[] ) {
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       glUseProgram(lightProg->getProgramLoc());
 
-      
       glActiveTexture( GL_TEXTURE0 );
       glBindTexture( GL_TEXTURE_2D, g_buffer_data.pos_tex_loc );
       glActiveTexture( GL_TEXTURE1 );
@@ -357,7 +525,6 @@ Int32 main( Int32 argc, char const *argv[] ) {
       glActiveTexture( GL_TEXTURE3 );
       glBindTexture( GL_TEXTURE_2D, g_buffer_data.alb_tex_loc ); //TODO:P Denna är den enda som gör något...
 
-      
       for ( Uint32 i = 0;  i < num_lights;  ++i ) { //TODO:P Endast en ljuskälla ger samma resultat som att använda alla...
          LightData &ld = lights[i];
          glUniform1i(  glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].type").c_str()),        ld.type);
@@ -370,11 +537,6 @@ Int32 main( Int32 argc, char const *argv[] ) {
          glUniform1f(  glGetUniformLocation(lightProg->getProgramLoc(), ("lights[" + std::to_string(i) + "].specularity").c_str()), ld.specularity );
       }
       glUniform1i( glGetUniformLocation(lightProg->getProgramLoc(), "num_lights"), num_lights );
-
-      // also send light relevant uniforms
-      
-      // SendAllLightUniformsToShader(shaderLightingPass);
-      // shaderLightingPass.setVec3("viewPos", camera.Position);
 
       glUniform3fv(glGetUniformLocation(lightProg->getProgramLoc(), "view_pos"), 1, glm::value_ptr(view_pos));
 
@@ -443,9 +605,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
      //                   GL_DEPTH_BUFFER_BIT,
      //                   GL_NEAREST );
      //glBindFramebuffer(GL_FRAMEBUFFER, 0);
-      //glUseProgram( quadProg->getProgramLoc() );
-
-
+     //glUseProgram( quadProg->getProgramLoc() );
 
       ImGui::Render();
       ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );
@@ -453,6 +613,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
       glfwMakeContextCurrent( window );
       glfwSwapBuffers( window );
 	} // main loop end
+
 
    // cleanup:
 	ImGui_ImplOpenGL3_Shutdown();
@@ -463,190 +624,3 @@ Int32 main( Int32 argc, char const *argv[] ) {
 	return 0; // successful exit   
 
 }
-
-
-
-
-bool  firstMouse   = true;
-static float yaw   = -90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
-static float pitch =  0.0f;
-static float lastX =  800.0f / 2.0;
-float lastY =  600.0 / 2.0;
-float fov   =  45.0f;
-
-void process_mouse( GLFWwindow *window, Viewport &cam, Float32 delta_time_s  ) {
-   if (!mouse_look) 
-      return;
-   
-   Float64 xPos, yPos;
-   glfwGetCursorPos( window, &xPos, &yPos );
-
-   //COPY PASTE leanopengl
-   if ( firstMouse ) {
-      lastX = xPos;
-      lastY = yPos;
-      firstMouse = false;
-   }
-
-   bool changed = lastX != xPos;
-
-   Float64 xoffset = xPos - lastX;
-   Float64 yoffset = lastY - yPos;
-   lastX = xPos;
-   lastY = yPos;   
-
-   Float64 sensitivity = 0.05;
-   xoffset *= sensitivity;
-   yoffset *= sensitivity;
-
-   yaw   += xoffset;
-   pitch += yoffset;
-
-   if (pitch > 89.0f)
-      pitch = 89.0f;
-   if (pitch < -89.0f)
-      pitch = -89.0f;
-
-   //cam.transform(Transform::make_rotation());
-
-   if (changed) {
-      cam.forward.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-      cam.forward.y = sin(glm::radians(pitch));
-      cam.forward.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-      glm::normalize(cam.forward);
-
-      // Transform rotation;
-      // rotation.look_at(front);
-      // cam.transform( rotation );
-
-      auto view = cam.get_view(); // get pos, rot, scale
-      view.look_at(cam.forward);        // set rot
-      cam.set_view(view);         // set view to cam view
-   }
-   //cameraFront = glm::normalize(g_forward);
-}
-
-
-void process_input( GLFWwindow *window, Viewport &cam, Float32 time_delta_s ) {
-   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) 
-      glfwSetWindowShouldClose(window, true);
-   if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS)
-      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-   if (glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS)
-      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-   if (glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS) {
-      mouse_look = !mouse_look;
-      if (mouse_look)
-         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-      else
-         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-   }
-   
-   Float32 move_distance = g_move_speed * time_delta_s;
-   Transform offset;
-
-   if ( glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS ) {
-      offset = Transform::make_translation(Vec3(1.0, 1.0, move_distance )* -cam.forward);
-      cam.transform( offset);
-   }
-   if ( glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS ) {
-      offset = Transform::make_translation(Vec3(-1.0, -1.0, -move_distance)* -cam.forward);
-      cam.transform(offset);
-   }
-   if ( glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS ) {
-      offset = Transform::make_translation(Vec3(move_distance , 1.0, 1.0)*glm::cross(cam.forward, Vec3(0.0, 1.0f, 0.0f)));
-      cam.transform(offset);
-   }
-   if ( glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS ) {
-      offset = Transform::make_translation(Vec3(-move_distance, -1.0, -1.0)* glm::cross( cam.forward, Vec3(0.0, 1.0f, 0.0f)));
-      cam.transform(offset);
-   }
-   if ( glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS ) {
-      offset = Transform::make_translation(Vec3(0.0, move_distance, 0.0) );
-      cam.transform(offset);
-   }
-   if ( glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS ) {
-      offset = Transform::make_translation(Vec3(0.0, -move_distance, 0.0));
-      cam.transform(offset);
-   }
-
-/*
-   if ( glfwGetKey(window, GLFW_KEY_W)            == GLFW_PRESS ) { // forward
-      cam.transform( translation * forward );
-   }
-   if ( glfwGetKey(window, GLFW_KEY_S)            == GLFW_PRESS ) { // backward
-      // auto backward = forward * Transform::make_rotation( Vec3(   0,  180,  0 ) );
-      // cam.transform( translation * backward );
-   }
-   if ( glfwGetKey(window, GLFW_KEY_A)            == GLFW_PRESS ) { // left
-      // auto left     = forward * Transform::make_rotation( Vec3(   0,  -90,  0 ) );
-      // cam.transform( translation * left );
-   }
-   if ( glfwGetKey(window, GLFW_KEY_D)            == GLFW_PRESS ) { // right
-      // auto right    = forward * Transform::make_rotation( Vec3(   0,   90,  0 ) );
-      // cam.transform( translation * right );
-   }
-   if ( glfwGetKey(window, GLFW_KEY_SPACE)        == GLFW_PRESS ) { // up
-      // auto up       = forward * Transform::make_rotation( Vec3( -90,    0,  0 ) );
-      // cam.transform( translation * up );
-   }
-   if ( glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS ) { // down
-      // auto down     = forward * Transform::make_rotation( Vec3( -90,    0,  0 ) );
-      // cam.transform( translation * down );
-   }
-*/
-}
-
-
-/*
-void process_input( GLFWwindow *window, Viewport &cam, Float32 delta ) {
-   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) 
-      glfwSetWindowShouldClose(window, true);
-   if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS)
-      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-   if (glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS)
-      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-   if (glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS) {
-      mouse_look = !mouse_look;
-      if (mouse_look)
-         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-      else
-         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-   }
-  
-   //If movement is disabled
-   if ( !mouse_look )
-      return;
-
-   // TODO: fix camera navigation
-   Float32 camspeed = g_move_speed * delta;
-   Transform offset;
-
-
-   if ( glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS ) {
-      offset = Transform::make_translation(Vec3(1.0, 1.0, camspeed )* -cam.front);
-      cam.transform( offset);
-   }
-   if ( glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS ) {
-      offset = Transform::make_translation(Vec3(-1.0, -1.0, -camspeed)* -cam.front);
-      cam.transform(offset);
-   }
-   if ( glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS ) {
-      offset = Transform::make_translation(Vec3(camspeed , 1.0, 1.0)*glm::cross(cam.front, Vec3(0.0, 1.0f, 0.0f)));
-      cam.transform(offset);
-   }
-   if ( glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS ) {
-      offset = Transform::make_translation(Vec3(-camspeed, -1.0, -1.0)* glm::cross( cam.front, Vec3(0.0, 1.0f, 0.0f)));
-      cam.transform(offset);
-   }
-   if ( glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS ) {
-      offset = Transform::make_translation(Vec3(0.0, camspeed, 0.0) );
-      cam.transform(offset);
-   }
-   if ( glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS ) {
-      offset = Transform::make_translation(Vec3(0.0, -camspeed, 0.0));
-      cam.transform(offset);
-   }
-}
-*/
-
