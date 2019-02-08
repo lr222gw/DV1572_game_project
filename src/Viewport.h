@@ -20,7 +20,7 @@ struct GBufferData {
 // TODO: uppåt vektorn baserat på normalen av ytan spelaren står på
 class Viewport {
 public:
-   Vec3  front;
+   Vec3  forward;
    
    Viewport( Vec3 position, GLFWwindow *window, Float32 fov = config::fov_rad );
    Viewport( Viewport  const &)            = delete;

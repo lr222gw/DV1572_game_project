@@ -7,7 +7,7 @@ Viewport::Viewport( Vec3 position, GLFWwindow *window, Float32 fov_rad ):
    _fov    ( fov_rad ),
    _aspect ( -1.0f   ),
    _window ( window  ),
-   front   (1.0f,1.0f,1.0f)
+   forward (0.0f,0.0f,1.0f)
 {
    // TODO: bind _camera och uniform buffer f�r Mat4
    //_model = Mat4(1.0f);
@@ -289,6 +289,7 @@ void Viewport::_g_buffer_init() {
                           GL_DEPTH_COMPONENT,
                           width,
                           height );
+
 
    // control the status of the frame buffer
    if ( glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE )

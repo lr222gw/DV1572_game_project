@@ -57,7 +57,7 @@ void main() {
       Light light = lights[i];
       if ( light.type == light_type_point ) {
       ////////////////////////////////////////////////////////////////////////////////////////
-         float radius      = light.radius;
+         float radius      = light.radius * 2.0;
          float distance    = length( light.pos - pos );
          if ( distance < radius ) {
             vec3  light_dir        = normalize( light.pos - pos );
