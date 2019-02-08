@@ -18,8 +18,6 @@
 Float32 g_move_speed            = 5.0f; // TODO: refactor away ugly globalness
 Bool    g_is_mouse_look_enabled = false;
 
-
-
 void create_demo_scene( /*...*/ ) {
    // TODO: setup the viewport camera
 
@@ -261,7 +259,6 @@ void draw_camera_debug_window( Vec3    &position,
                   ImGui::GetIO().Framerate,
                   1000.0f / ImGui::GetIO().Framerate );
    } ImGui::End(); // end our Camera window
-   assert(true);
 }
 
 

@@ -4,38 +4,44 @@
 #include "misc/defs.h"
 #include "ShaderProgram.h"
 
+
 struct Vertex {
-   glm::vec3 position;
-   glm::vec3 normal;
-   glm::vec2 uv;//texCoord
+   glm::vec3  position; // vertex local coordinate
+   glm::vec3  normal;   // vertex normal
+   glm::vec2  uv;       // texture coordinate
 };
+
 
 struct Texture {
-   GLuint id;
-   String type;
-   String path;
+   GLuint  id;   // texture ID
+   String  type; // texture type
+   String  path; // texture path
 };
 
+
+
 class Mesh {
-   friend class Model; //Ger oss tillgång till Mesh's privata
-                       //funktioner från Model klassen
-
+   friend class Model; // gives Model access to Mesh's private members
+   
+/*--------------- class member functions & operators ------------*/
 public:
-   Vector<Vertex>    vertex_list;
-   Vector<GLuint>    index_list;
-   Vector<Texture>   texture_list;
-
    Mesh(Vector<Vertex> vert_list, Vector<GLuint> index_list, Vector<Texture> texture_list) :
       vertex_list(vert_list), index_list(index_list), texture_list(texture_list) {
          _initialize_mesh();
    };
 
 private:
-   GLuint _vao,
-          _vbo,
-          _ebo;
-
    void _draw(ShaderProgram &shaderProgram);
    void _initialize_mesh();
 
+/*--------------- class member variables & constants ------------*/
+public:
+   Vector<Vertex>    vertex_list;
+   Vector<GLuint>    index_list;
+   Vector<Texture>   texture_list;
+
+private:
+   GLuint  _vao,
+           _vbo,
+           _ebo;
 };
