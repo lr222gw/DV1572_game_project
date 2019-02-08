@@ -67,8 +67,8 @@
                             using Float32      = float;
                             using Float64      = double;
 // string types:
-                            using String       = std::string;
-                            using StringView   = std::string_view;
+                            using String       = std::basic_string<char>;
+                            using StringView   = std::basic_string_view<char>;
 // stream types:
                             using Ifstream     = std::ifstream;
                             using StringStream = std::stringstream;
