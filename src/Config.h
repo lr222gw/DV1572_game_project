@@ -2,7 +2,7 @@
 
 #include "misc/defs.h"
 
-enum RenderMode : Uint32 { composite  = 0,
+enum RenderMode : Uint32 {       composite  = 0,
                                  albedo     = 1,
                                  normals    = 2,
                                  specular   = 3,
@@ -19,9 +19,9 @@ struct Config {
                               fov_rad            =  1.5708f, // 90 degrees in radians
                               start_aspect_ratio = (Float32)start_height / (Float32)start_width;
 
-   static char constexpr  shader_path[] { "dat/shaders/" };
-   static char constexpr   model_path[] { "dat/models/"  };
-   static char constexpr texture_path[] { "dat/models/"  }; //TODO: unneeded?
+   static char constexpr  shader_path[] = { "dat/shaders/" };
+   static char constexpr   model_path[] = { "dat/models/"  };
+   static char constexpr texture_path[] = { "dat/models/"  }; //TODO: unneeded?
 
 /*------------------------------ global variables -------------------------------*/
    Bool is_wireframe_mode = false; // used in SceneManager::Draw()

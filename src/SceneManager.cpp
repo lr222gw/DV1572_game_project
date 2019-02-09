@@ -45,8 +45,6 @@ void SceneManager::draw( Viewport &view ) {
    // toggle wireframe mode if config is set to true
    if ( config.is_wireframe_mode )
       glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-   else 
-      glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
    view.update();
 
@@ -58,8 +56,7 @@ void SceneManager::draw( Viewport &view ) {
    }
 
    // disabling wireframe rendering so the quad will render after the lighting pass
-   if ( config.is_wireframe_mode )
-      glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+   glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
 // 2. Lighting pass:
    glBindFramebuffer(GL_FRAMEBUFFER, 0);
