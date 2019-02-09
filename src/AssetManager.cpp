@@ -5,7 +5,7 @@ SharedPtr<Model> AssetManager::load_model(String const &filename) {
       return _loaded_models[filename].lock(); // return the shared pointer made from the weak pointer
    }
    else {         
-      String filenameAndDir = config::model_path + filename;
+      String filenameAndDir = Config::model_path + filename;
       auto model_ptr = std::make_shared<Model>(filenameAndDir);
       
       _model_is_loaded[filename] = true; // TODO: (låg prio) kommer aldrig att bli falsk; ej skalbart dynamiskt

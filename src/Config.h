@@ -1,21 +1,34 @@
 #pragma once
+
 #include "misc/defs.h"
 
-namespace config {
-   static constexpr Int32     height =  768,
-                              width  = 1024;
+enum RenderMode : Uint32 { composite  = 0,
+                                 albedo     = 1,
+                                 normals    = 2,
+                                 specular   = 3,
+                                 positional = 4  }; // TODO: emission!
 
-   static constexpr Float32   near_plane   =    0.01f,
-                              far_plane    =    200.0f,
-                              fov_rad      =    1.5708f, // 90 grader i radianer
-                              aspect_ratio = (Float32)height / (Float32)width;
+enum class FileType   { model, texture };
 
-   String const shader_path  { "dat/shaders/" };
-   String const model_path   { "dat/models/"  };
-   String const texture_path { "dat/models/"  }; //TODO: behöver vi en Texture mapp?
-};
+struct Config {
+   static constexpr Int32     start_height =  768,
+                              start_width  = 1024;
 
-enum class FileType { model, texture };
+   static constexpr Float32   near_plane         =  0.01f,
+                              far_plane          =  200.0f,
+                              fov_rad            =  1.5708f, // 90 degrees in radians
+                              start_aspect_ratio = (Float32)start_height / (Float32)start_width;
+
+   static char constexpr  shader_path[] { "dat/shaders/" };
+   static char constexpr   model_path[] { "dat/models/"  };
+   static char constexpr texture_path[] { "dat/models/"  }; //TODO: unneeded?
+
+/*------------------------------ global variables -------------------------------*/
+   Bool is_wireframe_mode = false; // used in SceneManager::Draw()
+   RenderMode render_mode = RenderMode::composite;
+
+
+} extern config; // <- our global Config instance declaration, defined in Config.cpp
 
 struct FilePath {
    // konstruktor och sådant
@@ -27,7 +40,7 @@ struct FilePath {
    String relative_path() const {    
       String path;
       switch (_type) {         
-         case FileType::texture: path += config::texture_path; break;
+         case FileType::texture: path += Config::texture_path; break;
          default: assert( false && "Unknown file type." );
       }
       path += _filename;

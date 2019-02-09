@@ -7,7 +7,7 @@ Viewport::Viewport( Vec3 position, GLFWwindow *window, Float32 fov_rad ):
    _fov    ( fov_rad ),
    _aspect ( -1.0f   ),
    _window ( window  ),
-   front   (1.0f,1.0f,1.0f)
+   forward (0.0f,0.0f,1.0f)
 {
    // TODO: bind _camera och uniform buffer f�r Mat4
    //_model = Mat4(1.0f);
@@ -39,8 +39,8 @@ void Viewport::_update_aspect_ratio() {
 void Viewport::_generate_perspective() {
    _projection = glm::perspective( _fov,
                                    _aspect,
-                                   config::near_plane,
-                                   config::far_plane );   
+                                   Config::near_plane,
+                                   Config::far_plane );   
    _write_to_buffer();
 }
 
@@ -281,7 +281,7 @@ void Viewport::_g_buffer_init() {
 
    glDrawBuffers( 4, attachments );
 
-   // Create a render buffer object for depth buffer
+// Create a render buffer object for depth buffer
 
    glBindRenderbuffer( GL_RENDERBUFFER, this->_g_buffer.depth_loc );
 
@@ -289,7 +289,13 @@ void Viewport::_g_buffer_init() {
                           GL_DEPTH_COMPONENT,
                           width,
                           height );
-   glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, this->_g_buffer.depth_loc);
+
+   // TODO: describe
+   glFramebufferRenderbuffer( GL_FRAMEBUFFER,
+                              GL_DEPTH_ATTACHMENT,
+                              GL_RENDERBUFFER,
+                              this->_g_buffer.depth_loc );
+
    // control the status of the frame buffer
    if ( glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE )
       assert( false && "G-buffer status is not complete. " );
