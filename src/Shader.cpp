@@ -6,7 +6,7 @@ Shader::Shader( char const *shader_str, Type const type ):
    // local buffer to store error strings when compiling.
    char buffer[1024];
    memset( buffer, 0, 1024 );
-   GLint compile_result = 0;
+   GLint compile_result { 0 };
 
    switch ( type ) {
       case Type::vertex:   _shader_location = glCreateShader( GL_VERTEX_SHADER   ); break;

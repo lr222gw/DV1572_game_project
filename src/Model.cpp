@@ -75,16 +75,16 @@ void Model::_load_model( String const &filename ) {
    Assimp::Importer importer; // using Assimp's importer class
    //
    // the importer loads a scene including all of the model's data:
-   //    * vertex normals
-   //    * vertices
-   //    * materials
+   //    + vertex normals
+   //    + vertices
+   //    + materials
    //    etc.
    //
    // aiProcess_Triangulate flag:
    //    converts the mesh to triangles if it contains non-tri faces (e.g. quads)
    //
    // aiProcess_FlipUVs flag:
-   //    flips UV coordinates along the Y-axis  
+   //    flips UV coordinates along the Y-axis
    //
    // Assimp also provides various other post-processing options that we don't use
 
@@ -97,7 +97,7 @@ void Model::_load_model( String const &filename ) {
 
    if ( encountered_error ) {
       assert( false && String( "[ERROR]  Assimp: "
-                               +String(importer.GetErrorString()) + "\n").c_str() );            
+                               +String(importer.GetErrorString()) + "\n").c_str() );
    }
 
    _process_node( scene->mRootNode, scene );
@@ -128,10 +128,9 @@ Mesh Model::_process_mesh( aiMesh *mesh, aiScene const *scene ) {
 
    const Uint32  face_count = mesh->mNumFaces;
    const Uint32  vert_count = mesh->mNumVertices;
-   // Vi förallokerar Lika många vertricer i a_vertex_lsit
-   // för lika många vertricer som finns i "mesh->mNumVertices"   
-   vertices.reserve(vert_count); 
 
+   // pre-allocate as many vertices as the mesh contains
+   vertices.reserve(vert_count);
    for ( Uint32 i = 0;  i < vert_count;  ++i ) {
       VertexData vertex; // our translated vertex
 
@@ -153,21 +152,23 @@ Mesh Model::_process_mesh( aiMesh *mesh, aiScene const *scene ) {
       else { // otherwise set them to zero
          vertex.uv.x = 0.0f;
          vertex.uv.y = 0.0f;
-      }           
-      
-      vertices.push_back( vertex ); // add the vertex to our vector of vertices
+      }
+
+      // add the vertex to our vector of vertices
+      vertices.push_back( vertex );
    }
 
-   indices.reserve( face_count * 3 ); // pre-allocate space for estimated minimum index count
+   // pre-allocate space for the estimated minimum index count
+   indices.reserve( face_count * 3 );
    for ( Uint32 i = 0;  i < face_count;  ++i ) {
       auto &current_face = mesh->mFaces[i];
       for ( Uint32 j = 0;  j < current_face.mNumIndices;  ++j ) {
          indices.push_back( current_face.mIndices[j] );
       }
    }
-   
-   if ( mesh->mMaterialIndex >= 0 ) {
 
+   // TODO: profile textures.reserve(...)
+   if ( mesh->mMaterialIndex >= 0 ) {
       auto *material { scene->mMaterials[mesh->mMaterialIndex] };
 
       // load diffuse maps:
@@ -192,19 +193,7 @@ Mesh Model::_process_mesh( aiMesh *mesh, aiScene const *scene ) {
       textures.insert( textures.end(), normal_maps.begin(), normal_maps.end() );
    }
 
-   // Resevera allt en gång istället för, för varje map
-   // a_texture_list.reserve(diffuseMaps.size() + specularMaps.size() + normalMaps.size());
-   // for(auto &e :diffuseMaps){
-   //    a_texture_list.push_back(e);
-   // }
-   // for (auto &e : specularMaps){
-   //    a_texture_list.push_back(e);
-   // }
-   // for (auto &e : normalMaps){
-   //    a_texture_list.push_back(e);
-   // }   
-
-   // TODO: implement more MaterialMaps based on ASSIMP's aiTextureType
+   // TODO: implement more MaterialMaps based on Assimp's aiTextureType enum values
    return Mesh( vertices, indices, textures );
 }
 
@@ -215,18 +204,18 @@ String Model::get_name() const {
 
 
 // TODO: Bryta ut "_load_material_textures" och "load_texture_from_file" till TextureHandler
-// Undvik att ladda in en textur som redan är inladdad... 
+// Undvik att ladda in en textur som redan är inladdad...
 Vector<TextureData> Model::_load_material_textures( aiMaterial    *material,
                                                     aiTextureType  type,
                                                     String         type_name ) {
    Vector<TextureData> textures;
-   
+
    for ( Uint32 i = 0;  i < material->GetTextureCount(type);  ++i ) {
       aiString model_name;
-      material->GetTexture( type, i, &model_name );      
+      material->GetTexture( type, i, &model_name );
 
       FilePath path { FileType::texture, String(model_name.C_Str()) };
-      
+
       TextureData texture;
       texture.id   = load_texture_from_file( path );
       texture.type = type_name;

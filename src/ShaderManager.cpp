@@ -12,7 +12,7 @@ SharedPtr<Shader> ShaderManager::load_shader( String const &filename  ) {
    else {
       //------------------------------------FIRST READ THE SHADER FROM FILE---------------------------//
       // declare files we need
-      Ifstream      shader_file;
+      IfStream      shader_file;
       StringStream  shader_stream;
       String        shader_code;
 
@@ -38,7 +38,7 @@ SharedPtr<Shader> ShaderManager::load_shader( String const &filename  ) {
       // create a shared pointer to the shader
       auto shader_ptr = std::make_shared<Shader>( shader_code.c_str(), type );
       // add a weak version to the loaded shaders list
-      _shader_is_loaded[filename] = true; // TODO: (låg prio) kommer aldrig att bli falsk; ej skalbart dynamiskt
+      _shader_is_loaded[filename] = true; // TODO: (low prio) will never reset--not scalable!
       _loaded_shaders[filename]   = WeakPtr<Shader>( shader_ptr );
 
       //----------------------------------------THEN RETURN-------------------------------------------//
@@ -47,49 +47,19 @@ SharedPtr<Shader> ShaderManager::load_shader( String const &filename  ) {
 }
 
 SharedPtr<ShaderProgram> ShaderManager::create_program( Vector<SharedPtr<Shader>> shaders) {
-   return std::make_shared<ShaderProgram>( shaders );   
+   return std::make_shared<ShaderProgram>( shaders );
 }
 
-/*
-[[nodiscard]] Shader const & ShaderManager::get_shader( ShaderId id ) const {
-   if ( _shaders.contains(id) )
-      return _shaders[id];
-   else throw {}; // TODO: exceptions
-}
-*/
-
-// extracts the type of a shader from a shader Id
-// by extracting the 8 leftmost bits and converting to Shader::Type enum type.
-/*
-[[nodiscard]]  Shader::Type ShaderManager::get_type( ShaderId id ) const {
-    return static_cast<Shader::Type>(id >> 56); // TODO: if it doesn't work, use dynamic_cast
-}
-*/
-
-  // Maintains a static Id counter that determines the next Id.
-  // Embeds the shader type category into the Id by masking the 8 leftmost bits.
-   /*
-  [[nodiscard]]  ShaderId ShaderManager::_generate_shader_id( Shader::Type type ) {
-      static ShaderId next_id { 1 };
-      return (type << 56) & next_id++;
-  }
-  */
-
-  /*
-  [[nodiscard]]  ShaderProgramId ShaderManager::_generate_shader_program_id() {
-      static ShaderProgramId next_id { 1 };
-      return next_id++;
-  }
-  */
- 
- 
 Shader::Type ShaderManager::_extract_type( StringView filename ) const {
-      auto extension = filename.substr( filename.find_last_of(".") + 1) ;
+      auto extension = filename.substr( filename.find_last_of(".") + 1 ) ;
       if      ( extension == "vert" )
           return Shader::Type::vertex;
       else if ( extension == "geom" )
           return Shader::Type::geometry;
       else if ( extension == "frag" )
           return Shader::Type::fragment;
-      else assert(false && "Unaccounted for Shader-extension"); return Shader::Type::error; // TODO: exceptions
+      else {
+         assert(false && "Unaccounted for Shader-extension");
+         return Shader::Type::error;
+      }
   }

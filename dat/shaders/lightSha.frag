@@ -37,7 +37,7 @@ uniform uint  num_lights;
 uniform uint  render_mode;
 uniform vec3  view_pos;
 
-void main() {             
+void main() {
    // retrieve data from gbuffer
    vec3  pos      = texture( g_tex_pos,    uv_fs ).rgb;
    vec3  norm     = texture( g_tex_norm,   uv_fs ).rgb;
@@ -59,8 +59,7 @@ void main() {
          lighting = albedo * 0.2 + vec3(0.05); // start off with ambient light
          for ( int i = 0;  i  < num_lights;  ++i ) {
          Light light = lights[i];
-         // TODO: take one array of each light type and have a loop for each instead?
-         if ( light.type == point_light_t ) {
+         if ( light.type == point_light_t ) { // TODO: take one array of each light type and have a loop for each instead
             ////////////////////////////////////////////////////////////////////////////////////////
             float radius   = light.radius * 100.0;
             float distance = length( light.pos - pos );
@@ -81,6 +80,11 @@ void main() {
                lighting              += spec_impact + diffuse_impact; // TODO: emission (+ emit_rgb)
                // TODO: HDR output?
             }
+
+
+
+
+
             /*
             vec3  light_dir   = normalize( light.pos - pos );
             float light_dist  = length(    light.pos - pos ) / radius;
@@ -108,7 +112,7 @@ void main() {
          else if ( light.type == spot_light_t ) {
             lighting = vec3(1.0, 0.0, 1.0 ); // TODO
          }
-         else { // light.type == directional_light_t 
+         else { // light.type == directional_light_t
             lighting = vec3(1.0, 0.0, 1.0 ); // TODO
          }
       } break; // end of mode_omposite case

@@ -1,24 +1,22 @@
 #include "ShaderProgram.h"
 
-ShaderProgram::ShaderProgram( Vector<SharedPtr<Shader>> const &shader_ptrs):
-   _shader_ptrs(shader_ptrs)
+ShaderProgram::ShaderProgram( Vector<SharedPtr<Shader>> const &shader_ptrs ):
+   _shader_ptrs ( shader_ptrs )
 {
-   // local buffer to store error strings when compiling.
+   // local buffer to store error strings during compilation
    char buffer[1024];
-   memset(buffer, 0, 1024);
-
-   //initializer();
+   memset( buffer, 0, 1024 );
 
    _program_location = glCreateProgram();
 
    for (auto &shader_ptr : shader_ptrs)
-      glAttachShader(_program_location, shader_ptr->get_location());
+      glAttachShader( _program_location, shader_ptr->get_location() );
 
-   glLinkProgram(_program_location);
+   glLinkProgram( _program_location );
 
-   
+
    auto compile_result = GL_FALSE;
-   glGetProgramiv(_program_location, GL_LINK_STATUS, &compile_result);
+   glGetProgramiv( _program_location, GL_LINK_STATUS, &compile_result );
 
    if (compile_result == GL_FALSE) {
       // query information about the compilation (nothing if compilation went fine!)
@@ -26,15 +24,10 @@ ShaderProgram::ShaderProgram( Vector<SharedPtr<Shader>> const &shader_ptrs):
       glGetProgramInfoLog( _program_location, 1024, nullptr, buffer );
       std::cout << buffer;
       assert( false && "[ERROR]: Shader program compilation failed." );
-      // OutputDebugStringA(buffer);
-   }   
+   }
 
    // förvarar en modellinstans transform
-   _transform_location = glGetUniformLocation(_program_location, "model_transform");
-
-
-  // auto id = _generate_shader_program_id();
-  // _shader_programs[id] = _program_location;
+   _transform_location = glGetUniformLocation( _program_location, "model_transform" );
 }
 
 GLuint ShaderProgram::get_location() const {
@@ -42,15 +35,13 @@ GLuint ShaderProgram::get_location() const {
 }
 
 GLuint ShaderProgram::get_transform_location() const {
-   
-   return _transform_location; // används i ModelInstance::draw() för att föra över instansens
-   // lokals transform till shader programmen så att modellen kan transformeras till korrekt
-   // globala position samt rotation osv. i slutändan.
+   return _transform_location; // used in ModelInstance::draw() to transfer the model
+   // instance's "local space"-to"global space"-transform to the shader program
 }
 
 ShaderProgram::~ShaderProgram() {
-   for (auto &shader_ptr : _shader_ptrs)
-      glDetachShader(_program_location, shader_ptr->get_location());
+   for ( auto &shader_ptr : _shader_ptrs )
+      glDetachShader( _program_location, shader_ptr->get_location() );
 
-   glDeleteProgram(_program_location);
+   glDeleteProgram( _program_location );
 }

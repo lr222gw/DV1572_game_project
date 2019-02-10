@@ -35,6 +35,7 @@ all: compiledb
 # generate compile database (compile_commands.json) silently & filtered
 compiledb:
 	@compiledb make resources $(TARGET) -s
+	@printf "\n"
 
 # remake
 remake: fullclean all
@@ -63,10 +64,10 @@ fullclean: clean
 $(TARGET): $(OBJECTS)
 	$(CC) -o $(TARGETDIR)/$(TARGET) $^ $(LIB)
 
-# compile
+# compile -- ANSI version: @printf "Compiling '\e[4;93m%s\e[24;0m'\n" $<
 $(BUILDDIR)/%.$(OBJEXT): $(SRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(dir $@)
-	@printf "Compiling '\e[4;93m%s\e[24;0m'\n" $<
+	@printf "Compiling '%s'\n" $<
 	@$(CC) $(CFLAGS) $(INC) -c -o $@ $<
 	@$(CC) $(CFLAGS) $(INCDEP) -MM $(SRCDIR)/$*.$(SRCEXT) > $(BUILDDIR)/$*.$(DEPEXT)
 	@cp -f $(BUILDDIR)/$*.$(DEPEXT) $(BUILDDIR)/$*.$(DEPEXT).tmp

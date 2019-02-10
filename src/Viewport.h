@@ -3,7 +3,6 @@
 #include "misc/defs.h"
 #include "Config.h"
 #include "ShaderProgram.h"
-
 #include "Transform.h"
 
 struct GBufferData {

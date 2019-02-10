@@ -38,7 +38,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/quaternion.hpp>
 
-#include "stb_image.h" 
+#include "stb_image.h"
 
 
 // unsigned integer types:
@@ -70,7 +70,7 @@
                             using String       = std::basic_string<char>;
                             using StringView   = std::basic_string_view<char>;
 // stream types:
-                            using Ifstream     = std::ifstream;
+                            using IfStream     = std::ifstream;
                             using StringStream = std::stringstream;
 // index type:
                             using Index        = int;

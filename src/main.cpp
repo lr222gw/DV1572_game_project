@@ -25,9 +25,9 @@ void create_demo_scene( /*...*/ ) {
    //auto statue_handle = assets.load_model( "12330_Statue_v1_L2.obj" );
 
    // create 9 statues arranged thusly:
-   //   0  1  2    
-   //   3  4  5   
-   //   6  7  8    
+   //   0  1  2
+   //   3  4  5
+   //   6  7  8
    for ( int i=0;  i<9;  ++i ) {
       glm::vec3 position { i/3, i%3, 0 };
       //auto instance_id = scene.add_object( statue_handle, position );
@@ -36,7 +36,7 @@ void create_demo_scene( /*...*/ ) {
 
 
 
-	
+
 [[nodiscard]] String lowercase( char const *base ) {
    String s ( base );
    std::transform( s.begin(), s.end(), s.begin(), ::tolower );
@@ -46,7 +46,7 @@ void create_demo_scene( /*...*/ ) {
 [[nodiscard]] String uppercase( char const *base ) {
    String s ( base );
    std::transform( s.begin(), s.end(), s.begin(), ::toupper );
-   return s;   
+   return s;
 }
 
 
@@ -63,9 +63,9 @@ void process_mouse( GLFWwindow *window, Viewport &cam, Float32 delta_time_s  ) {
 
    Float64 x_pos, y_pos;
 
-   if ( !g_is_mouse_look_enabled ) 
+   if ( !g_is_mouse_look_enabled )
       return;
-   
+
    glfwGetCursorPos( window, &x_pos, &y_pos );
 
    if ( first_mouse ) {
@@ -79,7 +79,7 @@ void process_mouse( GLFWwindow *window, Viewport &cam, Float32 delta_time_s  ) {
    Float64 x_offset = x_pos - last_x;
    Float64 y_offset = last_y - y_pos;
    last_x = x_pos;
-   last_y = y_pos;   
+   last_y = y_pos;
 
    Float64 sensitivity = 0.05;
    x_offset *= sensitivity;
@@ -110,7 +110,7 @@ void process_mouse( GLFWwindow *window, Viewport &cam, Float32 delta_time_s  ) {
 void process_input( GLFWwindow *window, Viewport &cam, Float32 time_delta_s ) {
    glfwSetInputMode( window, GLFW_STICKY_KEYS, 1 );
 
-   if ( glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS )  
+   if ( glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS )
       glfwSetWindowShouldClose(window, true);
 
    if ( glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS ) {
@@ -143,7 +143,7 @@ void process_input( GLFWwindow *window, Viewport &cam, Float32 time_delta_s ) {
 //      config.render_mode = RenderMode::emission; // TODO!
 
 
-   
+
    Float32 move_distance = g_move_speed * time_delta_s;
    Transform offset;
 
@@ -156,6 +156,7 @@ void process_input( GLFWwindow *window, Viewport &cam, Float32 time_delta_s ) {
       cam.transform(offset);
    }
    if ( glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS ) {
+      offset = Transform::make_translation(Vec3(move_distance, 1.0, 1.0)* glm::cross( cam.forward, Vec3(0.0, 1.0f, 0.0f)));
       cam.transform(offset);
    }
    if ( glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS ) {
@@ -203,7 +204,7 @@ void process_input( GLFWwindow *window, Viewport &cam, Float32 time_delta_s ) {
 
 /*
 void process_input( GLFWwindow *window, Viewport &cam, Float32 delta ) {
-   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) 
+   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
       glfwSetWindowShouldClose(window, true);
    if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS)
       glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -216,7 +217,7 @@ void process_input( GLFWwindow *window, Viewport &cam, Float32 delta ) {
       else
          glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
    }
-  
+
    //If movement is disabled
    if ( !mouse_look )
       return;
@@ -368,15 +369,15 @@ Int32 main( Int32 argc, char const *argv[] ) {
    SharedPtr<Model> nanosuit_model = asset_manager.load_model( "nanosuit.obj" );
 
    Vector<SharedPtr<ModelInstance>> model_instances;
-   model_instances.reserve( 9 );
-   for ( auto i=0;  i<9;  ++i ) {
-      Float32 n = 9;
+   model_instances.reserve( 64 );
+   for ( auto i=0;  i<64;  ++i ) {
+      Float32 n = 9; // spacing
       model_instances.push_back(
          scene_manager.instantiate_model( nanosuit_model,
                                           geometry_program,
-                                          Transform( Vec3( n*(i/3),  0.0f,  n*(i%3) ),
-                                                     Vec3(    0.0f,  0.0f,     0.0f ),
-                                                     Vec3(    1.3f,  1.3f,     1.3f ) ) ) );
+                                          Transform( Vec3( n*(i/8)-40,  0.0f,  n*(i%8)-40 ),
+                                                     Vec3(       0.0f,  0.0f,        0.0f ),
+                                                     Vec3(       1.3f,  1.3f,        1.3f ) ) ) );
    }
 
    /* TODO */ Vec3       cam_rotations {  0.0f,   0.0f,   0.0f };
@@ -393,24 +394,24 @@ Int32 main( Int32 argc, char const *argv[] ) {
    /* TODO */ //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
    glUseProgram( lighting_program->get_location() );
-   
+
    glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_pos"    ), 0 );
    glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_norm"   ), 1 );
    glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_spec"   ), 2 );
    glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_albedo" ), 3 );
    // TODO: emission map
-   
+
    Uint32 const num_lights { 8 };
    glUniform1i( lighting_program->get_location(), num_lights );
 
    LightData lights[light_capacity];
 
-   lights[0] = LightData{ LightType::point, 
-                          Vec3(  0.0f,   0.0f,   0.0f ), 
+   lights[0] = LightData{ LightType::point,
+                          Vec3(  0.0f,   0.0f,   0.0f ),
                           Vec3( 10.0f,  10.0f,  10.0f ),
-                          Vec3(  1.0f,   0.0f,   0.0f ), 
+                          Vec3(  1.0f,   0.0f,   0.0f ),
                            1.0,
-                          14.0, 
+                          14.0,
                            0.0,
                            1.0 };
 
@@ -479,7 +480,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
    Uint32  quad_vao = 0;
    Uint32  quad_vbo;
-   
+
 // glDisable( GL_BLEND );
 // main loop:
 	while ( !glfwWindowShouldClose(window) ) {
@@ -513,18 +514,18 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
       // glMatrixMode( GL_PROJECTION );
       // glLoadIdentity();
-      
+
       glUseProgram( geometry_program->get_location() );
       // TODO: we bind the shader program to the glUseProgram before sending the view_pos...
       view.update();
       auto view_pos = view.get_view().get_position();
-     
+
       scene_manager.draw( view );
-      
+
       // glUseProgram(shaProg->get_location());
       // a_Mesh.render();
       auto g_buffer_data { view.get_g_buffer() };
-      
+
       // glUseProgram( lightProg->get_location() );
       glClearColor( 0.0f, 0.0f, 0.0f, 1.0f ); // ( 0.4f, 0.6, 1.0, 1.0f );
       glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -598,7 +599,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
       glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
 
       glBindVertexArray( 0 );
-      
+
       ImGui::Render();
       ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );
       // float dt_time_s = ImGui::GetIO().DeltaTime; // UNUSED TODO
@@ -613,5 +614,5 @@ Int32 main( Int32 argc, char const *argv[] ) {
 	ImGui::DestroyContext();
 	glfwDestroyWindow( window );
 	glfwTerminate(); // close OpenGL window & terminate GLFW
-	return 0; // successful exit   
+	return 0; // successful exit
 }
