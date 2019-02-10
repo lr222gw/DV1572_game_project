@@ -268,3 +268,5 @@ __pycache__/
 *imgui.ini
 ./*imgui.ini
 *.exe
+/*.dll
+/*.out
