@@ -50,7 +50,7 @@ void main() {
 
    vec3 lighting;
 
-   switch ( render_mode )  {
+   switch ( render_mode ) {
       case mode_albedo:      lighting = albedo;   break;
       case mode_normals:     lighting = norm;     break;
       case mode_specular:    lighting = spec_rgb; break; // TODO: check texture channels

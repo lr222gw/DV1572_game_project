@@ -1,86 +1,107 @@
 #include "Mesh.h"
 
-//Mesh::Mesh(Vector<Vertex> vertex_list, Vector<Uint32> index_list, Vector<Texture> texture_list) {
-//
-//}
-
 void Mesh::_initialize_mesh() {
-
-   glGenVertexArrays(1, &_vao);
-   glGenBuffers(1, &_vbo);
-   glGenBuffers(1, &_ebo);
+   glGenVertexArrays( 1, &_vao );
+   glGenBuffers(      1, &_vbo );
+   glGenBuffers(      1, &_ebo );
    
-   glBindVertexArray(_vao);
-   glBindBuffer(GL_ARRAY_BUFFER, _vbo);
+   glBindVertexArray( _vao );
+   glBindBuffer( GL_ARRAY_BUFFER, _vbo );
 
-   glBufferData(GL_ARRAY_BUFFER, vertex_list.size() * sizeof(Vertex), &vertex_list[0], GL_STATIC_DRAW);
+   glBufferData( GL_ARRAY_BUFFER,
+                 _vertex_list.size() * sizeof(VertexData),
+                 &_vertex_list[0],
+                 GL_STATIC_DRAW );
+
+   glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, _ebo );
    
-   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ebo);
-   glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_list.size() * sizeof(GLuint), &index_list[0], GL_STATIC_DRAW);
+   glBufferData( GL_ELEMENT_ARRAY_BUFFER,
+                 _index_list.size() * sizeof(GLuint),
+                 &_index_list[0],
+                 GL_STATIC_DRAW );
 
-   //Attributes för Vertex Strukten; Position, Normal och TexturKoordinat
-   //Position
+   // attributes for VertexData struct: position, normal, UV
+
+   // position
    glEnableVertexAttribArray(0);
-   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, position));
-                      //0 indicates that this is the first Element of a Struct, 
-   //Normal
+   glVertexAttribPointer( 0, // 0 indicates that this is the first element of the struct
+                          3, // no. dimensions (position = Vec3)
+                          GL_FLOAT,
+                          GL_FALSE,
+                          sizeof(VertexData),
+                          (GLvoid*)offsetof(VertexData, position) );
+                      
+   // normal
    glEnableVertexAttribArray(1);
-   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, normal));
-                      //1 indicates that this is the second element of  the struct
-   //TextureKoordinat
+   glVertexAttribPointer( 1, // 1 indicates that this is the second element of the struct
+                          3, // no. dimensions (normal = Vec3)
+                          GL_FLOAT,
+                          GL_FALSE,
+                          sizeof(VertexData),
+                          (GLvoid*)offsetof(VertexData, normal) );
+                      
+   // texture
    glEnableVertexAttribArray(2);
-   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, uv));
-                     //2 indicates that this is the third element of  the struct
+   glVertexAttribPointer( 2, // 2 indicates that this is the third element of the struct
+                          2, // no. dimensions (UV = Vec2)
+                          GL_FLOAT,
+                          GL_FALSE, sizeof(VertexData),
+                          (GLvoid*)offsetof(VertexData, uv) );
+
    glBindVertexArray(0);
 }
 
-void Mesh::_draw(ShaderProgram &shader_program) {
-   GLuint diffuseNr = 1;
-   GLuint specularNr = 1;
-   GLuint normalNr = 1;
-   glUseProgram(shader_program.getProgramLoc());
-   for (Uint32 i = 0; i < this->texture_list.size(); i++) {
+void Mesh::_draw( ShaderProgram &shader_program ) {
+   GLuint diff_num = 0;
+   GLuint spec_num = 0;
+   GLuint norm_num = 0;
+
+   glUseProgram( shader_program.get_location() );
+
+   for ( Uint32 i = 0;  i < _texture_list.size();  ++i ) {
       
-      //ställa in vilken Textur vi jobbar på, vi kan högst ha 32 (eller 16?)
-      glActiveTexture(GL_TEXTURE0 + i); 
-         // varv 1; i = 0; GL_TEXTURE0 + i = GL_TEXTURE0;;; varv 2; i = 1 ; GL_TEXTURE0 + i = GL_TEXTURE1, osv.
+      // ställa in vilken Textur vi jobbar på, vi kan högst ha 32 (eller 16?)  TODO
+      glActiveTexture( GL_TEXTURE0 + i ); 
+      // varv 1; i = 0; GL_TEXTURE0 + i = GL_TEXTURE0;;; varv 2; i = 1 ; GL_TEXTURE0 + i = GL_TEXTURE1, osv. TODO
 
-      //Vi hämtar datan 
-      std::stringstream ss; 
-      String number;
-      String name = this->texture_list[i].type; 
+      // fetch the data
+      StringStream  stream; 
+      String        number;
+      String        name    = _texture_list[i].type; 
 
-      if ("tex_diff" == name) {
-         ss << diffuseNr++;
-      }
-      else if ("tex_spec" == name) {
-         ss << specularNr++;
-      }
-      else if ("tex_norm" == name) {
-         ss << normalNr++;
-      }
+      if      ( "tex_diff" == name )
+         stream  <<  ++diff_num;
+      else if ( "tex_spec" == name )
+         stream  <<  ++spec_num;
+      else if ( "tex_norm" == name )
+         stream  <<  ++norm_num;
 
-      number = ss.str();
+      number = stream.str();
       
-      glUniform1i(glGetUniformLocation(shader_program.getProgramLoc(), (name + number).c_str()), i);
-      glBindTexture(GL_TEXTURE_2D, this->texture_list[i].id);
+      glUniform1i(glGetUniformLocation( shader_program.get_location(),
+                                        (name + number).c_str()),
+                                        i );
+      glBindTexture( GL_TEXTURE_2D,
+                     _texture_list[i].id );
    }
 
-   //glUniform1f(glGetUniformLocation(shader_program.getProgramLoc(), "material.shininess"), 16.0f);
+   // glUniform1f( glGetUniformLocation(shader_program.get_location(), "material.shininess" ), 16.0f); TODO
+   glBindVertexArray( _vao );
 
-   glBindVertexArray(this->_vao);
-   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->_ebo);
-   glDrawElements(GL_TRIANGLES,this->index_list.size(), GL_UNSIGNED_INT, 0);
-   //glDrawArrays(GL_TRIANGLES, this->vertex_list[0].position.x, GL_UNSIGNED_INT);
+   glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, _ebo );
+
+   glDrawElements( GL_TRIANGLES,
+                   _index_list.size(),
+                   GL_UNSIGNED_INT,
+                   0);
+
+   // glDrawArrays( GL_TRIANGLES, this->vertex_list[0].position.x, GL_UNSIGNED_INT ); TODO
    
-   ////Bind OpenGL till standard värderna...
+   // bind OpenGL to standard values
    glBindVertexArray(0);
-   for (GLuint i = 0; i < this->texture_list.size(); i++) {
-   
-      glActiveTexture(GL_TEXTURE0+i);
-      glBindTexture(GL_TEXTURE_2D,0);
-   
+
+   for ( GLuint i = 0;  i < _texture_list.size();  ++i ) {
+      glActiveTexture( GL_TEXTURE0 + i );
+      glBindTexture( GL_TEXTURE_2D, 0 );
    }
-
 }
-

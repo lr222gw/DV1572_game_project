@@ -15,7 +15,8 @@
 constexpr Uint32 light_capacity = 32;
 
 //TODO: extract to own file
-enum LightType : Uint32 { point = 0, spot = 1, directional = 2 };
+enum   LightType : Uint32 { point = 0, spot = 1, directional = 2 };
+
 struct LightData {
    LightType   type;
 
@@ -36,27 +37,19 @@ public:
       SharedPtr<ShaderProgram>  shader_program,
       Transform const &         transform);
 
-   // NOTE! should only be used by Light's constructor (TODO: private+friend?)
-   void add_light( Uint64 id, LightData data );
-
-   LightData get_light_data( Uint64 id ) const;
-
-   void set_light_data( Uint64 id, LightData data );
-
-   // NOTE! should only be used by Light's destructor (TODO: private+friend?)
-   void remove_light( Uint64 id );
-
-   void draw( Viewport &view );
-
-   void draw_debug_scene_inspection();
+   void       add_light( Uint64 id, LightData data );
+   LightData  get_light_data( Uint64 id ) const; // NOTE! should only be used by Light's constructor (TODO: private+friend?)
+   void       set_light_data( Uint64 id, LightData data );
+   void       remove_light( Uint64 id );         // NOTE! should only be used by Light's destructor (TODO: private+friend?)
+   void       draw( Viewport &view );
+   void       draw_debug_scene_inspection();
 
 private:
 
    Uint32 _find_light_index( Uint64 id ) const;
 
    Vector<WeakPtr<ModelInstance>>  _instances;
-
    Array<LightData,light_capacity> _light_data;
-   Array<Uint64,light_capacity>    _ids; // used to ensure the correct removal of lights
+   Array<Uint64,light_capacity>    _ids;        // used to ensure the correct removal of lights
    Uint32                          _num_lights; // how much of the light capacity is used
 };

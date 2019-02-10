@@ -22,10 +22,10 @@ ShaderProgram::ShaderProgram( Vector<SharedPtr<Shader>> const &shader_ptrs):
 
    if (compile_result == GL_FALSE) {
       // query information about the compilation (nothing if compilation went fine!)
-      memset(buffer, 0, 1024);
+      memset( buffer, 0, 1024 );
       glGetProgramInfoLog( _program_location, 1024, nullptr, buffer );
-      // print to Visual Studio debug console output
-      assert(false && buffer);// TODO: ersätt med assert(...)
+      std::cout << buffer;
+      assert( false && "[ERROR]: Shader program compilation failed." );
       // OutputDebugStringA(buffer);
    }   
 
@@ -37,7 +37,7 @@ ShaderProgram::ShaderProgram( Vector<SharedPtr<Shader>> const &shader_ptrs):
   // _shader_programs[id] = _program_location;
 }
 
-GLuint ShaderProgram::getProgramLoc() const {
+GLuint ShaderProgram::get_location() const {
    return _program_location;
 }
 

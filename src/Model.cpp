@@ -46,15 +46,24 @@ Uint32 load_texture_from_file( FilePath path ) {
 
       glGenerateMipmap( GL_TEXTURE_2D );
 
-      glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
-      glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-      glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
-      glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-   }
-   else {
-      //TODO: FMT bibliotek här, sträng hantering?
-      assert( false && String("Error While Loading Texture using \"load_texture_from_file\": " + path.relative_path() + " \n").c_str() );
-   }
+      glTexParameteri( GL_TEXTURE_2D,
+                       GL_TEXTURE_WRAP_S,
+                       GL_REPEAT );
+
+      glTexParameteri( GL_TEXTURE_2D,
+                       GL_TEXTURE_WRAP_T,
+                       GL_REPEAT );
+
+      glTexParameteri( GL_TEXTURE_2D,
+                       GL_TEXTURE_MIN_FILTER,
+                       GL_LINEAR_MIPMAP_LINEAR );
+
+      glTexParameteri( GL_TEXTURE_2D,
+                       GL_TEXTURE_MAG_FILTER,
+                       GL_LINEAR );
+   } // TODO: use {fmt} here for formatting?
+   else assert( false && String( "Error while trying to load texture from file using:"
+                                 "load_texture_from_file( "+ path.relative_path() +"). ").c_str() );
 
    stbi_image_free( image_data );
 
@@ -79,11 +88,16 @@ void Model::_load_model( String const &filename ) {
    //
    // Assimp also provides various other post-processing options that we don't use
 
-   aiScene const *scene = importer.ReadFile( filename,    aiProcess_Triangulate | aiProcess_FlipUVs );
+   auto const *scene = importer.ReadFile( filename,
+                                          aiProcess_Triangulate | aiProcess_FlipUVs );
 
-   Bool encountered_error = !scene || (scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) || !scene->mRootNode;
+   Bool encountered_error =  !scene
+                          || (scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE)
+                          || !scene->mRootNode;
+
    if ( encountered_error ) {
-      assert( false && String( "[ERROR]  Assimp: " + String(importer.GetErrorString()) + "\n").c_str() );            
+      assert( false && String( "[ERROR]  Assimp: "
+                               +String(importer.GetErrorString()) + "\n").c_str() );            
    }
 
    _process_node( scene->mRootNode, scene );
@@ -92,7 +106,7 @@ void Model::_load_model( String const &filename ) {
 
 void Model::_process_node( aiNode *node,  aiScene const *scene ) {
    for ( Uint32 i = 0;  i < node->mNumMeshes;  ++i ) {    // for each mesh,
-      aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];    // extract the mesh
+      auto *mesh = scene->mMeshes[node->mMeshes[i]];      // extract the mesh
       _mesh_list.push_back( _process_mesh(mesh, scene) ); // and process it
    }
 
@@ -108,9 +122,9 @@ void Model::draw( ShaderProgram &shader_program ) {
 
 
 Mesh Model::_process_mesh( aiMesh *mesh, aiScene const *scene ) {
-   Vector<Vertex>   vertices;
-   Vector<GLuint>   indices;
-   Vector<Texture>  textures;
+   Vector<VertexData>   vertices;
+   Vector<GLuint>       indices;
+   Vector<TextureData>  textures;
 
    const Uint32  face_count = mesh->mNumFaces;
    const Uint32  vert_count = mesh->mNumVertices;
@@ -119,72 +133,62 @@ Mesh Model::_process_mesh( aiMesh *mesh, aiScene const *scene ) {
    vertices.reserve(vert_count); 
 
    for ( Uint32 i = 0;  i < vert_count;  ++i ) {
-      // vi binder en referens till en av de vertricerna vi
-      // förallkorat; 
-      Vertex vertex;
-      // sen sätter vi värden för Position, Normal och uv
-      // på den Vertexen i Listan...
+      VertexData vertex; // our translated vertex
 
+      // extract position of vertex:
       vertex.position  = { mesh->mVertices[i].x ,
                            mesh->mVertices[i].y ,
                            mesh->mVertices[i].z };
 
+      // extract normal of vertex:
       vertex.normal    = { mesh->mNormals[i].x ,
                            mesh->mNormals[i].y ,
                            mesh->mNormals[i].z };
 
-      // Innehåller vår mesh textures över huvudtaget?
-      if ( mesh->mTextureCoords[0] ) {
-         vertex.uv  = { mesh->mTextureCoords[0][i].x ,
+      // check whether mesh contains textures:
+      if ( mesh->mTextureCoords[0] ) {  // if it does, extract UV-coords
+         vertex.uv  = { mesh->mTextureCoords[0][i].x,
                         mesh->mTextureCoords[0][i].y };
       }
-      else {
+      else { // otherwise set them to zero
          vertex.uv.x = 0.0f;
          vertex.uv.y = 0.0f;
       }           
       
-      vertices.push_back( vertex );
+      vertices.push_back( vertex ); // add the vertex to our vector of vertices
    }
 
-   // En loop som går igenom Totala antalet Indicies
-   // Vi behöver veta då vi vill förallokera storleken av vår
-   //  a_index_list
-   // Uint32 nmrOfIndiciesTotal = 0;
-   // for (Uint32 i = 0; i < nmrFaces; i++) {
-   //    for (Uint32 j = 0; j < mesh->mFaces[i].mNumIndices; j++) {
-   //       nmrOfIndiciesTotal++;
-   //    }
-   // }
-   
-   // a_index_list.reserve(nmrOfIndiciesTotal);
-   // Uint32 counter = 0; 
+   indices.reserve( face_count * 3 ); // pre-allocate space for estimated minimum index count
    for ( Uint32 i = 0;  i < face_count;  ++i ) {
-      for ( Uint32 j = 0; j < mesh->mFaces[i].mNumIndices; ++j ) {
-         // Då vi allokerat index-listan kan vi köra följande rad         
-         indices.push_back( mesh->mFaces[i].mIndices[j] );
+      auto &current_face = mesh->mFaces[i];
+      for ( Uint32 j = 0;  j < current_face.mNumIndices;  ++j ) {
+         indices.push_back( current_face.mIndices[j] );
       }
    }
    
    if ( mesh->mMaterialIndex >= 0 ) {
 
-      aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
+      auto *material { scene->mMaterials[mesh->mMaterialIndex] };
 
       // load diffuse maps:
-      Vector<Texture> diffuse_maps = _load_material_textures( material,
-                                                              aiTextureType_DIFFUSE,
-                                                              "tex_diff");
+      Vector<TextureData> diffuse_maps = _load_material_textures( material,
+                                                                  aiTextureType_DIFFUSE,
+                                                                  "tex_diff");
+
       textures.insert( textures.end(), diffuse_maps.begin(), diffuse_maps.end() );
 
       // load specular maps:
-      Vector<Texture> specular_maps = _load_material_textures( material,
-                                                               aiTextureType_SPECULAR,
-                                                               "tex_spec");
+      Vector<TextureData> specular_maps = _load_material_textures( material,
+                                                                   aiTextureType_SPECULAR,
+                                                                   "tex_spec");
+
       textures.insert( textures.end(), specular_maps.begin(), specular_maps.end() );
 
       // load normal maps:
-      Vector<Texture> normal_maps = _load_material_textures( material,
-                                                             aiTextureType_NORMALS,
-                                                             "tex_norm");
+      Vector<TextureData> normal_maps = _load_material_textures( material,
+                                                                 aiTextureType_NORMALS,
+                                                                 "tex_norm");
+
       textures.insert( textures.end(), normal_maps.begin(), normal_maps.end() );
    }
 
@@ -200,7 +204,7 @@ Mesh Model::_process_mesh( aiMesh *mesh, aiScene const *scene ) {
    //    a_texture_list.push_back(e);
    // }   
 
-   // Implement more MaterialMaps based on ASSIMP's aiTextureType's (Enums) 
+   // TODO: implement more MaterialMaps based on ASSIMP's aiTextureType
    return Mesh( vertices, indices, textures );
 }
 
@@ -212,24 +216,23 @@ String Model::get_name() const {
 
 // TODO: Bryta ut "_load_material_textures" och "load_texture_from_file" till TextureHandler
 // Undvik att ladda in en textur som redan är inladdad... 
-Vector<Texture> Model::_load_material_textures( aiMaterial *material, aiTextureType type, String type_name ) {
-   Vector<Texture> texture_list;
+Vector<TextureData> Model::_load_material_textures( aiMaterial    *material,
+                                                    aiTextureType  type,
+                                                    String         type_name ) {
+   Vector<TextureData> textures;
    
    for ( Uint32 i = 0;  i < material->GetTextureCount(type);  ++i ) {
-      aiString str;
-      material->GetTexture( type, i, &str );      
+      aiString model_name;
+      material->GetTexture( type, i, &model_name );      
 
-//    GLboolean skip = false; // V: oanvänd, så bortkommenterad
-
-      String path_to_file = Config::model_path + String(str.C_Str());
-      FilePath path { FileType::texture, String(str.C_Str()) };
+      FilePath path { FileType::texture, String(model_name.C_Str()) };
       
-      Texture texture;
-      texture.id   = load_texture_from_file(path);
+      TextureData texture;
+      texture.id   = load_texture_from_file( path );
       texture.type = type_name;
       texture.path = path.relative_path();
-      texture_list.push_back(texture);
+      textures.push_back( texture );
    }
 
-   return texture_list;
+   return textures;
 }

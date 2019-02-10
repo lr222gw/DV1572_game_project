@@ -26,7 +26,7 @@ public:
    // TODO: (low priority) make constructor private and make make_shared a friend
    ShaderProgram( Vector<SharedPtr<Shader>> const &shader_ptrs );
    //initializer list finns i .cpp filen
-   GLuint getProgramLoc() const;
+   GLuint get_location() const;
    ~ShaderProgram();
 
    GLuint get_transform_location() const;

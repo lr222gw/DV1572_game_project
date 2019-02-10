@@ -32,9 +32,9 @@ OBJECTS     := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.$(OBJE
 # default make
 all: compiledb
 
-# generate compile database (compile_commands.json)
+# generate compile database (compile_commands.json) silently & filtered
 compiledb:
-	@compiledb make resources $(TARGET)
+	@compiledb make resources $(TARGET) -s
 
 # remake
 remake: fullclean all
@@ -66,7 +66,8 @@ $(TARGET): $(OBJECTS)
 # compile
 $(BUILDDIR)/%.$(OBJEXT): $(SRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) $(INC) -c -o $@ $<
+	@printf "Compiling '\e[4;93m%s\e[24;0m'\n" $<
+	@$(CC) $(CFLAGS) $(INC) -c -o $@ $<
 	@$(CC) $(CFLAGS) $(INCDEP) -MM $(SRCDIR)/$*.$(SRCEXT) > $(BUILDDIR)/$*.$(DEPEXT)
 	@cp -f $(BUILDDIR)/$*.$(DEPEXT) $(BUILDDIR)/$*.$(DEPEXT).tmp
 	@sed -e 's|.*:|$(BUILDDIR)/$*.$(OBJEXT):|' < $(BUILDDIR)/$*.$(DEPEXT).tmp > $(BUILDDIR)/$*.$(DEPEXT)

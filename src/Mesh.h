@@ -5,14 +5,14 @@
 #include "ShaderProgram.h"
 
 
-struct Vertex {
+struct VertexData {
    glm::vec3  position; // vertex local coordinate
    glm::vec3  normal;   // vertex normal
    glm::vec2  uv;       // texture coordinate
 };
 
 
-struct Texture {
+struct TextureData {
    GLuint  id;   // texture ID
    String  type; // texture type
    String  path; // texture path
@@ -25,22 +25,27 @@ class Mesh {
 
 /*--------------- class member functions & operators ------------*/
 public:
-   Mesh(Vector<Vertex> vert_list, Vector<GLuint> index_list, Vector<Texture> texture_list) :
-      vertex_list(vert_list), index_list(index_list), texture_list(texture_list) {
+   Mesh( Vector<VertexData>   vertex_list,
+         Vector<GLuint>       index_list,
+         Vector<TextureData>  texture_list )
+   :
+      _vertex_list  ( vertex_list  ),
+      _index_list   ( index_list   ),
+      _texture_list ( texture_list )
+   {
          _initialize_mesh();
-   };
+   }
 
 private:
-   void _draw(ShaderProgram &shaderProgram);
+   void _draw( ShaderProgram & );
    void _initialize_mesh();
 
 /*--------------- class member variables & constants ------------*/
-public:
-   Vector<Vertex>    vertex_list;   // TODO: make private?
-   Vector<GLuint>    index_list;    // TODO: make private?
-   Vector<Texture>   texture_list;  // TODO: make private?
-
 private:
+   Vector<VertexData>    _vertex_list;
+   Vector<GLuint>        _index_list;
+   Vector<TextureData>   _texture_list;
+
    GLuint  _vao,
            _vbo,
            _ebo;

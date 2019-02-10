@@ -78,7 +78,7 @@ void Viewport::set_fov(Float32 fov_rad) {
 }
 
 void Viewport::bind_shader_program(ShaderProgram &shapro) {
-   _location = shapro.getProgramLoc();
+   _location = shapro.get_location();
    _generate_perspective();
    _write_to_buffer();
 }

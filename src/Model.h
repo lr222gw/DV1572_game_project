@@ -10,9 +10,9 @@
 
 class Model {
 public:
-   Model(String const &filename);
+   Model( String const &filename );
 
-   Vector<Texture> &get_texture_list() {
+   Vector<TextureData> &get_texture_list() {
       return _texture_list;
    }
 
@@ -22,17 +22,19 @@ public:
 
    String get_name() const;
 
-   void draw(ShaderProgram &shaderProgram);
+   void draw( ShaderProgram & );
 
 private:
-   String const    _name;
-   Vector<Texture> _texture_list;
-   Vector<Mesh>    _mesh_list;
+   String const         _name;
+   Vector<TextureData>  _texture_list;
+   Vector<Mesh>         _mesh_list;
 
-   void _process_node(aiNode *node, const aiScene *scene);
-   Mesh _process_mesh(aiMesh *mesh, const aiScene *scene);
-   void _load_model(String const &filename);
+   void _process_node( aiNode *, const aiScene * );
+   Mesh _process_mesh( aiMesh *, const aiScene * );
+   void _load_model( String const &filename );
 
    //TODO: bryta ut till egenklass för textur hantering?
-   Vector<Texture> _load_material_textures(aiMaterial *material, aiTextureType type, String type_name);
+   Vector<TextureData> _load_material_textures( aiMaterial *,
+                                                aiTextureType,
+                                                String  type_name );
 };
