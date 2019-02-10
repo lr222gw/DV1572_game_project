@@ -12,7 +12,7 @@ Viewport::Viewport( Vec3 position, GLFWwindow *window, Float32 fov_rad ):
    // TODO: bind _camera and uniform buffer for Mat4
    //_model = Mat4(1.0f);
    // validate
-   _g_buffer = GBufferData{0,0,0,0,0,0};
+   _g_buffer = GBufferData{ 0,0,0,0,0,0 };
    _view = Transform( position );
 
    _update_aspect_ratio();
@@ -54,11 +54,11 @@ void Viewport::set_view( Transform const &transform ) {
    _write_to_buffer();
 }
 
-Transform Viewport::get_view() const {
+[[nodiscard]] Transform Viewport::get_view() const {
    return _view;
 }
 
-GBufferData const &Viewport::get_g_buffer() const {
+[[nodiscard]] GBufferData const &Viewport::get_g_buffer() const {
    return _g_buffer;
 }
 
@@ -67,8 +67,8 @@ void Viewport::set_fov(Float32 fov_rad) {
    _generate_perspective();
 }
 
-void Viewport::bind_shader_program(ShaderProgram &shapro) {
-   _location = shapro.get_location();
+void Viewport::bind_shader_program( ShaderProgram &shader_program ) {
+   _location = shader_program.get_location();
    _generate_perspective();
    _write_to_buffer();
 }

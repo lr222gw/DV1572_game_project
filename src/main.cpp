@@ -602,7 +602,6 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
       ImGui::Render();
       ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );
-      // float dt_time_s = ImGui::GetIO().DeltaTime; // UNUSED TODO
       glfwMakeContextCurrent( window );
       glfwSwapBuffers( window );
 	} // main loop end

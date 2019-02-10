@@ -14,7 +14,7 @@
 
 constexpr Uint32 light_capacity = 32;
 
-//TODO: extract to own file
+// TODO: extract to own file?
 enum   LightType : Uint32 { point = 0, spot = 1, directional = 2 };
 
 struct LightData {
@@ -37,12 +37,12 @@ public:
       SharedPtr<ShaderProgram>  shader_program,
       Transform const &         transform);
 
-   void       add_light( Uint64 id, LightData data );
-   LightData  get_light_data( Uint64 id ) const; // NOTE! should only be used by Light's constructor (TODO: private+friend?)
-   void       set_light_data( Uint64 id, LightData data );
-   void       remove_light( Uint64 id );         // NOTE! should only be used by Light's destructor (TODO: private+friend?)
-   void       draw( Viewport &view );
-   void       draw_debug_scene_inspection();
+   void                    add_light( Uint64 id, LightData );
+   [[nodiscard]] LightData get_light_data( Uint64 id ) const; // NOTE! should only be used by Light's constructor (TODO: private+friend?)
+   void                    set_light_data( Uint64 id, LightData );
+   void                    remove_light( Uint64 id );         // NOTE! should only be used by Light's destructor (TODO: private+friend?)
+   void                    draw( Viewport & );
+   void                    draw_debug_scene_inspection();
 
 private:
 

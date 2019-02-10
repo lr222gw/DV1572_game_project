@@ -30,28 +30,30 @@ struct Config {
 
 } extern config; // <- our global Config instance declaration, defined in Config.cpp
 
+// TODO: split into source
 struct FilePath {
    // konstruktor och sådant
    FilePath( FileType type, String filename ):
       _type     ( type     ),
       _filename ( filename )
    {}
-   // TODO: fundera över att spara som c-sträng istället... 
-   String relative_path() const {    
+
+   [[nodiscard]] String relative_path() const {
       String path;
-      switch (_type) {         
+      switch (_type) {
          case FileType::texture: path += Config::texture_path; break;
+         // TODO: model case
          default: assert( false && "Unknown file type." );
       }
       path += _filename;
       return path;
    }
 
-   String filename() {
+   [[nodiscard]] String filename() {
       return _filename;
    }
 private:
-   // TODO: två pekare till samma Cstring
+   // TODO: (low prio) use a single C-string with two pointers instead
    FileType _type;
    String   _filename;
 };

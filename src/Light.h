@@ -61,13 +61,13 @@ public:
    Light&     operator=( Light const  & ) = delete; // TODO: ?
    Light&     operator=( Light       && ) = delete;
 
-   LightData  get_data() const;
-   void       set_data( LightData const & );
+   [[nodiscard]] LightData  get_data() const;
+   void                     set_data( LightData const & );
 
-   Uint64     get_id() const;
+   [[nodiscard]] Uint64     get_id() const;
 
 private:
-   Uint64 _generate_id() const;
+   [[nodiscard]] Uint64    _generate_id() const;
 
    Uint64        _id;
    SceneManager &_scene;

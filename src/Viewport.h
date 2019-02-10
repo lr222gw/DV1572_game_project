@@ -26,32 +26,32 @@ public:
    Viewport& operator=( Viewport const & ) = delete;
    Viewport& operator=( Viewport && )      = delete;
 
-   void               transform( Transform const & );
-   void               set_view(  Transform const & );
-   Transform          get_view()     const;
-   GBufferData const& get_g_buffer() const;
-   void               bind_shader_program( ShaderProgram & );
-   void               set_fov( Float32 fov_in_radians );
-   void               update();
-   void _g_buffer_init(); // TODO: make private again
+   void                             transform( Transform const & );
+   void                             set_view(  Transform const & );
+   [[nodiscard]] Transform          get_view()     const;
+   [[nodiscard]] GBufferData const& get_g_buffer() const;
+   void                             bind_shader_program( ShaderProgram & );
+   void                             set_fov( Float32 fov_in_radians );
+   void                             update();
+   void                             _g_buffer_init(); // TODO: make private
 
 private:
-   void _write_to_buffer();
-   void _update_aspect_ratio();
-   void _generate_perspective();
+   void  _write_to_buffer();
+   void  _update_aspect_ratio();
+   void  _generate_perspective();
 
 /*--------------- class member variables & constants ------------*/
 private:
    // TODO: (low priority) -- use Transform for projection as well?
-   GBufferData _g_buffer;
-   Float32     _fov;
-   Float32     _aspect;
-   GLint       _width;
-   GLint       _height;
-   Transform   _view;
-   Mat4        _projection;
-   GLFWwindow *_window;
-   GLuint      _location;
+   GBufferData  _g_buffer;
+   Float32      _fov;
+   Float32      _aspect;
+   GLint        _width;
+   GLint        _height;
+   Transform    _view;
+   Mat4         _projection;
+   GLFWwindow  *_window;
+   GLuint       _location;
 
 public:
    Vec3  forward; // TODO: refactor away

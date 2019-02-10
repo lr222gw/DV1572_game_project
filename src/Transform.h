@@ -69,12 +69,12 @@ public:
 
    ~Transform() {}
 
-   Mat4 get_transform() const;
+   [[nodiscard]] Mat4 get_transform() const;
 
    Transform &operator=( Transform const  &other );
    Transform &operator=( Transform       &&other );
 
-   Transform operator*( Transform const &right_hand_side ) const;
+   [[nodiscard]] Transform operator*( Transform const &right_hand_side ) const;
    void operator*=(     Transform const &right_hand_side );
 
    void set_position( Vec3 const &offset );
@@ -91,21 +91,20 @@ public:
 
    void set_scale( Vec3 const &scale );
    void scale(     Vec3 const &scale );
- 
+
 
    // creates Transforms that exclusively translates, rotates, or scales
    // basically alternative constructors
-   static Transform make_translation( Vec3 const &offset );
-   static Transform make_rotation(    Vec3 const &euler_angles );
-   static Transform make_rotation(    Mat4 const &rotation_matrix );
-   static Transform make_rotation(    Vec3 const &axis, Float32 angle_rad );
-   static Transform make_scale(       Vec3 const &scale );
+   [[nodiscard]] static Transform make_translation( Vec3 const &offset );
+   [[nodiscard]] static Transform make_rotation(    Vec3 const &euler_angles );
+   [[nodiscard]] static Transform make_rotation(    Mat4 const &rotation_matrix );
+   [[nodiscard]] static Transform make_rotation(    Vec3 const &axis, Float32 angle_rad );
+   [[nodiscard]] static Transform make_scale(       Vec3 const &scale );
 
-   Vec3 get_position() const;
-   Mat4 get_rotation() const;
-   Vec3 get_scale()    const;
-
-   Vec3 get_euler_angles() const;
+   [[nodiscard]] Vec3 get_position()     const;
+   [[nodiscard]] Mat4 get_rotation()     const;
+   [[nodiscard]] Vec3 get_scale()        const;
+   [[nodiscard]] Vec3 get_euler_angles() const;
 
 private:
    void _update_matrix();
@@ -126,7 +125,7 @@ public:
 
 // Transform move_up = Transform::make_translation(...);
 // myView.transform( rotation );
-// 
+//
 // auto view = myView.get_view();
 // view.translate(...);
 // myView.set_view(view);

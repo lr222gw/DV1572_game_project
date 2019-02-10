@@ -22,10 +22,10 @@ public:
    void draw();
    void transform( Transform const &transform ); // TODO: move semantics
    void set_transform( Transform const &transform ); // TODO: move semantics
-   SharedPtr<Model const> get_model() const;
+   [[nodiscard]] SharedPtr<Model const> get_model() const;
 
 private:
-   // i ShaderInstance har vi två klassfält   
+   // i ShaderInstance har vi två klassfält
    SharedPtr<Model>          _model;
    SharedPtr<ShaderProgram>  _shader_program;
    Transform                 _transform;
@@ -40,14 +40,14 @@ public:
 //
 //class SceneManager; < -funktion: instantiera modeller som laddats in via AssetManager samt rendrera ?
 //
-////Todo; 
+////Todo;
 //   //-Implementera AssetManager, Se till att Importering av Modell-filer genom Assimp Fungerar (Insperation kolla på Shadermanager)
-//         //LoadModel() 
+//         //LoadModel()
 //   //-Implementera Model-klassen
 //         //Mesh    Struct
 //         //Texture Struct
 //
-//   //ViewPort Klassen; Render Via Scene, skicka in "view" 
+//   //ViewPort Klassen; Render Via Scene, skicka in "view"
 //         //Viewport view;
 //         //SceneManager scene;
 //         //
@@ -79,7 +79,7 @@ public:
 //
 //   void render( Float32 delta_t ) {
 //      // TODO:
-//      //    måste rendrera via _model 
+//      //    måste rendrera via _model
 //      //    men ta hänsyn till instansens attribut (t.ex. position)
 //   }
 //
