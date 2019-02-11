@@ -139,6 +139,16 @@ Mat4 Transform::get_rotation() const {
    return _rotation;
 }
 
+//Vec3 Transform::get_rotation_vec3() const
+//{
+//   Vec4 rotation_vector(1.0f,1.0,1.0,0.0);
+//
+//   Mat4 rotation_matrix = this->get_rotation();
+//   //rotation_vector.x  = 
+//
+//   return rotationmatrix;
+//}
+
 Vec3 Transform::get_scale() const {
    return _scale;
 }

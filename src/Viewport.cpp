@@ -14,6 +14,7 @@ Viewport::Viewport( Vec3 position, GLFWwindow *window, Float32 fov_rad ):
    // validate
    _g_buffer = GBufferData{ 0,0,0,0,0,0 };
    _view = Transform( position );
+   //_view.get_rotation()
 
    _update_aspect_ratio();
    _write_to_buffer();

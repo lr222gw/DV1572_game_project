@@ -103,6 +103,7 @@ public:
 
    [[nodiscard]] Vec3 get_position()     const;
    [[nodiscard]] Mat4 get_rotation()     const;
+   //[[nodiscard]] Vec3 get_rotation_vec3()     const;
    [[nodiscard]] Vec3 get_scale()        const;
    [[nodiscard]] Vec3 get_euler_angles() const;
 

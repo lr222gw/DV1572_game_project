@@ -65,14 +65,14 @@ void process_mouse( GLFWwindow *window, Viewport &cam, Float32 delta_time_s  ) {
 
    Float64 x_pos, y_pos;
 
-   if ( !g_is_mouse_look_enabled )
-      return;
+
 
    glfwGetCursorPos( window, &x_pos, &y_pos );
 
    if ( first_mouse ) {
-      last_x = x_pos;
-      last_y = y_pos;
+      
+      last_x = cam.forward.x;
+      last_y = cam.forward.y;
       first_mouse = false;
    }
 
@@ -80,8 +80,11 @@ void process_mouse( GLFWwindow *window, Viewport &cam, Float32 delta_time_s  ) {
 
    Float64 x_offset = x_pos - last_x;
    Float64 y_offset = last_y - y_pos;
-   //last_x = x_pos;
-   //last_y = y_pos;
+   last_x = x_pos;
+   last_y = y_pos;
+
+   if (!g_is_mouse_look_enabled)
+      return;
 
    Float64 sensitivity = 0.05;
    x_offset *= sensitivity;
@@ -462,7 +465,6 @@ Int32 main( Int32 argc, char const *argv[] ) {
    /* TODO */ //TODO: remove when we dont want to se dogass
    /* TODO */ Transform rotate_deg180 = view.get_view();
    /* TODO */ rotate_deg180.rotate_deg( Vec3( 0.0f, 1.0f, 0.0f ), 180.0f );
-   /* TODO */ view.set_view( rotate_deg180 );
    /* TODO */ view._g_buffer_init();
    /* TODO */ //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
