@@ -444,8 +444,13 @@ Int32 main( Int32 argc, char const *argv[] ) {
                            0.0,
                            1.0  }) };
    SharedPtr<Model> nanosuit_model = asset_manager.load_model( "nanosuit.obj" );
+   //SharedPtr<Model> isle = asset_manager.load_model("Small Tropical Island.obj");
 
    Vector<SharedPtr<ModelInstance>> model_instances;
+   //model_instances.push_back(scene_manager.instantiate_model(isle,geometry_program, Transform(Vec3(1*(2 / 8) -40, 150.0f, 2*(2 % 8) - 40),
+   //   Vec3(0.0f, 0.0f, 0.0f),
+   //   Vec3(.3f, .3f, .3f))));
+
    model_instances.reserve( 64 );
    for ( auto i=0;  i<64;  ++i ) {
       Float32 n = 9; // spacing

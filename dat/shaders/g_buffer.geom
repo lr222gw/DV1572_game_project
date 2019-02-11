@@ -12,6 +12,9 @@ out vec3 pos_fs;
 out vec3 nor_fs;
 
 uniform vec3 view_pos;
+uniform mat4 view;
+uniform mat4 model_transform;
+uniform mat4 projection;
 
 void main(void){
 
@@ -44,15 +47,18 @@ void main(void){
 
 	//vec3 vect1 = (gl_in[2].gl_Position.xyz - gl_in[0].gl_Position.xyz);
 	//vec3 vect2 = (gl_in[1].gl_Position.xyz - gl_in[0].gl_Position.xyz);
-	//
+	
 	//float area = (1/2) * length(cross( vect2, vect1));
-	vec3 vect1 = gl_in[0].gl_Position.xyz;
-	vec3 vect2 = gl_in[1].gl_Position.xyz;
-	vec3 vect3 = gl_in[2].gl_Position.xyz;
-	//float area = (((vect1.x * vect2.y) - (vect1.y * vect2.x)) + ((vect2.x * vect3.y) - (vect2.y * vect3.x)) + ((vect3.x * vect1.y)-(vect3.y * vect1.x)))/2;
-	float area = (((vect1.x * vect2.y) - (vect1.y * vect2.x)) + ((vect2.x * vect3.y) - (vect2.y * vect3.x)) + ((vect3.x * vect1.y)-(vect3.y * vect1.x)));
 
-	if(area > 0.0 ){
+	vec4 viewPos = projection * view * vec4(view_pos,1) ; 
+	viewPos.z =  view_pos.z -1500.0f; // if "-1000" is smaller, More artifacts...
+	vec3 vector_a =   normalize(viewPos.xyz) - (gl_in[0].gl_Position.xyz);
+	//vec3 normal = cross((gl_in[2].gl_Position.xyz - gl_in[0].gl_Position.xyz),(gl_in[1].gl_Position.xyz - gl_in[0].gl_Position.xyz));
+	vec3 normal = cross( (gl_in[2].gl_Position.xyz - gl_in[0].gl_Position.xyz), (gl_in[1].gl_Position.xyz - gl_in[0].gl_Position.xyz));
+	float result = max(dot(normalize(normal), vector_a ), 0);
+
+	 
+	if(result > 0.0 ){
 	    gl_Position = gl_in[0].gl_Position;
 		//gs_color = vs_color[0];
 		uv_fs = uv_gs[0];
