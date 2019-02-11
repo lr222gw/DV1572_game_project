@@ -475,7 +475,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_albedo" ), 3 );
    // TODO: emission map
 
- 
+   //glEnable(GL_CULL_FACE);
 
 // glDisable( GL_BLEND );
 // main loop:

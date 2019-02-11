@@ -34,12 +34,15 @@ void main(void){
 	//float sumTotal = sum_1+sum_2+sum_3;
 	//if(sumTotal < 0.001 ){
 
+	//Possible solution
+	vec3 viewPos = view_pos; 
+	viewPos.z =  view_pos.z -1000.0f;
+	vec3 vector_a =   normalize(viewPos.xyz) - (gl_in[0].gl_Position.xyz);
+	//vec3 normal = cross((gl_in[2].gl_Position.xyz - gl_in[0].gl_Position.xyz),(gl_in[1].gl_Position.xyz - gl_in[0].gl_Position.xyz));
+	vec3 normal = cross( (gl_in[2].gl_Position.xyz - gl_in[0].gl_Position.xyz), (gl_in[1].gl_Position.xyz - gl_in[0].gl_Position.xyz));
+	float result = max(dot(normalize(normal), vector_a ), 0);
 
-	vec3 vector_a =  normalize( (gl_in[0].gl_Position.xyz) - (view_pos.xyz));
-	vec3 normal = (cross(((gl_in[1].gl_Position.xyz - gl_in[0].gl_Position.xyz)), (gl_in[2].gl_Position.xyz - gl_in[0].gl_Position.xyz)));
-	float result = max(dot(vector_a, normal), 0);
-
-	if(result <= 0 ){
+	if(result > 0.0 ){
 	    gl_Position = gl_in[0].gl_Position;
 		//gs_color = vs_color[0];
 		uv_fs = uv_gs[0];
