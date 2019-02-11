@@ -17,6 +17,9 @@ SharedPtr<ModelInstance> SceneManager::instantiate_model(
 
 void SceneManager::draw( Viewport &view ) {
    auto &g_buffer = view.get_g_buffer(); // test
+
+   glUseProgram(this->_geometry_pass_shader->get_location());
+
    glBindFramebuffer( GL_FRAMEBUFFER, g_buffer.buffer_loc );
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -25,6 +28,7 @@ void SceneManager::draw( Viewport &view ) {
       glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
    view.update();
+   auto view_pos = view.get_view().get_position();
 
 // 1. Geometry Pass:
    // TODO: sortera instanserna efter ShaderProgram m.h.a. std::partition()
@@ -38,6 +42,171 @@ void SceneManager::draw( Viewport &view ) {
 // 2. Lighting pass:
    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
    // TODO: refactor lighting pass code here
+
+   glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // ( 0.4f, 0.6, 1.0, 1.0f );
+   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+   glUseProgram(this->_light_pass_shader->get_location());
+
+   ////////////////////
+   Uint32 const num_lights{ 8 };
+   glUniform1i(this->_light_pass_shader->get_location(), num_lights);
+
+   LightData lights[light_capacity];
+
+   lights[0] = LightData{ LightType::point,
+                          Vec3(0.0f,   0.0f,   0.0f),
+                          Vec3(10.0f,  10.0f,  10.0f),
+                          Vec3(1.0f,   0.0f,   0.0f),
+                           1.0,
+                          14.0,
+                           0.0,
+                           1.0 };
+
+   lights[1] = LightData{ LightType::point,
+                          Vec3(0.0f,  0.0f,  0.0f),
+                          Vec3(1.0f,  4.0f,  5.0f),
+                          Vec3(1.0f,  1.0f,  0.0f),
+                          1.0,
+                          7.0,
+                          0.0,
+                          1.0 };
+
+   lights[2] = LightData{ LightType::point,
+                          Vec3(0.0f,  0.0f,  0.0f),
+                          Vec3(2.0f,  1.0f,  5.0f),
+                          Vec3(1.0f,  0.0f,  1.0f),
+                           1.0,
+                          17.0,
+                           0.0,
+                           1.0 };
+
+   lights[3] = LightData{ LightType::point,
+                          Vec3(0.0f,  0.0f,  0.0f),
+                          Vec3(1.0f,  5.0f,  6.0f),
+                          Vec3(0.0f,  1.0f,  0.0f),
+                           1.0,
+                          11.0,
+                           0.0,
+                           1.0 };
+
+   lights[4] = LightData{ LightType::point,
+                          Vec3(0.0f,  0.0f,  1.0f),
+                          Vec3(3.0f,  3.0f,  1.0f),
+                          Vec3(0.0f,  1.0f,  1.0f),
+                          1.0,
+                          2.0,
+                          0.0,
+                          1.0 };
+
+   lights[5] = LightData{ LightType::point,
+                          Vec3(0.0f,  0.0f,   0.0f),
+                          Vec3(1.0f,  2.0f,  10.0f),
+                          Vec3(0.0f,  0.0f,   1.0f),
+                          1.0,
+                          1.0,
+                          0.0,
+                          1.0 };
+
+   lights[6] = LightData{ LightType::point,
+                          Vec3(0.0f,  0.0f,  0.0f),
+                          Vec3(10.0f,  0.0f,  5.0f),
+                          Vec3(1.0f,  1.0f,  1.0f),
+                          1.0,
+                          7.0,
+                          0.0,
+                          1.0 };
+
+   lights[7] = LightData{ LightType::point,
+                          Vec3(0.0f,  0.0f,   0.0f),
+                          Vec3(10.0f,  5.0f,  10.0f),
+                          Vec3(1.0f,  0.3f,   0.5f),
+                           1.0,
+                          17.0,
+                           0.0,
+                           1.0 };
+
+   Uint32 static  quad_vao = 0;
+   Uint32 static  quad_vbo;
+   //////////////////////
+
+
+   // glUseProgram(shaProg->get_location());
+      // a_Mesh.render();
+   auto g_buffer_data{ view.get_g_buffer() };
+
+   // glUseProgram( lightProg->get_location() );
+
+
+   glActiveTexture(GL_TEXTURE0);
+   glBindTexture(GL_TEXTURE_2D, g_buffer_data.pos_tex_loc);
+   glActiveTexture(GL_TEXTURE1);
+   glBindTexture(GL_TEXTURE_2D, g_buffer_data.nor_tex_loc);
+   glActiveTexture(GL_TEXTURE2);
+   glBindTexture(GL_TEXTURE_2D, g_buffer_data.spe_tex_loc);
+   glActiveTexture(GL_TEXTURE3);
+   glBindTexture(GL_TEXTURE_2D, g_buffer_data.alb_tex_loc); //TODO:P Denna är den enda som gör något...
+
+   for (Uint32 i = 0; i < num_lights; ++i) { //TODO:P Endast en ljuskälla ger samma resultat som att använda alla...
+      LightData &ld = lights[i];
+      glUniform1ui(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].type").c_str()), ld.type);
+      glUniform3fv(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].dir").c_str()), 1, glm::value_ptr(ld.direction));
+      glUniform3fv(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].pos").c_str()), 1, glm::value_ptr(ld.position));
+      glUniform3fv(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].rgb").c_str()), 1, glm::value_ptr(ld.color));
+      glUniform1f(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].intensity").c_str()), ld.intensity);
+      glUniform1f(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].radius").c_str()), ld.radius);
+      glUniform1f(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].degree").c_str()), ld.degree);
+      glUniform1f(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].specularity").c_str()), ld.specularity);
+   }
+   glUniform1ui(glGetUniformLocation(this->_light_pass_shader->get_location(), "num_lights"), num_lights);
+   glUniform3fv(glGetUniformLocation(this->_light_pass_shader->get_location(), "view_pos"), 1, glm::value_ptr(view_pos));
+   glUniform1ui(glGetUniformLocation(this->_light_pass_shader->get_location(), "render_mode"), (Uint32)config.render_mode);
+
+   if (0 == quad_vao) {
+      Float32 quad_verts[] = {
+         //   X      Y     Z       U     V
+            -1.0f,  1.0f, 0.0f,   0.0f, 1.0f,
+            -1.0f, -1.0f, 0.0f,   0.0f, 0.0f,
+             1.0f,  1.0f, 0.0f,   1.0f, 1.0f,
+             1.0f, -1.0f, 0.0f,   1.0f, 0.0f,
+      };
+
+      // setup plane VAO
+      glGenVertexArrays(1, &quad_vao);
+      glGenBuffers(1, &quad_vbo);
+      glBindVertexArray(quad_vao);
+
+      glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
+
+      glBufferData(GL_ARRAY_BUFFER,
+         sizeof(quad_verts),
+         &quad_verts,
+         GL_STATIC_DRAW);
+
+      glEnableVertexAttribArray(0);
+
+      glVertexAttribPointer(0,
+         3,
+         GL_FLOAT,
+         GL_FALSE,
+         5 * sizeof(Float32),
+         (void*)0);
+
+      glEnableVertexAttribArray(1);
+
+      glVertexAttribPointer(1,
+         2,
+         GL_FLOAT,
+         GL_FALSE,
+         5 * sizeof(Float32),
+         (void*)(3 * sizeof(Float32)));
+   }
+   glBindVertexArray(quad_vao);
+
+   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+   glBindVertexArray(0);
+
+
 }
 
 
@@ -95,9 +264,10 @@ void SceneManager::draw_debug_scene_inspection() {
    } ImGui::End(); // end our Inspection window
 }
 
-SceneManager::SceneManager(SharedPtr<ShaderProgram> lightPass)
+SceneManager::SceneManager(SharedPtr<ShaderProgram> geo_pass, SharedPtr<ShaderProgram> light_pass)
 {   
-   this->_light_pass_shader = lightPass;
+   this->_geometry_pass_shader = geo_pass;
+   this->_light_pass_shader = light_pass;
 }
 
 

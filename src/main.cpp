@@ -371,7 +371,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
    auto geometry_program      { shader_manager.create_program({ geometry_frag_shader, geometry_vert_shader }) };
    auto lighting_program      { shader_manager.create_program({ lighting_frag_shader, lighting_vert_shader }) };
 
-   SceneManager  scene_manager{ lighting_program };
+   //Add Lightning program to Scenemanager
+   SceneManager  scene_manager{ geometry_program, lighting_program };
 
    SharedPtr<Model> nanosuit_model = asset_manager.load_model( "nanosuit.obj" );
 
@@ -408,85 +409,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_albedo" ), 3 );
    // TODO: emission map
 
-   Uint32 const num_lights { 8 };
-   glUniform1i( lighting_program->get_location(), num_lights );
-
-   LightData lights[light_capacity];
-
-   lights[0] = LightData{ LightType::point,
-                          Vec3(  0.0f,   0.0f,   0.0f ),
-                          Vec3( 10.0f,  10.0f,  10.0f ),
-                          Vec3(  1.0f,   0.0f,   0.0f ),
-                           1.0,
-                          14.0,
-                           0.0,
-                           1.0 };
-
-   lights[1] = LightData{ LightType::point,
-                          Vec3( 0.0f,  0.0f,  0.0f ),
-                          Vec3( 1.0f,  4.0f,  5.0f ),
-                          Vec3( 1.0f,  1.0f,  0.0f ),
-                          1.0,
-                          7.0,
-                          0.0,
-                          1.0 };
-
-   lights[2] = LightData{ LightType::point,
-                          Vec3( 0.0f,  0.0f,  0.0f ),
-                          Vec3( 2.0f,  1.0f,  5.0f ),
-                          Vec3( 1.0f,  0.0f,  1.0f ),
-                           1.0,
-                          17.0,
-                           0.0,
-                           1.0 };
-
-   lights[3] = LightData{ LightType::point,
-                          Vec3( 0.0f,  0.0f,  0.0f ),
-                          Vec3( 1.0f,  5.0f,  6.0f ),
-                          Vec3( 0.0f,  1.0f,  0.0f ),
-                           1.0,
-                          11.0,
-                           0.0,
-                           1.0 };
-
-   lights[4] = LightData{ LightType::point,
-                          Vec3( 0.0f,  0.0f,  1.0f ),
-                          Vec3( 3.0f,  3.0f,  1.0f ),
-                          Vec3( 0.0f,  1.0f,  1.0f ),
-                          1.0,
-                          2.0,
-                          0.0,
-                          1.0 };
-
-   lights[5] = LightData{ LightType::point,
-                          Vec3( 0.0f,  0.0f,   0.0f ),
-                          Vec3( 1.0f,  2.0f,  10.0f ),
-                          Vec3( 0.0f,  0.0f,   1.0f ),
-                          1.0,
-                          1.0,
-                          0.0,
-                          1.0 };
-
-   lights[6] = LightData{ LightType::point,
-                          Vec3(  0.0f,  0.0f,  0.0f ),
-                          Vec3( 10.0f,  0.0f,  5.0f ),
-                          Vec3(  1.0f,  1.0f,  1.0f ),
-                          1.0,
-                          7.0,
-                          0.0,
-                          1.0 };
-
-   lights[7] = LightData{ LightType::point,
-                          Vec3(   0.0f,  0.0f,   0.0f ),
-                          Vec3(  10.0f,  5.0f,  10.0f ),
-                          Vec3(   1.0f,  0.3f,   0.5f ),
-                           1.0,
-                          17.0,
-                           0.0,
-                           1.0 };
-
-   Uint32  quad_vao = 0;
-   Uint32  quad_vbo;
+ 
 
 // glDisable( GL_BLEND );
 // main loop:
@@ -522,90 +445,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
       // glMatrixMode( GL_PROJECTION );
       // glLoadIdentity();
 
-      glUseProgram( geometry_program->get_location() );
-      // TODO: we bind the shader program to the glUseProgram before sending the view_pos...
-      view.update();
-      auto view_pos = view.get_view().get_position();
-
       scene_manager.draw( view );
-
-      // glUseProgram(shaProg->get_location());
-      // a_Mesh.render();
-      auto g_buffer_data { view.get_g_buffer() };
-
-      // glUseProgram( lightProg->get_location() );
-      glClearColor( 0.0f, 0.0f, 0.0f, 1.0f ); // ( 0.4f, 0.6, 1.0, 1.0f );
-      glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-      glUseProgram( lighting_program->get_location() );
-
-      glActiveTexture( GL_TEXTURE0 );
-      glBindTexture(   GL_TEXTURE_2D, g_buffer_data.pos_tex_loc );
-      glActiveTexture( GL_TEXTURE1 );
-      glBindTexture(   GL_TEXTURE_2D, g_buffer_data.nor_tex_loc );
-      glActiveTexture( GL_TEXTURE2 );
-      glBindTexture(   GL_TEXTURE_2D, g_buffer_data.spe_tex_loc );
-      glActiveTexture( GL_TEXTURE3 );
-      glBindTexture(   GL_TEXTURE_2D, g_buffer_data.alb_tex_loc ); //TODO:P Denna är den enda som gör något...
-
-      for ( Uint32 i = 0;  i < num_lights;  ++i ) { //TODO:P Endast en ljuskälla ger samma resultat som att använda alla...
-         LightData &ld = lights[i];
-         glUniform1ui( glGetUniformLocation(lighting_program->get_location(), ("lights[" + std::to_string(i) + "].type").c_str()),        ld.type);
-         glUniform3fv( glGetUniformLocation(lighting_program->get_location(), ("lights[" + std::to_string(i) + "].dir").c_str()),         1, glm::value_ptr(ld.direction));
-         glUniform3fv( glGetUniformLocation(lighting_program->get_location(), ("lights[" + std::to_string(i) + "].pos").c_str()),         1, glm::value_ptr(ld.position));
-         glUniform3fv( glGetUniformLocation(lighting_program->get_location(), ("lights[" + std::to_string(i) + "].rgb").c_str()),         1, glm::value_ptr(ld.color));
-         glUniform1f(  glGetUniformLocation(lighting_program->get_location(), ("lights[" + std::to_string(i) + "].intensity").c_str()),   ld.intensity);
-         glUniform1f(  glGetUniformLocation(lighting_program->get_location(), ("lights[" + std::to_string(i) + "].radius").c_str()),      ld.radius);
-         glUniform1f(  glGetUniformLocation(lighting_program->get_location(), ("lights[" + std::to_string(i) + "].degree").c_str()),      ld.degree);
-         glUniform1f(  glGetUniformLocation(lighting_program->get_location(), ("lights[" + std::to_string(i) + "].specularity").c_str()), ld.specularity );
-      }
-      glUniform1ui( glGetUniformLocation(lighting_program->get_location(), "num_lights"),  num_lights );
-      glUniform3fv( glGetUniformLocation(lighting_program->get_location(), "view_pos"), 1, glm::value_ptr(view_pos));
-      glUniform1ui( glGetUniformLocation(lighting_program->get_location(), "render_mode"), (Uint32)config.render_mode );
-
-      if ( 0 == quad_vao ) {
-         Float32 quad_verts[] = {
-         //   X      Y     Z       U     V
-            -1.0f,  1.0f, 0.0f,   0.0f, 1.0f,
-            -1.0f, -1.0f, 0.0f,   0.0f, 0.0f,
-             1.0f,  1.0f, 0.0f,   1.0f, 1.0f,
-             1.0f, -1.0f, 0.0f,   1.0f, 0.0f,
-         };
-
-         // setup plane VAO
-         glGenVertexArrays( 1, &quad_vao );
-         glGenBuffers(      1, &quad_vbo );
-         glBindVertexArray(     quad_vao );
-
-         glBindBuffer( GL_ARRAY_BUFFER, quad_vbo );
-
-         glBufferData( GL_ARRAY_BUFFER,
-                       sizeof(quad_verts),
-                       &quad_verts,
-                       GL_STATIC_DRAW );
-
-         glEnableVertexAttribArray( 0 );
-
-         glVertexAttribPointer( 0,
-                                3,
-                                GL_FLOAT,
-                                GL_FALSE,
-                                5 * sizeof(Float32),
-                                (void*)0 );
-
-         glEnableVertexAttribArray( 1 );
-
-         glVertexAttribPointer( 1,
-                                2,
-                                GL_FLOAT,
-                                GL_FALSE,
-                                5 * sizeof(Float32),
-                                (void*)(3 * sizeof(Float32)) );
-      }
-      glBindVertexArray( quad_vao );
-
-      glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
-
-      glBindVertexArray( 0 );
 
       ImGui::Render();
       ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );
