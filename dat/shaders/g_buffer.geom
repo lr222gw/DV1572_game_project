@@ -11,28 +11,35 @@ out vec2 uv_fs;
 out vec3 pos_fs;
 out vec3 nor_fs;
 
+uniform vec3 view_pos;
 
 void main(void){
 
 	
-	float sum1 = gl_in[1].gl_Position.x -gl_in[0].gl_Position.x;
-	float sum2 = gl_in[1].gl_Position.y + gl_in[0].gl_Position.y;
+	//float sum1 = gl_in[1].gl_Position.x -gl_in[0].gl_Position.x;
+	//float sum2 = gl_in[1].gl_Position.y + gl_in[0].gl_Position.y;
+	//
+	//float sum_1 = sum1*sum2;
+	//
+	//float sum3 = gl_in[2].gl_Position.x -gl_in[1].gl_Position.x;
+	//float sum4 = gl_in[2].gl_Position.y + gl_in[1].gl_Position.y;
+	//
+	//float sum_2 = sum3*sum4;
+	//
+	//float sum5 = gl_in[0].gl_Position.x -gl_in[2].gl_Position.x;
+	//float sum6 = gl_in[0].gl_Position.y + gl_in[2].gl_Position.y;
+	//
+	//float sum_3 = sum5*sum6;
+	//
+	//float sumTotal = sum_1+sum_2+sum_3;
+	//if(sumTotal < 0.001 ){
 
-	float sum_1 = sum1*sum2;
 
-	float sum3 = gl_in[2].gl_Position.x -gl_in[1].gl_Position.x;
-	float sum4 = gl_in[2].gl_Position.y + gl_in[1].gl_Position.y;
+	vec3 vector_a =  normalize( (gl_in[0].gl_Position.xyz) - (view_pos.xyz));
+	vec3 normal = (cross(((gl_in[1].gl_Position.xyz - gl_in[0].gl_Position.xyz)), (gl_in[2].gl_Position.xyz - gl_in[0].gl_Position.xyz)));
+	float result = max(dot(vector_a, normal), 0);
 
-	float sum_2 = sum3*sum4;
-
-	float sum5 = gl_in[0].gl_Position.x -gl_in[2].gl_Position.x;
-	float sum6 = gl_in[0].gl_Position.y + gl_in[2].gl_Position.y;
-
-	float sum_3 = sum5*sum6;
-
-	float sumTotal = sum_1+sum_2+sum_3;
-
-	if(sumTotal < 0 ){
+	if(result <= 0 ){
 	    gl_Position = gl_in[0].gl_Position;
 		//gs_color = vs_color[0];
 		uv_fs = uv_gs[0];

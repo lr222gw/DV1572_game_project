@@ -27,10 +27,13 @@ void SceneManager::draw( Viewport &view ) {
    if ( config.is_wireframe_mode )
       glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
+   //Send view_pos to g_buffer.geom shader
    view.update();
    auto view_pos = view.get_view().get_position();
+   glUniform3fv(glGetUniformLocation(this->_geometry_pass_shader->get_location(), "view_pos"), 1, glm::value_ptr(view_pos));
 
-// 1. Geometry Pass:
+   
+   // 1. Geometry Pass:
    // TODO: sortera instanserna efter ShaderProgram m.h.a. std::partition()
    for ( auto &instance : _instances )
       if (!instance.expired())

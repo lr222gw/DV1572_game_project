@@ -14,7 +14,7 @@ struct Config {
    static constexpr Int32     start_height =  768,
                               start_width  = 1024;
 
-   static constexpr Float32   near_plane         =  0.01f,
+   static constexpr Float32   near_plane         =  0.001f,
                               far_plane          =  200.0f,
                               fov_rad            =  1.5708f, // 90 degrees in radians
                               start_aspect_ratio = (Float32)start_height / (Float32)start_width;
