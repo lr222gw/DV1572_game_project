@@ -4,6 +4,7 @@ in vec2 uv_fs;
 in vec3 pos_fs;
 in vec3 nor_fs;
 
+
 uniform sampler2D tex_diff1;
 uniform sampler2D tex_diff2;
 uniform sampler2D tex_spec1;

@@ -373,7 +373,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
    auto lighting_frag_shader  { shader_manager.load_shader( "lightSha.frag" ) }; // TODO: rename files
    auto geometry_vert_shader  { shader_manager.load_shader( "g_buffer.vert" ) }; // TODO: rename files
    auto geometry_frag_shader  { shader_manager.load_shader( "g_buffer.frag" ) }; // TODO: rename files
-   auto geometry_program      { shader_manager.create_program({ geometry_frag_shader, geometry_vert_shader }) };
+   auto geometry_geom_shader  { shader_manager.load_shader( "g_buffer.geom") };
+   auto geometry_program      { shader_manager.create_program({ geometry_frag_shader, geometry_vert_shader, geometry_geom_shader }) };
    auto lighting_program      { shader_manager.create_program({ lighting_frag_shader, lighting_vert_shader }) };
 
    //Add Lightning program to Scenemanager
