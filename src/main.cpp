@@ -12,6 +12,8 @@
 #include "Viewport.h"
 #include "SceneManager.h"
 
+#include "Light.h"
+
 // #include "misc/stb_image.h"
 // #include <range/v3/all.hpp>
 
@@ -373,7 +375,70 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
    //Add Lightning program to Scenemanager
    SceneManager  scene_manager{ geometry_program, lighting_program };
-
+   Light lights[8]{ Light(scene_manager , LightData {LightType::point,
+                                                      Vec3(0.0f,   0.0f,   0.0f),
+                                                      Vec3(10.0f,  10.0f,  10.0f),
+                                                      Vec3(1.0f,   0.0f,   0.0f),
+                                                       1.0,
+                                                      14.0,
+                                                       0.0,
+                                                       1.0 }),
+                     Light(scene_manager , LightData {LightType::point,
+                                                      Vec3(0.0f,  0.0f,  0.0f),
+                                                      Vec3(1.0f,  4.0f,  5.0f),
+                                                      Vec3(1.0f,  1.0f,  0.0f),
+                                                      1.0,
+                                                      7.0,
+                                                      0.0,
+                                                      1.0 }),
+                     Light(scene_manager , LightData {LightType::point,
+                                                      Vec3(0.0f,  0.0f,  0.0f),
+                                                      Vec3(2.0f,  1.0f,  5.0f),
+                                                      Vec3(1.0f,  0.0f,  1.0f),
+                                                       1.0,
+                                                      17.0,
+                                                       0.0,
+                                                       1.0}) ,
+                     Light(scene_manager ,   LightData{  LightType::point,
+                                                      Vec3(0.0f,  0.0f,  0.0f),
+                                                      Vec3(1.0f,  5.0f,  6.0f),
+                                                      Vec3(0.0f,  1.0f,  0.0f),
+                                                       1.0,
+                                                      11.0,
+                                                       0.0,
+                                                       1.0 }),
+                        Light(scene_manager ,   LightData{  LightType::point,
+                          Vec3(0.0f,  0.0f,  1.0f),
+                          Vec3(3.0f,  3.0f,  1.0f),
+                          Vec3(0.0f,  1.0f,  1.0f),
+                          1.0,
+                          2.0,
+                          0.0,
+                          1.0 }),
+                        Light(scene_manager ,   LightData{   LightType::point,
+                          Vec3(0.0f,  0.0f,   0.0f),
+                          Vec3(1.0f,  2.0f,  10.0f),
+                          Vec3(0.0f,  0.0f,   1.0f),
+                          1.0,
+                          1.0,
+                          0.0,
+                          1.0}),
+                        Light(scene_manager ,   LightData{   LightType::point,
+                          Vec3(0.0f,  0.0f,  0.0f),
+                          Vec3(10.0f,  0.0f,  5.0f),
+                          Vec3(1.0f,  1.0f,  1.0f),
+                          1.0,
+                          7.0,
+                          0.0,
+                          1.0}),
+                        Light(scene_manager ,   LightData{LightType::point,
+                          Vec3(0.0f,  0.0f,   0.0f),
+                          Vec3(10.0f,  5.0f,  10.0f),
+                          Vec3(1.0f,  0.3f,   0.5f),
+                           1.0,
+                          17.0,
+                           0.0,
+                           1.0  }) };
    SharedPtr<Model> nanosuit_model = asset_manager.load_model( "nanosuit.obj" );
 
    Vector<SharedPtr<ModelInstance>> model_instances;

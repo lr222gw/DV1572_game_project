@@ -48,94 +48,8 @@ void SceneManager::draw( Viewport &view ) {
    glUseProgram(this->_light_pass_shader->get_location());
 
    ////////////////////
-   Uint32 const num_lights{ 8 };
-   glUniform1i(this->_light_pass_shader->get_location(), num_lights);
 
-   LightData lights[light_capacity];
-
-   lights[0] = LightData{ LightType::point,
-                          Vec3(0.0f,   0.0f,   0.0f),
-                          Vec3(10.0f,  10.0f,  10.0f),
-                          Vec3(1.0f,   0.0f,   0.0f),
-                           1.0,
-                          14.0,
-                           0.0,
-                           1.0 };
-
-   lights[1] = LightData{ LightType::point,
-                          Vec3(0.0f,  0.0f,  0.0f),
-                          Vec3(1.0f,  4.0f,  5.0f),
-                          Vec3(1.0f,  1.0f,  0.0f),
-                          1.0,
-                          7.0,
-                          0.0,
-                          1.0 };
-
-   lights[2] = LightData{ LightType::point,
-                          Vec3(0.0f,  0.0f,  0.0f),
-                          Vec3(2.0f,  1.0f,  5.0f),
-                          Vec3(1.0f,  0.0f,  1.0f),
-                           1.0,
-                          17.0,
-                           0.0,
-                           1.0 };
-
-   lights[3] = LightData{ LightType::point,
-                          Vec3(0.0f,  0.0f,  0.0f),
-                          Vec3(1.0f,  5.0f,  6.0f),
-                          Vec3(0.0f,  1.0f,  0.0f),
-                           1.0,
-                          11.0,
-                           0.0,
-                           1.0 };
-
-   lights[4] = LightData{ LightType::point,
-                          Vec3(0.0f,  0.0f,  1.0f),
-                          Vec3(3.0f,  3.0f,  1.0f),
-                          Vec3(0.0f,  1.0f,  1.0f),
-                          1.0,
-                          2.0,
-                          0.0,
-                          1.0 };
-
-   lights[5] = LightData{ LightType::point,
-                          Vec3(0.0f,  0.0f,   0.0f),
-                          Vec3(1.0f,  2.0f,  10.0f),
-                          Vec3(0.0f,  0.0f,   1.0f),
-                          1.0,
-                          1.0,
-                          0.0,
-                          1.0 };
-
-   lights[6] = LightData{ LightType::point,
-                          Vec3(0.0f,  0.0f,  0.0f),
-                          Vec3(10.0f,  0.0f,  5.0f),
-                          Vec3(1.0f,  1.0f,  1.0f),
-                          1.0,
-                          7.0,
-                          0.0,
-                          1.0 };
-
-   lights[7] = LightData{ LightType::point,
-                          Vec3(0.0f,  0.0f,   0.0f),
-                          Vec3(10.0f,  5.0f,  10.0f),
-                          Vec3(1.0f,  0.3f,   0.5f),
-                           1.0,
-                          17.0,
-                           0.0,
-                           1.0 };
-
-   Uint32 static  quad_vao = 0;
-   Uint32 static  quad_vbo;
-   //////////////////////
-
-
-   // glUseProgram(shaProg->get_location());
-      // a_Mesh.render();
    auto g_buffer_data{ view.get_g_buffer() };
-
-   // glUseProgram( lightProg->get_location() );
-
 
    glActiveTexture(GL_TEXTURE0);
    glBindTexture(GL_TEXTURE_2D, g_buffer_data.pos_tex_loc);
@@ -146,20 +60,18 @@ void SceneManager::draw( Viewport &view ) {
    glActiveTexture(GL_TEXTURE3);
    glBindTexture(GL_TEXTURE_2D, g_buffer_data.alb_tex_loc); //TODO:P Denna är den enda som gör något...
 
-   for (Uint32 i = 0; i < num_lights; ++i) { //TODO:P Endast en ljuskälla ger samma resultat som att använda alla...
-      LightData &ld = lights[i];
-      glUniform1ui(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].type").c_str()), ld.type);
-      glUniform3fv(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].dir").c_str()), 1, glm::value_ptr(ld.direction));
-      glUniform3fv(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].pos").c_str()), 1, glm::value_ptr(ld.position));
-      glUniform3fv(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].rgb").c_str()), 1, glm::value_ptr(ld.color));
-      glUniform1f(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].intensity").c_str()), ld.intensity);
-      glUniform1f(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].radius").c_str()), ld.radius);
-      glUniform1f(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].degree").c_str()), ld.degree);
-      glUniform1f(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].specularity").c_str()), ld.specularity);
-   }
-   glUniform1ui(glGetUniformLocation(this->_light_pass_shader->get_location(), "num_lights"), num_lights);
    glUniform3fv(glGetUniformLocation(this->_light_pass_shader->get_location(), "view_pos"), 1, glm::value_ptr(view_pos));
-   glUniform1ui(glGetUniformLocation(this->_light_pass_shader->get_location(), "render_mode"), (Uint32)config.render_mode);
+ 
+   _lights_to_GPU();
+   _render_to_quad();
+
+
+
+}
+void SceneManager::_render_to_quad() {
+   
+   Uint32 static  quad_vao = 0;
+   Uint32 static  quad_vbo;
 
    if (0 == quad_vao) {
       Float32 quad_verts[] = {
@@ -205,10 +117,7 @@ void SceneManager::draw( Viewport &view ) {
    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
    glBindVertexArray(0);
-
-
 }
-
 
 
 void SceneManager::draw_debug_scene_inspection() {
@@ -305,9 +214,110 @@ void SceneManager::remove_light( Uint64 id ) {
 Uint32 SceneManager::_find_light_index( Uint64 id ) const {
    auto index = -1;
    // find index of target id
-   for ( auto i = 0;  index < _num_lights;  ++index )
-      if ( _ids[i] == id)
+   //for ( auto i = 0;  index < _num_lights;  ++index )
+   //   if ( _ids[i] == id)
+   //      index = i;
+
+   for (auto i = 0; i < _num_lights; ++i)
+      if (_ids[i] == id)
          index = i;
+
+   //TODO:P Should this assert be here with these conditions?
    assert( index != -1 && "Bug! There should only be one entry point and exit point for every light instance" );
    return index;
 }
+
+void SceneManager::_lights_to_GPU()
+{
+
+   Uint32 const num_lights{ this->_num_lights };
+   glUniform1i(this->_light_pass_shader->get_location(), num_lights);
+
+   for (Uint32 i = 0; i < this->_num_lights; ++i) { //TODO:P Endast en ljuskälla ger samma resultat som att använda alla...
+      LightData ld = this->get_light_data(i);
+      glUniform1ui(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].type").c_str()), ld.type);
+      glUniform3fv(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].dir").c_str()), 1, glm::value_ptr(ld.direction));
+      glUniform3fv(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].pos").c_str()), 1, glm::value_ptr(ld.position));
+      glUniform3fv(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].rgb").c_str()), 1, glm::value_ptr(ld.color));
+      glUniform1f(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].intensity").c_str()), ld.intensity);
+      glUniform1f(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].radius").c_str()), ld.radius);
+      glUniform1f(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].degree").c_str()), ld.degree);
+      glUniform1f(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].specularity").c_str()), ld.specularity);
+   }
+   glUniform1ui(glGetUniformLocation(this->_light_pass_shader->get_location(), "num_lights"), num_lights);  
+   glUniform1ui(glGetUniformLocation(this->_light_pass_shader->get_location(), "render_mode"), (Uint32)config.render_mode);
+}
+
+
+/*
+   lights[0] = LightData{ LightType::point,
+                          Vec3(0.0f,   0.0f,   0.0f),
+                          Vec3(10.0f,  10.0f,  10.0f),
+                          Vec3(1.0f,   0.0f,   0.0f),
+                           1.0,
+                          14.0,
+                           0.0,
+                           1.0 };
+
+   lights[1] = LightData{ LightType::point,
+                          Vec3(0.0f,  0.0f,  0.0f),
+                          Vec3(1.0f,  4.0f,  5.0f),
+                          Vec3(1.0f,  1.0f,  0.0f),
+                          1.0,
+                          7.0,
+                          0.0,
+                          1.0 };
+
+   lights[2] = LightData{ LightType::point,
+                          Vec3(0.0f,  0.0f,  0.0f),
+                          Vec3(2.0f,  1.0f,  5.0f),
+                          Vec3(1.0f,  0.0f,  1.0f),
+                           1.0,
+                          17.0,
+                           0.0,
+                           1.0 };
+
+   lights[3] = LightData{ LightType::point,
+                          Vec3(0.0f,  0.0f,  0.0f),
+                          Vec3(1.0f,  5.0f,  6.0f),
+                          Vec3(0.0f,  1.0f,  0.0f),
+                           1.0,
+                          11.0,
+                           0.0,
+                           1.0 };
+
+   lights[4] = LightData{ LightType::point,
+                          Vec3(0.0f,  0.0f,  1.0f),
+                          Vec3(3.0f,  3.0f,  1.0f),
+                          Vec3(0.0f,  1.0f,  1.0f),
+                          1.0,
+                          2.0,
+                          0.0,
+                          1.0 };
+
+   lights[5] = LightData{ LightType::point,
+                          Vec3(0.0f,  0.0f,   0.0f),
+                          Vec3(1.0f,  2.0f,  10.0f),
+                          Vec3(0.0f,  0.0f,   1.0f),
+                          1.0,
+                          1.0,
+                          0.0,
+                          1.0 };
+
+   lights[6] = LightData{ LightType::point,
+                          Vec3(0.0f,  0.0f,  0.0f),
+                          Vec3(10.0f,  0.0f,  5.0f),
+                          Vec3(1.0f,  1.0f,  1.0f),
+                          1.0,
+                          7.0,
+                          0.0,
+                          1.0 };
+
+   lights[7] = LightData{ LightType::point,
+                          Vec3(0.0f,  0.0f,   0.0f),
+                          Vec3(10.0f,  5.0f,  10.0f),
+                          Vec3(1.0f,  0.3f,   0.5f),
+                           1.0,
+                          17.0,
+                           0.0,
+                           1.0 };*/

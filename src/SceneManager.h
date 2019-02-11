@@ -55,4 +55,7 @@ private:
    Array<LightData,light_capacity> _light_data;
    Array<Uint64,light_capacity>    _ids;        // used to ensure the correct removal of lights
    Uint32                          _num_lights; // how much of the light capacity is used
+
+   void _lights_to_GPU();
+   void _render_to_quad();
 };
