@@ -80,8 +80,8 @@ void process_mouse( GLFWwindow *window, Viewport &cam, Float32 delta_time_s  ) {
 
    Float64 x_offset = x_pos - last_x;
    Float64 y_offset = last_y - y_pos;
-   last_x = x_pos;
-   last_y = y_pos;
+   //last_x = x_pos;
+   //last_y = y_pos;
 
    Float64 sensitivity = 0.05;
    x_offset *= sensitivity;
