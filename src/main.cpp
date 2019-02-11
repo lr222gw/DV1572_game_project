@@ -106,38 +106,51 @@ void process_mouse( GLFWwindow *window, Viewport &cam, Float32 delta_time_s  ) {
 
 
 
+void toggle_input_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
+   static bool isPressed = false;
 
-void process_input( GLFWwindow *window, Viewport &cam, Float32 time_delta_s ) {
-   glfwSetInputMode( window, GLFW_STICKY_KEYS, 1 );
-
-   if ( glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS )
+   if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
       glfwSetWindowShouldClose(window, true);
 
-   if ( glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS ) {
+   if (key ==  GLFW_KEY_F1 && action == GLFW_PRESS ) {
       g_is_mouse_look_enabled = !g_is_mouse_look_enabled;
-      if ( g_is_mouse_look_enabled )
+      if (g_is_mouse_look_enabled)
          glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
       else
          glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+
    }
 
-   if ( glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS )
+   if (key ==  GLFW_KEY_F2 && action ==  GLFW_PRESS ) {
       config.is_wireframe_mode = !config.is_wireframe_mode; // used in SceneManager::Draw()
 
-   if ( glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS )
+   }
+   if (key == GLFW_KEY_F3 && action == GLFW_PRESS ) {
       config.render_mode = RenderMode::composite;
 
-   if ( glfwGetKey(window, GLFW_KEY_F4) == GLFW_PRESS )
+   }
+   if (key == GLFW_KEY_F4 && action == GLFW_PRESS ) {
       config.render_mode = RenderMode::albedo;
 
-   if ( glfwGetKey(window, GLFW_KEY_F5) == GLFW_PRESS )
+   }
+   if (key == GLFW_KEY_F5 && action == GLFW_PRESS ) {
       config.render_mode = RenderMode::normals;
 
-   if ( glfwGetKey(window, GLFW_KEY_F6) == GLFW_PRESS )
+   }
+   if (key == GLFW_KEY_F6 && action == GLFW_PRESS ) {
       config.render_mode = RenderMode::specular;
 
-   if ( glfwGetKey(window, GLFW_KEY_F7) == GLFW_PRESS )
+   }
+   if (key == GLFW_KEY_F7 && action == GLFW_PRESS ) {
       config.render_mode = RenderMode::positional;
+
+   }
+}
+void process_input( GLFWwindow *window, Viewport &cam, Float32 time_delta_s ) {
+   //glfwSetInputMode( window, GLFW_STICKY_KEYS, 1 );
+   
+
+   
 
 //   if ( glfwGetKey(window, GLFW_KEY_F8) == GLFW_PRESS )
 //      config.render_mode = RenderMode::emission; // TODO!
@@ -337,6 +350,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    // glfwSetCursorPosCallback(window, mouse_callback); // TODO: make a call back matching template that calls on our process_mouse();
    glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
    // glfwSetCursorPosCallback(window, process_mouse);
+   glfwSetKeyCallback(window, toggle_input_callback);
 
 	// ImGui context setup
 	IMGUI_CHECKVERSION();
