@@ -21,5 +21,5 @@ void main() {
 	vec4 pos_world = model_transform * vec4( pos_vs, 1.0 );
 	pos_gs         = pos_world.xyz;
 
-	gl_Position    = projection * view * pos_world;
+	gl_Position    = projection * view  * pos_world;
 }
