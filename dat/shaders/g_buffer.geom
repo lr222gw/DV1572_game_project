@@ -14,26 +14,47 @@ out vec3 nor_fs;
 
 void main(void){
 
-    gl_Position = gl_in[0].gl_Position;
-    //gs_color = vs_color[0];
-	uv_fs = uv_gs[0];
-	pos_fs = pos_gs[0];
-	nor_fs = nor_gs[0];
-    EmitVertex();
-    
-    gl_Position = gl_in[1].gl_Position;
-    //gs_color = vs_color[1];
-	uv_fs = uv_gs[1];
-	pos_fs = pos_gs[1];
-	nor_fs = nor_gs[1];
-    EmitVertex();
+	
+	float sum1 = gl_in[1].gl_Position.x -gl_in[0].gl_Position.x;
+	float sum2 = gl_in[1].gl_Position.y + gl_in[0].gl_Position.y;
 
-    gl_Position = gl_in[2].gl_Position;
-    //gs_color = vs_color[2];
-	uv_fs = uv_gs[2];
-	pos_fs = pos_gs[2];
-	nor_fs = nor_gs[2];
-    EmitVertex();
+	float sum_1 = sum1*sum2;
 
-    EndPrimitive();    
+	float sum3 = gl_in[2].gl_Position.x -gl_in[1].gl_Position.x;
+	float sum4 = gl_in[2].gl_Position.y + gl_in[1].gl_Position.y;
+
+	float sum_2 = sum3*sum4;
+
+	float sum5 = gl_in[0].gl_Position.x -gl_in[2].gl_Position.x;
+	float sum6 = gl_in[0].gl_Position.y + gl_in[2].gl_Position.y;
+
+	float sum_3 = sum5*sum6;
+
+	float sumTotal = sum_1+sum_2+sum_3;
+
+	if(sumTotal < 0 ){
+	    gl_Position = gl_in[0].gl_Position;
+		//gs_color = vs_color[0];
+		uv_fs = uv_gs[0];
+		pos_fs = pos_gs[0];
+		nor_fs = nor_gs[0];
+		EmitVertex();
+		
+		gl_Position = gl_in[1].gl_Position;
+		//gs_color = vs_color[1];
+		uv_fs = uv_gs[1];
+		pos_fs = pos_gs[1];
+		nor_fs = nor_gs[1];
+		EmitVertex();
+
+		gl_Position = gl_in[2].gl_Position;
+		//gs_color = vs_color[2];
+		uv_fs = uv_gs[2];
+		pos_fs = pos_gs[2];
+		nor_fs = nor_gs[2];
+		EmitVertex();
+
+		EndPrimitive();   
+	}
+ 
 }
