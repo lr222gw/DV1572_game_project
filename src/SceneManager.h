@@ -44,10 +44,12 @@ public:
    void                    draw( Viewport & );
    void                    draw_debug_scene_inspection();
 
+   SceneManager(SharedPtr<ShaderProgram> lightPass);
+
 private:
 
    Uint32 _find_light_index( Uint64 id ) const;
-
+   SharedPtr<ShaderProgram>        _light_pass_shader;
    Vector<WeakPtr<ModelInstance>>  _instances;
    Array<LightData,light_capacity> _light_data;
    Array<Uint64,light_capacity>    _ids;        // used to ensure the correct removal of lights

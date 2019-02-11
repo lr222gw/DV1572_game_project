@@ -148,14 +148,6 @@ void toggle_input_callback(GLFWwindow *window, int key, int scancode, int action
 }
 void process_input( GLFWwindow *window, Viewport &cam, Float32 time_delta_s ) {
    //glfwSetInputMode( window, GLFW_STICKY_KEYS, 1 );
-   
-
-   
-
-//   if ( glfwGetKey(window, GLFW_KEY_F8) == GLFW_PRESS )
-//      config.render_mode = RenderMode::emission; // TODO!
-
-
 
    Float32 move_distance = g_move_speed * time_delta_s;
    Transform offset;
@@ -369,9 +361,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
 	glEnable( GL_DEPTH_TEST   );
 	glEnable( GL_STENCIL_TEST );
 
-   ShaderManager shader_manager {};
-   AssetManager  asset_manager  {};
-   SceneManager  scene_manager  {};
+   ShaderManager shader_manager{};
+   AssetManager  asset_manager{};
 
    auto lighting_vert_shader  { shader_manager.load_shader( "lightSha.vert" ) }; // TODO: rename files
    auto lighting_frag_shader  { shader_manager.load_shader( "lightSha.frag" ) }; // TODO: rename files
@@ -379,6 +370,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
    auto geometry_frag_shader  { shader_manager.load_shader( "g_buffer.frag" ) }; // TODO: rename files
    auto geometry_program      { shader_manager.create_program({ geometry_frag_shader, geometry_vert_shader }) };
    auto lighting_program      { shader_manager.create_program({ lighting_frag_shader, lighting_vert_shader }) };
+
+   SceneManager  scene_manager{ lighting_program };
 
    SharedPtr<Model> nanosuit_model = asset_manager.load_model( "nanosuit.obj" );
 

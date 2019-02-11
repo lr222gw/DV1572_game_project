@@ -95,6 +95,11 @@ void SceneManager::draw_debug_scene_inspection() {
    } ImGui::End(); // end our Inspection window
 }
 
+SceneManager::SceneManager(SharedPtr<ShaderProgram> lightPass)
+{   
+   this->_light_pass_shader = lightPass;
+}
+
 
 
 // NOTE! should only be used by Light's constructor (TODO: private+friend?)
