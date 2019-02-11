@@ -36,7 +36,7 @@ void main(void){
 
 	//Possible solution
 	vec3 viewPos = view_pos; 
-	viewPos.z =  view_pos.z -1000.0f;
+	viewPos.z =  view_pos.z -1000.0f; // if "-1000" is smaller, More artifacts...
 	vec3 vector_a =   normalize(viewPos.xyz) - (gl_in[0].gl_Position.xyz);
 	//vec3 normal = cross((gl_in[2].gl_Position.xyz - gl_in[0].gl_Position.xyz),(gl_in[1].gl_Position.xyz - gl_in[0].gl_Position.xyz));
 	vec3 normal = cross( (gl_in[2].gl_Position.xyz - gl_in[0].gl_Position.xyz), (gl_in[1].gl_Position.xyz - gl_in[0].gl_Position.xyz));
