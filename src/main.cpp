@@ -74,7 +74,7 @@ void process_mouse( GLFWwindow *window, Viewport &cam, Float32 delta_time_s  ) {
       first_mouse = false;
    }
 
-   bool changed = last_x != x_pos;
+   bool changed = last_x != x_pos || last_y != y_pos;
 
    Float64 x_offset = x_pos - last_x;
    Float64 y_offset = last_y - y_pos;
