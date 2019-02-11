@@ -463,8 +463,6 @@ Int32 main( Int32 argc, char const *argv[] ) {
    /* TODO */ Viewport view { cam_position, window, fov_rad };
    /* TODO */ view.bind_shader_program( *geometry_program );
    /* TODO */ //TODO: remove when we dont want to se dogass
-   /* TODO */ Transform rotate_deg180 = view.get_view();
-   /* TODO */ rotate_deg180.rotate_deg( Vec3( 0.0f, 1.0f, 0.0f ), 180.0f );
    /* TODO */ view._g_buffer_init();
    /* TODO */ //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
