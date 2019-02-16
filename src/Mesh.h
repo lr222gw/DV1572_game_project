@@ -19,7 +19,6 @@ struct TextureData {
 };
 
 
-
 class Mesh {
    friend class Model; // gives Model access to Mesh's private members
 
@@ -50,3 +49,4 @@ private:
            _vbo,
            _ebo;
 };
+

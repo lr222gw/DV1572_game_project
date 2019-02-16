@@ -70,9 +70,8 @@ void process_mouse( GLFWwindow *window, Viewport &cam, Float32 delta_time_s  ) {
    glfwGetCursorPos( window, &x_pos, &y_pos );
 
    if ( first_mouse ) {
-      
-      last_x = cam.forward.x;
-      last_y = cam.forward.y;
+      last_x      = cam.forward.x;
+      last_y      = cam.forward.y;
       first_mouse = false;
    }
 
@@ -80,11 +79,13 @@ void process_mouse( GLFWwindow *window, Viewport &cam, Float32 delta_time_s  ) {
 
    Float64 x_offset = x_pos - last_x;
    Float64 y_offset = last_y - y_pos;
-   last_x = x_pos;
-   last_y = y_pos;
+   last_x           = x_pos;
+   last_y           = y_pos;
 
    if (!g_is_mouse_look_enabled)
       return;
+
+   // 'http://justsomething.co/wp-content/uploads/2013/11/guns-replaced-thumbs-up-20.jpg'
 
    Float64 sensitivity = 0.05;
    x_offset *= sensitivity;
@@ -111,46 +112,41 @@ void process_mouse( GLFWwindow *window, Viewport &cam, Float32 delta_time_s  ) {
 
 
 
-void toggle_input_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
-   static bool isPressed = false;
+void toggle_input_callback( GLFWwindow  *window,
+                            Int32        key,
+                            Int32        scancode,
+                            Int32        action,
+                            Int32        mods )
+{
+   static Bool is_pressed = false;
 
-   if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-      glfwSetWindowShouldClose(window, true);
+   if ( key == GLFW_KEY_ESCAPE  &&  action == GLFW_PRESS )
+      glfwSetWindowShouldClose( window, true );
 
-   if (key ==  GLFW_KEY_F1 && action == GLFW_PRESS ) {
+   if ( key == GLFW_KEY_F1  &&  action == GLFW_PRESS ) {
       g_is_mouse_look_enabled = !g_is_mouse_look_enabled;
-      if (g_is_mouse_look_enabled)
-         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+      if ( g_is_mouse_look_enabled )
+         glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_DISABLED );
       else
-         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-
+         glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_NORMAL );
    }
 
-   if (key ==  GLFW_KEY_F2 && action ==  GLFW_PRESS ) {
+   if ( key == GLFW_KEY_F2  &&  action == GLFW_PRESS )
       config.is_wireframe_mode = !config.is_wireframe_mode; // used in SceneManager::Draw()
-
-   }
-   if (key == GLFW_KEY_F3 && action == GLFW_PRESS ) {
+   if ( key == GLFW_KEY_F3  &&  action == GLFW_PRESS )
       config.render_mode = RenderMode::composite;
-
-   }
-   if (key == GLFW_KEY_F4 && action == GLFW_PRESS ) {
+   if ( key == GLFW_KEY_F4  &&  action == GLFW_PRESS )
       config.render_mode = RenderMode::albedo;
-
-   }
-   if (key == GLFW_KEY_F5 && action == GLFW_PRESS ) {
+   if ( key == GLFW_KEY_F5  &&  action == GLFW_PRESS )
       config.render_mode = RenderMode::normals;
-
-   }
-   if (key == GLFW_KEY_F6 && action == GLFW_PRESS ) {
+   if ( key == GLFW_KEY_F6  &&  action == GLFW_PRESS )
       config.render_mode = RenderMode::specular;
-
-   }
-   if (key == GLFW_KEY_F7 && action == GLFW_PRESS ) {
+   if ( key == GLFW_KEY_F7  &&  action == GLFW_PRESS )
       config.render_mode = RenderMode::positional;
-
-   }
 }
+
+
+
 void process_input( GLFWwindow *window, Viewport &cam, Float32 time_delta_s ) {
    //glfwSetInputMode( window, GLFW_STICKY_KEYS, 1 );
 
@@ -347,7 +343,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    // glfwSetCursorPosCallback(window, mouse_callback); // TODO: make a call back matching template that calls on our process_mouse();
    glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
    // glfwSetCursorPosCallback(window, process_mouse);
-   glfwSetKeyCallback(window, toggle_input_callback);
+   glfwSetKeyCallback( window, toggle_input_callback);
 
 	// ImGui context setup
 	IMGUI_CHECKVERSION();
@@ -373,9 +369,14 @@ Int32 main( Int32 argc, char const *argv[] ) {
    auto lighting_frag_shader  { shader_manager.load_shader( "lightSha.frag" ) }; // TODO: rename files
    auto geometry_vert_shader  { shader_manager.load_shader( "g_buffer.vert" ) }; // TODO: rename files
    auto geometry_frag_shader  { shader_manager.load_shader( "g_buffer.frag" ) }; // TODO: rename files
-   auto geometry_geom_shader  { shader_manager.load_shader( "g_buffer.geom") };
-   auto geometry_program      { shader_manager.create_program({ geometry_frag_shader, geometry_vert_shader, geometry_geom_shader }) };
+   auto geometry_geom_shader  { shader_manager.load_shader( "g_buffer.geom" ) };
+
+   auto geometry_program      { shader_manager.create_program( { geometry_frag_shader,
+                                                                 geometry_vert_shader,
+                                                                 geometry_geom_shader } ) };
+
    auto lighting_program      { shader_manager.create_program({ lighting_frag_shader, lighting_vert_shader }) };
+
 
    //Add Lightning program to Scenemanager
    SceneManager  scene_manager{ geometry_program, lighting_program };
@@ -441,6 +442,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
                           Vec3(1.0f,  0.3f,   0.5f),
                            1.0,
                           17.0,
+
                            0.0,
                            1.0  }) };
    SharedPtr<Model> nanosuit_model = asset_manager.load_model( "nanosuit.obj" );
@@ -523,7 +525,6 @@ Int32 main( Int32 argc, char const *argv[] ) {
       glfwMakeContextCurrent( window );
       glfwSwapBuffers( window );
 	} // main loop end
-
 
    // cleanup:
 	ImGui_ImplOpenGL3_Shutdown();

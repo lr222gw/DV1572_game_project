@@ -32,7 +32,7 @@ void SceneManager::draw( Viewport &view ) {
    auto view_pos = view.get_view().get_position();
    glUniform3fv(glGetUniformLocation(this->_geometry_pass_shader->get_location(), "view_pos"), 1, glm::value_ptr(view_pos));
 
-   
+
    // 1. Geometry Pass:
    // TODO: sortera instanserna efter ShaderProgram m.h.a. std::partition()
    for ( auto &instance : _instances )
@@ -61,10 +61,10 @@ void SceneManager::draw( Viewport &view ) {
    glActiveTexture(GL_TEXTURE2);
    glBindTexture(GL_TEXTURE_2D, g_buffer_data.spe_tex_loc);
    glActiveTexture(GL_TEXTURE3);
-   glBindTexture(GL_TEXTURE_2D, g_buffer_data.alb_tex_loc); //TODO:P Denna är den enda som gör något...
+   glBindTexture(GL_TEXTURE_2D, g_buffer_data.alb_tex_loc); //TODO:P Denna ? den enda som g?r n?ot...
 
    glUniform3fv(glGetUniformLocation(this->_light_pass_shader->get_location(), "view_pos"), 1, glm::value_ptr(view_pos));
- 
+
    _lights_to_GPU();
    _render_to_quad();
 
@@ -72,11 +72,11 @@ void SceneManager::draw( Viewport &view ) {
 
 }
 void SceneManager::_render_to_quad() {
-   
-   Uint32 static  quad_vao = 0;
-   Uint32 static  quad_vbo;
 
-   if (0 == quad_vao) {
+   static Uint32  quad_vao = 0;
+   static Uint32  quad_vbo;
+
+   if ( 0 == quad_vao ) {
       Float32 quad_verts[] = {
          //   X      Y     Z       U     V
             -1.0f,  1.0f, 0.0f,   0.0f, 1.0f,
@@ -108,16 +108,16 @@ void SceneManager::_render_to_quad() {
 
       glEnableVertexAttribArray(1);
 
-      glVertexAttribPointer(1,
-         2,
-         GL_FLOAT,
-         GL_FALSE,
-         5 * sizeof(Float32),
-         (void*)(3 * sizeof(Float32)));
+      glVertexAttribPointer( 1,
+                             2,
+                             GL_FLOAT,
+                             GL_FALSE,
+                             5 * sizeof(Float32),
+                             (void*)(3 * sizeof(Float32)));
    }
-   glBindVertexArray(quad_vao);
+   glBindVertexArray( quad_vao );
 
-   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+   glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
 
    glBindVertexArray(0);
 }
@@ -139,13 +139,13 @@ void SceneManager::draw_debug_scene_inspection() {
 
             Float32 position_array[3]   { position.x,
                                           position.y,
-                                          position.z }; // fulhack
+                                          position.z }; // temp
 
             Float32 scale_array[3] { scale.x,
                                      scale.y,
-                                     scale.z }; // fulhack
+                                     scale.z }; // temp
 
-            // fulhack
+            // temp
             String id = instance->get_model()->get_name() +"::"+ std::to_string(i);
 
             ImGui::PushID( id.c_str() );
@@ -177,7 +177,7 @@ void SceneManager::draw_debug_scene_inspection() {
 }
 
 SceneManager::SceneManager(SharedPtr<ShaderProgram> geo_pass, SharedPtr<ShaderProgram> light_pass)
-{   
+{
    this->_geometry_pass_shader = geo_pass;
    this->_light_pass_shader = light_pass;
 }
@@ -236,7 +236,7 @@ void SceneManager::_lights_to_GPU()
    Uint32 const num_lights{ this->_num_lights };
    glUniform1i(this->_light_pass_shader->get_location(), num_lights);
 
-   for (Uint32 i = 0; i < this->_num_lights; ++i) { //TODO:P Endast en ljuskälla ger samma resultat som att använda alla...
+   for (Uint32 i = 0; i < this->_num_lights; ++i) { //TODO:P Endast en ljusk?la ger samma resultat som att anv?da alla...
       LightData ld = this->get_light_data(i);
       glUniform1ui(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].type").c_str()), ld.type);
       glUniform3fv(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].dir").c_str()), 1, glm::value_ptr(ld.direction));
@@ -247,7 +247,7 @@ void SceneManager::_lights_to_GPU()
       glUniform1f(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].degree").c_str()), ld.degree);
       glUniform1f(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].specularity").c_str()), ld.specularity);
    }
-   glUniform1ui(glGetUniformLocation(this->_light_pass_shader->get_location(), "num_lights"), num_lights);  
+   glUniform1ui(glGetUniformLocation(this->_light_pass_shader->get_location(), "num_lights"), num_lights);
    glUniform1ui(glGetUniformLocation(this->_light_pass_shader->get_location(), "render_mode"), (Uint32)config.render_mode);
 }
 
