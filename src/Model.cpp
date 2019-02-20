@@ -1,75 +1,11 @@
 #include "Model.h"
+#include "Texture.h"
 
 Model::Model( String const &filename ):
    _name ( filename )
 {
     _load_model( filename );
 }
-
-
-Uint32 load_texture_from_file( FilePath path ) {
-   Uint32  texture_id;
-   glGenTextures( 1, &texture_id );
-
-   Int32  width,
-          height,
-          channel_count;
-
-   Uint8 *image_data = stbi_load( path.relative_path().c_str(),
-                                  &width,
-                                  &height,
-                                  &channel_count,
-                                  0 );
-
-   if ( image_data ) {
-
-      GLenum format;
-      if      ( 1 == channel_count )
-         format = GL_RED;
-      else if ( 3 == channel_count )
-         format = GL_RGB;
-      else if ( 4 == channel_count )
-         format = GL_RGBA;
-      else assert( false && "Unexpected texture format channel count." );
-
-      glBindTexture( GL_TEXTURE_2D, texture_id );
-
-      glTexImage2D( GL_TEXTURE_2D,
-                    0,
-                    format,
-                    width,
-                    height,
-                    0,
-                    format,
-                    GL_UNSIGNED_BYTE,
-                    image_data );
-
-      glGenerateMipmap( GL_TEXTURE_2D );
-
-      glTexParameteri( GL_TEXTURE_2D,
-                       GL_TEXTURE_WRAP_S,
-                       GL_REPEAT );
-
-      glTexParameteri( GL_TEXTURE_2D,
-                       GL_TEXTURE_WRAP_T,
-                       GL_REPEAT );
-
-      glTexParameteri( GL_TEXTURE_2D,
-                       GL_TEXTURE_MIN_FILTER,
-                       GL_LINEAR_MIPMAP_LINEAR );
-
-      glTexParameteri( GL_TEXTURE_2D,
-                       GL_TEXTURE_MAG_FILTER,
-                       GL_LINEAR );
-   } // TODO: use {fmt} here for formatting?
-   else assert( false && String( "Error while trying to load texture from file using:"
-                                 "load_texture_from_file( "+ path.relative_path() +"). ").c_str() );
-
-   stbi_image_free( image_data );
-
-   return texture_id;
-}
-
 
 void Model::_load_model( String const &filename ) {
    Assimp::Importer importer; // using Assimp's importer class
@@ -103,11 +39,10 @@ void Model::_load_model( String const &filename ) {
    _process_node( scene->mRootNode, scene );
 }
 
-
 void Model::_process_node( aiNode *node,  aiScene const *scene ) {
    for ( Uint32 i = 0;  i < node->mNumMeshes;  ++i ) {    // for each mesh,
       auto *mesh = scene->mMeshes[node->mMeshes[i]];      // extract the mesh
-      _mesh_list.push_back( _process_mesh(mesh, scene) ); // and process it
+      _meshes.emplace_back( _process_mesh(mesh, scene) ); // and process it
    }
 
    for ( Uint32 i = 0;  i < node->mNumChildren;  ++i ) // for each child mesh,
@@ -115,19 +50,19 @@ void Model::_process_node( aiNode *node,  aiScene const *scene ) {
 }
 
 
-void Model::draw( ShaderProgram &shader_program ) {
-   for ( auto &e : get_mesh_list() )  // for each mesh in the model
-      e._draw( shader_program );      // call the mesh's draw function
+void Model::draw( ShaderProgram &shader_program ) const {
+   for ( auto &e : get_meshes() )  // for each mesh in the model
+      e->_draw( shader_program );   // call the mesh's draw function
 }
 
 
-Mesh Model::_process_mesh( aiMesh *mesh, aiScene const *scene ) {
-   Vector<VertexData>   vertices;
-   Vector<GLuint>       indices;
-   Vector<TextureData>  textures;
+SharedPtr<Mesh> Model::_process_mesh( aiMesh *mesh, aiScene const *scene ) {
+   Vector<VertexData>          vertices;
+   Vector<GLuint>              indices;
+   Vector<SharedPtr<Texture>>  textures;
 
-   const Uint32  face_count = mesh->mNumFaces;
-   const Uint32  vert_count = mesh->mNumVertices;
+   Uint32 const  face_count = mesh->mNumFaces;
+   Uint32 const  vert_count = mesh->mNumVertices;
 
    // pre-allocate as many vertices as the mesh contains
    vertices.reserve(vert_count);
@@ -180,29 +115,30 @@ Mesh Model::_process_mesh( aiMesh *mesh, aiScene const *scene ) {
       auto *material { scene->mMaterials[mesh->mMaterialIndex] };
 
       // load diffuse maps:
-      Vector<TextureData> diffuse_maps = _load_material_textures( material,
-                                                                  aiTextureType_DIFFUSE,
-                                                                  "tex_diff");
+      Vector<SharedPtr<Texture>> diffuse_maps = _load_material_textures( material,
+                                                                         aiTextureType_DIFFUSE );
+      for ( auto &e : diffuse_maps )
+         textures.emplace_back( e );
 
-      textures.insert( textures.end(), diffuse_maps.begin(), diffuse_maps.end() );
 
       // load specular maps:
-      Vector<TextureData> specular_maps = _load_material_textures( material,
-                                                                   aiTextureType_SPECULAR,
-                                                                   "tex_spec");
+      Vector<SharedPtr<Texture>> specular_maps = _load_material_textures( material,
+                                                                          aiTextureType_SPECULAR );
+      for ( auto &e : specular_maps )
+         textures.emplace_back( e );
 
-      textures.insert( textures.end(), specular_maps.begin(), specular_maps.end() );
 
       // load normal maps:
-      Vector<TextureData> normal_maps = _load_material_textures( material,
-                                                                 aiTextureType_NORMALS,
-                                                                 "tex_norm");
-
-      textures.insert( textures.end(), normal_maps.begin(), normal_maps.end() );
+      Vector<SharedPtr<Texture>> normal_maps = _load_material_textures( material,
+                                                                        aiTextureType_NORMALS );
+      for ( auto &e : normal_maps )
+         textures.emplace_back( e );
    }
 
    // TODO: implement more MaterialMaps based on Assimp's aiTextureType enum values
-   return Mesh( vertices, indices, textures );
+   return std::make_shared<Mesh>( std::move(vertices),
+                                  std::move(indices),
+                                  std::move(textures) );
 }
 
 
@@ -212,11 +148,19 @@ String Model::get_name() const {
 
 
 // TODO: Bryta ut "_load_material_textures" och "load_texture_from_file" till TextureHandler
-// Undvik att ladda in en textur som redan �r inladdad...
-Vector<TextureData> Model::_load_material_textures( aiMaterial    *material,
-                                                    aiTextureType  type,
-                                                    String         type_name ) {
-   Vector<TextureData> textures;
+// Undvik att ladda in en textur som redan är inladdad...
+Vector<SharedPtr<Texture>> Model::_load_material_textures( aiMaterial    *material,
+                                                           aiTextureType  type )
+{
+   Vector<SharedPtr<Texture>> textures;
+
+   Texture::Type our_type;
+   switch ( type ) {
+      case aiTextureType_DIFFUSE:   our_type = Texture::Type::diffuse;  break;
+      case aiTextureType_SPECULAR:  our_type = Texture::Type::specular; break;
+      case aiTextureType_NORMALS:   our_type = Texture::Type::normal;   break;
+      default: assert( false && "Unknown texture type encountered!" );
+   }
 
    for ( Uint32 i = 0;  i < material->GetTextureCount(type);  ++i ) {
       aiString model_name;
@@ -224,11 +168,7 @@ Vector<TextureData> Model::_load_material_textures( aiMaterial    *material,
 
       FilePath path { FileType::texture, String(model_name.C_Str()) };
 
-      TextureData texture;
-      texture.id   = load_texture_from_file( path );
-      texture.type = type_name;
-      texture.path = path.relative_path();
-      textures.push_back( texture );
+      textures.emplace_back( std::make_shared<Texture>(path, our_type) );
    }
 
    return textures;
