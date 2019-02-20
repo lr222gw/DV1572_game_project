@@ -118,8 +118,6 @@ void toggle_input_callback( GLFWwindow  *window,
                             Int32        action,
                             Int32        mods )
 {
-   static Bool is_pressed = false;
-
    if ( key == GLFW_KEY_ESCAPE  &&  action == GLFW_PRESS )
       glfwSetWindowShouldClose( window, true );
 
@@ -147,34 +145,57 @@ void toggle_input_callback( GLFWwindow  *window,
 
 
 
-void process_input( GLFWwindow *window, Viewport &cam, Float32 time_delta_s ) {
+void process_input( GLFWwindow  *window,
+                    Viewport    &cam,
+                    Float32      time_delta_s )
+{
    //glfwSetInputMode( window, GLFW_STICKY_KEYS, 1 );
 
-   Float32 move_distance = g_move_speed * time_delta_s;
-   Transform offset;
+   Float32    move_distance = g_move_speed * time_delta_s;
+   Transform  offset;
 
    if ( glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS ) {
-      offset = Transform::make_translation(Vec3(1.0, 1.0, move_distance )* -cam.forward);
+      offset = Transform::make_translation(
+                  Vec3( 1.0f, 1.0f, move_distance )
+                  *
+                  -cam.forward
+               );
       cam.transform( offset);
    }
    if ( glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS ) {
-      offset = Transform::make_translation(Vec3(-1.0, -1.0, -move_distance)* -cam.forward);
+      offset = Transform::make_translation(
+                  Vec3( -1.0f, -1.0f, -move_distance )
+                  *
+                  -cam.forward
+               );
       cam.transform(offset);
    }
    if ( glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS ) {
-      offset = Transform::make_translation(Vec3(move_distance, 1.0, 1.0)* glm::cross( cam.forward, Vec3(0.0, 1.0f, 0.0f)));
+      offset = Transform::make_translation(
+                  Vec3( move_distance, 1.0f, 1.0f )
+                  *
+                  glm::cross( cam.forward, Vec3(0.0, 1.0f, 0.0f) )
+               );
       cam.transform(offset);
    }
    if ( glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS ) {
-      offset = Transform::make_translation(Vec3(-move_distance, -1.0, -1.0)* glm::cross( cam.forward, Vec3(0.0, 1.0f, 0.0f)));
+      offset = Transform::make_translation(
+                  Vec3( -move_distance, -1.0f, -1.0f )
+                  *
+                  glm::cross( cam.forward, Vec3(0.0f, 1.0f, 0.0f) )
+               );
       cam.transform(offset);
    }
    if ( glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS ) {
-      offset = Transform::make_translation(Vec3(0.0, move_distance, 0.0) );
+      offset = Transform::make_translation(
+                  Vec3( 0.0f, move_distance, 0.0f)
+               );
       cam.transform(offset);
    }
    if ( glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS ) {
-      offset = Transform::make_translation(Vec3(0.0, -move_distance, 0.0));
+      offset = Transform::make_translation(
+                  Vec3( 0.0f, -move_distance, 0.0f )
+               );
       cam.transform(offset);
    }
 

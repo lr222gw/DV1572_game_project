@@ -12,10 +12,12 @@
 #include "Transform.h"
 #include "Viewport.h"
 
-constexpr Uint32 light_capacity = 32;
+constexpr Uint32  light_capacity = 32;
 
 // TODO: extract to own file?
-enum   LightType : Uint32 { point = 0, spot = 1, directional = 2 };
+enum   LightType : Uint32 { point       = 0,
+                            spot        = 1,
+                            directional = 2 };
 
 struct LightData {
    LightType   type;
@@ -44,18 +46,18 @@ public:
    void                    draw( Viewport & );
    void                    draw_debug_scene_inspection();
 
-   SceneManager(SharedPtr<ShaderProgram> geo_pass, SharedPtr<ShaderProgram> light_pass);
+   SceneManager( SharedPtr<ShaderProgram> geometry_pass, SharedPtr<ShaderProgram> lighting_pass );
 
 private:
 
    Uint32 _find_light_index( Uint64 id ) const;
-   SharedPtr<ShaderProgram>        _light_pass_shader;
-   SharedPtr<ShaderProgram>        _geometry_pass_shader;
+   SharedPtr<ShaderProgram>        _lighting_shader_program;
+   SharedPtr<ShaderProgram>        _geometry_shader_program;
    Vector<WeakPtr<ModelInstance>>  _instances;
    Array<LightData,light_capacity> _light_data;
    Array<Uint64,light_capacity>    _ids;        // used to ensure the correct removal of lights
    Uint32                          _num_lights; // how much of the light capacity is used
 
-   void _lights_to_GPU();
+   void _lights_to_gpu();
    void _render_to_quad();
 };
