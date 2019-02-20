@@ -9,6 +9,8 @@
 struct VertexData {
    glm::vec3  position; // vertex local coordinate
    glm::vec3  normal;   // vertex normal
+   glm::vec3  tangent;	// tangent
+   glm::vec3  bitangent;// bitangent
    glm::vec2  uv;       // texture coordinate
 };
 

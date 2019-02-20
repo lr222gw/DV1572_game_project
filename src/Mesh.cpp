@@ -20,7 +20,7 @@ void Mesh::_initialize_mesh() {
                  &_indices[0],
                  GL_STATIC_DRAW );
 
-   // attributes for VertexData struct: position, normal, UV
+   // attributes for VertexData struct: position, normal, tangent, bitangent, UV
 
    // position
    glEnableVertexAttribArray(0);
@@ -40,9 +40,27 @@ void Mesh::_initialize_mesh() {
                           sizeof(VertexData),
                           (GLvoid*)offsetof(VertexData, normal) );
 
-   // texture
+   // tangent
    glEnableVertexAttribArray(2);
-   glVertexAttribPointer( 2, // 2 indicates that this is the third element of the struct
+   glVertexAttribPointer(2, // 1 indicates that this is the second element of the struct
+						 3, // no. dimensions (tangent = Vec3)
+						 GL_FLOAT,
+						 GL_FALSE,
+						 sizeof(VertexData),
+						 (GLvoid*)offsetof(VertexData, tangent));
+
+   // bitangent
+   glEnableVertexAttribArray(3);
+   glVertexAttribPointer(3, // 1 indicates that this is the second element of the struct
+						 3, // no. dimensions (bitangent = Vec3)
+						 GL_FLOAT,
+						 GL_FALSE,
+						 sizeof(VertexData),
+						 (GLvoid*)offsetof(VertexData, bitangent));
+                      
+   // texture
+   glEnableVertexAttribArray(4);
+   glVertexAttribPointer( 4, // 2 indicates that this is the third element of the struct
                           2, // no. dimensions (UV = Vec2)
                           GL_FLOAT,
                           GL_FALSE, sizeof(VertexData),
@@ -60,7 +78,7 @@ void Mesh::_draw( ShaderProgram &shader_program ) const {
 
    for ( Uint32 i = 0;  i < _textures.size();  ++i ) {
 
-      // ställa in vilken Textur vi jobbar på, vi kan högst ha 32 (eller 16?)  TODO
+      // stÃ¤lla in vilken Textur vi jobbar pÃ¥, vi kan hÃ¶gst ha 32 (eller 16?)  TODO
       glActiveTexture( GL_TEXTURE0 + i );
       // varv 1; i = 0; GL_TEXTURE0 + i = GL_TEXTURE0;;; varv 2; i = 1 ; GL_TEXTURE0 + i = GL_TEXTURE1, osv. TODO
 

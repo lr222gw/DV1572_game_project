@@ -25,7 +25,7 @@ void Model::_load_model( String const &filename ) {
    // Assimp also provides various other post-processing options that we don't use
 
    auto const *scene = importer.ReadFile( filename,
-                                          aiProcess_Triangulate | aiProcess_FlipUVs );
+                                          aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 
    Bool encountered_error =  !scene
                           || (scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE)
@@ -78,6 +78,14 @@ SharedPtr<Mesh> Model::_process_mesh( aiMesh *mesh, aiScene const *scene ) {
       vertex.normal    = { mesh->mNormals[i].x ,
                            mesh->mNormals[i].y ,
                            mesh->mNormals[i].z };
+
+	  vertex.tangent = { mesh->mTangents[i].x,
+						 mesh->mTangents[i].y,
+						 mesh->mTangents[i].z };
+
+	  vertex.bitangent = { mesh->mBitangents[i].x,
+						   mesh->mBitangents[i].y,
+						   mesh->mBitangents[i].z };
 
       // check whether mesh contains textures:
       if ( mesh->mTextureCoords[0] ) {  // if it does, extract UV-coords
@@ -140,7 +148,7 @@ String Model::get_name() const {
 
 
 // TODO: Bryta ut "_load_material_textures" och "load_texture_from_file" till TextureHandler
-// Undvik att ladda in en textur som redan är inladdad...
+// Undvik att ladda in en textur som redan Ã¤r inladdad...
 Vector<SharedPtr<Texture>> Model::_load_material_textures( aiMaterial    *material,
                                                            aiTextureType  type )
 {
