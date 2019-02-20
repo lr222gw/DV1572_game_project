@@ -25,7 +25,7 @@ void Model::_load_model( String const &filename ) {
    // Assimp also provides various other post-processing options that we don't use
 
    auto const *scene = importer.ReadFile( filename,
-                                          aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+                                          aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace);
 
    Bool encountered_error =  !scene
                           || (scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE)
