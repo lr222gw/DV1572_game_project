@@ -75,7 +75,7 @@ public:
    Transform &operator=( Transform       &&other );
 
    [[nodiscard]] Transform operator*( Transform const &right_hand_side ) const;
-   void operator*=(     Transform const &right_hand_side );
+   void operator*=( Transform const &right_hand_side );
 
    void set_position( Vec3 const &offset );
    void translate(    Vec3 const &offset);
@@ -92,20 +92,16 @@ public:
    void set_scale( Vec3 const &scale );
    void scale(     Vec3 const &scale );
 
-
-   // creates Transforms that exclusively translates, rotates, or scales
-   // basically alternative constructors
    [[nodiscard]] static Transform make_translation( Vec3 const &offset );
    [[nodiscard]] static Transform make_rotation(    Vec3 const &euler_angles );
    [[nodiscard]] static Transform make_rotation(    Mat4 const &rotation_matrix );
    [[nodiscard]] static Transform make_rotation(    Vec3 const &axis, Float32 angle_rad );
    [[nodiscard]] static Transform make_scale(       Vec3 const &scale );
 
-   [[nodiscard]] Vec3 get_position()     const;
-   [[nodiscard]] Mat4 get_rotation()     const;
-   //[[nodiscard]] Vec3 get_rotation_vec3()     const;
-   [[nodiscard]] Vec3 get_scale()        const;
-   [[nodiscard]] Vec3 get_euler_angles() const;
+   [[nodiscard]] Vec3 get_position()      const;
+   [[nodiscard]] Mat4 get_rotation()      const;
+   [[nodiscard]] Vec3 get_scale()         const;
+   [[nodiscard]] Vec3 get_euler_angles()  const;
 
 private:
    void _update_matrix();
@@ -121,6 +117,14 @@ private:
 public:
    Mat4 const &matrix;
 };
+
+
+
+
+
+
+
+
 // TODO: lerp, slerp
 
 
