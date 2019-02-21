@@ -2,51 +2,54 @@
 
 #include "glm/glm.hpp"
 #include "misc/defs.h"
+#include "Texture.h"
 #include "ShaderProgram.h"
 
 
 struct VertexData {
    glm::vec3  position; // vertex local coordinate
    glm::vec3  normal;   // vertex normal
+   glm::vec3  tangent;	// tangent
+   glm::vec3  bitangent;// bitangent
    glm::vec2  uv;       // texture coordinate
 };
-
-
-struct TextureData {
-   GLuint  id;   // texture ID
-   String  type; // texture type
-   String  path; // texture path
-};
-
-
 
 class Mesh {
    friend class Model; // gives Model access to Mesh's private members
 
 /*--------------- class member functions & operators ------------*/
 public:
-   Mesh( Vector<VertexData>   vertex_list,
-         Vector<GLuint>       index_list,
-         Vector<TextureData>  texture_list )
+   Mesh( Vector<VertexData>         &&vertices,
+         Vector<GLuint>             &&indices,
+         Vector<SharedPtr<Texture>> &&textures )
    :
-      _vertex_list  ( vertex_list  ),
-      _index_list   ( index_list   ),
-      _texture_list ( texture_list )
+      _vertices  ( std::move(vertices) ),
+      _indices   ( std::move(indices)  ),
+      _textures  ( std::move(textures) )
    {
-         _initialize_mesh();
+      _initialize_mesh();
    }
 
+   Mesh( Mesh const & ) = delete;
+
+   Mesh( Mesh &&other ):
+      _vertices  ( std::move(other._vertices) ),
+      _indices   ( std::move(other._indices)  ),
+      _textures  ( std::move(other._textures) )
+   {}
+
 private:
-   void _draw( ShaderProgram & );
+   void _draw( ShaderProgram & ) const;
    void _initialize_mesh();
 
 /*--------------- class member variables & constants ------------*/
 private:
-   Vector<VertexData>    _vertex_list;
-   Vector<GLuint>        _index_list;
-   Vector<TextureData>   _texture_list;
+   Vector<VertexData>          _vertices;
+   Vector<GLuint>              _indices;
+   Vector<SharedPtr<Texture>>  _textures;
 
    GLuint  _vao,
            _vbo,
            _ebo;
 };
+
