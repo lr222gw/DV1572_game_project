@@ -16,7 +16,7 @@ SRCEXT      := cpp
 DEPEXT      := d
 OBJEXT      := o
 
-# flags, libraries, and includes (TODO: make -g or -g3 conditional?)
+# flags, libraries, and includes
 CFLAGS      := -Wall -Wformat -std=c++1z
 LIB         := -lGL -lGLU -lglfw -lGLEW -lassimp
 INC         := -I$(INCDIR) -I/usr/local/include

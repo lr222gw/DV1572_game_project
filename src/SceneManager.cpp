@@ -5,11 +5,8 @@ SharedPtr<ModelInstance> SceneManager::instantiate_model(
    SharedPtr<ShaderProgram>  shader_program,
    Transform const&          transform)
 {
-   // construct return value (shared pointer):
-   auto instance_ptr = // TODO: switch to UniquePtr..?
-      std::make_shared<ModelInstance>( model,
-                                       shader_program,
-                                       transform );
+   // construct return value (shared pointer):         TODO: switch to UniquePtr..?
+   auto instance_ptr { std::make_shared<ModelInstance>(model, shader_program, transform) };
 
    // add a weak pointer to the scene manager's instance list before returning:
    _instances.push_back( instance_ptr );
@@ -19,7 +16,7 @@ SharedPtr<ModelInstance> SceneManager::instantiate_model(
 
 
 void SceneManager::draw( Viewport &view ) {
-   auto &g_buffer = view.get_g_buffer();
+   auto &g_buffer = view.get_g_buffer(); // test
 
    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -33,10 +30,8 @@ void SceneManager::draw( Viewport &view ) {
 
    glUseProgram(this->_geometry_pass_shader->get_location());
 
-   glUseProgram( geometry_pass_loc );
-
    glBindFramebuffer( GL_FRAMEBUFFER, g_buffer.buffer_loc );
-   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
    // toggle wireframe mode if config is set to true
    if ( config.is_wireframe_mode )
@@ -45,11 +40,9 @@ void SceneManager::draw( Viewport &view ) {
    //Send view_pos to g_buffer.geom shader
    view.update();
    auto view_pos = view.get_view().get_position();
-   glUniform3fv( glGetUniformLocation( geometry_pass_loc, "view_pos"),
-                 1,
-                 glm::value_ptr(view_pos));
+   glUniform3fv(glGetUniformLocation(this->_geometry_pass_shader->get_location(), "view_pos"), 1, glm::value_ptr(view_pos));
 
-
+   
    // 1. Geometry Pass:
    // TODO: sortera instanserna efter ShaderProgram m.h.a. std::partition()
    for ( auto &instance : _instances )
@@ -66,22 +59,22 @@ void SceneManager::draw( Viewport &view ) {
    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
    // TODO: refactor lighting pass code here
 
-   glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
-   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-   glUseProgram( lighting_pass_loc );
+   glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // ( 0.4f, 0.6, 1.0, 1.0f );
+   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+   glUseProgram(this->_light_pass_shader->get_location());
 
    ////////////////////
 
    auto g_buffer_data{ view.get_g_buffer() };
 
-   glActiveTexture( GL_TEXTURE0 );
-   glBindTexture(   GL_TEXTURE_2D, g_buffer_data.pos_tex_loc );
-   glActiveTexture( GL_TEXTURE1 );
-   glBindTexture(   GL_TEXTURE_2D, g_buffer_data.nor_tex_loc );
-   glActiveTexture( GL_TEXTURE2 );
-   glBindTexture(   GL_TEXTURE_2D, g_buffer_data.spe_tex_loc );
-   glActiveTexture( GL_TEXTURE3) ;
-   glBindTexture(   GL_TEXTURE_2D, g_buffer_data.alb_tex_loc );
+   glActiveTexture(GL_TEXTURE0);
+   glBindTexture(GL_TEXTURE_2D, g_buffer_data.pos_tex_loc);
+   glActiveTexture(GL_TEXTURE1);
+   glBindTexture(GL_TEXTURE_2D, g_buffer_data.nor_tex_loc);
+   glActiveTexture(GL_TEXTURE2);
+   glBindTexture(GL_TEXTURE_2D, g_buffer_data.spe_tex_loc);
+   glActiveTexture(GL_TEXTURE3);
+   glBindTexture(GL_TEXTURE_2D, g_buffer_data.alb_tex_loc); //TODO:P Denna är den enda som gör något...
 
   
 
@@ -114,11 +107,11 @@ void SceneManager::draw( Viewport &view ) {
 
 }
 void SceneManager::_render_to_quad() {
+   
+   Uint32 static  quad_vao = 0;
+   Uint32 static  quad_vbo;
 
-   static Uint32  quad_vao = 0;
-   static Uint32  quad_vbo;
-
-   if ( 0 == quad_vao ) {
+   if (0 == quad_vao) {
       Float32 quad_verts[] = {
          //   X      Y     Z       U     V
             -1.0f,  1.0f, 0.0f,   0.0f, 1.0f,
@@ -150,16 +143,16 @@ void SceneManager::_render_to_quad() {
 
       glEnableVertexAttribArray(1);
 
-      glVertexAttribPointer( 1,
-                             2,
-                             GL_FLOAT,
-                             GL_FALSE,
-                             5 * sizeof(Float32),
-                             (void*)(3 * sizeof(Float32)));
+      glVertexAttribPointer(1,
+         2,
+         GL_FLOAT,
+         GL_FALSE,
+         5 * sizeof(Float32),
+         (void*)(3 * sizeof(Float32)));
    }
-   glBindVertexArray( quad_vao );
+   glBindVertexArray(quad_vao);
 
-   glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
+   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
    glBindVertexArray(0);
 }
@@ -181,13 +174,13 @@ void SceneManager::draw_debug_scene_inspection() {
 
             Float32 position_array[3]   { position.x,
                                           position.y,
-                                          position.z }; // temp
+                                          position.z }; // fulhack
 
             Float32 scale_array[3] { scale.x,
                                      scale.y,
-                                     scale.z }; // temp
+                                     scale.z }; // fulhack
 
-            // temp
+            // fulhack
             String id = instance->get_model()->get_name() +"::"+ std::to_string(i);
 
             ImGui::PushID( id.c_str() );
@@ -338,7 +331,7 @@ SceneManager::SceneManager(SharedPtr<ShaderProgram> geo_pass, SharedPtr<ShaderPr
    _init_depth_map_FBO();
 }
 
-// TODO: refactor light instances into classes that RAII wrap their lifetimes
+
 
 // NOTE! should only be used by Light's constructor (TODO: private+friend?)
 void SceneManager::add_light( Uint64 id, LightData data ) {
@@ -377,59 +370,34 @@ Uint32 SceneManager::_find_light_index( Uint64 id ) const {
    //   if ( _ids[i] == id)
    //      index = i;
 
-   for ( auto i = 0; i < _num_lights; ++i )
-      if ( _ids[i] == id )
+   for (auto i = 0; i < _num_lights; ++i)
+      if (_ids[i] == id)
          index = i;
 
    //TODO:P Should this assert be here with these conditions?
-   assert( index != -1 && "Invalid index; no match." );
+   assert( index != -1 && "Bug! There should only be one entry point and exit point for every light instance" );
    return index;
 }
 
-void SceneManager::_lights_to_gpu() {
-   auto lighting_pass_loc = _lighting_shader_program->get_location();
+void SceneManager::_lights_to_GPU()
+{
 
-   Uint32 const num_lights { _num_lights };
+   Uint32 const num_lights{ this->_num_lights };
+   glUniform1i(this->_light_pass_shader->get_location(), num_lights);
 
-   glUniform1i( lighting_pass_loc, num_lights );
-
-   for ( Uint32 i = 0; i <  _num_lights; ++i ) {
-      auto light = get_light_data(i); // light data of light at index 'i'
-      auto str_i = std::to_string(i); // index 'i' as String
-
-      glUniform1ui( glGetUniformLocation( lighting_pass_loc, ("lights["+str_i+"].type").c_str() ),
-                    light.type );
-
-      glUniform3fv( glGetUniformLocation( lighting_pass_loc, ("lights["+str_i+"].dir").c_str() ),
-                    1,
-                    glm::value_ptr(light.direction) );
-
-      glUniform3fv( glGetUniformLocation( lighting_pass_loc, ("lights["+str_i+"].pos").c_str() ),
-                    1,
-                    glm::value_ptr(light.position) );
-
-      glUniform3fv( glGetUniformLocation( lighting_pass_loc, ("lights["+str_i+"].rgb").c_str() ),
-                    1,
-                    glm::value_ptr(light.color) );
-
-      glUniform1f( glGetUniformLocation( lighting_pass_loc, ("lights["+str_i+"].intensity").c_str() ),
-                   light.intensity );
-
-      glUniform1f( glGetUniformLocation( lighting_pass_loc, ("lights["+str_i+"].radius").c_str() ),
-                   light.radius );
-
-      glUniform1f( glGetUniformLocation( lighting_pass_loc, ("lights["+str_i+"].degree").c_str() ),
-                   light.degree );
-
-      glUniform1f( glGetUniformLocation( lighting_pass_loc, ("lights["+str_i+"].specularity").c_str() ),
-                   light.specularity );
+   for (Uint32 i = 0; i < this->_num_lights; ++i) { //TODO:P Endast en ljuskälla ger samma resultat som att använda alla...
+      LightData ld = this->get_light_data(i);
+      glUniform1ui(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].type").c_str()), ld.type);
+      glUniform3fv(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].dir").c_str()), 1, glm::value_ptr(ld.direction));
+      glUniform3fv(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].pos").c_str()), 1, glm::value_ptr(ld.position));
+      glUniform3fv(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].rgb").c_str()), 1, glm::value_ptr(ld.color));
+      glUniform1f(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].intensity").c_str()), ld.intensity);
+      glUniform1f(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].radius").c_str()), ld.radius);
+      glUniform1f(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].degree").c_str()), ld.degree);
+      glUniform1f(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].specularity").c_str()), ld.specularity);
    }
-
-   glUniform1ui( glGetUniformLocation( lighting_pass_loc, "num_lights"),
-                 num_lights );
-
-   glUniform1ui( glGetUniformLocation( lighting_pass_loc, "render_mode"),
-                 (Uint32)config.render_mode );
+   glUniform1ui(glGetUniformLocation(this->_light_pass_shader->get_location(), "num_lights"), num_lights);  
+   glUniform1ui(glGetUniformLocation(this->_light_pass_shader->get_location(), "render_mode"), (Uint32)config.render_mode);
 }
 
 

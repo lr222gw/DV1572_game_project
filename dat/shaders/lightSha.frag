@@ -63,12 +63,6 @@ void main() {
 
    vec3 lighting;
 
-
-//   for ( ... ) // för alla point lights
-
-//   for ( ... ) // för alla directional lights
-
-
    switch ( render_mode ) {
       case mode_albedo:      lighting = albedo;   break;
       case mode_normals:     lighting = norm;     break;

@@ -13,12 +13,10 @@
 #include "Viewport.h"
 #include "Shadowcaster.h"
 
-constexpr Uint32  light_capacity = 32;
+constexpr Uint32 light_capacity = 32;
 
 // TODO: extract to own file?
-enum   LightType : Uint32 { point       = 0,
-                            spot        = 1,
-                            directional = 2 };
+enum   LightType : Uint32 { point = 0, spot = 1, directional = 2 };
 
 struct LightData {
    LightType   type;
@@ -70,6 +68,6 @@ private:
    Array<Uint64,light_capacity>      _ids;        // used to ensure the correct removal of lights
    Uint32                            _num_lights; // how much of the light capacity is used
 
-   void _lights_to_gpu();
+   void _lights_to_GPU();
    void _render_to_quad();
 };

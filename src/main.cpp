@@ -70,8 +70,9 @@ void process_mouse( GLFWwindow *window, Viewport &cam, Float32 delta_time_s  ) {
    glfwGetCursorPos( window, &x_pos, &y_pos );
 
    if ( first_mouse ) {
-      last_x      = cam.forward.x;
-      last_y      = cam.forward.y;
+      
+      last_x = cam.forward.x;
+      last_y = cam.forward.y;
       first_mouse = false;
    }
 
@@ -79,13 +80,11 @@ void process_mouse( GLFWwindow *window, Viewport &cam, Float32 delta_time_s  ) {
 
    Float64 x_offset = x_pos - last_x;
    Float64 y_offset = last_y - y_pos;
-   last_x           = x_pos;
-   last_y           = y_pos;
+   last_x = x_pos;
+   last_y = y_pos;
 
    if (!g_is_mouse_look_enabled)
       return;
-
-   // 'http://justsomething.co/wp-content/uploads/2013/11/guns-replaced-thumbs-up-20.jpg'
 
    Float64 sensitivity = 0.05;
    x_offset *= sensitivity;
@@ -112,90 +111,74 @@ void process_mouse( GLFWwindow *window, Viewport &cam, Float32 delta_time_s  ) {
 
 
 
-void toggle_input_callback( GLFWwindow  *window,
-                            Int32        key,
-                            Int32        scancode,
-                            Int32        action,
-                            Int32        mods )
-{
-   if ( key == GLFW_KEY_ESCAPE  &&  action == GLFW_PRESS )
-      glfwSetWindowShouldClose( window, true );
+void toggle_input_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
+   static bool isPressed = false;
 
-   if ( key == GLFW_KEY_F1  &&  action == GLFW_PRESS ) {
+   if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+      glfwSetWindowShouldClose(window, true);
+
+   if (key ==  GLFW_KEY_F1 && action == GLFW_PRESS ) {
       g_is_mouse_look_enabled = !g_is_mouse_look_enabled;
-      if ( g_is_mouse_look_enabled )
-         glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_DISABLED );
+      if (g_is_mouse_look_enabled)
+         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
       else
-         glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_NORMAL );
+         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+
    }
 
-   if ( key == GLFW_KEY_F2  &&  action == GLFW_PRESS )
+   if (key ==  GLFW_KEY_F2 && action ==  GLFW_PRESS ) {
       config.is_wireframe_mode = !config.is_wireframe_mode; // used in SceneManager::Draw()
-   if ( key == GLFW_KEY_F3  &&  action == GLFW_PRESS )
+
+   }
+   if (key == GLFW_KEY_F3 && action == GLFW_PRESS ) {
       config.render_mode = RenderMode::composite;
-   if ( key == GLFW_KEY_F4  &&  action == GLFW_PRESS )
+
+   }
+   if (key == GLFW_KEY_F4 && action == GLFW_PRESS ) {
       config.render_mode = RenderMode::albedo;
-   if ( key == GLFW_KEY_F5  &&  action == GLFW_PRESS )
+
+   }
+   if (key == GLFW_KEY_F5 && action == GLFW_PRESS ) {
       config.render_mode = RenderMode::normals;
-   if ( key == GLFW_KEY_F6  &&  action == GLFW_PRESS )
+
+   }
+   if (key == GLFW_KEY_F6 && action == GLFW_PRESS ) {
       config.render_mode = RenderMode::specular;
-   if ( key == GLFW_KEY_F7  &&  action == GLFW_PRESS )
+
+   }
+   if (key == GLFW_KEY_F7 && action == GLFW_PRESS ) {
       config.render_mode = RenderMode::positional;
+
+   }
 }
-
-
-
-void process_input( GLFWwindow  *window,
-                    Viewport    &cam,
-                    Float32      time_delta_s )
-{
+void process_input( GLFWwindow *window, Viewport &cam, Float32 time_delta_s ) {
    //glfwSetInputMode( window, GLFW_STICKY_KEYS, 1 );
 
-   Float32    move_distance = g_move_speed * time_delta_s;
-   Transform  offset;
+   Float32 move_distance = g_move_speed * time_delta_s;
+   Transform offset;
 
    if ( glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS ) {
-      offset = Transform::make_translation(
-                  Vec3( 1.0f, 1.0f, move_distance )
-                  *
-                  -cam.forward
-               );
+      offset = Transform::make_translation(Vec3(1.0, 1.0, move_distance )* -cam.forward);
       cam.transform( offset);
    }
    if ( glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS ) {
-      offset = Transform::make_translation(
-                  Vec3( -1.0f, -1.0f, -move_distance )
-                  *
-                  -cam.forward
-               );
+      offset = Transform::make_translation(Vec3(-1.0, -1.0, -move_distance)* -cam.forward);
       cam.transform(offset);
    }
    if ( glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS ) {
-      offset = Transform::make_translation(
-                  Vec3( move_distance, 1.0f, 1.0f )
-                  *
-                  glm::cross( cam.forward, Vec3(0.0, 1.0f, 0.0f) )
-               );
+      offset = Transform::make_translation(Vec3(move_distance, 1.0, 1.0)* glm::cross( cam.forward, Vec3(0.0, 1.0f, 0.0f)));
       cam.transform(offset);
    }
    if ( glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS ) {
-      offset = Transform::make_translation(
-                  Vec3( -move_distance, -1.0f, -1.0f )
-                  *
-                  glm::cross( cam.forward, Vec3(0.0f, 1.0f, 0.0f) )
-               );
+      offset = Transform::make_translation(Vec3(-move_distance, -1.0, -1.0)* glm::cross( cam.forward, Vec3(0.0, 1.0f, 0.0f)));
       cam.transform(offset);
    }
    if ( glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS ) {
-      offset = Transform::make_translation(
-                  Vec3( 0.0f, move_distance, 0.0f)
-               );
+      offset = Transform::make_translation(Vec3(0.0, move_distance, 0.0) );
       cam.transform(offset);
    }
    if ( glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS ) {
-      offset = Transform::make_translation(
-                  Vec3( 0.0f, -move_distance, 0.0f )
-               );
+      offset = Transform::make_translation(Vec3(0.0, -move_distance, 0.0));
       cam.transform(offset);
    }
 
@@ -364,7 +347,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    // glfwSetCursorPosCallback(window, mouse_callback); // TODO: make a call back matching template that calls on our process_mouse();
    glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
    // glfwSetCursorPosCallback(window, process_mouse);
-   glfwSetKeyCallback( window, toggle_input_callback);
+   glfwSetKeyCallback(window, toggle_input_callback);
 
 	// ImGui context setup
 	IMGUI_CHECKVERSION();
@@ -462,7 +445,6 @@ Int32 main( Int32 argc, char const *argv[] ) {
                           Vec3(1.0f,  0.3f,   0.5f),
                            1.0,
                           17.0,
-
                            0.0,
                            1.0 }) };
    SharedPtr<Model> nanosuit_model = asset_manager.load_model( "nanosuit.obj" );
@@ -571,6 +553,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
       glfwMakeContextCurrent( window );
       glfwSwapBuffers( window );
 	} // main loop end
+
 
    // cleanup:
 	ImGui_ImplOpenGL3_Shutdown();
