@@ -51,11 +51,11 @@ void main(void){
 	//float area = (1/2) * length(cross( vect2, vect1));
 
 	vec4 viewPos = projection * view * vec4(view_pos,1) ; 
-	viewPos.z =  view_pos.z -1500.0f; // if "-1000" is smaller, More artifacts...
+	viewPos.z =  view_pos.z -1500.0f; // if "-1000" is smaller, More artifacts... 
 	vec3 vector_a =   normalize(viewPos.xyz) - (gl_in[0].gl_Position.xyz);
 	//vec3 normal = cross((gl_in[2].gl_Position.xyz - gl_in[0].gl_Position.xyz),(gl_in[1].gl_Position.xyz - gl_in[0].gl_Position.xyz));
 	vec3 normal = cross( (gl_in[2].gl_Position.xyz - gl_in[0].gl_Position.xyz), (gl_in[1].gl_Position.xyz - gl_in[0].gl_Position.xyz));
-	float result = max(dot(normalize(normal), vector_a ), 0);
+	float result = dot(normalize(normal), vector_a );
 
 	 
 	if(result > 0.0 ){

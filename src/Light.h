@@ -69,6 +69,7 @@ public:
 private:
    [[nodiscard]] Uint64    _generate_id() const;
 
+   //Mat4        _proj_view_matrix;
    Uint64        _id;
    SceneManager &_scene;
 };

@@ -42,6 +42,9 @@ void Viewport::_generate_perspective() {
                                    _aspect,
                                    Config::near_plane,
                                    Config::far_plane );
+
+   //_projection = glm::ortho(-50.f, 50.f, -50.f, 50.f, 0.1f, 200.f);
+
    _write_to_buffer();
 }
 
@@ -52,6 +55,7 @@ void Viewport::transform( Transform const &transform ) {
 
 void Viewport::set_view( Transform const &transform ) {
    _view = transform;
+   //_view = 
    _write_to_buffer();
 }
 
