@@ -36,6 +36,7 @@
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\ShaderManager.cpp" />
     <ClCompile Include="src\ShaderProgram.cpp" />
+    <ClCompile Include="src\Shadowcaster.cpp" />
     <ClCompile Include="src\Transform.cpp" />
     <ClCompile Include="src\Viewport.cpp" />
   </ItemGroup>
@@ -65,6 +66,7 @@
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\ShaderManager.h" />
     <ClInclude Include="src\ShaderProgram.h" />
+    <ClInclude Include="src\Shadowcaster.h" />
     <ClInclude Include="src\Transform.h" />
     <ClInclude Include="src\Viewport.h" />
   </ItemGroup>
@@ -77,6 +79,8 @@
     <None Include="dat\shaders\lightSha.vert" />
     <None Include="dat\shaders\quad.frag" />
     <None Include="dat\shaders\quad.vert" />
+    <None Include="dat\shaders\shadow_depth.frag" />
+    <None Include="dat\shaders\shadow_depth.vert" />
     <None Include="dat\shaders\vertSha.vert" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
