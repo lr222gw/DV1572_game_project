@@ -4,12 +4,14 @@ layout ( triangle_strip, max_vertices = 3) out;
 
 in vec2 uv_gs[];
 in vec3 pos_gs[];
-in vec3 nor_gs[];
+//in vec3 nor_gs[];
+in mat3 tbn_gs[];
 
 
 out vec2 uv_fs;
 out vec3 pos_fs;
 out vec3 nor_fs;
+out mat3 tbn_fs;
 
 uniform vec3 view_pos;
 uniform mat4 view;
@@ -63,21 +65,24 @@ void main(void){
 		//gs_color = vs_color[0];
 		uv_fs = uv_gs[0];
 		pos_fs = pos_gs[0];
-		nor_fs = nor_gs[0];
+		nor_fs = (tbn_gs[2])[0];
+		tbn_fs = tbn_gs[0];
 		EmitVertex();
 		
 		gl_Position = gl_in[1].gl_Position;
 		//gs_color = vs_color[1];
 		uv_fs = uv_gs[1];
 		pos_fs = pos_gs[1];
-		nor_fs = nor_gs[1];
+		nor_fs = (tbn_gs[2])[1];
+		tbn_fs = tbn_gs[1];
 		EmitVertex();
 
 		gl_Position = gl_in[2].gl_Position;
 		//gs_color = vs_color[2];
 		uv_fs = uv_gs[2];
 		pos_fs = pos_gs[2];
-		nor_fs = nor_gs[2];
+		nor_fs = (tbn_gs[2])[2];
+		tbn_fs = tbn_gs[2];
 		EmitVertex();
 
 		EndPrimitive();   

@@ -8,26 +8,25 @@
 #include "misc/ImGui/imgui_impl_glfw.h"
 #include "misc/ImGui/imgui_impl_opengl3.h"
 
-class ModelInstance{
+class ModelInstance {
 public:
-   ModelInstance(SharedPtr<Model> model,
-                 SharedPtr<ShaderProgram> shader_program,
-                 Transform const& transform)
+   ModelInstance( SharedPtr<Model> model,
+                  SharedPtr<ShaderProgram> shader_program,
+                  Transform const &transform)
    :
-      _model          (model),
-      _shader_program (shader_program),
-      _transform      (transform),
-      model_transform (_transform)
+      _model          ( model ),
+      _shader_program ( shader_program ),
+      _transform      ( transform ),
+      model_transform ( _transform )
    {}
    void draw();
-   void transform( Transform const &transform ); // TODO: move semantics
+   void transform(     Transform const &transform ); // TODO: move semantics
    void set_transform( Transform const &transform ); // TODO: move semantics
    SharedPtr<ShaderProgram>  get_shader_program(); // TODO: move semantics
    void set_shader_program(SharedPtr<ShaderProgram> shaderprogram); // TODO: move semantics
    [[nodiscard]] SharedPtr<Model const> get_model() const;
 
 private:
-   // i ShaderInstance har vi två klassfält
    SharedPtr<Model>          _model;
    SharedPtr<ShaderProgram>  _shader_program;
    Transform                 _transform;
@@ -35,6 +34,10 @@ private:
 public:
    Transform const &model_transform; // read-only exposure
 };
+
+
+
+
 
 
 
