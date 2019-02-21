@@ -23,7 +23,9 @@ void SceneManager::draw( Viewport &view ) {
    this->update_shadowmap();
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-   glUseProgram(this->_geometry_pass_shader->get_location());
+   //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+   glUseProgram( geometry_pass_loc );
 
    glBindFramebuffer( GL_FRAMEBUFFER, g_buffer.buffer_loc );
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -70,6 +72,9 @@ void SceneManager::draw( Viewport &view ) {
    glBindTexture(GL_TEXTURE_2D, g_buffer_data.spe_tex_loc);
    glActiveTexture(GL_TEXTURE3);
    glBindTexture(GL_TEXTURE_2D, g_buffer_data.alb_tex_loc); //TODO:P Denna är den enda som gör något...
+
+  
+
 
   
 
@@ -371,22 +376,43 @@ Uint32 SceneManager::_find_light_index( Uint64 id ) const {
    return index;
 }
 
-void SceneManager::_lights_to_GPU()
-{
+void SceneManager::_lights_to_gpu() {
+   auto lighting_pass_loc = _lighting_shader_program->get_location();
 
-   Uint32 const num_lights{ this->_num_lights };
-   glUniform1i(this->_light_pass_shader->get_location(), num_lights);
+   Uint32 const num_lights { _num_lights };
 
-   for (Uint32 i = 0; i < this->_num_lights; ++i) { //TODO:P Endast en ljuskälla ger samma resultat som att använda alla...
-      LightData ld = this->get_light_data(i);
-      glUniform1ui(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].type").c_str()), ld.type);
-      glUniform3fv(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].dir").c_str()), 1, glm::value_ptr(ld.direction));
-      glUniform3fv(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].pos").c_str()), 1, glm::value_ptr(ld.position));
-      glUniform3fv(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].rgb").c_str()), 1, glm::value_ptr(ld.color));
-      glUniform1f(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].intensity").c_str()), ld.intensity);
-      glUniform1f(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].radius").c_str()), ld.radius);
-      glUniform1f(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].degree").c_str()), ld.degree);
-      glUniform1f(glGetUniformLocation(this->_light_pass_shader->get_location(), ("lights[" + std::to_string(i) + "].specularity").c_str()), ld.specularity);
+   glUniform1i( lighting_pass_loc, num_lights );
+
+   for ( Uint32 i = 0; i <  _num_lights; ++i ) {
+      auto light = get_light_data(i); // light data of light at index 'i'
+      auto str_i = std::to_string(i); // index 'i' as String
+
+      glUniform1ui( glGetUniformLocation( lighting_pass_loc, ("lights["+str_i+"].type").c_str() ),
+                    light.type );
+
+      glUniform3fv( glGetUniformLocation( lighting_pass_loc, ("lights["+str_i+"].dir").c_str() ),
+                    1,
+                    glm::value_ptr(light.direction) );
+
+      glUniform3fv( glGetUniformLocation( lighting_pass_loc, ("lights["+str_i+"].pos").c_str() ),
+                    1,
+                    glm::value_ptr(light.position) );
+
+      glUniform3fv( glGetUniformLocation( lighting_pass_loc, ("lights["+str_i+"].rgb").c_str() ),
+                    1,
+                    glm::value_ptr(light.color) );
+
+      glUniform1f( glGetUniformLocation( lighting_pass_loc, ("lights["+str_i+"].intensity").c_str() ),
+                   light.intensity );
+
+      glUniform1f( glGetUniformLocation( lighting_pass_loc, ("lights["+str_i+"].radius").c_str() ),
+                   light.radius );
+
+      glUniform1f( glGetUniformLocation( lighting_pass_loc, ("lights["+str_i+"].degree").c_str() ),
+                   light.degree );
+
+      glUniform1f( glGetUniformLocation( lighting_pass_loc, ("lights["+str_i+"].specularity").c_str() ),
+                   light.specularity );
    }
    glUniform1ui(glGetUniformLocation(this->_light_pass_shader->get_location(), "num_lights"), num_lights);  
    glUniform1ui(glGetUniformLocation(this->_light_pass_shader->get_location(), "render_mode"), (Uint32)config.render_mode);
