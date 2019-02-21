@@ -23,11 +23,6 @@ void SceneManager::draw( Viewport &view ) {
    this->update_shadowmap();
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-   //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-   this->update_shadowmap();
-   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
    glUseProgram(this->_geometry_pass_shader->get_location());
 
    glBindFramebuffer( GL_FRAMEBUFFER, g_buffer.buffer_loc );
@@ -75,9 +70,6 @@ void SceneManager::draw( Viewport &view ) {
    glBindTexture(GL_TEXTURE_2D, g_buffer_data.spe_tex_loc);
    glActiveTexture(GL_TEXTURE3);
    glBindTexture(GL_TEXTURE_2D, g_buffer_data.alb_tex_loc); //TODO:P Denna är den enda som gör något...
-
-  
-
 
   
 
