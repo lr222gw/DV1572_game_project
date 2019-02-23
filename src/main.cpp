@@ -490,6 +490,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
    scene_manager.set_shadowcasting(light_sc);
 
 
+   SharedPtr<Model> floor = asset_manager.load_model("floor.obj");
+
 
    Vector<SharedPtr<ModelInstance>> model_instances;
    //model_instances.push_back(scene_manager.instantiate_model(isle,geometry_program, Transform(Vec3(1*(2 / 8) -40, 150.0f, 2*(2 % 8) - 40),
@@ -514,6 +516,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
          Vec3(0.0f, 5.0f, 0.0f),
          Vec3(1.3f, 1.3f, 1.3f))));
 
+   model_instances.push_back(scene_manager.instantiate_model(floor, geometry_program, Transform(Vec3(0.0, 0.0, 0.0), Vec3(0.0f, 0.0f, 0.0f), Vec3(15.0f, 1.0f, 15.0f))));
 
    /* TODO */ Vec3       cam_rotations {  0.0f,   0.0f,   0.0f };
    /* TODO */ Vec3       cam_position  {  0.0f, -20.0f,  15.0f };

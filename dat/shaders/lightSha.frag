@@ -4,7 +4,7 @@
 
 in VS_OUT {
     vec3 FragPos;
-    vec3 Normal;
+    //vec3 Normal;
     vec2 uv;
     vec4 FragPosLightSpace;
 } fs_in;
@@ -129,7 +129,7 @@ void main() {
          else if (light.type == directional_light_t ){ // light.type == directional_light_t
 
 			
-			vec3 normal = normalize(fs_in.Normal);
+			vec3 normal = norm;
 			//vec3 lightColor = vec3(0.3);
 			// ambient
 			vec3 ambient = 0.3 * albedo;
@@ -156,8 +156,9 @@ void main() {
 			// check whether current frag pos is in shadow
 			float shadow = currentDepth > closestDepth  ? 1.0 : 0.0;
 
-
-			lighting += (ambient + (1.0 - shadow) * (diffuse + specular)) * albedo;    
+			//TODO: Disable to not test last light...
+			//lighting += (ambient + (1.0 - shadow) * (diffuse + specular)) * albedo;    
+			lighting = (ambient + (1.0 - shadow) * (diffuse + specular)) * albedo;    
 			
 			//rgba_rasterizer = vec4(lighting, 1.0);
 			 break;

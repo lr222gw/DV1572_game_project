@@ -24,8 +24,9 @@ void SceneManager::draw( Viewport &view ) {
    auto lighting_pass_loc = _lighting_shader_program->get_location();
    auto geometry_pass_loc = _geometry_shader_program->get_location();
 
-   this->update_shadowmap();
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+   this->update_shadowmap();
+   //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
    glUseProgram( geometry_pass_loc );
 
