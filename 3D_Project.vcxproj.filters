@@ -90,6 +90,9 @@
     <ClCompile Include="src\Texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Shadowcaster.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\misc\defs.h">
@@ -176,6 +179,9 @@
     <ClInclude Include="src\Texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Shadowcaster.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="dat\shaders\fraSha.frag">
@@ -203,6 +209,12 @@
       <Filter>Resource Files\Shaders</Filter>
     </None>
     <None Include="dat\shaders\g_buffer.geom">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="dat\shaders\shadow_depth.frag">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="dat\shaders\shadow_depth.vert">
       <Filter>Resource Files\Shaders</Filter>
     </None>
   </ItemGroup>
