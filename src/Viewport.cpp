@@ -12,7 +12,6 @@ Viewport::Viewport( Vec3 position, GLFWwindow *window, Float32 fov_rad ):
    // TODO: bind _camera and uniform buffer for Mat4
    //_model = Mat4(1.0f);
    // validate
-   _g_buffer = GBufferData{ 0,0,0,0,0,0 };
    _view = Transform( position );
    //_view.get_rotation()
 
@@ -63,7 +62,7 @@ void Viewport::set_view( Transform const &transform ) {
    return _g_buffer;
 }
 
-void Viewport::set_fov(Float32 fov_rad) {
+void Viewport::set_fov( Float32 fov_rad ) {
    _fov = fov_rad;
    _generate_perspective();
 }
@@ -99,12 +98,15 @@ void Viewport::_g_buffer_init() {
       glGenTextures(      1, &(_g_buffer.nor_tex_loc) );
       glGenTextures(      1, &(_g_buffer.spe_tex_loc) );
       glGenTextures(      1, &(_g_buffer.alb_tex_loc) );
+      glGenTextures(      1, &(_g_buffer.emi_tex_loc) );
       glGenRenderbuffers( 1, &(_g_buffer.depth_loc)   );
       initialized = true;
   }
 
    glBindFramebuffer( GL_FRAMEBUFFER,
                       _g_buffer.buffer_loc );
+
+
 
 // position texture for g-buffer:
    glBindTexture( GL_TEXTURE_2D,
@@ -137,6 +139,8 @@ void Viewport::_g_buffer_init() {
                            _g_buffer.pos_tex_loc,
                            0 );
 
+
+
 // normal texture for g-buffer:
    glBindTexture( GL_TEXTURE_2D,
                   _g_buffer.nor_tex_loc );
@@ -167,6 +171,8 @@ void Viewport::_g_buffer_init() {
                            GL_TEXTURE_2D,
                            _g_buffer.nor_tex_loc,
                            0 );
+
+
 
 // specularity (specularity color + specularity intensity) for g-buffer:
    glBindTexture( GL_TEXTURE_2D,
@@ -199,6 +205,8 @@ void Viewport::_g_buffer_init() {
                            _g_buffer.spe_tex_loc,
                            0 );
 
+
+
 // albedo (RGBA) color texture for g-buffer
    glBindTexture( GL_TEXTURE_2D,
                   _g_buffer.alb_tex_loc );
@@ -230,13 +238,49 @@ void Viewport::_g_buffer_init() {
                            _g_buffer.alb_tex_loc,
                            0 );
 
-// Describe for fragment shader to write to these buffers (?)
-   GLuint attachments[4] = { GL_COLOR_ATTACHMENT0,
-                             GL_COLOR_ATTACHMENT1,
-                             GL_COLOR_ATTACHMENT2,
-                             GL_COLOR_ATTACHMENT3 };
 
-   glDrawBuffers( 4, attachments );
+
+// emission (RGBA) light texture for g-buffer
+   glBindTexture( GL_TEXTURE_2D,
+                  _g_buffer.emi_tex_loc );
+
+   glTexImage2D( GL_TEXTURE_2D,
+                 0,
+                 GL_RGBA,
+                 width,
+                 height,
+                 0,
+                 GL_RGBA,
+                 GL_UNSIGNED_BYTE,
+                 NULL );
+
+   // setting minifier:
+   glTexParameteri( GL_TEXTURE_2D,
+                    GL_TEXTURE_MIN_FILTER,
+                    GL_NEAREST );
+
+   // setting magnifier:
+   glTexParameteri( GL_TEXTURE_2D,
+                    GL_TEXTURE_MAG_FILTER,
+                    GL_NEAREST );
+
+   // attach the texture id to currently bound g-buffer
+   glFramebufferTexture2D( GL_FRAMEBUFFER,
+                           GL_COLOR_ATTACHMENT4,
+                           GL_TEXTURE_2D,
+                           _g_buffer.emi_tex_loc,
+                           0 );
+
+
+
+// Describe for fragment shader to write to these buffers (?)
+   GLuint attachments[] = { GL_COLOR_ATTACHMENT0,
+                            GL_COLOR_ATTACHMENT1,
+                            GL_COLOR_ATTACHMENT2,
+                            GL_COLOR_ATTACHMENT3,
+                            GL_COLOR_ATTACHMENT4 };
+
+   glDrawBuffers( 5, attachments );
 
 // Create a render buffer object for depth buffer
 

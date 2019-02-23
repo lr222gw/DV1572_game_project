@@ -141,6 +141,8 @@ void toggle_input_callback( GLFWwindow  *window,
       config.render_mode = RenderMode::specular;
    if ( key == GLFW_KEY_F7  &&  action == GLFW_PRESS )
       config.render_mode = RenderMode::positional;
+   if ( key == GLFW_KEY_F8  &&  action == GLFW_PRESS )
+      config.render_mode = RenderMode::emission;
 }
 
 
@@ -467,6 +469,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
                            0.0,
                            1.0  }) };
    SharedPtr<Model> nanosuit_model = asset_manager.load_model( "nanosuit.obj" );
+
    //SharedPtr<Model> isle = asset_manager.load_model("Small Tropical Island.obj");
 
    Vector<SharedPtr<ModelInstance>> model_instances;
@@ -485,6 +488,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
                                                      Vec3(       1.3f,  1.3f,        1.3f ) ) ) );
    }
 
+
+
    /* TODO */ Vec3       cam_rotations {  0.0f,   0.0f,   0.0f };
    /* TODO */ Vec3       cam_position  {  0.0f, -20.0f,  15.0f };
    /* TODO */ Transform  cam_transform;
@@ -501,6 +506,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_norm"   ), 1 );
    glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_spec"   ), 2 );
    glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_albedo" ), 3 );
+   glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_emit"   ), 4 );
    // TODO: emission map
 
    //glEnable(GL_CULL_FACE);

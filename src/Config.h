@@ -6,13 +6,16 @@ enum RenderMode : Uint32 {       composite  = 0,
                                  albedo     = 1,
                                  normals    = 2,
                                  specular   = 3,
-                                 positional = 4  }; // TODO: emission!
+                                 positional = 4,
+                                 emission   = 5 };
 
 enum class FileType   { model, texture };
 
 struct Config {
    static constexpr Int32     start_height =  768,
                               start_width  = 1024;
+
+   static constexpr Uint32    particle_max_count = 512;
 
    static constexpr Float32   near_plane         =  0.001f,
                               far_plane          =  200.0f,

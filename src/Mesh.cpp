@@ -57,7 +57,7 @@ void Mesh::_initialize_mesh() {
 						 GL_FALSE,
 						 sizeof(VertexData),
 						 (GLvoid*)offsetof(VertexData, bitangent));
-                      
+
    // texture
    glEnableVertexAttribArray(4);
    glVertexAttribPointer( 4, // 2 indicates that this is the third element of the struct
@@ -70,40 +70,25 @@ void Mesh::_initialize_mesh() {
 }
 
 void Mesh::_draw( ShaderProgram &shader_program ) const {
-   GLuint diff_num = 0;
-   GLuint spec_num = 0;
-   GLuint norm_num = 0;
+   auto shader_location = shader_program.get_location();
 
-   glUseProgram( shader_program.get_location() );
+   glUseProgram( shader_location );
 
-   for ( Uint32 i = 0;  i < _textures.size();  ++i ) {
+   glActiveTexture( GL_TEXTURE0 );
+   glUniform1i( glGetUniformLocation(shader_location, "tex_diff"), 0 );
+   glBindTexture( GL_TEXTURE_2D, _textures.diffuse->get_location() );
 
-      // ställa in vilken Textur vi jobbar på, vi kan högst ha 32 (eller 16?)  TODO
-      glActiveTexture( GL_TEXTURE0 + i );
-      // varv 1; i = 0; GL_TEXTURE0 + i = GL_TEXTURE0;;; varv 2; i = 1 ; GL_TEXTURE0 + i = GL_TEXTURE1, osv. TODO
+   glActiveTexture( GL_TEXTURE1 );
+   glUniform1i( glGetUniformLocation(shader_location, "tex_spec"), 1 );
+   glBindTexture( GL_TEXTURE_2D, _textures.specular->get_location() );
 
-      // fetch the data
-      StringStream  stream;
+   glActiveTexture( GL_TEXTURE2 );
+   glUniform1i( glGetUniformLocation(shader_location, "tex_norm"), 2 );
+   glBindTexture( GL_TEXTURE_2D, _textures.normal->get_location() );
 
-      auto type = _textures[i]->get_type();
-
-
-      stream << "tex_"; // output prefix, then type and type number:
-      switch ( type ) {
-         case Texture::Type::diffuse:   stream << to_string(type) << ++diff_num;  break;
-         case Texture::Type::specular:  stream << to_string(type) << ++spec_num;  break;
-         case Texture::Type::normal:    stream << to_string(type) << ++norm_num;  break;
-      // case Texture::Type::emission:  stream << to_string(type) << ++emit_num;  break;
-         default: assert( false && "Unknown texture type!" );
-      }
-
-      String texture_channel = stream.str();
-
-      glUniform1i( glGetUniformLocation( shader_program.get_location(),  texture_channel.c_str() ),
-                   i );
-
-      glBindTexture( GL_TEXTURE_2D, _textures[i]->get_location() );
-   }
+   glActiveTexture( GL_TEXTURE3 );
+   glUniform1i( glGetUniformLocation(shader_location, "tex_emit"), 3 );
+   glBindTexture( GL_TEXTURE_2D, _textures.emission->get_location() );
 
    // glUniform1f( glGetUniformLocation(shader_program.get_location(), "material.shininess" ), 16.0f); TODO
    glBindVertexArray( _vao );
@@ -120,7 +105,8 @@ void Mesh::_draw( ShaderProgram &shader_program ) const {
    // bind OpenGL to standard values
    glBindVertexArray(0);
 
-   for ( GLuint i = 0;  i < _textures.size();  ++i ) {
+   // unbind textures
+   for ( GLuint i = 0;  i < 4;  ++i ) {
       glActiveTexture( GL_TEXTURE0 + i );
       glBindTexture( GL_TEXTURE_2D, 0 );
    }

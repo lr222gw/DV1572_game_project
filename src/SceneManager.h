@@ -32,7 +32,11 @@ struct LightData {
                specularity;
 };
 
+
 class SceneManager {
+// friend class Handle<ModelInstance>;
+// friend class Handle<ParticleSystem>;
+// friend class Handle<Light>;
 public:
    SharedPtr<ModelInstance> instantiate_model(
       SharedPtr<Model>          model,
@@ -45,6 +49,11 @@ public:
    void                    remove_light( Uint64 id );         // NOTE! should only be used by Light's destructor (TODO: private+friend?)
    void                    draw( Viewport & );
    void                    draw_debug_scene_inspection();
+
+
+   // Handle<Light>          add_light          ( Light          && );
+   // Handle<ModelInstance>  add_model          ( ModelInstance  && );
+   // Handle<ParticleSystem> add_particle_system( ParticleSystem && );
 
    SceneManager( SharedPtr<ShaderProgram> geometry_pass, SharedPtr<ShaderProgram> lighting_pass );
 
@@ -61,3 +70,30 @@ private:
    void _lights_to_gpu();
    void _render_to_quad();
 };
+
+
+
+// template <class T>
+// class Handle {
+// public:
+//    typedef T Type;
+//
+//    Handle( SceneManager &context, Uint64 id ):
+//       _scene_man ( context ),
+//       id         ( id      ),
+//    {}
+//
+//    ~Handle() {
+//       _scene_man->_remove(this);
+//    }
+//
+//    T& operator*() {
+//       return _scene_man->_get(this);
+//    }
+//
+//
+//    Uint64 const id;
+//
+// private:
+//    SceneManager &_scene_man;
+// };

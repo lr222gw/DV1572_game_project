@@ -5,6 +5,7 @@ uniform  sampler2D  g_tex_pos;
 uniform  sampler2D  g_tex_norm;
 uniform  sampler2D  g_tex_spec;
 uniform  sampler2D  g_tex_albedo;
+uniform  sampler2D  g_tex_emit;
 out      vec4       rgba_rasterizer;
 
 struct Light {
@@ -26,8 +27,8 @@ const uint     mode_composite  = 0,
                mode_albedo     = 1,
                mode_normals    = 2,
                mode_specular   = 3,
-               mode_positional = 4;
-//             mode_emission   = 5;
+               mode_positional = 4,
+               mode_emission   = 5;
 
 const int lights_cap = 32;
 
@@ -44,7 +45,8 @@ void main() {
    vec3  albedo   = texture( g_tex_albedo, uv_fs ).rgb;
    vec3  spec_rgb = texture( g_tex_spec,   uv_fs ).rgb; // TODO: check texture channels
    float spec_str = texture( g_tex_spec,   uv_fs ).w;   // TODO: check texture channels
-// vec3  emit_rgb = texture( g_tex_emit,   uv_fs).rgb;  // TODO: add emission?
+   vec4  emission = texture( g_tex_emit,   uv_fs);
+   vec3  emit_rgb = emission.xyz * emission.w;
 
    vec3 view_dir  = normalize( view_pos - pos );
 
@@ -61,6 +63,7 @@ void main() {
       case mode_normals:     lighting = norm;     break;
       case mode_specular:    lighting = spec_rgb; break; // TODO: check texture channels
       case mode_positional:  lighting = pos;      break;
+      case mode_emission:    lighting = emit_rgb; break;
       case mode_composite:
          lighting = albedo * 0.2 + vec3(0.05); // start off with ambient light
          for ( int i = 0;  i  < num_lights;  ++i ) {
@@ -121,7 +124,9 @@ void main() {
          else { // light.type == directional_light_t
             lighting = vec3(1.0, 0.0, 1.0 ); // TODO
          }
-      } break; // end of mode_omposite case
+      }
+      lighting += emit_rgb;
+      break; // end of mode_composite case
 
       default: lighting = vec3( 1, 0, 1 ); // render pink if erronous mode
    }
