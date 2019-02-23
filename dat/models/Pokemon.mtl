@@ -7,9 +7,7 @@ illum 2
 Ka 0 0 0
 Ks 0 0 0
 map_kd Final_Pokemon_Diffuse.jpg
-map_Kn Final_Pokemon_Normal.jpg
-map_Ks Final_Pokemon_Specular.jpg
-
+map_d Final_Pokemon_Diffuse.jpg
 
 newmtl Pokemon
 Kd 0.48 0.48 0.48
@@ -19,5 +17,4 @@ illum 2
 Ka 0 0 0
 Ks 0 0 0
 map_kd Final_Pokemon_Diffuse.jpg
-map_Kn Final_Pokemon_Normal.jpg
-map_Ks Final_Pokemon_Specular.jpg
+map_d Final_Pokemon_Specular.jpg

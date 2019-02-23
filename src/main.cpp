@@ -70,8 +70,9 @@ void process_mouse( GLFWwindow *window, Viewport &cam, Float32 delta_time_s  ) {
    glfwGetCursorPos( window, &x_pos, &y_pos );
 
    if ( first_mouse ) {
-      last_x      = cam.forward.x;
-      last_y      = cam.forward.y;
+      
+      last_x = cam.forward.x;
+      last_y = cam.forward.y;
       first_mouse = false;
    }
 
@@ -79,13 +80,11 @@ void process_mouse( GLFWwindow *window, Viewport &cam, Float32 delta_time_s  ) {
 
    Float64 x_offset = x_pos - last_x;
    Float64 y_offset = last_y - y_pos;
-   last_x           = x_pos;
-   last_y           = y_pos;
+   last_x = x_pos;
+   last_y = y_pos;
 
    if (!g_is_mouse_look_enabled)
       return;
-
-   // 'http://justsomething.co/wp-content/uploads/2013/11/guns-replaced-thumbs-up-20.jpg'
 
    Float64 sensitivity = 0.05;
    x_offset *= sensitivity;
@@ -112,90 +111,74 @@ void process_mouse( GLFWwindow *window, Viewport &cam, Float32 delta_time_s  ) {
 
 
 
-void toggle_input_callback( GLFWwindow  *window,
-                            Int32        key,
-                            Int32        scancode,
-                            Int32        action,
-                            Int32        mods )
-{
-   if ( key == GLFW_KEY_ESCAPE  &&  action == GLFW_PRESS )
-      glfwSetWindowShouldClose( window, true );
+void toggle_input_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
+   static bool isPressed = false;
 
-   if ( key == GLFW_KEY_F1  &&  action == GLFW_PRESS ) {
+   if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+      glfwSetWindowShouldClose(window, true);
+
+   if (key ==  GLFW_KEY_F1 && action == GLFW_PRESS ) {
       g_is_mouse_look_enabled = !g_is_mouse_look_enabled;
-      if ( g_is_mouse_look_enabled )
-         glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_DISABLED );
+      if (g_is_mouse_look_enabled)
+         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
       else
-         glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_NORMAL );
+         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+
    }
 
-   if ( key == GLFW_KEY_F2  &&  action == GLFW_PRESS )
+   if (key ==  GLFW_KEY_F2 && action ==  GLFW_PRESS ) {
       config.is_wireframe_mode = !config.is_wireframe_mode; // used in SceneManager::Draw()
-   if ( key == GLFW_KEY_F3  &&  action == GLFW_PRESS )
+
+   }
+   if (key == GLFW_KEY_F3 && action == GLFW_PRESS ) {
       config.render_mode = RenderMode::composite;
-   if ( key == GLFW_KEY_F4  &&  action == GLFW_PRESS )
+
+   }
+   if (key == GLFW_KEY_F4 && action == GLFW_PRESS ) {
       config.render_mode = RenderMode::albedo;
-   if ( key == GLFW_KEY_F5  &&  action == GLFW_PRESS )
+
+   }
+   if (key == GLFW_KEY_F5 && action == GLFW_PRESS ) {
       config.render_mode = RenderMode::normals;
-   if ( key == GLFW_KEY_F6  &&  action == GLFW_PRESS )
+
+   }
+   if (key == GLFW_KEY_F6 && action == GLFW_PRESS ) {
       config.render_mode = RenderMode::specular;
-   if ( key == GLFW_KEY_F7  &&  action == GLFW_PRESS )
+
+   }
+   if (key == GLFW_KEY_F7 && action == GLFW_PRESS ) {
       config.render_mode = RenderMode::positional;
+
+   }
 }
-
-
-
-void process_input( GLFWwindow  *window,
-                    Viewport    &cam,
-                    Float32      time_delta_s )
-{
+void process_input( GLFWwindow *window, Viewport &cam, Float32 time_delta_s ) {
    //glfwSetInputMode( window, GLFW_STICKY_KEYS, 1 );
 
-   Float32    move_distance = g_move_speed * time_delta_s;
-   Transform  offset;
+   Float32 move_distance = g_move_speed * time_delta_s;
+   Transform offset;
 
    if ( glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS ) {
-      offset = Transform::make_translation(
-                  Vec3( 1.0f, 1.0f, move_distance )
-                  *
-                  -cam.forward
-               );
+      offset = Transform::make_translation(Vec3(1.0, 1.0, move_distance )* -cam.forward);
       cam.transform( offset);
    }
    if ( glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS ) {
-      offset = Transform::make_translation(
-                  Vec3( -1.0f, -1.0f, -move_distance )
-                  *
-                  -cam.forward
-               );
+      offset = Transform::make_translation(Vec3(-1.0, -1.0, -move_distance)* -cam.forward);
       cam.transform(offset);
    }
    if ( glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS ) {
-      offset = Transform::make_translation(
-                  Vec3( move_distance, 1.0f, 1.0f )
-                  *
-                  glm::cross( cam.forward, Vec3(0.0, 1.0f, 0.0f) )
-               );
+      offset = Transform::make_translation(Vec3(move_distance, 1.0, 1.0)* glm::cross( cam.forward, Vec3(0.0, 1.0f, 0.0f)));
       cam.transform(offset);
    }
    if ( glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS ) {
-      offset = Transform::make_translation(
-                  Vec3( -move_distance, -1.0f, -1.0f )
-                  *
-                  glm::cross( cam.forward, Vec3(0.0f, 1.0f, 0.0f) )
-               );
+      offset = Transform::make_translation(Vec3(-move_distance, -1.0, -1.0)* glm::cross( cam.forward, Vec3(0.0, 1.0f, 0.0f)));
       cam.transform(offset);
    }
    if ( glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS ) {
-      offset = Transform::make_translation(
-                  Vec3( 0.0f, move_distance, 0.0f)
-               );
+      offset = Transform::make_translation(Vec3(0.0, move_distance, 0.0) );
       cam.transform(offset);
    }
    if ( glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS ) {
-      offset = Transform::make_translation(
-                  Vec3( 0.0f, -move_distance, 0.0f )
-               );
+      offset = Transform::make_translation(Vec3(0.0, -move_distance, 0.0));
       cam.transform(offset);
    }
 
@@ -364,7 +347,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    // glfwSetCursorPosCallback(window, mouse_callback); // TODO: make a call back matching template that calls on our process_mouse();
    glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
    // glfwSetCursorPosCallback(window, process_mouse);
-   glfwSetKeyCallback( window, toggle_input_callback);
+   glfwSetKeyCallback(window, toggle_input_callback);
 
 	// ImGui context setup
 	IMGUI_CHECKVERSION();
@@ -390,17 +373,16 @@ Int32 main( Int32 argc, char const *argv[] ) {
    auto lighting_frag_shader  { shader_manager.load_shader( "lightSha.frag" ) }; // TODO: rename files
    auto geometry_vert_shader  { shader_manager.load_shader( "g_buffer.vert" ) }; // TODO: rename files
    auto geometry_frag_shader  { shader_manager.load_shader( "g_buffer.frag" ) }; // TODO: rename files
-   auto geometry_geom_shader  { shader_manager.load_shader( "g_buffer.geom" ) };
-
-   auto geometry_program      { shader_manager.create_program( { geometry_frag_shader,
-                                                                 geometry_vert_shader,
-                                                                 geometry_geom_shader } ) };
-
+   auto geometry_geom_shader  { shader_manager.load_shader( "g_buffer.geom") };
+   auto shadowdepth_vert_shader{ shader_manager.load_shader("shadow_depth.vert") };
+   auto shadowdepth_frag_shader{ shader_manager.load_shader("shadow_depth.frag") };
+   
+   auto geometry_program      { shader_manager.create_program({ geometry_frag_shader, geometry_vert_shader, geometry_geom_shader }) };
    auto lighting_program      { shader_manager.create_program({ lighting_frag_shader, lighting_vert_shader }) };
-
+   auto shadowdepth_program   { shader_manager.create_program({ shadowdepth_frag_shader, shadowdepth_vert_shader }) };
 
    //Add Lightning program to Scenemanager
-   SceneManager  scene_manager{ geometry_program, lighting_program };
+   SceneManager  scene_manager{ geometry_program, lighting_program, shadowdepth_program };
    Light lights[8]{ Light(scene_manager , LightData {LightType::point,
                                                       Vec3(0.0f,   0.0f,   0.0f),
                                                       Vec3(10.0f,  10.0f,  10.0f),
@@ -457,17 +439,32 @@ Int32 main( Int32 argc, char const *argv[] ) {
                           7.0,
                           0.0,
                           1.0}),
-                        Light(scene_manager ,   LightData{LightType::point,
+                        Light(scene_manager, LightData{ LightType::point,
                           Vec3(0.0f,  0.0f,   0.0f),
-                          Vec3(10.0f,  5.0f,  10.0f),
+                          Vec3(10.0f,  -355.0f,  10.0f),
                           Vec3(1.0f,  0.3f,   0.5f),
                            1.0,
                           17.0,
-
                            0.0,
-                           1.0  }) };
+                           1.0 }) };
    SharedPtr<Model> nanosuit_model = asset_manager.load_model( "nanosuit.obj" );
    //SharedPtr<Model> isle = asset_manager.load_model("Small Tropical Island.obj");
+   
+
+   Vec3 poss = Vec3(10.0f, 10.0f, 10.0f);
+   Vec3 dirr = Vec3(1.0f, 0.0f, 0.0f);
+   SharedPtr<Light>sun = std::make_shared<Light>(scene_manager, LightData{ LightType::directional,
+                          dirr,
+                          poss,
+                          Vec3(1.0f,  1.0f,   1.0f),
+                           1.0,
+                          570.0,
+                           0.0,
+                           1.0 });
+
+    SharedPtr<Shadowcaster> light_sc  = std::make_shared<Shadowcaster>(sun);
+    light_sc->set_Light_matrix(0.1f, 200.f, -50, 50, -50, 50, poss, dirr, Vec3(0.0f, 1.0f, 0.0f));
+    scene_manager.set_shadowcasting(light_sc);
 
    Vector<SharedPtr<ModelInstance>> model_instances;
    //model_instances.push_back(scene_manager.instantiate_model(isle,geometry_program, Transform(Vec3(1*(2 / 8) -40, 150.0f, 2*(2 % 8) - 40),
@@ -485,6 +482,13 @@ Int32 main( Int32 argc, char const *argv[] ) {
                                                      Vec3(       1.3f,  1.3f,        1.3f ) ) ) );
    }
 
+   model_instances.push_back(scene_manager.instantiate_model(nanosuit_model,
+      geometry_program,
+      Transform(Vec3(0.0,0.0,0.0),
+         Vec3(0.0f, 5.0f, 0.0f),
+         Vec3(1.3f, 1.3f, 1.3f)) ));
+
+
    /* TODO */ Vec3       cam_rotations {  0.0f,   0.0f,   0.0f };
    /* TODO */ Vec3       cam_position  {  0.0f, -20.0f,  15.0f };
    /* TODO */ Transform  cam_transform;
@@ -501,6 +505,9 @@ Int32 main( Int32 argc, char const *argv[] ) {
    glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_norm"   ), 1 );
    glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_spec"   ), 2 );
    glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_albedo" ), 3 );
+
+   glUniform1i(glGetUniformLocation(lighting_program->get_location(), "shadowMap"), 4);
+   
    // TODO: emission map
 
    //glEnable(GL_CULL_FACE);
@@ -546,6 +553,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
       glfwMakeContextCurrent( window );
       glfwSwapBuffers( window );
 	} // main loop end
+
 
    // cleanup:
 	ImGui_ImplOpenGL3_Shutdown();

@@ -1,11 +1,11 @@
-//Todo;
+//Todo; 
    //-Implementera AssetManager, Se till att Importering av Modell-filer genom Assimp Fungerar (Insperation kolla på Shadermanager)
-         //LoadModel()
+         //LoadModel() 
    //-Implementera Model-klassen
          //Mesh    Struct
          //Texture Struct
 
-   //ViewPort Klassen; Render Via Scene, skicka in "view"
+   //ViewPort Klassen; Render Via Scene, skicka in "view" 
          //Viewport view;
          //SceneManager scene;
          //
@@ -14,8 +14,8 @@
          //   auto delta_t = ...;
          //   scene.render(view, delta_t);
          //}
-
-
+		 
+		 
 class AssetManager; < -funktion: ladda in modeller(returnerar ett handle)
 
 class SceneManager; < -funktion: instantiera modeller som laddats in via AssetManager samt rendrera ?
@@ -43,7 +43,7 @@ public:
 
    void render( Float32 delta_t ) {
       // TODO:
-      //    måste rendrera via _model
+      //    måste rendrera via _model 
       //    men ta hänsyn till instansens attribut (t.ex. position)
    }
 
@@ -158,5 +158,3 @@ private:
 // Scene *_current_scene;
    Vector<ModelInstance> _instances;
 }
-
-
