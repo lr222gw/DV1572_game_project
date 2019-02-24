@@ -19,13 +19,20 @@ SharedPtr<ModelInstance> SceneManager::instantiate_model(
 
 
 void SceneManager::draw( Viewport &view ) {
+   static bool update_shadowmap_once = true;
+   
    auto &g_buffer = view.get_g_buffer();
 
    auto lighting_pass_loc = _lighting_shader_program->get_location();
    auto geometry_pass_loc = _geometry_shader_program->get_location();
-
-   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-   this->update_shadowmap();
+   
+   
+   if (update_shadowmap_once) {
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+      this->update_shadowmap();
+      update_shadowmap_once = false;
+   }
+   
    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
    glUseProgram( geometry_pass_loc );
@@ -80,13 +87,13 @@ void SceneManager::draw( Viewport &view ) {
                  glm::value_ptr(view_pos));
 
    for (auto &e : _shadow_maps) {
-      glUniformMatrix4fv(
-         glGetUniformLocation(_shadow_depth_shader->get_location(),
+      glUniformMatrix4fv( 
+         glGetUniformLocation(lighting_pass_loc,
             "lightmatrix"),
          1,
          GL_FALSE,
          glm::value_ptr(e.first->get_matrix()));
-
+      Mat4 ello = e.first->get_matrix();
       glActiveTexture(GL_TEXTURE4);
       glBindTexture(GL_TEXTURE_2D, e.second);
 
@@ -128,6 +135,7 @@ void SceneManager::_render_to_quad() {
 
       glEnableVertexAttribArray(0);
 
+      //Screen 2D Pos
       glVertexAttribPointer(0,
          3,
          GL_FLOAT,
@@ -137,6 +145,7 @@ void SceneManager::_render_to_quad() {
 
       glEnableVertexAttribArray(1);
 
+      //Screen 2D uv
       glVertexAttribPointer( 1,
                              2,
                              GL_FLOAT,

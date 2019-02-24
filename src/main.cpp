@@ -521,7 +521,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
                                                                geometry_program,
                                                                Transform(Vec3(0.0, 0.0, 0.0), 
                                                                          Vec3(0.0f, 0.0f, 0.0f), 
-                                                                         Vec3(15.0f, 1.0f, 15.0f))));
+                                                                  Vec3(15.0f, 1.0f, 15.0f))));
 
    /* TODO */ Vec3       cam_rotations {  0.0f,   0.0f,   0.0f };
    /* TODO */ Vec3       cam_position  {  0.0f, -20.0f,  15.0f };
