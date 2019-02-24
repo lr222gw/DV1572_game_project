@@ -21,7 +21,7 @@ class Mesh {
 public:
    Mesh( Vector<VertexData>         &&vertices,
          Vector<GLuint>             &&indices,
-         Vector<SharedPtr<Texture>> &&textures )
+         TextureSet                 &&textures )
    :
       _vertices  ( std::move(vertices) ),
       _indices   ( std::move(indices)  ),
@@ -44,9 +44,9 @@ private:
 
 /*--------------- class member variables & constants ------------*/
 private:
-   Vector<VertexData>          _vertices;
-   Vector<GLuint>              _indices;
-   Vector<SharedPtr<Texture>>  _textures;
+   Vector<VertexData>  _vertices;
+   Vector<GLuint>      _indices;
+   TextureSet          _textures;
 
    GLuint  _vao,
            _vbo,

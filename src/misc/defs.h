@@ -18,6 +18,8 @@
 #include <fstream>
 #include <iostream>
 
+#include <utility>
+#include <functional>
 #include <algorithm>
 
 #include <memory>
@@ -78,6 +80,9 @@
                             using Size         = size_t;
 // boolean type:
                             using Bool         = bool;
+// function type:
+template< class R, class... Args >
+                            using Function     = std::function<R(Args...)>;
 // array types:
 template <class T>          using Vector       = std::vector<T>;
 template <class T, Size N>  using Array        = std::array<T,N>;

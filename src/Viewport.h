@@ -6,12 +6,13 @@
 #include "Transform.h"
 
 struct GBufferData {
-   GLuint  buffer_loc;
-   GLuint  pos_tex_loc;
-   GLuint  nor_tex_loc;
-   GLuint  spe_tex_loc;
-   GLuint  alb_tex_loc;
-   GLuint  depth_loc;
+   GLuint  buffer_loc  = 0;
+   GLuint  pos_tex_loc = 0;
+   GLuint  nor_tex_loc = 0;
+   GLuint  spe_tex_loc = 0;
+   GLuint  alb_tex_loc = 0;
+   GLuint  emi_tex_loc = 0;
+   GLuint  depth_loc   = 0;
 };
 
 // TODO: (låg prioritet) lägg till en  void make_active(); som i princip bara kallar på _write_to_buffer();

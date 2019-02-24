@@ -141,6 +141,10 @@ void toggle_input_callback( GLFWwindow  *window,
       config.render_mode = RenderMode::specular;
    if ( key == GLFW_KEY_F7  &&  action == GLFW_PRESS )
       config.render_mode = RenderMode::positional;
+   if ( key == GLFW_KEY_F8  &&  action == GLFW_PRESS )
+      config.render_mode = RenderMode::emissive;
+   if ( key == GLFW_KEY_F9  &&  action == GLFW_PRESS )
+      config.render_mode = RenderMode::textureless;
 }
 
 
@@ -394,7 +398,6 @@ Int32 main( Int32 argc, char const *argv[] ) {
    auto shadowdepth_vert_shader{ shader_manager.load_shader("shadow_depth.vert") };
    auto shadowdepth_frag_shader{ shader_manager.load_shader("shadow_depth.frag") };
 
-
    auto geometry_program      { shader_manager.create_program( { geometry_frag_shader,
                                                                  geometry_vert_shader,
                                                                  geometry_geom_shader } ) };
@@ -471,7 +474,10 @@ Int32 main( Int32 argc, char const *argv[] ) {
                            0.0,
                            1.0  }) };
    SharedPtr<Model> nanosuit_model = asset_manager.load_model( "nanosuit.obj" );
+
    //SharedPtr<Model> isle = asset_manager.load_model("Small Tropical Island.obj");
+
+
 
 
    Vec3 poss = Vec3(10.0f, 10.0f, 10.0f);
@@ -490,8 +496,6 @@ Int32 main( Int32 argc, char const *argv[] ) {
    scene_manager.set_shadowcasting(light_sc);
 
 
- 
-
 
    Vector<SharedPtr<ModelInstance>> model_instances;
    //model_instances.push_back(scene_manager.instantiate_model(isle,geometry_program, Transform(Vec3(1*(2 / 8) -40, 150.0f, 2*(2 % 8) - 40),
@@ -509,19 +513,14 @@ Int32 main( Int32 argc, char const *argv[] ) {
                                                      Vec3(       1.3f,  1.3f,        1.3f ) ) ) );
    }
 
-
-   model_instances.push_back(scene_manager.instantiate_model(nanosuit_model,
-      geometry_program,
-      Transform(Vec3(0.0, 0.0, 0.0),
-         Vec3(0.0f, 5.0f, 0.0f),
-         Vec3(1.3f, 1.3f, 1.3f))));
-
    SharedPtr<Model> floor = asset_manager.load_model("floor.obj");
-   model_instances.push_back(scene_manager.instantiate_model(  floor, 
+   model_instances.push_back(scene_manager.instantiate_model(  floor,
                                                                geometry_program,
                                                                Transform(Vec3(0.0, 0.0, 0.0), 
                                                                          Vec3(0.0f, 0.0f, 0.0f), 
                                                                   Vec3(15.0f, 1.0f, 15.0f))));
+
+
 
    /* TODO */ Vec3       cam_rotations {  0.0f,   0.0f,   0.0f };
    /* TODO */ Vec3       cam_position  {  0.0f, -20.0f,  15.0f };
@@ -539,9 +538,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
    glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_norm"   ), 1 );
    glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_spec"   ), 2 );
    glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_albedo" ), 3 );
-   // TODO: emission map
-
-   glUniform1i(glGetUniformLocation(lighting_program->get_location(), "shadowMap"), 4);
+   glUniform1i( glGetUniformLocation( lighting_program->get_location(), "shadowMap"    ), 4 );
+   glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_emit"   ), 5 );
 
    //glEnable(GL_CULL_FACE);
 

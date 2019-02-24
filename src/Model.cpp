@@ -57,9 +57,9 @@ void Model::draw( ShaderProgram &shader_program ) const {
 
 
 SharedPtr<Mesh> Model::_process_mesh( aiMesh *mesh, aiScene const *scene ) {
-   Vector<VertexData>          vertices;
-   Vector<GLuint>              indices;
-   Vector<SharedPtr<Texture>>  textures;
+   Vector<VertexData>  vertices;
+   Vector<GLuint>      indices;
+   TextureSet          textures;
 
    Uint32 const  face_count = mesh->mNumFaces;
    Uint32 const  vert_count = mesh->mNumVertices;
@@ -110,29 +110,73 @@ SharedPtr<Mesh> Model::_process_mesh( aiMesh *mesh, aiScene const *scene ) {
       }
    }
 
-   // TODO: profile textures.reserve(...)
+
    if ( mesh->mMaterialIndex >= 0 ) {
       auto *material { scene->mMaterials[mesh->mMaterialIndex] };
 
-      // load diffuse maps:
-      Vector<SharedPtr<Texture>> diffuse_maps = _load_material_textures( material,
-                                                                         aiTextureType_DIFFUSE );
-      for ( auto &e : diffuse_maps )
-         textures.emplace_back( e );
+      switch ( material->GetTextureCount(aiTextureType_DIFFUSE) ) {
+         case 0: {
+            textures.diffuse = std::make_shared<DiffuseTexture>();
+         } break;
+
+         case 1: {
+            aiString texture_name;
+            material->GetTexture( aiTextureType_DIFFUSE, 0, &texture_name );
+            FilePath path { FileType::texture, String(texture_name.C_Str()) };
+            textures.diffuse = std::make_shared<DiffuseTexture>(path);
+         } break;
+
+         default: assert( false && "Engine does not support multiple diffuse maps." );
+      }
 
 
-      // load specular maps:
-      Vector<SharedPtr<Texture>> specular_maps = _load_material_textures( material,
-                                                                          aiTextureType_SPECULAR );
-      for ( auto &e : specular_maps )
-         textures.emplace_back( e );
+      switch ( material->GetTextureCount(aiTextureType_SPECULAR) ) {
+         case 0: {
+            textures.specular = std::make_shared<SpecularTexture>();
+         } break;
+
+         case 1: {
+            aiString texture_name;
+            material->GetTexture( aiTextureType_SPECULAR, 0, &texture_name );
+            FilePath path { FileType::texture, String(texture_name.C_Str()) };
+            textures.specular = std::make_shared<SpecularTexture>(path);
+         } break;
+
+         default: assert( false && "Engine does not support multiple specular maps." );
+      }
 
 
-      // load normal maps:
-      Vector<SharedPtr<Texture>> normal_maps = _load_material_textures( material,
-                                                                        aiTextureType_NORMALS );
-      for ( auto &e : normal_maps )
-         textures.emplace_back( e );
+      switch ( material->GetTextureCount(aiTextureType_NORMALS) ) {
+         case 0: {
+            textures.normal = std::make_shared<NormalTexture>();
+         } break;
+
+         case 1: {
+            aiString texture_name;
+            material->GetTexture( aiTextureType_NORMALS, 0, &texture_name );
+            FilePath path { FileType::texture, String(texture_name.C_Str()) };
+            textures.normal = std::make_shared<NormalTexture>(path);
+         } break;
+
+         default: assert( false && "Engine does not support multiple normal maps." );
+      }
+
+      switch ( material->GetTextureCount(aiTextureType_EMISSIVE) ) {
+         case 0: {
+            textures.emissive = std::make_shared<EmissiveTexture>();
+         } break;
+
+         case 1: {
+            aiString texture_name;
+            material->GetTexture( aiTextureType_EMISSIVE, 0, &texture_name );
+            FilePath path { FileType::texture, String(texture_name.C_Str()) };
+            textures.emissive = std::make_shared<EmissiveTexture>(path);
+         } break;
+
+         default: assert( false && "Engine does not support multiple emissive maps." );
+      }
+
+
    }
 
    // TODO: implement more MaterialMaps based on Assimp's aiTextureType enum values
@@ -146,30 +190,3 @@ String Model::get_name() const {
    return _name;
 }
 
-
-// TODO: Bryta ut "_load_material_textures" och "load_texture_from_file" till TextureHandler
-// Undvik att ladda in en textur som redan är inladdad...
-Vector<SharedPtr<Texture>> Model::_load_material_textures( aiMaterial    *material,
-                                                           aiTextureType  type )
-{
-   Vector<SharedPtr<Texture>> textures;
-
-   Texture::Type our_type;
-   switch ( type ) {
-      case aiTextureType_DIFFUSE:   our_type = Texture::Type::diffuse;  break;
-      case aiTextureType_SPECULAR:  our_type = Texture::Type::specular; break;
-      case aiTextureType_NORMALS:   our_type = Texture::Type::normal;   break;
-      default: assert( false && "Unknown texture type encountered!" );
-   }
-
-   for ( Uint32 i = 0;  i < material->GetTextureCount(type);  ++i ) {
-      aiString model_name;
-      material->GetTexture( type, i, &model_name );
-
-      FilePath path { FileType::texture, String(model_name.C_Str()) };
-
-      textures.emplace_back( std::make_shared<Texture>(path, our_type) );
-   }
-
-   return textures;
-}
