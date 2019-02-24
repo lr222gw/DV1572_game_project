@@ -80,6 +80,12 @@ private:
    Array<Uint64,light_capacity>    _ids;        // used to ensure the correct removal of lights
    Uint32                          _num_lights; // how much of the light capacity is used
 
+   //If models orientation has been changed, shadowmap needs to be updated
+   bool _should_recalculate_shadowmap = false;
+
+   //Listen for transform changes in our ModelInstances 
+
+
    void _lights_to_gpu();
    void _render_to_quad();
 };

@@ -5,11 +5,13 @@ SharedPtr<ModelInstance> SceneManager::instantiate_model(
    SharedPtr<ShaderProgram>  shader_program,
    Transform const&          transform)
 {
+   auto callback_lambda = [=]() {_should_recalculate_shadowmap = true; };
    // construct return value (shared pointer):
    auto instance_ptr = // TODO: switch to UniquePtr..?
       std::make_shared<ModelInstance>( model,
                                        shader_program,
-                                       transform );
+                                       transform,
+                                       callback_lambda);
 
    // add a weak pointer to the scene manager's instance list before returning:
    _instances.push_back( instance_ptr );
@@ -19,18 +21,16 @@ SharedPtr<ModelInstance> SceneManager::instantiate_model(
 
 
 void SceneManager::draw( Viewport &view ) {
-   static bool update_shadowmap_once = true;
-   
    auto &g_buffer = view.get_g_buffer();
 
    auto lighting_pass_loc = _lighting_shader_program->get_location();
    auto geometry_pass_loc = _geometry_shader_program->get_location();
    
-   
-   if (update_shadowmap_once) {
+   //TODO: Make modelinstance supply unique ID to Callback Function and then in CAllback function compare the boundingbox of the modelinstance with the frustrum of all the active shadowcasters and recalculate shadowmap for any intersections
+   if (_should_recalculate_shadowmap) {
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       this->update_shadowmap();
-      update_shadowmap_once = false;
+      _should_recalculate_shadowmap = false;
    }
    
    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -390,6 +390,7 @@ Uint32 SceneManager::_find_light_index( Uint64 id ) const {
    assert( index != -1 && "Invalid index; no match." );
    return index;
 }
+
 
 void SceneManager::_lights_to_gpu() {
    auto lighting_pass_loc = _lighting_shader_program->get_location();
