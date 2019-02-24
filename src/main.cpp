@@ -517,7 +517,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
    model_instances.push_back(scene_manager.instantiate_model(floor,
       geometry_program,
       Transform(Vec3(0.0, 0.0, 0.0),
-         Vec3(0.0f, 430.f, 0.0f),
+         //Vec3(0.0f, 1 * 3.14 ,0.0f),
+         Vec3(0.0f, 0.0f, 0.0f),
          Vec3(18.0f, 1.0f, 18.0f))));
 
 

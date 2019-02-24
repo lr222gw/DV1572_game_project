@@ -266,7 +266,8 @@ void main() {
 			// get depth of current fragment from light's perspective
 			float currentDepth = projCoords.z;
 			// check whether current frag pos is in shadow
-			float shadow = currentDepth - 0.005 > closestDepth  ? 1.0 : 0.0;
+			float shadowBias = 0.005;
+			float shadow = currentDepth - shadowBias > closestDepth  ? 1.0 : 0.0;
 
 			//TODO: Disable to not test last light...
 			//lighting += (ambient + (1.0 - shadow) * (diffuse + specular)) * albedo;
