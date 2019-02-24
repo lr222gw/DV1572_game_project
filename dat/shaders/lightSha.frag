@@ -10,7 +10,7 @@ in VS_OUT {
 } fs_in;
 
 uniform sampler2D shadowMap;
-
+uniform mat4 lightmatrix;
 
 
 //in       vec2       uv_fs;
@@ -134,11 +134,11 @@ void main() {
 			// ambient
 			vec3 ambient = 0.3 * albedo;
 			// diffuse
-			vec3 lightDir = normalize(light.pos - fs_in.FragPos);
+			vec3 lightDir = normalize(light.pos - pos);
 			float diff = max(dot(light.dir, normal), 0.0);
 			vec3 diffuse = diff * light.rgb;
 			// specular
-			vec3 viewDir = normalize(view_pos - fs_in.FragPos);
+			vec3 viewDir = normalize(view_pos - pos);
 			vec3 reflectDir = reflect(-light.dir, normal);
 			float spec = spec_str;
 			vec3 halfwayDir = normalize(light.dir + viewDir);  
@@ -146,7 +146,9 @@ void main() {
 			vec3 specular = spec * light.rgb;    
 			// calculate shadow                   
 
-			vec3 projCoords = fs_in.FragPosLightSpace.xyz / fs_in.FragPosLightSpace.w;
+			vec4 lightSpacePos = lightmatrix * vec4(pos, 1.0f);//fs_in.FragPosLightSpace.xyz / fs_in.FragPosLightSpace.w;
+			
+			vec3 projCoords = lightSpacePos.xyz / lightSpacePos.w;
 			// transform to [0,1] range
 			projCoords = projCoords * 0.5 + 0.5;
 			// get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
