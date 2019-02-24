@@ -160,6 +160,23 @@ SharedPtr<Mesh> Model::_process_mesh( aiMesh *mesh, aiScene const *scene ) {
 
          default: assert( false && "Engine does not support multiple normal maps." );
       }
+
+      switch ( material->GetTextureCount(aiTextureType_EMISSIVE) ) {
+         case 0: {
+            textures.emissive = std::make_shared<EmissiveTexture>();
+         } break;
+
+         case 1: {
+            aiString texture_name;
+            material->GetTexture( aiTextureType_EMISSIVE, 0, &texture_name );
+            FilePath path { FileType::texture, String(texture_name.C_Str()) };
+            textures.emissive = std::make_shared<EmissiveTexture>(path);
+         } break;
+
+         default: assert( false && "Engine does not support multiple emissive maps." );
+      }
+
+
    }
 
    // TODO: implement more MaterialMaps based on Assimp's aiTextureType enum values

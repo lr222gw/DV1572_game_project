@@ -478,6 +478,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
    //SharedPtr<Model> isle = asset_manager.load_model("Small Tropical Island.obj");
 
 
+
+
    Vec3 poss = Vec3(10.0f, 10.0f, 10.0f);
    Vec3 dirr = Vec3(1.0f, 0.0f, 0.0f);
    SharedPtr<Light>sun = std::make_shared<Light>(scene_manager, LightData{ LightType::directional,
@@ -510,6 +512,14 @@ Int32 main( Int32 argc, char const *argv[] ) {
                                                      Vec3(       0.0f,  0.0f,        0.0f ),
                                                      Vec3(       1.3f,  1.3f,        1.3f ) ) ) );
    }
+
+   SharedPtr<Model> floor = asset_manager.load_model("floor.obj");
+   model_instances.push_back(scene_manager.instantiate_model(  floor,
+                                                               geometry_program,
+                                                               Transform(Vec3(0.0, 0.0, 0.0),
+                                                                         Vec3(0.0f, 0.0f, 0.0f),
+                                                                         Vec3(15.0f, 1.0f, 15.0f))));
+
 
 
    /* TODO */ Vec3       cam_rotations {  0.0f,   0.0f,   0.0f };
