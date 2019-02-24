@@ -1,0 +1,499 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"Str",
+				"StringView"
+			],
+			[
+				"string",
+				"string_view"
+			],
+			[
+				"Token_",
+				"TOKEN_PARENT"
+			],
+			[
+				"token",
+				"TOKEN_DELIMITER"
+			],
+			[
+				"TOKEN",
+				"TOKEN_DELIMITER"
+			],
+			[
+				"buff",
+				"buffer_256b"
+			],
+			[
+				"TRE",
+				"TREE_ENTRY_BASIC"
+			],
+			[
+				"get",
+				"get_parent"
+			],
+			[
+				"first",
+				"first_fat_block"
+			],
+			[
+				"FAT_",
+				"FAT_MARKER_UNUSED"
+			],
+			[
+				"current",
+				"current_byte"
+			],
+			[
+				"FAT_MARKER",
+				"FAT_MARKER_EOF"
+			],
+			[
+				"unorder",
+				"unordered_map\tstandard header (since c++11)"
+			],
+			[
+				"ROOT",
+				"TOKEN_ROOT"
+			],
+			[
+				"printf",
+				"serial_printf"
+			],
+			[
+				"free",
+				"freelist_head_addr"
+			],
+			[
+				"claim",
+				"claimed_addr"
+			],
+			[
+				"free_lis",
+				"free_list_head"
+			],
+			[
+				"seria",
+				"serial_printf"
+			],
+			[
+				"matri",
+				"MatrixType"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "3D_Project.sublime-project",
+			"settings":
+			{
+				"buffer_size": 0,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"syntax",
+				"Set Syntax: C++"
+			],
+			[
+				"menu",
+				"View: Toggle Menu"
+			],
+			[
+				"refresh",
+				"Project: Refresh Folders"
+			],
+			[
+				"build",
+				"Build With: C++ Single File - Run"
+			],
+			[
+				"format",
+				"SublimeAStyleFormmatter: Format Current Selection"
+			],
+			[
+				"synt",
+				"Set Syntax: C++"
+			],
+			[
+				"text",
+				"Set Syntax: Plain Text"
+			],
+			[
+				"c++",
+				"Set Syntax: C++"
+			],
+			[
+				" text",
+				"Set Syntax: Plain Text"
+			],
+			[
+				"theme",
+				"UI: Select Theme"
+			],
+			[
+				"convert case",
+				"Convert Case: Upper Case"
+			],
+			[
+				"package",
+				"Package Control: Remove Package"
+			],
+			[
+				"vim",
+				"ActualVim: Disable (Global)"
+			],
+			[
+				"ActualVim",
+				"ActualVim: Disable (File)"
+			],
+			[
+				"actual",
+				"Preferences: ActualVim Settings"
+			],
+			[
+				"open",
+				"PackageResourceViewer: Open Resource"
+			],
+			[
+				"edit",
+				"Color Scheme Editor: Edit current color scheme"
+			],
+			[
+				"prv",
+				"PackageResourceViewer: Open Resource"
+			]
+		],
+		"width": 0.0
+	},
+	"console":
+	{
+		"height": 302.0,
+		"history":
+		[
+			"sublime.log_input(True)",
+			"sublime.log_commands(True)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": false,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/home/falk/Code/DV1568_3DProjekt"
+	],
+	"file_history":
+	[
+		"/home/falk/Code/OpenGL/main.cpp",
+		"/home/falk/Documents/Fysik_001.md",
+		"/home/falk/3D_Project/src/main.cpp",
+		"/home/falk/3D_Project/src/misc/defs.h",
+		"/home/falk/Code/Sandbox/Makefile",
+		"/home/falk/Code/defs.h",
+		"/home/falk/Code/Sandbox/main.cpp",
+		"/home/falk/3D_Project/inc/defs.h",
+		"/home/falk/Code/OpenGL/defs.h",
+		"/home/falk/Code/OpenGL/Makefile",
+		"/home/falk/Code/OpenGL/imgui/imgui_impl_opengl3.cpp",
+		"/home/falk/Code/OpenGL/build/main.cpp",
+		"/home/falk/code/osdev/lab3b/testVectors.d/common.h",
+		"/home/falk/code/osdev/lab3b/student.cc",
+		"/home/falk/code/osdev/lab3b/defs.h",
+		"/home/falk/code/osdev/lab3b/filesystem.cc",
+		"/home/falk/code/osdev/lab3b/testVectors.d/cd.d/test.cc",
+		"/home/falk/code/osdev/lab3b/filesystem.h",
+		"/home/falk/code/osdev/lab3b/kernelbase.cc",
+		"/home/falk/code/osdev/lab3b/hardware.cc",
+		"/home/falk/code/osdev/lab3b/mkdir.out",
+		"/home/falk/code/osdev/lab3b/kernelbase.h",
+		"/home/falk/code/osdev/lab3/fsTesting/defs.h",
+		"/home/falk/code/osdev/lab3/fsTesting/filesystem.cc",
+		"/home/falk/code/osdev/lab3/fsTesting/testVectors.d/readwrite.d/test.cc",
+		"/home/falk/code/osdev/lab3/fsTesting/testVectors.d/cd.d/test.cc",
+		"/home/falk/code/osdev/lab3/fsTesting/testVectors.d/mkdir.d/test.cc",
+		"/home/falk/code/osdev/lab3/fsTesting/testVectors.d/move_dir.d/test.cc",
+		"/home/falk/code/osdev/lab3/fsTesting/student.cc",
+		"/home/falk/code/osdev/lab3/fsTesting/Makefile",
+		"/home/falk/code/osdev/lab3/fsTesting/student.h",
+		"/home/falk/code/osdev/lab3/fsTesting/filesystem.h",
+		"/home/falk/code/osdev/lab2/test.bash",
+		"/home/falk/code/osdev/lab3/fsTesting/testVectors.d/relative.d/test.cc",
+		"/home/falk/code/osdev/lab3/fsTesting/testVectors.d/pwd.d/test.cc",
+		"/home/falk/code/osdev/lab3/fsTesting/fs_terminal.c",
+		"/home/falk/code/osdev/lab3/fsTesting/kernelbase.h",
+		"/home/falk/code/osdev/lab3/fsTesting/testVectors.d/seek.d/test.cc",
+		"/home/falk/code/osdev/lab3/fsTesting/kernelbase.cc",
+		"/home/falk/code/osdev/lab3/fsTesting/testVectors.d/common.h",
+		"/home/falk/code/osdev/lab3/fsTesting/testVectors.d/entry.cc",
+		"/home/falk/code/osdev/lab3/fsTesting/hardware.h",
+		"/home/falk/code/osdev/lab3/fsTesting/hardware.cc",
+		"/home/falk/code/osdev/Lab2/training5.cc",
+		"/home/falk/code/osdev/Lab2/training4.cc",
+		"/home/falk/code/osdev/Lab2/logs/results.log",
+		"/home/falk/code/osdev/Lab2/training3.c",
+		"/home/falk/code/osdev/Lab2/training2.c",
+		"/home/falk/code/osdev/Lab2/training1.c",
+		"/home/falk/code/osdev/Lab2/test.bash",
+		"/home/falk/code/osdev/Lab2/training4.c",
+		"/home/falk/code/osdev/Lab2/t2_8_time.txt",
+		"/home/falk/code/osdev/Lab2/test2.txt",
+		"/home/falk/code/osdev/Lab2/test2.",
+		"/home/falk/code/osdev/Lab2/txt",
+		"/home/falk/code/osdev/bareBones/user-printf.h",
+		"/home/falk/code/osdev/bareBones/tickhandler.h",
+		"/home/falk/code/osdev/bareBones/initrd/init",
+		"/home/falk/code/osdev/bareBones/serial.c",
+		"/home/falk/code/osdev/bareBones/mem.c",
+		"/home/falk/code/osdev/bareBones/mem.h",
+		"/home/falk/code/osdev/bareBones/kernel.c",
+		"/home/falk/code/osdev/bareBones/pcb.h",
+		"/home/falk/code/osdev/bareBones/serial.h",
+		"/home/falk/code/osdev/bareBones/termhandler.h",
+		"/home/falk/code/osdev/bareBones/initrd.h",
+		"/home/falk/code/osdev/bareBones/kernel.bin",
+		"/home/falk/code/osdev/bareBones/defs.h",
+		"/home/falk/code/osdev/bareBones/x86.h",
+		"/home/falk/code/osdev/ syscall.txt",
+		"/home/falk/code/osdev/bareBones/Makefile",
+		"/home/falk/code/osdev/bareBones/makePrefix.bash",
+		"/home/falk/code/osdev/bareBones/makeBootp.bash",
+		"/home/falk/code/osdev/bareBones/init.c",
+		"/home/falk/code/osdev/bareBones/ints.c",
+		"/home/falk/code/osdev/bareBones/tickhandler.c",
+		"/home/falk/code/osdev/bareBones/termhandler.c",
+		"/home/falk/code/osdev/bareBones/___window_system.c",
+		"/home/falk/code/osdev/bareBones/printfhandler.c",
+		"/home/falk/code/osdev/bareBones/initrd.c",
+		"/home/falk/code/osdev/bareBones/ints.h",
+		"/home/falk/.config/sublime-text-3/Packages/Theme - Default/Default.sublime-theme",
+		"/home/falk/code/osdev/bareBones/crt0.s",
+		"/home/falk/code/osdev/bareBones/linker.ld",
+		"/home/falk/.config/sublime-text-3/Packages/Color Scheme - Default/Monokai.sublime-color-scheme",
+		"/home/falk/.config/sublime-text-3/Packages/SublimeAStyleFormatter/SublimeAStyleFormatter.sublime-settings",
+		"/home/falk/.config/sublime-text-3/Packages/User/ActualVim.sublime-settings",
+		"/home/falk/.config/sublime-text-3/Monokai.sublime-color-scheme",
+		"/home/falk/.config/sublime-text-3/Packages/Theme - Default/Widget - Default.hidden-color-scheme",
+		"/home/falk/.config/sublime-text-3/Packages/Theme - Default/Widget - Default.sublime-settings",
+		"/etc/default/grub",
+		"/home/falk/Downloads/helping.bash",
+		"/home/falk/code/SFML_Sandbox/makefile",
+		"/home/falk/code/SFML_Sandbox/main.cpp",
+		"/home/falk/code/sandbox/Makefile",
+		"/home/falk/Code/Sandbox/defs.hpp",
+		"/home/falk/Code/Sandbox/matrix_printer.hpp",
+		"/home/falk/Code/test.cpp",
+		"/home/falk/bin/OS/bareBones/Makefile",
+		"/home/falk/.config/openbox/lxde-rc.xml"
+	],
+	"find":
+	{
+		"height": 66.0
+	},
+	"find_in_files":
+	{
+		"height": 190.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "3D_Project.sublime-project",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 0,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"actual_mode": false,
+							"av_input": false,
+							"color_helper.box_height": 13,
+							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
+							"color_helper.file_palette":
+							[
+							],
+							"color_helper.preview_meta":
+							{
+							},
+							"color_helper.scan":
+							{
+								"current_ext": ".sublime-project",
+								"current_syntax": "JavaScript/JSON",
+								"enabled": false,
+								"last_updated": 1551013750.79
+							},
+							"git_gutter_is_enabled": true,
+							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
+							"markdonw_live_preview_last_run": 1551017442.21,
+							"syntax": "Packages/JavaScript/JSON.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 66.0
+	},
+	"input":
+	{
+		"height": 66.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.astyle_error_message":
+	{
+		"height": 0.0
+	},
+	"output.diagnostics":
+	{
+		"height": 121.0
+	},
+	"output.exec":
+	{
+		"height": 145.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"output.unsaved_changes":
+	{
+		"height": 38.0
+	},
+	"pinned_build_system": "",
+	"project": "3D_Project.sublime-project",
+	"replace":
+	{
+		"height": 128.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": false,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 171.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

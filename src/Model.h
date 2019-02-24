@@ -40,8 +40,4 @@ private:
    void                          _process_node( aiNode *, const aiScene * );
    [[nodiscard]] SharedPtr<Mesh> _process_mesh( aiMesh *, const aiScene * );
    void                          _load_model(   String const &filename );
-
-   // TODO: bryta ut till egenklass för texturhantering?
-   [[nodiscard]] Vector<SharedPtr<Texture>> _load_material_textures( aiMaterial *,
-                                                                     aiTextureType );
 };

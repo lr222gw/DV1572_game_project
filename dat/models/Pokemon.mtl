@@ -9,6 +9,7 @@ Ks 0 0 0
 map_kd Final_Pokemon_Diffuse.jpg
 map_Kn Final_Pokemon_Normal.jpg
 map_Ks Final_Pokemon_Specular.jpg
+map_Ke Final_Pokemon_Emissive.jpg
 
 
 newmtl Pokemon
@@ -21,3 +22,4 @@ Ks 0 0 0
 map_kd Final_Pokemon_Diffuse.jpg
 map_Kn Final_Pokemon_Normal.jpg
 map_Ks Final_Pokemon_Specular.jpg
+map_Ke Final_Pokemon_Emissive.jpg

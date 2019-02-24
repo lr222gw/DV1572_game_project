@@ -33,7 +33,11 @@ struct LightData {
                specularity;
 };
 
+
 class SceneManager {
+// friend class Handle<ModelInstance>;
+// friend class Handle<ParticleSystem>;
+// friend class Handle<Light>;
 public:
    SharedPtr<ModelInstance> instantiate_model(
       SharedPtr<Model>          model,
@@ -46,6 +50,10 @@ public:
    void                    remove_light( Uint64 id );         // NOTE! should only be used by Light's destructor (TODO: private+friend?)
    void                    draw( Viewport & );
    void                    draw_debug_scene_inspection();
+
+   // Handle<Light>          add_light          ( Light          && );
+   // Handle<ModelInstance>  add_model          ( ModelInstance  && );
+   // Handle<ParticleSystem> add_particle_system( ParticleSystem && );
 
    void                    set_shadowcasting(SharedPtr<Shadowcaster> light);
    void                    _init_depth_map_FBO();
@@ -60,7 +68,7 @@ private:
    Uint32 _find_light_index( Uint64 id ) const;
    SharedPtr<ShaderProgram>        _lighting_shader_program;
    SharedPtr<ShaderProgram>        _geometry_shader_program;
-   SharedPtr<ShaderProgram>          _shadow_depth_shader;
+   SharedPtr<ShaderProgram>        _shadow_depth_shader;
 
    //DepthMap stuff for Shadowmapping
    Uint32                            _depth_map_FBO_id;
@@ -75,3 +83,30 @@ private:
    void _lights_to_gpu();
    void _render_to_quad();
 };
+
+
+
+// template <class T>
+// class Handle {
+// public:
+//    typedef T Type;
+//
+//    Handle( SceneManager &context, Uint64 id ):
+//       _scene_man ( context ),
+//       id         ( id      ),
+//    {}
+//
+//    ~Handle() {
+//       _scene_man->_remove(this);
+//    }
+//
+//    T& operator*() {
+//       return _scene_man->_get(this);
+//    }
+//
+//
+//    Uint64 const id;
+//
+// private:
+//    SceneManager &_scene_man;
+// };

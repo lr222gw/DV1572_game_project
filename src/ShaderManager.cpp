@@ -16,9 +16,6 @@ SharedPtr<Shader> ShaderManager::load_shader( String const &filename  ) {
       StringStream  shader_stream;
       String        shader_code;
 
-      // .vs = vertex   shader
-      // .gs = geometry shader
-      // .fs = fragment shader
       Shader::Type type = _extract_type( filename );
 
       // ensure ifstream objects can throw exceptions:
@@ -31,7 +28,8 @@ SharedPtr<Shader> ShaderManager::load_shader( String const &filename  ) {
          shader_code = shader_stream.str();                  // convert to string
       }
       catch ( std::ifstream::failure e ) {
-         std::cout << "[ERROR] Unable to read shader code from file." << std::endl;
+         std::cout << "[ERROR] Unable to read shader code from file:\n\t" << e.what();
+         //assert( false && "[ERROR] Unable to read shader code from file." ); // temp
       }
 
       //-------------------------------------THEN COMPILE THE SHADER----------------------------------//

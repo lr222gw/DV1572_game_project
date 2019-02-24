@@ -19,13 +19,20 @@ SharedPtr<ModelInstance> SceneManager::instantiate_model(
 
 
 void SceneManager::draw( Viewport &view ) {
+   static bool update_shadowmap_once = true;
+   
    auto &g_buffer = view.get_g_buffer();
 
    auto lighting_pass_loc = _lighting_shader_program->get_location();
    auto geometry_pass_loc = _geometry_shader_program->get_location();
-
-   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-   this->update_shadowmap();
+   
+   
+   if (update_shadowmap_once) {
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+      this->update_shadowmap();
+      update_shadowmap_once = false;
+   }
+   
    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
    glUseProgram( geometry_pass_loc );
@@ -74,19 +81,21 @@ void SceneManager::draw( Viewport &view ) {
    glBindTexture(   GL_TEXTURE_2D, g_buffer_data.spe_tex_loc );
    glActiveTexture( GL_TEXTURE3) ;
    glBindTexture(   GL_TEXTURE_2D, g_buffer_data.alb_tex_loc );
+   glActiveTexture( GL_TEXTURE5) ;
+   glBindTexture(   GL_TEXTURE_2D, g_buffer_data.emi_tex_loc );
 
    glUniform3fv( glGetUniformLocation( lighting_pass_loc, "view_pos"),
                  1,
                  glm::value_ptr(view_pos));
 
    for (auto &e : _shadow_maps) {
-      glUniformMatrix4fv(
-         glGetUniformLocation(_shadow_depth_shader->get_location(),
+      glUniformMatrix4fv( 
+         glGetUniformLocation(lighting_pass_loc,
             "lightmatrix"),
          1,
          GL_FALSE,
          glm::value_ptr(e.first->get_matrix()));
-
+      Mat4 ello = e.first->get_matrix();
       glActiveTexture(GL_TEXTURE4);
       glBindTexture(GL_TEXTURE_2D, e.second);
 
@@ -128,6 +137,7 @@ void SceneManager::_render_to_quad() {
 
       glEnableVertexAttribArray(0);
 
+      //Screen 2D Pos
       glVertexAttribPointer(0,
          3,
          GL_FLOAT,
@@ -137,6 +147,7 @@ void SceneManager::_render_to_quad() {
 
       glEnableVertexAttribArray(1);
 
+      //Screen 2D uv
       glVertexAttribPointer( 1,
                              2,
                              GL_FLOAT,
@@ -207,13 +218,13 @@ void SceneManager::draw_debug_scene_inspection() {
 
 void SceneManager::set_shadowcasting(SharedPtr<Shadowcaster> light)
 {
-   //TODO: If-statement to check validity of light, is it directional? 
+   //TODO: If-statement to check validity of light, is it directional?
    use_depth_map_FBO();
 
    Uint32 depthMap, width, height;
    glGenTextures(1, &depthMap);
 
-   width = 1024;
+   width  = 1024;
    height = 1024; //TODO: Enable SetSize of Width and height
 
    glBindTexture(GL_TEXTURE_2D, depthMap);
@@ -284,7 +295,7 @@ void SceneManager::update_shadowmap()
 
    for (auto &e : _shadow_maps) {
       //_shadowcasters[i]
-      //send lightMatrix to 
+      //send lightMatrix to
       glUniformMatrix4fv(
          glGetUniformLocation(_shadow_depth_shader->get_location(),
             "lightmatrix"),
