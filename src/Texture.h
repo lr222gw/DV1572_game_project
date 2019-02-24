@@ -6,7 +6,7 @@
 enum class TextureType : Uint8 { diffuse  = 0,
                                  normal   = 1,
                                  specular = 2,
-                                 emission = 3 };
+                                 emissive = 3 };
 
 template <TextureType T_type>
 class Texture {
@@ -129,7 +129,7 @@ private:
          pixel_data[2] = 127; // TODO: contemplate proper default value
          format        = GL_RGBA;
       }
-      else if      ( type == TextureType::emission ) {
+      else if      ( type == TextureType::emissive ) {
          pixel_data[0] = 0;
          pixel_data[1] = 0;
          pixel_data[2] = 0;
@@ -176,12 +176,12 @@ private:
 using NormalTexture   = Texture<TextureType::normal>;
 using SpecularTexture = Texture<TextureType::specular>;
 using DiffuseTexture  = Texture<TextureType::diffuse>;
-using EmissionTexture = Texture<TextureType::emission>;
+using EmissiveTexture = Texture<TextureType::emissive>;
 
 struct TextureSet {
    SharedPtr<DiffuseTexture>   diffuse;
    SharedPtr<NormalTexture>    normal;
    SharedPtr<SpecularTexture>  specular;
-   SharedPtr<EmissionTexture>  emission;
+   SharedPtr<EmissiveTexture>  emissive;
 };
 

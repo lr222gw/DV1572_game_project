@@ -1,7 +1,5 @@
 #version 440 core
 
-
-
 in VS_OUT {
     vec3 FragPos;
     //vec3 Normal;
@@ -10,8 +8,7 @@ in VS_OUT {
 } fs_in;
 
 uniform sampler2D shadowMap;
-uniform mat4 lightmatrix;
-
+uniform mat4      lightmatrix;
 
 //in       vec2       uv_fs;
 uniform  sampler2D  g_tex_pos;

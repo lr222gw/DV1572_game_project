@@ -86,9 +86,9 @@ void Mesh::_draw( ShaderProgram &shader_program ) const {
    glUniform1i( glGetUniformLocation(shader_location, "tex_norm"), 2 );
    glBindTexture( GL_TEXTURE_2D, _textures.normal->get_location() );
 
-   glActiveTexture( GL_TEXTURE3 );
-   glUniform1i( glGetUniformLocation(shader_location, "tex_emit"), 3 );
-   glBindTexture( GL_TEXTURE_2D, _textures.emission->get_location() );
+   glActiveTexture( GL_TEXTURE5 );
+   glUniform1i( glGetUniformLocation(shader_location, "tex_emit"), 5 );
+   glBindTexture( GL_TEXTURE_2D, _textures.emissive->get_location() );
 
    // glUniform1f( glGetUniformLocation(shader_program.get_location(), "material.shininess" ), 16.0f); TODO
    glBindVertexArray( _vao );

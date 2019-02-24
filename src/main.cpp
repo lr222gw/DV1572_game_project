@@ -473,7 +473,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
                            0.0,
                            1.0  }) };
-   SharedPtr<Model> nanosuit_model = asset_manager.load_model( "Pokemon.obj" );
+   SharedPtr<Model> nanosuit_model = asset_manager.load_model( "nanosuit.obj" );
 
    //SharedPtr<Model> isle = asset_manager.load_model("Small Tropical Island.obj");
 
@@ -528,8 +528,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
    glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_norm"   ), 1 );
    glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_spec"   ), 2 );
    glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_albedo" ), 3 );
+   glUniform1i( glGetUniformLocation( lighting_program->get_location(), "shadowMap"    ), 4 );
    glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_emit"   ), 5 );
-   glUniform1i(glGetUniformLocation(  lighting_program->get_location(), "shadowMap"),     4 );
 
    //glEnable(GL_CULL_FACE);
 

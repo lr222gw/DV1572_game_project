@@ -6,7 +6,7 @@ String to_string( TextureType t ) {
       case TextureType::diffuse:   s = "diff";  break;
       case TextureType::normal:    s = "norm";  break;
       case TextureType::specular:  s = "spec";  break;
-      case TextureType::emission:  s = "emit";  break;
+      case TextureType::emissive:  s = "emit";  break;
       default: s = "ERROR";
    }
    return s;

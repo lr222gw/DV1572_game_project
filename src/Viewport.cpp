@@ -266,7 +266,7 @@ void Viewport::_g_buffer_init() {
 
    // attach the texture id to currently bound g-buffer
    glFramebufferTexture2D( GL_FRAMEBUFFER,
-                           GL_COLOR_ATTACHMENT4,
+                           GL_COLOR_ATTACHMENT5,
                            GL_TEXTURE_2D,
                            _g_buffer.emi_tex_loc,
                            0 );
@@ -278,7 +278,7 @@ void Viewport::_g_buffer_init() {
                             GL_COLOR_ATTACHMENT1,
                             GL_COLOR_ATTACHMENT2,
                             GL_COLOR_ATTACHMENT3,
-                            GL_COLOR_ATTACHMENT4 };
+                            GL_COLOR_ATTACHMENT5 };
 
    glDrawBuffers( 5, attachments );
 

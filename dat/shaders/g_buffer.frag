@@ -15,7 +15,7 @@ layout (location = 0) out vec3 g_position;
 layout (location = 1) out vec3 g_normal;
 layout (location = 2) out vec4 g_spec;
 layout (location = 3) out vec4 g_albedo;
-layout (location = 4) out vec4 g_emit;
+layout (location = 5) out vec4 g_emit;
 
 void main() {
 	g_position = pos_fs;
