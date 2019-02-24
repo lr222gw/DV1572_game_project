@@ -79,6 +79,11 @@ SharedPtr<Mesh> Model::_process_mesh( aiMesh *mesh, aiScene const *scene ) {
                            mesh->mNormals[i].y ,
                            mesh->mNormals[i].z };
 
+
+      //if (dot(cross(norm, tang), btan) < 0.0) {
+      //   tang = tang * -1.0;
+      //}
+
 	  vertex.tangent = { mesh->mTangents[i].x,
 						 mesh->mTangents[i].y,
 						 mesh->mTangents[i].z };
@@ -86,6 +91,13 @@ SharedPtr<Mesh> Model::_process_mesh( aiMesh *mesh, aiScene const *scene ) {
 	  vertex.bitangent = { mesh->mBitangents[i].x,
 						   mesh->mBitangents[i].y,
 						   mesh->mBitangents[i].z };
+
+     //TODO: Shadow on floor return if we use ">" instead of "<"
+     //if (glm::dot(glm::cross(vertex.normal, vertex.tangent), vertex.bitangent) > 0.0) {
+     //   vertex.tangent = { -mesh->mTangents[i].x,
+     //              -mesh->mTangents[i].y,
+     //              -mesh->mTangents[i].z };
+     //}
 
       // check whether mesh contains textures:
       if ( mesh->mTextureCoords[0] ) {  // if it does, extract UV-coords

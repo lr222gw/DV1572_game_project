@@ -7,6 +7,7 @@ in vec3 pos_gs[];
 //in vec3 nor_gs[];
 in mat3 tbn_gs[];
 
+
 out vec2 uv_fs;
 out vec3 pos_fs;
 out vec3 nor_fs;
@@ -58,11 +59,12 @@ void main(void) {
 
 
 	if(result > 0.0 ){
-	   gl_Position = gl_in[0].gl_Position;
+	    gl_Position = gl_in[0].gl_Position;
 		//gs_color = vs_color[0];
 		uv_fs  = uv_gs[0];
 		pos_fs = pos_gs[0];
-		nor_fs = (tbn_gs[2])[0];
+		//nor_fs = (tbn_gs[2])[0];
+		nor_fs = tbn_gs[0][2];
 		tbn_fs = tbn_gs[0];
 		EmitVertex();
 
@@ -70,7 +72,8 @@ void main(void) {
 		//gs_color = vs_color[1];
 		uv_fs  = uv_gs[1];
 		pos_fs = pos_gs[1];
-		nor_fs = (tbn_gs[2])[1];
+		//nor_fs = (tbn_gs[2])[1];
+		nor_fs = tbn_gs[1][2];
 		tbn_fs = tbn_gs[1];
 		EmitVertex();
 
@@ -78,7 +81,8 @@ void main(void) {
 		//gs_color = vs_color[2];
 		uv_fs  = uv_gs[2];
 		pos_fs = pos_gs[2];
-		nor_fs = (tbn_gs[2])[2];
+		//nor_fs = (tbn_gs[2])[2];
+		nor_fs = tbn_gs[2][2];
 		tbn_fs = tbn_gs[2];
 		EmitVertex();
 

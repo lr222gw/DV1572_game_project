@@ -21,7 +21,7 @@ void main() {
 	g_position = pos_fs;
 	g_normal   = normalize(texture( tex_norm, uv_fs ).xyz);
 	//TODO: Fix wierd Model bugg, half has a different color...
-	//g_normal   = normalize(g_normal * 2.0 -1.0);  // G�r om s� vi f�r mellan -1 och 1 ist�llet f�r 0 och 1. Beh�vs kanske inte f�r se
+	g_normal   = normalize(g_normal * 2.0 -1.0);  // G�r om s� vi f�r mellan -1 och 1 ist�llet f�r 0 och 1. Beh�vs kanske inte f�r se
 	g_normal   = normalize(tbn_fs * g_normal);
 	g_spec     = texture( tex_spec, uv_fs );
 	g_albedo   = texture( tex_diff, uv_fs );

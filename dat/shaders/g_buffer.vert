@@ -22,10 +22,11 @@ void main() {
 	vec3 btan = normalize( vec3(model_transform * vec4(bit_vs, 0.0) ) );
 	vec3 norm = normalize( vec3(model_transform * vec4(nor_vs, 0.0) ) );
 	//mat3 tbn = mat3(tang, btan, norm);
-	if ( dot( cross(norm, tang), btan ) < 0.0 ) {
-		tang = tang * -1.0;
-	}
+	//if ( dot( cross( norm, tang), btan ) < 0.0 ) {
+	//	tang = tang * -1.0;
+	//}
 	tbn_gs = mat3(tang, btan, norm);
+
 
 //	mat3 norm_mat3 = transpose( inverse( mat3(model_transform) ) );
 //	nor_gs         = norm_mat3 * nor_vs;
