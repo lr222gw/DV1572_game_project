@@ -21,3 +21,10 @@ void ModelInstance::set_transform( Transform const &transform ) {
 SharedPtr<Model const> ModelInstance::get_model() const {
    return _model;
 }
+
+SharedPtr<ShaderProgram>  ModelInstance::get_shader_program() {
+   return _shader_program;
+}
+void ModelInstance::set_shader_program(SharedPtr<ShaderProgram> shaderprogram) {
+   _shader_program = shaderprogram;
+}

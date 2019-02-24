@@ -11,7 +11,7 @@ uniform mat4 view;
 uniform mat4 projection;
 
 out vec3 pos_gs;
-out vec3 nor_gs;
+// out vec3 nor_gs;
 out vec2 uv_gs;
 out mat3 tbn_gs;
 
@@ -27,8 +27,8 @@ void main() {
 	}
 	tbn_gs = mat3(tang, btan, norm);
 
-	mat3 norm_mat3 = transpose( inverse( mat3(model_transform) ) );
-	nor_gs         = norm_mat3 * nor_vs;
+//	mat3 norm_mat3 = transpose( inverse( mat3(model_transform) ) );
+//	nor_gs         = norm_mat3 * nor_vs;
 
 	vec4 pos_world = model_transform * vec4( pos_vs, 1.0 );
 	pos_gs         = pos_world.xyz;

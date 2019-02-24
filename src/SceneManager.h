@@ -11,6 +11,7 @@
 #include "ShaderProgram.h"
 #include "Transform.h"
 #include "Viewport.h"
+#include "Shadowcaster.h"
 
 constexpr Uint32  light_capacity = 32;
 
@@ -50,18 +51,30 @@ public:
    void                    draw( Viewport & );
    void                    draw_debug_scene_inspection();
 
-
    // Handle<Light>          add_light          ( Light          && );
    // Handle<ModelInstance>  add_model          ( ModelInstance  && );
    // Handle<ParticleSystem> add_particle_system( ParticleSystem && );
 
-   SceneManager( SharedPtr<ShaderProgram> geometry_pass, SharedPtr<ShaderProgram> lighting_pass );
+   void                    set_shadowcasting(SharedPtr<Shadowcaster> light);
+   void                    _init_depth_map_FBO();
+   void                    use_depth_map_FBO();
+   void                    update_shadowmap();
+
+   SceneManager(SharedPtr<ShaderProgram> geo_pass, SharedPtr<ShaderProgram> light_pass, SharedPtr<ShaderProgram> shadow_depth);
+
 
 private:
 
    Uint32 _find_light_index( Uint64 id ) const;
    SharedPtr<ShaderProgram>        _lighting_shader_program;
    SharedPtr<ShaderProgram>        _geometry_shader_program;
+   SharedPtr<ShaderProgram>        _shadow_depth_shader;
+
+   //DepthMap stuff for Shadowmapping
+   Uint32                            _depth_map_FBO_id;
+   HashMap< SharedPtr<Shadowcaster>, Uint32> _shadow_maps;// = { _shadowcasters ,  _depth_map_ids };
+
+
    Vector<WeakPtr<ModelInstance>>  _instances;
    Array<LightData,light_capacity> _light_data;
    Array<Uint64,light_capacity>    _ids;        // used to ensure the correct removal of lights

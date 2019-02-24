@@ -22,6 +22,10 @@ public:
    void draw();
    void transform(     Transform const &transform ); // TODO: move semantics
    void set_transform( Transform const &transform ); // TODO: move semantics
+
+   SharedPtr<ShaderProgram>  get_shader_program(); // TODO: move semantics
+   void set_shader_program(SharedPtr<ShaderProgram> shaderprogram); // TODO: move semantics
+
    [[nodiscard]] SharedPtr<Model const> get_model() const;
 
 private:

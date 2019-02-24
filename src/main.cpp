@@ -142,7 +142,9 @@ void toggle_input_callback( GLFWwindow  *window,
    if ( key == GLFW_KEY_F7  &&  action == GLFW_PRESS )
       config.render_mode = RenderMode::positional;
    if ( key == GLFW_KEY_F8  &&  action == GLFW_PRESS )
-      config.render_mode = RenderMode::emission;
+      config.render_mode = RenderMode::emissive;
+   if ( key == GLFW_KEY_F9  &&  action == GLFW_PRESS )
+      config.render_mode = RenderMode::textureless;
 }
 
 
@@ -393,6 +395,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
    auto geometry_vert_shader  { shader_manager.load_shader( "g_buffer.vert" ) }; // TODO: rename files
    auto geometry_frag_shader  { shader_manager.load_shader( "g_buffer.frag" ) }; // TODO: rename files
    auto geometry_geom_shader  { shader_manager.load_shader( "g_buffer.geom" ) };
+   auto shadowdepth_vert_shader{ shader_manager.load_shader("shadow_depth.vert") };
+   auto shadowdepth_frag_shader{ shader_manager.load_shader("shadow_depth.frag") };
 
    auto geometry_program      { shader_manager.create_program( { geometry_frag_shader,
                                                                  geometry_vert_shader,
@@ -400,9 +404,10 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
    auto lighting_program      { shader_manager.create_program({ lighting_frag_shader, lighting_vert_shader }) };
 
+   auto shadowdepth_program{ shader_manager.create_program({ shadowdepth_frag_shader, shadowdepth_vert_shader }) };
 
    //Add Lightning program to Scenemanager
-   SceneManager  scene_manager{ geometry_program, lighting_program };
+   SceneManager  scene_manager{ geometry_program, lighting_program , shadowdepth_program };
    Light lights[8]{ Light(scene_manager , LightData {LightType::point,
                                                       Vec3(0.0f,   0.0f,   0.0f),
                                                       Vec3(10.0f,  10.0f,  10.0f),
@@ -468,9 +473,27 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
                            0.0,
                            1.0  }) };
-   SharedPtr<Model> nanosuit_model = asset_manager.load_model( "nanosuit.obj" );
+   SharedPtr<Model> nanosuit_model = asset_manager.load_model( "Pokemon.obj" );
 
    //SharedPtr<Model> isle = asset_manager.load_model("Small Tropical Island.obj");
+
+
+   Vec3 poss = Vec3(10.0f, 10.0f, 10.0f);
+   Vec3 dirr = Vec3(1.0f, 0.0f, 0.0f);
+   SharedPtr<Light>sun = std::make_shared<Light>(scene_manager, LightData{ LightType::directional,
+                          dirr,
+                          poss,
+                          Vec3(1.0f,  1.0f,   1.0f),
+                           1.0,
+                          570.0,
+                           0.0,
+                           1.0 });
+
+   SharedPtr<Shadowcaster> light_sc = std::make_shared<Shadowcaster>(sun);
+   light_sc->set_Light_matrix(0.1f, 200.f, -50, 50, -50, 50, poss, dirr, Vec3(0.0f, 1.0f, 0.0f));
+   scene_manager.set_shadowcasting(light_sc);
+
+
 
    Vector<SharedPtr<ModelInstance>> model_instances;
    //model_instances.push_back(scene_manager.instantiate_model(isle,geometry_program, Transform(Vec3(1*(2 / 8) -40, 150.0f, 2*(2 % 8) - 40),
@@ -489,7 +512,6 @@ Int32 main( Int32 argc, char const *argv[] ) {
    }
 
 
-
    /* TODO */ Vec3       cam_rotations {  0.0f,   0.0f,   0.0f };
    /* TODO */ Vec3       cam_position  {  0.0f, -20.0f,  15.0f };
    /* TODO */ Transform  cam_transform;
@@ -506,8 +528,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
    glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_norm"   ), 1 );
    glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_spec"   ), 2 );
    glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_albedo" ), 3 );
-   glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_emit"   ), 4 );
-   // TODO: emission map
+   glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_emit"   ), 5 );
+   glUniform1i(glGetUniformLocation(  lighting_program->get_location(), "shadowMap"),     4 );
 
    //glEnable(GL_CULL_FACE);
 

@@ -24,6 +24,10 @@ void SceneManager::draw( Viewport &view ) {
    auto lighting_pass_loc = _lighting_shader_program->get_location();
    auto geometry_pass_loc = _geometry_shader_program->get_location();
 
+   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+   this->update_shadowmap();
+   //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
    glUseProgram( geometry_pass_loc );
 
    glBindFramebuffer( GL_FRAMEBUFFER, g_buffer.buffer_loc );
@@ -74,6 +78,21 @@ void SceneManager::draw( Viewport &view ) {
    glUniform3fv( glGetUniformLocation( lighting_pass_loc, "view_pos"),
                  1,
                  glm::value_ptr(view_pos));
+
+   for (auto &e : _shadow_maps) {
+      glUniformMatrix4fv(
+         glGetUniformLocation(_shadow_depth_shader->get_location(),
+            "lightmatrix"),
+         1,
+         GL_FALSE,
+         glm::value_ptr(e.first->get_matrix()));
+
+      glActiveTexture(GL_TEXTURE4);
+      glBindTexture(GL_TEXTURE_2D, e.second);
+
+      //glUniform1i(glGetUniformLocation(_light_pass_shader->get_location(), "shadowMap"), 4);
+   }
+
 
    _lights_to_gpu();
    _render_to_quad();
@@ -186,12 +205,132 @@ void SceneManager::draw_debug_scene_inspection() {
    } ImGui::End(); // end our Inspection window
 }
 
-SceneManager::SceneManager( SharedPtr<ShaderProgram> geometry_pass,
-                            SharedPtr<ShaderProgram> lighting_pass )
+void SceneManager::set_shadowcasting(SharedPtr<Shadowcaster> light)
 {
-   _geometry_shader_program = geometry_pass;
-   _lighting_shader_program = lighting_pass;
+   //TODO: If-statement to check validity of light, is it directional? 
+   use_depth_map_FBO();
+
+   Uint32 depthMap, width, height;
+   glGenTextures(1, &depthMap);
+
+   width = 1024;
+   height = 1024; //TODO: Enable SetSize of Width and height
+
+   glBindTexture(GL_TEXTURE_2D, depthMap);
+
+   glTexImage2D(GL_TEXTURE_2D,
+      0,
+      GL_DEPTH_COMPONENT,
+      width,
+      height,
+      0,
+      GL_DEPTH_COMPONENT,
+      GL_FLOAT,
+      NULL);
+
+   glTexParameteri(GL_TEXTURE_2D,
+      GL_TEXTURE_MIN_FILTER,
+      GL_NEAREST);
+
+   glTexParameteri(GL_TEXTURE_2D,
+      GL_TEXTURE_MAG_FILTER,
+      GL_NEAREST);
+
+   glTexParameteri(GL_TEXTURE_2D,
+      GL_TEXTURE_WRAP_S,
+      GL_CLAMP_TO_BORDER);
+
+   glTexParameteri(GL_TEXTURE_2D,
+      GL_CLAMP_TO_BORDER,
+      GL_CLAMP_TO_BORDER);
+
+   float borderColor[] = { 1.0,1.0,1.0, 1.0 };
+   glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+
+   Uint32 AttatchmentNmbr = _shadow_maps.size();
+
+   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+   glDrawBuffer(GL_NONE);
+   glReadBuffer(GL_NONE);
+
+   _shadow_maps.emplace(light, depthMap);
+   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
+
+void SceneManager::_init_depth_map_FBO()
+{
+   glGenFramebuffers(1, &_depth_map_FBO_id);
+}
+
+void SceneManager::use_depth_map_FBO()
+{
+   glBindFramebuffer(GL_FRAMEBUFFER, _depth_map_FBO_id);
+}
+
+void SceneManager::update_shadowmap()
+{
+   if (_shadow_maps.size() == 0) {
+      return;
+   }
+
+   //glBindFramebuffer(GL_FRAMEBUFFER, this->_depth_map_FBO_id);
+   use_depth_map_FBO();
+   glUseProgram(_shadow_depth_shader->get_location());
+
+   GLuint count = 0;
+   GLint oldSize[4];
+   glGetIntegerv(GL_VIEWPORT, oldSize);
+
+
+   for (auto &e : _shadow_maps) {
+      //_shadowcasters[i]
+      //send lightMatrix to 
+      glUniformMatrix4fv(
+         glGetUniformLocation(_shadow_depth_shader->get_location(),
+            "lightmatrix"),
+         1,
+         GL_FALSE,
+         glm::value_ptr(e.first->get_matrix()));
+
+      glViewport(0, 0, 1024, 1024);//TODO: do not hardcode, decide based on Shadowcaster
+
+
+      glClear(GL_DEPTH_BUFFER_BIT);
+
+      //TODO: Increment GL_TEXTURE
+      //glActiveTexture(GL_TEXTURE0/*+ count*/);
+
+      //Render from light pov
+      for (auto &instance : _instances) {
+         if (!instance.expired()) {
+            SharedPtr<ShaderProgram> previous = instance.lock()->get_shader_program();
+            instance.lock()->set_shader_program(this->_shadow_depth_shader);
+            instance.lock()->draw();
+            instance.lock()->set_shader_program(previous);
+         }
+      }
+
+      count++;
+   }
+   glBindFramebuffer(GL_FRAMEBUFFER, 0);
+   glViewport(0, 0, oldSize[2], oldSize[3]);
+
+}
+
+SceneManager::SceneManager(SharedPtr<ShaderProgram> geo_pass, SharedPtr<ShaderProgram> light_pass, SharedPtr<ShaderProgram> shadow_depth)
+{
+   this->_geometry_shader_program = geo_pass;
+   this->_lighting_shader_program = light_pass;
+   this->_shadow_depth_shader = shadow_depth;
+   _init_depth_map_FBO();
+}
+
+//SceneManager::SceneManager( SharedPtr<ShaderProgram> geometry_pass,
+//                            SharedPtr<ShaderProgram> lighting_pass )
+//{
+//   _geometry_shader_program = geometry_pass;
+//   _lighting_shader_program = lighting_pass;
+//}
 
 // TODO: refactor light instances into classes that RAII wrap their lifetimes
 
