@@ -438,6 +438,19 @@ void SceneManager::_lights_to_gpu() {
                  (Uint32)config.render_mode );
 }
 
+Uint32 SceneManager::get_object_id_at_pixel(Uint32 x, Uint32 y, Viewport &view)
+{
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, _geometry_shader_program->get_location());
+	glReadBuffer(GL_COLOR_ATTACHMENT6);
+
+	Uvec4 pixel_info;
+	glReadPixels(x, y, view.width, view.height, GL_RGBA, GL_UNSIGNED_INT, &pixel_info);
+
+	Uint32 obj_id = (pixel_info.x << 24) + (pixel_info.y << 16) + (pixel_info.z << 8) + pixel_info.w; // TODO: validate that we get the correct ids
+
+	return obj_id;
+}
+
 
 /*
    lights[0] = LightData{ LightType::point,

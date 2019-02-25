@@ -7,11 +7,11 @@ void ModelInstance::draw() {
                        GL_FALSE,
                        &(_transform.matrix[0][0]) );
    // index for picking
-   glUniform1f( glGetUniformLocation(_shader_program->get_location(), "obj_id"),
-				Uvec4(	_obj_id << 0 & 0xFF,
+   glUniform4ui( glGetUniformLocation(_shader_program->get_location(), "obj_id"),
+							_obj_id << 0 & 0xFF,
 							_obj_id << 8 & 0xFF,
 							_obj_id << 16 & 0xFF,
-							_obj_id << 24 & 0xFF));
+							_obj_id << 24 & 0xFF);
 
    // draw model:
    _model->draw(*_shader_program);
