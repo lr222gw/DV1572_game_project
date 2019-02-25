@@ -2,6 +2,7 @@
 
 #include "misc/defs.h"
 #include "Config.h"
+#include "debug.h"
 
 #include "misc/ImGui/imgui.h"
 #include "misc/ImGui/imgui_impl_glfw.h"
