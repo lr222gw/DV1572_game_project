@@ -4,6 +4,6 @@ Kd 0.00 0.00 0.00
 Ka 0.00 0.00 0.00
 Tf 1.00 1.00 1.00
 map_Kd earth_diffuse.png
-bump earth_normalmap.png -bm 1
+map_Kn earth_normalmap.png
 Ni 1.00
 Ks 0.31 0.31 0.31

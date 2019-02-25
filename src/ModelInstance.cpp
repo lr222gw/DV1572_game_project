@@ -6,16 +6,22 @@ void ModelInstance::draw() {
                        1,
                        GL_FALSE,
                        &(_transform.matrix[0][0]) );
+   // index for picking
+   glUniform1f( glGetUniformLocation(_shader_program->get_location(), "obj_id"),
+				(float)_obj_id);
+
    // draw model:
    _model->draw(*_shader_program);
 }
 
 void ModelInstance::transform( Transform const &transform ) {
    _transform *= transform;
+   _callback_on_transform();
 }
 
 void ModelInstance::set_transform( Transform const &transform ) {
    _transform = transform;
+   _callback_on_transform();
 }
 
 SharedPtr<Model const> ModelInstance::get_model() const {

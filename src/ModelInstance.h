@@ -12,13 +12,20 @@ class ModelInstance {
 public:
    ModelInstance( SharedPtr<Model> model,
                   SharedPtr<ShaderProgram> shader_program,
-                  Transform const &transform)
+                  Transform const &transform,
+                  std::function<void()> callback_on_transform,
+				  Uint32 id)
    :
       _model          ( model ),
       _shader_program ( shader_program ),
       _transform      ( transform ),
-      model_transform ( _transform )
-   {}
+      model_transform ( _transform ),
+	  _obj_id		  ( id ),
+      _callback_on_transform(callback_on_transform)
+   {
+      //ShadowMap needs to be updated if a new model is loaded..
+      _callback_on_transform();
+   }
    void draw();
    void transform(     Transform const &transform ); // TODO: move semantics
    void set_transform( Transform const &transform ); // TODO: move semantics
@@ -32,6 +39,8 @@ private:
    SharedPtr<Model>          _model;
    SharedPtr<ShaderProgram>  _shader_program;
    Transform                 _transform;
+   std:: function<void()>          _callback_on_transform;
+   Uint32					 _obj_id;
 
 public:
    Transform const &model_transform; // read-only exposure

@@ -69,6 +69,7 @@ private:
    SharedPtr<ShaderProgram>        _lighting_shader_program;
    SharedPtr<ShaderProgram>        _geometry_shader_program;
    SharedPtr<ShaderProgram>        _shadow_depth_shader;
+   Uint32						   _obj_id_counter = 0;
 
    //DepthMap stuff for Shadowmapping
    Uint32                            _depth_map_FBO_id;
@@ -79,6 +80,12 @@ private:
    Array<LightData,light_capacity> _light_data;
    Array<Uint64,light_capacity>    _ids;        // used to ensure the correct removal of lights
    Uint32                          _num_lights; // how much of the light capacity is used
+
+   //If models orientation has been changed, shadowmap needs to be updated
+   bool _should_recalculate_shadowmap = false;
+
+   //Listen for transform changes in our ModelInstances 
+
 
    void _lights_to_gpu();
    void _render_to_quad();
