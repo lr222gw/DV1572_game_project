@@ -62,7 +62,7 @@ public:
 
    SceneManager(SharedPtr<ShaderProgram> geo_pass, SharedPtr<ShaderProgram> light_pass, SharedPtr<ShaderProgram> shadow_depth);
 
-   Uint64 SceneManager::get_object_id_at_pixel(Uint32 x, Uint32 y);
+   // Uint64 SceneManager::get_object_id_at_pixel(Uint32 x, Uint32 y);
    // l�s [x][y] ur gbufferkanalen med IDs som pixelf�rger och kasta till Uint64
 
 private:
@@ -85,7 +85,7 @@ private:
    //If models orientation has been changed, shadowmap needs to be updated
    bool _should_recalculate_shadowmap = false;
 
-   //Listen for transform changes in our ModelInstances 
+   //Listen for transform changes in our ModelInstances
 
 
    void _lights_to_gpu();
