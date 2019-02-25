@@ -12,12 +12,14 @@ class ModelInstance {
 public:
    ModelInstance( SharedPtr<Model> model,
                   SharedPtr<ShaderProgram> shader_program,
-                  Transform const &transform)
+                  Transform const &transform,
+				  Uint32 id)
    :
       _model          ( model ),
       _shader_program ( shader_program ),
       _transform      ( transform ),
-      model_transform ( _transform )
+      model_transform ( _transform ),
+	  _obj_id		  ( id )
    {}
    void draw();
    void transform(     Transform const &transform ); // TODO: move semantics
@@ -32,6 +34,7 @@ private:
    SharedPtr<Model>          _model;
    SharedPtr<ShaderProgram>  _shader_program;
    Transform                 _transform;
+   Uint32					 _obj_id;
 
 public:
    Transform const &model_transform; // read-only exposure

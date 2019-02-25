@@ -69,6 +69,7 @@ private:
    SharedPtr<ShaderProgram>        _lighting_shader_program;
    SharedPtr<ShaderProgram>        _geometry_shader_program;
    SharedPtr<ShaderProgram>        _shadow_depth_shader;
+   Uint32						   _obj_id_counter = 0;
 
    //DepthMap stuff for Shadowmapping
    Uint32                            _depth_map_FBO_id;

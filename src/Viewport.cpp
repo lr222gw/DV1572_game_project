@@ -271,6 +271,38 @@ void Viewport::_g_buffer_init() {
                            _g_buffer.emi_tex_loc,
                            0 );
 
+// emission (RGBA) light texture for g-buffer
+   glBindTexture(GL_TEXTURE_2D,
+	   _g_buffer.pic_tex_loc);
+
+   glTexImage2D(GL_TEXTURE_2D,
+	   0,
+	   GL_RGB32F,
+	   width,
+	   height,
+	   0,
+	   GL_RGB,
+	   GL_FLOAT,
+	   NULL);
+
+   // setting minifier:
+   glTexParameteri(GL_TEXTURE_2D,
+	   GL_TEXTURE_MIN_FILTER,
+	   GL_NEAREST);
+
+   // setting magnifier:
+   glTexParameteri(GL_TEXTURE_2D,
+	   GL_TEXTURE_MAG_FILTER,
+	   GL_NEAREST);
+
+   // attach the texture id to currently bound g-buffer
+   glFramebufferTexture2D(GL_FRAMEBUFFER,
+	   GL_COLOR_ATTACHMENT6,
+	   GL_TEXTURE_2D,
+	   _g_buffer.pic_tex_loc,
+	   0);
+
+
 
 
 // Describe for fragment shader to write to these buffers (?)
@@ -278,9 +310,10 @@ void Viewport::_g_buffer_init() {
                             GL_COLOR_ATTACHMENT1,
                             GL_COLOR_ATTACHMENT2,
                             GL_COLOR_ATTACHMENT3,
-                            GL_COLOR_ATTACHMENT5 };
+                            GL_COLOR_ATTACHMENT5,
+							GL_COLOR_ATTACHMENT6 };
 
-   glDrawBuffers( 5, attachments );
+   glDrawBuffers( 6, attachments );
 
 // Create a render buffer object for depth buffer
 

@@ -12,6 +12,7 @@ struct GBufferData {
    GLuint  spe_tex_loc = 0;
    GLuint  alb_tex_loc = 0;
    GLuint  emi_tex_loc = 0;
+   GLuint  pic_tex_loc = 0;
    GLuint  depth_loc   = 0;
 };
 

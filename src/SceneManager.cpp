@@ -9,7 +9,8 @@ SharedPtr<ModelInstance> SceneManager::instantiate_model(
    auto instance_ptr = // TODO: switch to UniquePtr..?
       std::make_shared<ModelInstance>( model,
                                        shader_program,
-                                       transform );
+                                       transform,
+		                               _obj_id_counter++ );
 
    // add a weak pointer to the scene manager's instance list before returning:
    _instances.push_back( instance_ptr );
@@ -83,6 +84,8 @@ void SceneManager::draw( Viewport &view ) {
    glBindTexture(   GL_TEXTURE_2D, g_buffer_data.alb_tex_loc );
    glActiveTexture( GL_TEXTURE5) ;
    glBindTexture(   GL_TEXTURE_2D, g_buffer_data.emi_tex_loc );
+   //glActiveTexture( GL_TEXTURE6);									Tror inte de beh�vs i light shader men har kvar de som en kommentar s� l�nge
+   //glBindTexture(	GL_TEXTURE_2D, g_buffer_data.pic_tex_loc);
 
    glUniform3fv( glGetUniformLocation( lighting_pass_loc, "view_pos"),
                  1,
