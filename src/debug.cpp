@@ -33,3 +33,21 @@ void debug::view_mat4( Mat4 const &m, String name ) {
    ImGui::End();
    ImGui::PopID();
 }
+
+void debug::lightsource( Vec3 &position, Vec3 &direction ) {
+   ImGui::PushID( "Lightsource_debug" );
+   ImGui::Begin( "Lightsource:" );
+   {
+      ImGui::Text( "Position: " );
+      ImGui::Value( "", position[0], "%3.1f");
+      ImGui::Value( "", position[1], "%3.1f");
+      ImGui::Value( "", position[2], "%3.1f");
+      ImGui::NewLine();
+      ImGui::Text( "Rotation: " );
+      ImGui::Value( "", direction[0], "%3.1f");
+      ImGui::Value( "", direction[1], "%3.1f");
+      ImGui::Value( "", direction[2], "%3.1f");
+   }
+   ImGui::End();
+   ImGui::PopID();
+}

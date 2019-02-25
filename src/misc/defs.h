@@ -56,6 +56,9 @@
 // byte type:
                             using Byte         = Uint8;
 // glm vectors:
+                            using Uvec2        = glm::uvec2;
+                            using Uvec3        = glm::uvec3;
+                            using Uvec4        = glm::uvec4;
                             using Vec2         = glm::vec2;
                             using Vec3         = glm::vec3;
                             using Vec4         = glm::vec4;

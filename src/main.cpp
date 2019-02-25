@@ -2,6 +2,7 @@
 
 #include "misc/defs.h"
 #include "Config.h"
+#include "debug.h"
 
 #include "misc/ImGui/imgui.h"
 #include "misc/ImGui/imgui_impl_glfw.h"
@@ -492,16 +493,12 @@ Int32 main( Int32 argc, char const *argv[] ) {
                            1.0 });
 
    SharedPtr<Shadowcaster> light_sc = std::make_shared<Shadowcaster>(sun);
-   light_sc->set_Light_matrix(0.1f, 200.f, -50, 50, -50, 50, poss, dirr, Vec3(0.0f, 1.0f, 0.0f));
-   scene_manager.set_shadowcasting(light_sc);
-
-
 
    Vector<SharedPtr<ModelInstance>> model_instances;
    //model_instances.push_back(scene_manager.instantiate_model(isle,geometry_program, Transform(Vec3(1*(2 / 8) -40, 150.0f, 2*(2 % 8) - 40),
    //   Vec3(0.0f, 0.0f, 0.0f),
    //   Vec3(.3f, .3f, .3f))));
-   
+
    model_instances.reserve( 64 );
    for ( auto i=0;  i<64;  ++i ) {
       Float32 n = 9; // spacing
@@ -520,7 +517,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
          Vec3(0.0f, 0.0f ,0.0f),
          //Vec3(0.0f, 0.0, 0.0f),
          Vec3(-18.0f, 1.0f, 18.0f))));
-  
+
 
 
    /* TODO */ Vec3       cam_rotations {  0.0f,   0.0f,   0.0f };
@@ -571,6 +568,10 @@ Int32 main( Int32 argc, char const *argv[] ) {
       ImGui::Begin( "Settings:" );
       ImGui::SliderFloat( "Move speed", &g_move_speed, 0.0f, 25.0f );
       ImGui::End();
+
+      light_sc->set_Light_matrix(0.1f, 200.f, -50, 50, -50, 50, poss, dirr, Vec3(0.0f, 1.0f, 0.0f));
+      scene_manager.set_shadowcasting( light_sc );
+      debug::lightsource( poss, dirr );
 
       process_mouse( window, view, delta_time_s );
       process_input( window, view, delta_time_s );
