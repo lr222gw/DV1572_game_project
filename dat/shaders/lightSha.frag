@@ -203,9 +203,6 @@ void main() {
             }
 
 
-
-
-
             /*
             vec3  light_dir   = normalize( light.pos - pos );
             float light_dist  = length(    light.pos - pos ) / radius;

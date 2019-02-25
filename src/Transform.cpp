@@ -144,7 +144,7 @@ Mat4 Transform::get_rotation() const {
 //   Vec4 rotation_vector(1.0f,1.0,1.0,0.0);
 //
 //   Mat4 rotation_matrix = this->get_rotation();
-//   //rotation_vector.x  = 
+//   //rotation_vector.x  =
 //
 //   return rotationmatrix;
 //}
@@ -154,8 +154,18 @@ Vec3 Transform::get_scale() const {
 }
 
 Vec3 Transform::get_euler_angles() const {
-   // TODO
-   return Vec3( 0.0f );
+   Vec3 euler_angles;
+
+   //euler_angles.x = /*...*/; // bryt ut från _rotations[0].xyz;
+   //euler_angles.y = /*...*/; // bryt ut från _rotations[1].xyz;
+   //euler_angles.z = /*...*/; // bryt ut från _rotations[2].xyz;
+
+   // a d g 0    a,b,c = x axeln
+   // b e h 0    d,e,f = y axeln
+   // c f j 0    g,h,j = z axeln
+   // 0 0 0 1
+
+   return euler_angles;
 }
 
 void Transform::_extract_data( Mat4 const &mat ) {

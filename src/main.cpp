@@ -473,7 +473,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
                            0.0,
                            1.0  }) };
-   SharedPtr<Model> nanosuit_model = asset_manager.load_model( "nanosuit.obj" );
+   SharedPtr<Model> nanosuit_model = asset_manager.load_model( "ape.obj" );
 
    //SharedPtr<Model> isle = asset_manager.load_model("Small Tropical Island.obj");
 
