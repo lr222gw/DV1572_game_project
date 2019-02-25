@@ -62,6 +62,8 @@ public:
 
    SceneManager(SharedPtr<ShaderProgram> geo_pass, SharedPtr<ShaderProgram> light_pass, SharedPtr<ShaderProgram> shadow_depth);
 
+   Uint64 SceneManager::get_object_id_at_pixel(Uint32 x, Uint32 y);
+   // l�s [x][y] ur gbufferkanalen med IDs som pixelf�rger och kasta till Uint64
 
 private:
 
@@ -69,7 +71,6 @@ private:
    SharedPtr<ShaderProgram>        _lighting_shader_program;
    SharedPtr<ShaderProgram>        _geometry_shader_program;
    SharedPtr<ShaderProgram>        _shadow_depth_shader;
-   Uint32						   _obj_id_counter = 0;
 
    //DepthMap stuff for Shadowmapping
    Uint32                            _depth_map_FBO_id;

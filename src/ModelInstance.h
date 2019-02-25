@@ -13,15 +13,14 @@ public:
    ModelInstance( SharedPtr<Model> model,
                   SharedPtr<ShaderProgram> shader_program,
                   Transform const &transform,
-                  std::function<void()> callback_on_transform,
-				  Uint32 id)
+                  std::function<void()> callback_on_transform)
    :
-      _model                 ( model ),
-      _shader_program        ( shader_program ),
-      _transform             ( transform ),
-      model_transform        ( _transform ),
-      _callback_on_transform ( callback_on_transform ),
-      _obj_id                ( id )
+      _model                 ( model                 ),
+      _shader_program        ( shader_program        ),
+      _transform             ( transform             ),
+      model_transform        ( _transform            ),
+	   _obj_id                ( _generate_id()        ),
+      _callback_on_transform ( callback_on_transform )
    {
       //ShadowMap needs to be updated if a new model is loaded..
       _callback_on_transform();
@@ -39,16 +38,23 @@ private:
    SharedPtr<Model>          _model;
    SharedPtr<ShaderProgram>  _shader_program;
    Transform                 _transform;
-   std:: function<void()>    _callback_on_transform;
-   Uint32                    _obj_id;
+   std:: function<void()>          _callback_on_transform;
+   Uint32					 _obj_id;
+   Uint32 _generate_id() const;
 
 public:
    Transform const &model_transform; // read-only exposure
 };
 
+<<<<<<< HEAD
 // Uint64 SceneManager::get_object_id_at_pixel( Uint32 x, Uint32 y ) {
 //    // läs [x][y] ur gbufferkanalen med IDs som pixelfärger och kasta till Uint64
 // }
+=======
+
+
+
+>>>>>>> ebc246f6401aaf91b650968ab23e755173c8b14f
 
 
 

@@ -8,7 +8,10 @@ void ModelInstance::draw() {
                        &(_transform.matrix[0][0]) );
    // index for picking
    glUniform1f( glGetUniformLocation(_shader_program->get_location(), "obj_id"),
-				(float)_obj_id);
+				Uvec4(	_obj_id << 0 & 0xFF,
+							_obj_id << 8 & 0xFF,
+							_obj_id << 16 & 0xFF,
+							_obj_id << 24 & 0xFF));
 
    // draw model:
    _model->draw(*_shader_program);
@@ -33,4 +36,9 @@ SharedPtr<ShaderProgram>  ModelInstance::get_shader_program() {
 }
 void ModelInstance::set_shader_program(SharedPtr<ShaderProgram> shaderprogram) {
    _shader_program = shaderprogram;
+}
+
+Uint32 ModelInstance::_generate_id() const {
+	static Uint32 next_id = 0;
+	return next_id++;
 }
