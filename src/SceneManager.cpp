@@ -11,8 +11,7 @@ SharedPtr<ModelInstance> SceneManager::instantiate_model(
       std::make_shared<ModelInstance>( model,
                                        shader_program,
                                        transform,
-                                       callback_lambda,
-		                               _obj_id_counter++ );
+                                       callback_lambda );
 
    // add a weak pointer to the scene manager's instance list before returning:
    _instances.push_back( instance_ptr );
