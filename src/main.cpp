@@ -412,7 +412,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
                                                       Vec3(0.0f,   0.0f,   0.0f),
                                                       Vec3(10.0f,  10.0f,  10.0f),
                                                       Vec3(1.0f,   0.0f,   0.0f),
-                                                       1.0,
+                                                       0.1,
                                                       14.0,
                                                        0.0,
                                                        1.0 }),
@@ -420,7 +420,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
                                                       Vec3(0.0f,  0.0f,  0.0f),
                                                       Vec3(1.0f,  4.0f,  5.0f),
                                                       Vec3(1.0f,  1.0f,  0.0f),
-                                                      1.0,
+                                                      0.1,
                                                       7.0,
                                                       0.0,
                                                       1.0 }),
@@ -428,7 +428,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
                                                       Vec3(0.0f,  0.0f,  0.0f),
                                                       Vec3(2.0f,  1.0f,  5.0f),
                                                       Vec3(1.0f,  0.0f,  1.0f),
-                                                       1.0,
+                                                       0.1,
                                                       17.0,
                                                        0.0,
                                                        1.0}) ,
@@ -436,7 +436,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
                                                       Vec3(0.0f,  0.0f,  0.0f),
                                                       Vec3(1.0f,  5.0f,  6.0f),
                                                       Vec3(0.0f,  1.0f,  0.0f),
-                                                       1.0,
+                                                       0.1,
                                                       11.0,
                                                        0.0,
                                                        1.0 }),
@@ -444,7 +444,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
                           Vec3(0.0f,  0.0f,  1.0f),
                           Vec3(3.0f,  3.0f,  1.0f),
                           Vec3(0.0f,  1.0f,  1.0f),
-                          1.0,
+                          0.1,
                           2.0,
                           0.0,
                           1.0 }),
@@ -452,7 +452,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
                           Vec3(0.0f,  0.0f,   0.0f),
                           Vec3(1.0f,  2.0f,  10.0f),
                           Vec3(0.0f,  0.0f,   1.0f),
-                          1.0,
+                          0.1,
                           1.0,
                           0.0,
                           1.0}),
@@ -460,7 +460,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
                           Vec3(0.0f,  0.0f,  0.0f),
                           Vec3(10.0f,  0.0f,  5.0f),
                           Vec3(1.0f,  1.0f,  1.0f),
-                          1.0,
+                          0.1,
                           7.0,
                           0.0,
                           1.0}),
@@ -468,7 +468,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
                           Vec3(0.0f,  0.0f,   0.0f),
                           Vec3(10.0f,  5.0f,  10.0f),
                           Vec3(1.0f,  0.3f,   0.5f),
-                           1.0,
+                           0.1,
                           17.0,
 
                            0.0,
@@ -480,7 +480,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
 
 
-   Vec3 poss = Vec3(10.0f, 10.0f, 10.0f);
+   Vec3 poss = Vec3(101.0f, 100.0f, 100.0f);
    Vec3 dirr = Vec3(1.0f, 0.0f, 0.0f);
    SharedPtr<Light>sun = std::make_shared<Light>(scene_manager, LightData{ LightType::directional,
                           dirr,
@@ -501,7 +501,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    //model_instances.push_back(scene_manager.instantiate_model(isle,geometry_program, Transform(Vec3(1*(2 / 8) -40, 150.0f, 2*(2 % 8) - 40),
    //   Vec3(0.0f, 0.0f, 0.0f),
    //   Vec3(.3f, .3f, .3f))));
-
+   
    model_instances.reserve( 64 );
    for ( auto i=0;  i<64;  ++i ) {
       Float32 n = 9; // spacing
@@ -514,12 +514,13 @@ Int32 main( Int32 argc, char const *argv[] ) {
    }
 
    SharedPtr<Model> floor = asset_manager.load_model("floor.obj");
-   model_instances.push_back(scene_manager.instantiate_model(  floor,
-                                                               geometry_program,
-                                                               Transform(Vec3(0.0, 0.0, 0.0), 
-                                                                         Vec3(0.0f, 0.0f, 0.0f), 
-                                                                  Vec3(15.0f, 1.0f, 15.0f))));
-
+   model_instances.push_back(scene_manager.instantiate_model(floor,
+      geometry_program,
+      Transform(Vec3(0.0, 0.0, 0.0),
+         Vec3(0.0f, 0.0f ,0.0f),
+         //Vec3(0.0f, 0.0, 0.0f),
+         Vec3(-18.0f, 1.0f, 18.0f))));
+  
 
 
    /* TODO */ Vec3       cam_rotations {  0.0f,   0.0f,   0.0f };

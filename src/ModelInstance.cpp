@@ -16,10 +16,12 @@ void ModelInstance::draw() {
 
 void ModelInstance::transform( Transform const &transform ) {
    _transform *= transform;
+   _callback_on_transform();
 }
 
 void ModelInstance::set_transform( Transform const &transform ) {
    _transform = transform;
+   _callback_on_transform();
 }
 
 SharedPtr<Model const> ModelInstance::get_model() const {

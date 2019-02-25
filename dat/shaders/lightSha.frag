@@ -161,7 +161,7 @@ void main() {
 
          //TODO: Disable to not test last light...
          //lighting += (ambient + (1.0 - shadow) * (diffuse + specular)) * albedo;
-         lighting = (ambient + (1.0 - shadow) * (diffuse + specular)) * vec3(0.2);
+         lighting += (ambient + (1.0 - shadow) * (diffuse + specular)) * vec3(0.2);
 
          //rgba_rasterizer = vec4(lighting, 1.0);
           break;
@@ -187,12 +187,15 @@ void main() {
             if ( distance < radius ) {
                vec3  light_dir        = normalize( light.pos - pos );
                vec3  halfway_dir      = normalize( light_dir + view_dir );
+
+			   light.rgb = light.rgb * light.intensity;
+
                // calculate light effect falloff:
                float linear_falloff   = (1.0 - distance / radius);       // yields a normalized value (within the range [0, 1.0])
                float quad_falloff     = linear_falloff * linear_falloff; // quadratic falloff = linear falloff squared
                // calculate light diffuse impact:
                float light_modulation = max( dot(norm, light_dir), 0.0f ); // yields a normalized value (within the range [0, 1.0])
-               vec3  diffuse_impact   = albedo * light.rgb * (light_modulation * light.intensity * quad_falloff);
+               vec3  diffuse_impact   = albedo * light.rgb * (light_modulation/* * light.intensity */* quad_falloff);
                // calculate specular impact:
                float spec_modulation  = max( dot(norm, halfway_dir), 0.0f ); // yields a normalized value (within the range [0, 1.0])
                //vec3  spec_impact      = vec3(0.1)/num_lights;//(spec_modulation * spec_str * quad_falloff) * spec_rgb; // mix( spec_rgb, light.rgb, 0.5f );
@@ -263,11 +266,14 @@ void main() {
 			// get depth of current fragment from light's perspective
 			float currentDepth = projCoords.z;
 			// check whether current frag pos is in shadow
-			float shadow = currentDepth > closestDepth  ? 1.0 : 0.0;
+			float shadowBias = 0.005;
+			float shadow = currentDepth - shadowBias > closestDepth  ? 1.0 : 0.0;
 
 			//TODO: Disable to not test last light...
 			//lighting += (ambient + (1.0 - shadow) * (diffuse + specular)) * albedo;
-			lighting = (ambient + (1.0 - shadow) * (diffuse + specular)) * albedo;
+			lighting += (ambient + (1.0 - shadow) * (diffuse + specular)) * albedo;
+
+			
 
 			//rgba_rasterizer = vec4(lighting, 1.0);
 			 break;
