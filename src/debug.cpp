@@ -34,19 +34,51 @@ void debug::view_mat4( Mat4 const &m, String name ) {
    ImGui::PopID();
 }
 
-void debug::lightsource( Vec3 &position, Vec3 &direction ) {
+void debug::lightsource( Vec3 &position, Vec3 &direction, SceneManager &scene_man ) {
    ImGui::PushID( "Lightsource_debug" );
    ImGui::Begin( "Lightsource:" );
    {
-      ImGui::Text( "Position: " );
-      ImGui::Value( "", position[0], "%3.1f");
-      ImGui::Value( "", position[1], "%3.1f");
-      ImGui::Value( "", position[2], "%3.1f");
-      ImGui::NewLine();
-      ImGui::Text( "Rotation: " );
-      ImGui::Value( "", direction[0], "%3.1f");
-      ImGui::Value( "", direction[1], "%3.1f");
-      ImGui::Value( "", direction[2], "%3.1f");
+      ImGui::Text( "Position:" );
+
+      ImGui::PushItemWidth( 96.0f );
+
+      ImGui::PushID( "lspx" );
+      ImGui::InputFloat( "", &position.x, 1.0f, 0.1f, "%3.1f" );
+      ImGui::PopID();
+
+      ImGui::SameLine();
+      ImGui::PushID( "lspy" );
+      ImGui::InputFloat( "", &position.y, 1.0f, 0.1f, "%3.1f" );
+      ImGui::PopID();
+
+      ImGui::SameLine();
+      ImGui::PushID( "lspz" );
+      ImGui::InputFloat( "", &position.z, 1.0f, 0.1f, "%3.1f" );
+      ImGui::PopID();
+
+      ImGui::PopItemWidth();
+
+      ImGui::Separator();
+
+      ImGui::Text( "Direction:" );
+
+      ImGui::PushItemWidth( 96.0f );
+
+      ImGui::PushID( "lsrx" );
+      ImGui::InputFloat( "", &direction.x, 1.0f, 0.1f, "%3.1f" );
+      ImGui::PopID();
+
+      ImGui::SameLine();
+      ImGui::PushID( "lsry" );
+      ImGui::InputFloat( "", &direction.y, 1.0f, 0.1f, "%3.1f" );
+      ImGui::PopID();
+
+      ImGui::SameLine();
+      ImGui::PushID( "lsrz" );
+      ImGui::InputFloat( "", &direction.z, 1.0f, 0.1f, "%3.1f" );
+      ImGui::PopID();
+
+      ImGui::PopItemWidth();
    }
    ImGui::End();
    ImGui::PopID();

@@ -85,7 +85,7 @@ private:
    //If models orientation has been changed, shadowmap needs to be updated
    bool _should_recalculate_shadowmap = false;
 
-   //Listen for transform changes in our ModelInstances 
+   //Listen for transform changes in our ModelInstances
 
 
    void _lights_to_gpu();

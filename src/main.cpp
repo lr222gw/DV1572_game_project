@@ -494,9 +494,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
                            1.0 });
 
    SharedPtr<Shadowcaster> light_sc = std::make_shared<Shadowcaster>(sun);
-   light_sc->set_Light_matrix(0.1f, 200.f, -50, 50, -50, 50, poss, dirr, Vec3(0.0f, 1.0f, 0.0f));
-   scene_manager.set_shadowcasting(light_sc);
-
+   scene_manager.set_shadowcasting( light_sc );
 
 
    Vector<SharedPtr<ModelInstance>> model_instances;
@@ -573,6 +571,9 @@ Int32 main( Int32 argc, char const *argv[] ) {
       ImGui::Begin( "Settings:" );
       ImGui::SliderFloat( "Move speed", &g_move_speed, 0.0f, 25.0f );
       ImGui::End();
+
+      debug::lightsource( poss, dirr, scene_manager );
+      light_sc->set_Light_matrix(0.1f, 200.f, -50, 50, -50, 50, poss, dirr, Vec3(0.0f, 1.0f, 0.0f));
 
       process_mouse( window, view, delta_time_s );
       process_input( window, view, delta_time_s );
