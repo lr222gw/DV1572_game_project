@@ -17,7 +17,7 @@ DEPEXT      := d
 OBJEXT      := o
 
 # flags, libraries, and includes (TODO: make -g or -g3 conditional?)
-CFLAGS      := -Wall -Wformat -std=c++1z
+CFLAGS      := -Wall -Wformat -std=c++1z -O0 -g3
 LIB         := -lGL -lGLU -lglfw -lGLEW -lassimp
 INC         := -I$(INCDIR) -I/usr/local/include
 INCDEP      := -I$(INCDIR)

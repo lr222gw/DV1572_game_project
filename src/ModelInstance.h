@@ -18,9 +18,9 @@ public:
       _model                 ( model                 ),
       _shader_program        ( shader_program        ),
       _transform             ( transform             ),
-      model_transform        ( _transform            ),
-	   _obj_id                ( _generate_id()        ),
-      _callback_on_transform ( callback_on_transform )
+      _callback_on_transform ( callback_on_transform ),
+      _obj_id                ( _generate_id()        ),
+      model_transform        ( _transform            )
    {
       //ShadowMap needs to be updated if a new model is loaded..
       _callback_on_transform();

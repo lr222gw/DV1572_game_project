@@ -15,6 +15,10 @@
 
 #include "Light.h"
 
+// temp:
+#include <cstdio>
+#include <unistd.h>
+
 // #include "misc/stb_image.h"
 // #include <range/v3/all.hpp>
 
@@ -290,7 +294,7 @@ void process_input( GLFWwindow *window, Viewport &cam, Float32 delta ) {
 
 
 
-
+// TODO: refactor into debug.h/cpp
 void draw_camera_debug_window( Vec3    &position,
                                Vec3    &rotation,
                                Float32 &fov_rad ) {
@@ -319,9 +323,16 @@ void draw_camera_debug_window( Vec3    &position,
 }
 
 
+void print_cwd() {
+   char path[1024] = "";
+   getcwd( path, 1024 );
+   printf( "%s\n", path ); //std::filesystem::current_path().c_str() );
+}
 
 
 Int32 main( Int32 argc, char const *argv[] ) {
+   print_cwd();
+
 	// initialise GLFW
 	glewExperimental = true; // <- needed for core profile
 	if (!glfwInit()) {
@@ -411,7 +422,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
    //Add Lightning program to Scenemanager
    SceneManager  scene_manager{ geometry_program, lighting_program , shadowdepth_program };
-   Light lights[8]{ Light(scene_manager , LightData {LightType::point,
+   /*
+   Light lights[8] = { Light(scene_manager , LightData {LightType::point,
                                                       Vec3(0.0f,   0.0f,   0.0f),
                                                       Vec3(10.0f,  10.0f,  10.0f),
                                                       Vec3(1.0f,   0.0f,   0.0f),
@@ -475,7 +487,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
                           17.0,
 
                            0.0,
-                           1.0  }) };
+                           1.0  }) };*/
+
    SharedPtr<Model> nanosuit_model = asset_manager.load_model( "ape.obj" );
 
    //SharedPtr<Model> isle = asset_manager.load_model("Small Tropical Island.obj");
@@ -502,7 +515,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    //model_instances.push_back(scene_manager.instantiate_model(isle,geometry_program, Transform(Vec3(1*(2 / 8) -40, 150.0f, 2*(2 % 8) - 40),
    //   Vec3(0.0f, 0.0f, 0.0f),
    //   Vec3(.3f, .3f, .3f))));
-   
+
    model_instances.reserve( 64 );
    for ( auto i=0;  i<64;  ++i ) {
       Float32 n = 9; // spacing
@@ -521,7 +534,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
          Vec3(0.0f, 0.0f ,0.0f),
          //Vec3(0.0f, 0.0, 0.0f),
          Vec3(-18.0f, 1.0f, 18.0f))));
-  
+
 
 
    /* TODO */ Vec3       cam_rotations {  0.0f,   0.0f,   0.0f };

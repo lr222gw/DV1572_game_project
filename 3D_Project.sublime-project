@@ -12,9 +12,26 @@
 			"clangd":
 			{
 				"enabled": true
-			}
-		}
+			},
+			"command":
+         [
+             "clangd-7"
+         ]
+		},
+
+		"sublimegdb_workingdir":  "${folder:${project_path:Makefile}}",
+		"sublimegdb_commandline": "gdb --interpreter=mi ./bin/program.bin",
 	},
-	"sublimegdb_commandline": "gdb --interpreter=mi ./bin/program.bin",
-	"sublimegdb_workingdir": "${project_path:${folder}}"
 }
+
+
+//{
+//      "sublimegdb_arguments": "",
+//
+//      "sublimegdb_workingdir": "${project_path:${folder}}",
+//      "sublimegdb_commandline": "gdb --interpreter=mi -args ./bin/program.bin",
+//
+//
+//      //"sublimegdb_workingdir":  "${folder:${project_path:bin/program.bin}}",
+//      //"sublimegdb_commandline": "gdb --interpreter=mi -args ./bin/program.bin",
+//}

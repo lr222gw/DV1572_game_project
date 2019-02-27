@@ -13,4 +13,4 @@ illum 2
 map_Kd ape_dif.png
 map_Kn ape_nor.png
 map_Ks ape_spec.png
-map_Ke ape_emit.png
+map_emissive ape_emit.png

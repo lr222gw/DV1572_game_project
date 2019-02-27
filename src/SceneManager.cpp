@@ -25,14 +25,14 @@ void SceneManager::draw( Viewport &view ) {
 
    auto lighting_pass_loc = _lighting_shader_program->get_location();
    auto geometry_pass_loc = _geometry_shader_program->get_location();
-   
+
    //TODO: Make modelinstance supply unique ID to Callback Function and then in CAllback function compare the boundingbox of the modelinstance with the frustrum of all the active shadowcasters and recalculate shadowmap for any intersections
    if (_should_recalculate_shadowmap) {
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       this->update_shadowmap();
       _should_recalculate_shadowmap = false;
    }
-   
+
    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
    glUseProgram( geometry_pass_loc );
@@ -89,13 +89,13 @@ void SceneManager::draw( Viewport &view ) {
                  glm::value_ptr(view_pos));
 
    for (auto &e : _shadow_maps) {
-      glUniformMatrix4fv( 
+      glUniformMatrix4fv(
          glGetUniformLocation(lighting_pass_loc,
             "lightmatrix"),
          1,
          GL_FALSE,
          glm::value_ptr(e.first->get_matrix()));
-      Mat4 ello = e.first->get_matrix();
+      // Mat4 ello = e.first->get_matrix();
       glActiveTexture(GL_TEXTURE4);
       glBindTexture(GL_TEXTURE_2D, e.second);
 
@@ -258,7 +258,7 @@ void SceneManager::set_shadowcasting(SharedPtr<Shadowcaster> light)
    float borderColor[] = { 1.0,1.0,1.0, 1.0 };
    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 
-   Uint32 AttatchmentNmbr = _shadow_maps.size();
+   //Uint32 AttatchmentNmbr = _shadow_maps.size();
 
    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
    glDrawBuffer(GL_NONE);
