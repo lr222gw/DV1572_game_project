@@ -83,6 +83,8 @@ void SceneManager::draw( Viewport &view ) {
    glBindTexture(   GL_TEXTURE_2D, g_buffer_data.alb_tex_loc );
    glActiveTexture( GL_TEXTURE5) ;
    glBindTexture(   GL_TEXTURE_2D, g_buffer_data.emi_tex_loc );
+   glActiveTexture(GL_TEXTURE6);
+   glBindTexture(GL_TEXTURE_2D, g_buffer_data.pic_tex_loc);
 
    glUniform3fv( glGetUniformLocation( lighting_pass_loc, "view_pos"),
                  1,
@@ -443,13 +445,35 @@ Uint32 SceneManager::get_object_id_at_pixel(Uint32 x, Uint32 y, Viewport &view)
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, _geometry_shader_program->get_location());
 	glReadBuffer(GL_COLOR_ATTACHMENT6);
 
-	Uvec4 pixel_info;
-	glReadPixels(x, y, view.width, view.height, GL_RGBA, GL_UNSIGNED_INT, &pixel_info);
-
-	Uint32 obj_id = (pixel_info.x << 24) + (pixel_info.y << 16) + (pixel_info.z << 8) + pixel_info.w; // TODO: validate that we get the correct ids
+	Uint32 pixel_info[4]{};
+	//struct pixel_info_struct
+	//{
+	//	int x;
+	//	int y;
+	//	int z;
+	//	int w;
+	//};
+	//pixel_info_struct pixel_info;
+	
+	glReadPixels(x, y, 1, 1, GL_RGBA, GL_UNSIGNED_INT, (void*)&pixel_info);
+	
+	Uint32 obj_id = ((pixel_info[0] ) << 24 + ((pixel_info[1] & 0xff) << 16) + ((pixel_info[2] & 0xff) << 8) + ((pixel_info[3] & 0xff))); // TODO: validate that we get the correct ids
 
 	return obj_id;
 }
+
+SharedPtr<ModelInstance> SceneManager::get_instance_ptr(Uint32 obj_id)
+{
+	for (auto &e : _instances) {
+		if (!e.expired()) {
+			auto e_ptr = e.lock();
+			if (e_ptr->id == obj_id)
+				return e_ptr;
+		}
+	}
+	assert(false && "[ERROR] Instance of id no longer exists.");
+}
+
 
 
 /*

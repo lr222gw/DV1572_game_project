@@ -99,6 +99,7 @@ void Viewport::_g_buffer_init() {
       glGenTextures(      1, &(_g_buffer.spe_tex_loc) );
       glGenTextures(      1, &(_g_buffer.alb_tex_loc) );
       glGenTextures(      1, &(_g_buffer.emi_tex_loc) );
+	  glGenTextures(	  1, &(_g_buffer.pic_tex_loc));
       glGenRenderbuffers( 1, &(_g_buffer.depth_loc)   );
       initialized = true;
   }
