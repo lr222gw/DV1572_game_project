@@ -19,7 +19,7 @@ struct Config {
    static constexpr Uint32    particle_max_count = 512;
 
    static constexpr Float32   near_plane         =  0.001f,
-                              far_plane          =  200.0f,
+                              far_plane          =  500.0f,
                               fov_rad            =  1.5708f, // 90 degrees in radians
                               start_aspect_ratio = (Float32)start_height / (Float32)start_width;
 

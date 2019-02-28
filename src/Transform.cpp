@@ -154,7 +154,7 @@ Vec3 Transform::get_scale() const {
 }
 
 Vec3 Transform::get_euler_angles() const {
-   Vec3 euler_angles;
+   Vec3 euler_angles(1.0f);
 
    //euler_angles.x = /*...*/; // bryt ut från _rotations[0].xyz;
    //euler_angles.y = /*...*/; // bryt ut från _rotations[1].xyz;
