@@ -10,7 +10,7 @@ uniform sampler2D tex_spec;
 uniform sampler2D tex_norm;
 uniform sampler2D tex_emit;
 
-uniform uint obj_id;
+uniform uvec4 obj_id;
 
 layout (location = 0) out vec3 g_position;
 layout (location = 1) out vec3 g_normal;
@@ -28,5 +28,5 @@ void main() {
 	g_spec     = texture( tex_spec, uv_fs );
 	g_albedo   = texture( tex_diff, uv_fs );
 	g_emit     = texture( tex_emit, uv_fs );
-	g_picking  = vec4( (obj_id << 0), (obj_id << 8), (obj_id << 16), (obj_id << 24) );
+	g_picking  = obj_id;
 }

@@ -57,7 +57,7 @@ void create_demo_scene( /*...*/ ) {
 
 
 
-void process_mouse( GLFWwindow *window, Viewport &cam, Float32 delta_time_s  ) {
+void process_mouse( GLFWwindow *window, Viewport &cam, SceneManager scene, Float32 delta_time_s  ) {
    // yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a
    // direction vector pointing to the right so we initially rotate a bit to the left.
    static Float64 yaw         = -90.0f;
@@ -76,6 +76,15 @@ void process_mouse( GLFWwindow *window, Viewport &cam, Float32 delta_time_s  ) {
       last_x      = cam.forward.x;
       last_y      = cam.forward.y;
       first_mouse = false;
+   }
+
+    // mouse picking
+   if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1))
+   {
+	  SharedPtr<ModelInstance> model = scene.get_instance_ptr(scene.get_object_id_at_pixel(x_pos, y_pos, cam));
+	  model->transform(Transform::make_rotation(Vec3(1.0, 1.0, 1.0)));
+	  std::cout << x_pos << ":" << y_pos << std::endl;
+
    }
 
    bool changed = last_x != x_pos || last_y != y_pos;
@@ -113,7 +122,10 @@ void process_mouse( GLFWwindow *window, Viewport &cam, Float32 delta_time_s  ) {
    }
 }
 
-
+//void process_picking(GLFWwindow *window, SceneManager scene, Viewport view)
+//{
+//
+//}
 
 void toggle_input_callback( GLFWwindow  *window,
                             Int32        key,
@@ -505,7 +517,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    //model_instances.push_back(scene_manager.instantiate_model(isle,geometry_program, Transform(Vec3(1*(2 / 8) -40, 150.0f, 2*(2 % 8) - 40),
    //   Vec3(0.0f, 0.0f, 0.0f),
    //   Vec3(.3f, .3f, .3f))));
-
+   
    model_instances.reserve( 64 );
    for ( auto i=0;  i<64;  ++i ) {
       Float32 n = 9; // spacing
@@ -524,7 +536,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
          Vec3(0.0f, 0.0f ,0.0f),
          //Vec3(0.0f, 0.0, 0.0f),
          Vec3(-18.0f, 1.0f, 18.0f))));
-
+  
 
    //Tool to see more clearly how Light frustrum looks like
    ShadowcasterDebug sundbg = ShadowcasterDebug(light_sc, &asset_manager, &scene_manager, &model_instances, geometry_program, &poss, &dirr);
@@ -589,7 +601,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
       sundbg.light_caster_debugg_tool_render();
 
 
-      process_mouse( window, view, delta_time_s );
+      process_mouse( window, view, scene_manager, delta_time_s );
       process_input( window, view, delta_time_s );
 
       // glMatrixMode( GL_PROJECTION );

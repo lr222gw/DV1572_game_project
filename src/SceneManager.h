@@ -62,8 +62,9 @@ public:
 
    SceneManager(SharedPtr<ShaderProgram> geo_pass, SharedPtr<ShaderProgram> light_pass, SharedPtr<ShaderProgram> shadow_depth);
 
-   // Uint64 SceneManager::get_object_id_at_pixel(Uint32 x, Uint32 y);
-   // l�s [x][y] ur gbufferkanalen med IDs som pixelf�rger och kasta till Uint64
+   Uint32 get_object_id_at_pixel(Uint32 x, Uint32 y, Viewport &);
+   
+   SharedPtr<ModelInstance> get_instance_ptr(Uint32 obj_id);
 
 private:
 
