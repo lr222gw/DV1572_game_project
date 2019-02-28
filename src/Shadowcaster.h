@@ -1,12 +1,18 @@
 #pragma once
 
 #include "misc/defs.h"
+
+
+//class SceneManager;
 //#include "Light.h"
 class Light; // Forward Declaration; we only point to Light class, does not store instances of it or use Light function
 
+
+
 class Shadowcaster {
 public:
-   Shadowcaster(SharedPtr<Light> source) : _source(source) {};
+   
+   Shadowcaster(SharedPtr<Light> source) : _source(source) { std::cout << "Make sure to run 'set_light_matrix()' atleast once!" << std::endl; };
    Shadowcaster(           SharedPtr<Light> source, 
                            Float32 n_plane, 
                            Float32 f_plane, 
@@ -28,7 +34,12 @@ public:
                            Vec3 target,
                            Vec3 up = Vec3(0.0f, 1.0f, 0.0f));
    Mat4 get_matrix();
+   Array<Float32, 4>    getCorners();
+
+
 private:
+
+
 
    SharedPtr<Light>  _source;
    Mat4              _light_matrix;

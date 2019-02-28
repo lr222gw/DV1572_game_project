@@ -15,6 +15,8 @@
 
 #include "Light.h"
 
+#include "shadowcasterDebug.h"
+
 // #include "misc/stb_image.h"
 // #include <range/v3/all.hpp>
 
@@ -493,6 +495,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
                            1.0 });
 
    SharedPtr<Shadowcaster> light_sc = std::make_shared<Shadowcaster>(sun);
+   //Must initialize before first use (set_light_matrix(...) atleast once!)
+   light_sc->set_Light_matrix(0.1f, glm::length(poss - dirr), 50, -50, 50, -50, poss, dirr, Vec3(0.0f, 1.0f, 0.0f));
    scene_manager.set_shadowcasting( light_sc );
 
 
@@ -515,64 +519,17 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
    SharedPtr<Model> floor = asset_manager.load_model("floor.obj");
    model_instances.push_back(scene_manager.instantiate_model(floor,
-      geometry_program,
-      Transform(Vec3(0.0, 0.0, 0.0),
+         geometry_program,
+         Transform(Vec3(0.0, 0.0, 0.0),
          Vec3(0.0f, 0.0f ,0.0f),
          //Vec3(0.0f, 0.0, 0.0f),
          Vec3(-18.0f, 1.0f, 18.0f))));
 
 
-
-   SharedPtr<Model> SunApe_pos_model = asset_manager.load_model("sunApe_pos.obj");
-   SharedPtr<Model> SunApe_look_model = asset_manager.load_model("sunApe_look.obj");
-   SharedPtr<Model> SunApe_corner_model = asset_manager.load_model("sunApe_corner.obj");
-
-   SharedPtr<ModelInstance> corner[4];
-   Transform corner_trans[4];
-   int corners[]{ -50, 50, -50, 50 };
-   Vec3 up(0.0f,1.0f,0.0f);
-   int prev = 0;
-   for (int i = 0; i < 4; i++) {
-      Vec3 target = dirr - poss;
-      Vec3 tempVertical;
-      Vec3 tempHorizontal;
-      Vec3 tempPos;
-      tempVertical = glm::normalize(glm::cross(target, up));
-      tempHorizontal = glm::normalize(glm::cross(-tempVertical, target));
-      tempPos = target + tempVertical * (float)corners[i] + tempHorizontal * (float)corners[(i+prev)%(2 + (i % 2))];
-      prev += i;
-
-      //temp.x = dirr.x + (float)corners[i];
-      corner_trans[i] = Transform(tempPos,
-         Vec3(0,0,0),
-         Vec3(1.0f, 1.0f, 1.0f));
-
-      corner[i] = scene_manager.instantiate_model(SunApe_corner_model,
-         geometry_program,
-         corner_trans[i]);
-
-      model_instances.push_back(corner[i]);
-   }
-
-   Transform SunApe_pos_modelTrans = Transform(poss,
-      Vec3(0, 0, 0),
-      Vec3(1.3f, 1.3f, 1.3f));
-
-      SharedPtr<ModelInstance> SunApe_pos = scene_manager.instantiate_model(SunApe_pos_model,
-         geometry_program,
-         SunApe_pos_modelTrans);
-
-   model_instances.push_back(SunApe_pos);
-
-   Transform sunApe_Look_modeltrans = Transform(dirr,
-      Vec3(0, 0, 0),
-      Vec3(1.3f, 1.3f, 1.3f));
-
-   SharedPtr<ModelInstance> SunApe_Look = scene_manager.instantiate_model(SunApe_look_model,
-      geometry_program,
-      sunApe_Look_modeltrans);
+   //Tool to see more clearly how Light frustrum looks like
+   ShadowcasterDebug sundbg = ShadowcasterDebug(light_sc, &asset_manager, &scene_manager, &model_instances, geometry_program, &poss, &dirr);
+ 
    
-   model_instances.push_back(SunApe_Look);
 
    //SunApe->set_transform()
 
@@ -625,30 +582,11 @@ Int32 main( Int32 argc, char const *argv[] ) {
       ImGui::SliderFloat( "Move speed", &g_move_speed, 0.0f, 25.0f );
       ImGui::End();
 
+      Array<Float32,4> corners = light_sc->getCorners();
+
       debug::lightsource( poss, dirr, scene_manager );
       light_sc->set_Light_matrix(0.1f, glm::length(poss-dirr), corners[0], corners[1], corners[2], corners[3], poss, dirr, Vec3(0.0f, 1.0f, 0.0f));
-      SunApe_pos_modelTrans.set_position(poss);
-      //SunApe_pos_modelTrans.set_rotation();
-      sunApe_Look_modeltrans.set_position(dirr);
-
-      SunApe_pos->set_transform(SunApe_pos_modelTrans);
-      SunApe_Look->set_transform(sunApe_Look_modeltrans);
-
-
-      for (int i = 0; i < 4; i++) {
-
-         Vec3 target =  dirr - poss;
-         Vec3 tempVertical;
-         Vec3 tempHorizontal;
-         Vec3 tempPos;
-         tempVertical = glm::normalize(glm::cross(target, up));
-         tempHorizontal = glm::normalize(glm::cross(-tempVertical, target));
-         tempPos = tempVertical * (float)corners[i] + tempHorizontal * (float)corners[(i + prev) % (2 + (i % 2))];
-         prev += i;
-
-         corner_trans[i].set_position(dirr + tempPos);
-         corner[i]->set_transform(corner_trans[i]);
-      }
+      sundbg.light_caster_debugg_tool_render();
 
 
       process_mouse( window, view, delta_time_s );

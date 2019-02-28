@@ -37,6 +37,7 @@
     <ClCompile Include="src\ShaderManager.cpp" />
     <ClCompile Include="src\ShaderProgram.cpp" />
     <ClCompile Include="src\Shadowcaster.cpp" />
+    <ClCompile Include="src\shadowcasterDebug.cpp" />
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\Transform.cpp" />
     <ClCompile Include="src\Viewport.cpp" />
@@ -68,6 +69,7 @@
     <ClInclude Include="src\ShaderManager.h" />
     <ClInclude Include="src\ShaderProgram.h" />
     <ClInclude Include="src\Shadowcaster.h" />
+    <ClInclude Include="src\shadowcasterDebug.h" />
     <ClInclude Include="src\Texture.h" />
     <ClInclude Include="src\Transform.h" />
     <ClInclude Include="src\Viewport.h" />

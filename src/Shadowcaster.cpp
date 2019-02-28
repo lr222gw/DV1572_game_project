@@ -33,3 +33,9 @@ Mat4 Shadowcaster::get_matrix()
 {
    return _light_matrix;
 }
+
+Array<Float32,4> Shadowcaster::getCorners()
+{   
+   return { _left, _right, _bottom, _top };
+}
+
