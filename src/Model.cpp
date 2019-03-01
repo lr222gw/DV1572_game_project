@@ -93,7 +93,7 @@ SharedPtr<Mesh> Model::_process_mesh( aiMesh *mesh, aiScene const *scene ) {
 						   mesh->mBitangents[i].z };
 
      //TODO: Shadow on floor return if we use ">" instead of "<"
-     //if (glm::dot(glm::cross(vertex.normal, vertex.tangent), vertex.bitangent) > 0.0) {
+     //if (glm::dot(glm::cross(vertex.normal, vertex.tangent), vertex.bitangent) < 0.0) {
      //   vertex.tangent = { -mesh->mTangents[i].x,
      //              -mesh->mTangents[i].y,
      //              -mesh->mTangents[i].z };
