@@ -209,8 +209,8 @@ void Transform::_update_matrix() {
    // omvandlar skala och position till mat4 transformer
    // och uppdaterar sedan klasstransformen till en kombination
    // av dessa och rotationsmatrisen
-   _matrix = _rotation                                      // 3
-           * glm::translate( _identity_matrix, _position )  // 2
+   _matrix = glm::translate( _identity_matrix, _position )  // 3
+           * _rotation                                      // 2
            * glm::scale(     _identity_matrix, _scale    ); // 1
 
    // handle W // _matrix[3][3]

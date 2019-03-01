@@ -264,6 +264,7 @@ void Viewport::_g_buffer_init() {
                            _g_buffer.emi_tex_loc,
                            0 );
 
+<<<<<<< HEAD
 // mouse picking texture for g-buffer
    glBindTexture( GL_TEXTURE_2D,
                   _g_buffer.pic_tex_loc );
@@ -287,6 +288,22 @@ void Viewport::_g_buffer_init() {
    glTexParameteri( GL_TEXTURE_2D,
                     GL_TEXTURE_MAG_FILTER,
                     GL_NEAREST);
+=======
+// picking (RGBA) light texture for g-buffer
+   glBindTexture(GL_TEXTURE_2D,
+	   _g_buffer.pic_tex_loc);
+
+   glTexImage2D(GL_TEXTURE_2D,
+	   0,
+	   GL_RGBA32F,
+	   width,
+	   height,
+	   0,
+	   GL_RGBA,
+	   GL_FLOAT,
+	   NULL);
+
+>>>>>>> db25cc35e4d2105b126c77e14c1c9d631b0fad13
 
    // attach the texture id to currently bound g-buffer
    glFramebufferTexture2D( GL_FRAMEBUFFER,

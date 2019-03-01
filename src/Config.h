@@ -8,7 +8,8 @@ enum RenderMode : Uint32 {       composite   = 0,
                                  specular    = 3,
                                  positional  = 4,
                                  emissive    = 5,
-                                 textureless = 6 };
+                                 textureless = 6,
+								 picking	 = 7 };
 
 enum class FileType   { model, texture };
 
@@ -19,7 +20,7 @@ struct Config {
    static constexpr Uint32    particle_max_count = 512;
 
    static constexpr Float32   near_plane         =  0.001f,
-                              far_plane          =  200.0f,
+                              far_plane          =  500.0f,
                               fov_rad            =  1.5708f, // 90 degrees in radians
                               start_aspect_ratio = (Float32)start_height / (Float32)start_width;
 
@@ -36,7 +37,7 @@ struct Config {
 
 // TODO: split into source
 struct FilePath {
-   // konstruktor och sådant
+   // konstruktor och sï¿½dant
    FilePath( FileType type, String filename ):
       _type     ( type     ),
       _filename ( filename )
