@@ -79,15 +79,14 @@ void process_mouse( GLFWwindow *window, Viewport &cam, SceneManager scene, Float
    }
 
     // mouse picking
-   if (false) { //Temporary switch to disable while using ImGui
-      if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1))
-      {
-         SharedPtr<ModelInstance> model = scene.get_instance_ptr(scene.get_object_id_at_pixel(x_pos, y_pos, cam));
-         model->transform(Transform::make_rotation(Vec3(1.0, 1.0, 1.0)));
-         std::cout << x_pos << ":" << y_pos << std::endl;
-
-      }
+   if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1))
+   {
+      SharedPtr<ModelInstance> model = scene.get_instance_ptr(scene.get_object_id_at_pixel(x_pos, y_pos, cam));
+      model->transform(Transform::make_rotation(Vec3(1.0, 1.0, 1.0)));
+      std::cout << x_pos << ":" << y_pos << std::endl;
+   
    }
+
 
 
    bool changed = last_x != x_pos || last_y != y_pos;
