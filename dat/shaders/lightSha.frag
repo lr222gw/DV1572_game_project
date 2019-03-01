@@ -77,7 +77,7 @@ void main() {
       case mode_composite:
          lighting = albedo * 0.2; // start off with ambient light
 
-         for ( int i = 0;  i  < num_lights;  ++i ) {
+         for ( int i = 0;  i < num_lights;  ++i ) {
            Light light = lights[i];
            if ( light.type == point_light_t ) { // TODO: take one array of each light type and have a loop for each instead
               ////////////////////////////////////////////////////////////////////////////////////////
