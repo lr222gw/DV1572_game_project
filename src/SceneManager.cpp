@@ -84,7 +84,7 @@ void SceneManager::draw( Viewport &view ) {
    glActiveTexture( GL_TEXTURE5) ;
    glBindTexture(   GL_TEXTURE_2D, g_buffer_data.emi_tex_loc );
    glActiveTexture(GL_TEXTURE6);
-   glBindTexture(GL_TEXTURE_2D, g_buffer_data.pic_tex_loc);
+   glBindTexture(	GL_TEXTURE_2D, g_buffer_data.pic_tex_loc );
 
    glUniform3fv( glGetUniformLocation( lighting_pass_loc, "view_pos"),
                  1,
@@ -440,24 +440,24 @@ void SceneManager::_lights_to_gpu() {
                  (Uint32)config.render_mode );
 }
 
-Uint32 SceneManager::get_object_id_at_pixel(Uint32 x, Uint32 y, Viewport &view)
+Uint32 SceneManager::get_object_id_at_pixel(Uint32 x, Uint32 y, Viewport &view) 
 {
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, _geometry_shader_program->get_location());
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, view.get_g_buffer().buffer_loc);
 	glReadBuffer(GL_COLOR_ATTACHMENT6);
 
-	Uint32 pixel_info[4]{};
-	//struct pixel_info_struct
-	//{
-	//	int x;
-	//	int y;
-	//	int z;
-	//	int w;
-	//};
-	//pixel_info_struct pixel_info;
+	//Uint32 pixel_info[4]{};
+	struct pixel_info_struct
+	{
+		float x;
+		float y;
+		float z;
+		float w;
+	};
+	pixel_info_struct pixel_info;
 	
-	glReadPixels(x, y, 1, 1, GL_RGBA, GL_UNSIGNED_INT, (void*)&pixel_info);
+	glReadPixels(x, y, 1, 1, GL_RGBA, GL_FLOAT, &pixel_info);
 	
-	Uint32 obj_id = ((pixel_info[0] ) << 24 + ((pixel_info[1] & 0xff) << 16) + ((pixel_info[2] & 0xff) << 8) + ((pixel_info[3] & 0xff))); // TODO: validate that we get the correct ids
+	Uint32 obj_id = ((int(pixel_info.x ) & 0xff) << 24) + ((int(pixel_info.y) & 0xff) << 16) + ((int(pixel_info.z) & 0xff) << 8) + ((int(pixel_info.w) & 0xff)); // TODO: validate that we get the correct ids
 
 	return obj_id;
 }

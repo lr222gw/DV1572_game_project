@@ -16,6 +16,7 @@ uniform  sampler2D  g_tex_norm;
 uniform  sampler2D  g_tex_spec;
 uniform  sampler2D  g_tex_albedo;
 uniform  sampler2D  g_tex_emit;
+uniform  sampler2D  g_tex_pic;
 out      vec4       rgba_rasterizer;
 
 struct Light {
@@ -39,7 +40,8 @@ const uint     mode_composite   = 0,
                mode_specular    = 3,
                mode_positional  = 4,
                mode_emissive    = 5,
-               mode_textureless = 6;
+               mode_textureless = 6,
+			   mode_picking		= 7;
 
 const int lights_cap = 32;
 
@@ -58,6 +60,7 @@ void main() {
    float spec_str = texture( g_tex_spec,   fs_in.uv ).w;   // TODO: check texture channels
    vec4  emissive = texture( g_tex_emit,   fs_in.uv );
    vec3  emit_rgb = emissive.xyz;
+   vec4 picking = texture(g_tex_pic, fs_in.uv);
 
    vec3 view_dir  = normalize( view_pos - pos );
 
@@ -69,6 +72,7 @@ void main() {
       case mode_specular:    lighting = spec_rgb; break; // TODO: check texture channels
       case mode_positional:  lighting = pos;      break;
       case mode_emissive:    lighting = emit_rgb; break;
+	  case mode_picking:    lighting = picking.rgb; break;
       case mode_textureless: if ( pos.x+pos.y+pos.z!=0 ) albedo = vec3( 1.0 ); // no break so that the mode_composite code gets run
       case mode_composite:
          lighting = albedo * 0.2; // start off with ambient light
