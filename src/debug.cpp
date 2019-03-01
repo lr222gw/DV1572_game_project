@@ -34,7 +34,7 @@ void debug::view_mat4( Mat4 const &m, String name ) {
    ImGui::PopID();
 }
 
-void debug::lightsource( Vec3 &position, Vec3 &direction, SceneManager &scene_man ) {
+void debug::lightsource( Vec3 &position, Vec3 &direction, Float32 &intensity, Float32 &radius, Float32 &degree, Float32 &specularity, SceneManager &scene_man ) {
    ImGui::PushID( "Lightsource_debug" );
    ImGui::Begin( "Lightsource:" );
    {
@@ -77,6 +77,34 @@ void debug::lightsource( Vec3 &position, Vec3 &direction, SceneManager &scene_ma
       ImGui::PushID( "lsrz" );
       ImGui::InputFloat( "", &direction.z, 1.0f, 0.1f, "%3.1f" );
       ImGui::PopID();
+
+      //intensity, Float32 &radius, Float32 &degree, Float32 &specularity
+        ImGui::PopItemWidth();
+
+        ImGui::Separator();
+
+        ImGui::Text("Light variables:");
+
+        ImGui::PushItemWidth(85.0f);
+
+        ImGui::PushID("lvrx");
+        ImGui::InputFloat(": Intensitet ", &intensity, 0.01f, 0.05f, "%1.2f");
+        ImGui::PopID();
+
+        
+        //ImGui::PushID("lvry");
+        //ImGui::InputFloat(": Radius ", &radius, 1.0f, 0.1f, "%3.1f");
+        //ImGui::PopID();
+        //
+        //
+        //ImGui::PushID("lvrz");
+        //ImGui::InputFloat(": Degree ", &degree, 1.0f, 0.1f, "%3.1f");
+        //ImGui::PopID();
+
+        
+        ImGui::PushID("lvru");
+        ImGui::InputFloat(": Specular ", &specularity, 1.0f, 0.1f, "%3.1f");
+        ImGui::PopID();
 
         ImGui::PopItemWidth();
    }

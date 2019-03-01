@@ -208,6 +208,7 @@ void SceneManager::draw_debug_scene_inspection() {
    ImGui::Begin( "Instances:" ); // begin our Inspection window:
    {  // draw our window GUI components and do I/O:
       Uint32 i = 0;
+
       for ( auto &e : _instances ) {
          if ( !e.expired() ) {
             auto instance = e.lock();
@@ -226,6 +227,8 @@ void SceneManager::draw_debug_scene_inspection() {
                                      scale.y,
                                      scale.z }; // temp
 
+            Vec3 rotation(0.0f);
+
             // temp
             String id = instance->get_model()->get_name() +"::"+ std::to_string(i);
 
@@ -233,14 +236,44 @@ void SceneManager::draw_debug_scene_inspection() {
             ImGui::NewLine();
             ImGui::Text( "%s:", id.c_str() );
             ImGui::InputFloat3( "Position", position_array, "%.1f");
-            // ImGui::SliderAngle( "X rotation", &rotation.x );
-            // ImGui::SliderAngle( "Y rotation", &rotation.y );
-            // ImGui::SliderAngle( "Z rotation", &rotation.z );
+
+            ImGui::SliderAngle( "X rotation", &rotation.x );
+            ImGui::SliderAngle( "Y rotation", &rotation.y );
+            ImGui::SliderAngle( "Z rotation", &rotation.z );
+
             ImGui::InputFloat3( "Scale", scale_array, "%.2f" );
             ImGui::NewLine();
 
             ImGui::Separator();
             ImGui::PopID();
+            
+            Vec3 oldPos = position;
+           
+            Transform trans = Transform(Vec3(0.0f, 0.0f, 0.0f));
+            //instance->set_transform(trans);
+            //transform = instance->model_transform;
+            
+            //instance->set_transform(trans);
+            
+
+            //instance->set_transform(trans);
+            transform = instance->model_transform;
+
+            transform.set_position(Vec3(0.0f,0.0f,0.0f));
+
+            instance->set_transform(transform);
+            transform = instance->model_transform;
+            
+            //glm::rotation(Mat4(1.0f), rotation);
+            transform.set_rotation(Vec3(1.0f, 0.0f, 0.0f), rotation.x);
+            transform.set_rotation(Vec3(0.0f, 1.0f, 0.0f), rotation.y);
+            transform.set_rotation(Vec3(0.0f, 0.0f, 1.0f), rotation.z);
+
+            //transform.set_rotation(transform.get_rotation());
+            //position = oldPos;
+            //transform.get_rotation();
+            //instance->set_transform(transform);
+          
 
             Transform new_transform( Vec3( position_array[0],
                                            position_array[1],
@@ -248,9 +281,17 @@ void SceneManager::draw_debug_scene_inspection() {
                                 /* temp */ transform.get_rotation(),
                                      Vec3( scale_array[0],
                                            scale_array[1],
-                                           scale_array[2] ) );
+                                           scale_array[2] ) );          
 
-            instance->set_transform( new_transform );
+            //Transform new_transform(Vec3(0.0f, 0.0f,0.0f));
+           ////new_transform.set_rotation(Transform::make_rotation(,));
+            //instance->set_transform(new_transform);
+            //new_transform.set_position(Vec3(position_array[0],
+            //   position_array[1],
+            //   position_array[2]));
+            
+            instance->set_transform(new_transform);
+            
          }
          ++i; // increment counter
       }

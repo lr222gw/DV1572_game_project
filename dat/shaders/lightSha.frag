@@ -169,7 +169,7 @@ void main() {
 
 			//TODO: Disable to not test last light...
 			//lighting += (ambient + (1.0 - shadow) * (diffuse + specular)) * albedo;
-			lighting += (ambient + (1.0 - shadow) * (diffuse + specular)) * albedo;
+			lighting += ((ambient + (1.0 - shadow) * (diffuse + specular)) * albedo) * light.intensity;
 
 
 

@@ -47,12 +47,16 @@ void Transform::set_rotation( Vec3 const &euler_angles ) {
 
 void Transform::set_rotation( Mat4 const &rotation_matrix ) {
    // TODO: verify veracity of matrix
+
    _rotation = rotation_matrix;
+
    _update_matrix();
 }
 
 void Transform::set_rotation( Vec3 const &axis, Float32 angle_rad ) {
+
    _rotation = glm::rotate( _rotation, glm::radians(angle_rad), axis );
+
    _update_matrix();
 }
 
@@ -165,6 +169,13 @@ Vec3 Transform::get_euler_angles() const {
    // c f j 0    g,h,j = z axeln
    // 0 0 0 1
 
+   // glm::vec3 scale;
+   // glm::quat rotation;
+   // glm::vec3 translation;
+   // glm::vec3 skew;
+   // glm::vec4 perspective;
+   // glm::decompose(_rotation, scale, rotation, translation, skew, perspective);
+
    return euler_angles;
 }
 
@@ -198,7 +209,7 @@ void Transform::_extract_data( Mat4 const &mat ) {
    rot_mat[2][1] = mat[2][1] / _scale[2];
    rot_mat[2][2] = mat[2][2] / _scale[2];
 
-  // _rotation = ... // TODO: bryt ut vec3 från mat4
+   //TODO: look up GLM::decompose
 
    _update_matrix();
 }
