@@ -41,7 +41,7 @@ const uint     mode_composite   = 0,
                mode_positional  = 4,
                mode_emissive    = 5,
                mode_textureless = 6,
-			   mode_picking		= 7;
+               mode_picking	    = 7;
 
 const int lights_cap = 32;
 
@@ -130,7 +130,7 @@ void main() {
            else if ( light.type == spot_light_t ) {
               lighting = vec3(1.0, 0.0, 1.0 ); // TODO
            }
-           else if (light.type == directional_light_t ){ // light.type == directional_light_t
+           else if ( light.type == directional_light_t ) { // light.type == directional_light_t
       			vec3 normal = norm;
       			//vec3 lightColor = vec3(0.3);
       			// ambient
@@ -154,7 +154,7 @@ void main() {
       			// transform to [0,1] range
       			projCoords = projCoords * 0.5 + 0.5;
       			// get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
-      			float closestDepth = texture(shadowMap, projCoords.xy).r;
+      			float closestDepth = texture( shadowMap, projCoords.xy ).r;
       			// get depth of current fragment from light's perspective
       			float currentDepth = projCoords.z;
       			// check whether current frag pos is in shadow

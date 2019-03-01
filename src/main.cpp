@@ -61,7 +61,11 @@ void create_demo_scene( /*...*/ ) {
 
 
 
-void process_mouse( GLFWwindow *window, Viewport &cam, SceneManager scene, Float32 delta_time_s  ) {
+void process_mouse( GLFWwindow   *window,
+                    Viewport     &cam,
+                    SceneManager  scene,
+                    Float32       delta_time_s )
+{
    // yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a
    // direction vector pointing to the right so we initially rotate a bit to the left.
    static Float64 yaw         = -90.0f;
@@ -87,19 +91,16 @@ void process_mouse( GLFWwindow *window, Viewport &cam, SceneManager scene, Float
       SharedPtr<ModelInstance> model = scene.get_instance_ptr(scene.get_object_id_at_pixel(x_pos, y_pos, cam));
       model->transform(Transform::make_rotation(Vec3(1.0, 1.0, 1.0)));
       std::cout << x_pos << ":" << y_pos << std::endl;
-
    }
 
-
-
-   bool changed = last_x != x_pos || last_y != y_pos;
+   Bool has_changed = last_x != x_pos || last_y != y_pos;
 
    Float64 x_offset = x_pos - last_x;
    Float64 y_offset = last_y - y_pos;
    last_x           = x_pos;
    last_y           = y_pos;
 
-   if (!g_is_mouse_look_enabled)
+   if ( !g_is_mouse_look_enabled )
       return;
 
    // 'http://justsomething.co/wp-content/uploads/2013/11/guns-replaced-thumbs-up-20.jpg'
@@ -116,7 +117,7 @@ void process_mouse( GLFWwindow *window, Viewport &cam, SceneManager scene, Float
    if ( pitch < -89.0f )
       pitch = -89.0f;
 
-   if ( changed ) {
+   if ( has_changed ) {
       cam.forward.x = cos( glm::radians(yaw)) * cos(glm::radians(pitch) );
       cam.forward.y = sin( glm::radians(pitch)                          );
       cam.forward.z = sin( glm::radians(yaw)) * cos(glm::radians(pitch) );
@@ -310,7 +311,8 @@ void process_input( GLFWwindow *window, Viewport &cam, Float32 delta ) {
 // TODO: refactor into debug.h/cpp
 void draw_camera_debug_window( Vec3    &position,
                                Vec3    &rotation,
-                               Float32 &fov_rad ) {
+                               Float32 &fov_rad )
+{
    ImGui::Begin( "Camera:" ); // begin our Camera window:
    {  // draw our window GUI components and do I/O:
       ImGui::SliderAngle( "X-axis", &rotation.x );
@@ -622,12 +624,10 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
       debug::lightsource( poss, dirr, intensity, radius, degree, specularity, scene_manager );
 
-      // TODO: fråga Lowe
-      //sun->set_data( Light::Data{ Light::Type::directional,
-
       light_sc->set_Light_matrix(0.1f, glm::length(poss-dirr), corners[0], corners[1], corners[2], corners[3], poss, dirr, Vec3(0.0f, 1.0f, 0.0f));
       sundbg.light_caster_debugg_tool_render();
 
+      sun->set_type( Light::Type::directional );
       sun->set_direction( glm::normalize(poss - dirr) );
       sun->set_position( poss );
       // sun->set_color( Vec3(1.0f,  1.0f,   1.0f) );
