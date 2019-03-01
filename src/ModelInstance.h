@@ -18,9 +18,9 @@ public:
       _model                 ( model                 ),
       _shader_program        ( shader_program        ),
       _transform             ( transform             ),
-      model_transform        ( _transform            ),
-	   id	                 ( _generate_id()        ),
-      _callback_on_transform ( callback_on_transform )
+      _callback_on_transform ( callback_on_transform ),
+      id                     ( _generate_id()        ),
+      model_transform        ( _transform            )
    {
       //ShadowMap needs to be updated if a new model is loaded..
       _callback_on_transform();
@@ -32,8 +32,6 @@ public:
    SharedPtr<ShaderProgram>  get_shader_program(); // TODO: move semantics
    void set_shader_program(SharedPtr<ShaderProgram> shaderprogram); // TODO: move semantics
 
-   Uint32 const			     id;
-
    [[nodiscard]] SharedPtr<Model const> get_model() const;
 
 private:
@@ -44,6 +42,7 @@ private:
    Uint32 _generate_id() const;
 
 public:
+   Uint32    const  id;
    Transform const &model_transform; // read-only exposure
 };
 

@@ -3,7 +3,7 @@
 void ShadowcasterDebug::light_caster_debugg_tool_render() {
 
    if (_dbg_initialied) {
-      
+
       auto t = _dbgdat.SunApe_pos->model_transform;
       t.set_position(*pos);
       _dbgdat.SunApe_pos->set_transform(t);
@@ -42,22 +42,28 @@ ShadowcasterDebug::ShadowcasterDebug(SharedPtr<Shadowcaster> shadowcaster, Asset
    light_caster_debugg_tool_init(shadowcaster, asset_manager, scene_manager, model_instances, geometry_program,poss,dirr);
 }
 
-void ShadowcasterDebug::light_caster_debugg_tool_init(SharedPtr<Shadowcaster> shadowcaster,  AssetManager *asset_manager, SceneManager *scene_manager, Vector<SharedPtr<ModelInstance>> *model_instances, SharedPtr<ShaderProgram> geometry_program, Vec3 *poss, Vec3 *dirr) {
+void ShadowcasterDebug::light_caster_debugg_tool_init( SharedPtr<Shadowcaster> shadowcaster,
+                                                       AssetManager *asset_manager,
+                                                       SceneManager *scene_manager,
+                                                       Vector<SharedPtr<ModelInstance>> *model_instances,
+                                                       SharedPtr<ShaderProgram> geometry_program,
+                                                       Vec3 *poss,
+                                                       Vec3 *dirr) {
 
 
    if (_dbg_initialied == false) {
 
       this->shadowcaster = shadowcaster;
 
-      auto SunApe_pos_model = asset_manager->load_model("sunApe_pos.obj");
-      auto SunApe_look_model = asset_manager->load_model("sunApe_look.obj");
+      auto SunApe_pos_model    = asset_manager->load_model("sunApe_pos.obj");
+      auto SunApe_look_model   = asset_manager->load_model("sunApe_look.obj");
       auto SunApe_corner_model = asset_manager->load_model("sunApe_corner.obj");
 
-      _dbgdat.corner[4];
-      _dbgdat.corner_trans[4];
+      //_dbgdat.corner[4];
+      //_dbgdat.corner_trans[4];
       //int corners[]{ -50, 50, -50, 50 };
-       //_left, _right, _bottom, _top 
-      
+      //_left, _right, _bottom, _top
+
       _dbgdat.corners = this->shadowcaster->getCorners();
 
       Vec3 up(0.0f, 1.0f, 0.0f);
@@ -103,7 +109,7 @@ void ShadowcasterDebug::light_caster_debugg_tool_init(SharedPtr<Shadowcaster> sh
          sunApe_Look_modeltrans);
 
       model_instances->push_back(SunApe_Look);
-      
+
       _dbgdat.SunApe_pos = SunApe_pos;
       _dbgdat.SunApe_Look = SunApe_Look;
 

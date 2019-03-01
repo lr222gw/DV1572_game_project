@@ -5,7 +5,7 @@ SharedPtr<ModelInstance> SceneManager::instantiate_model(
    SharedPtr<ShaderProgram>  shader_program,
    Transform const&          transform)
 {
-   auto callback_lambda = [=]() {_should_recalculate_shadowmap = true; };
+   auto callback_lambda = [=]() { _should_recalculate_shadowmap = true; };
    // construct return value (shared pointer):
    auto instance_ptr = // TODO: switch to UniquePtr..?
       std::make_shared<ModelInstance>( model,
@@ -20,19 +20,58 @@ SharedPtr<ModelInstance> SceneManager::instantiate_model(
 }
 
 
+Uint64 SceneManager::_generate_light_id() {
+   return _next_light_id++;
+}
+
+void SceneManager::_light_destruction_listener( Uint64 id ) {
+   int match_index = -1;
+   for ( auto i=0;  i<_num_lights;  ++i )
+      if ( _id_of_light_at[i] == id )
+         match_index = id;
+
+   // if the light was in the light data buffer, remove it by swapping
+   if ( -1 != match_index ) { // the entry with the last entry and decrement count
+      Light::Data  temp_buffer = _light_data[match_index];
+      _light_data[match_index] = _light_data[--_num_lights];
+      _light_data[_num_lights] = temp_buffer;
+      // TODO: (if buffer for over-capacity lights gets added): check for new lights to insert
+   }
+
+   // TODO: "else { /* remove from over-capacity buffer */ }""
+}
+
+SharedPtr<Light> SceneManager::instantiate_light( Light::Data data )
+{
+   auto result = std::make_shared<Light>( std::bind( &SceneManager::_light_destruction_listener,
+                                                     this,
+                                                     std::placeholders::_1 ),
+                                          _generate_light_id(),
+                                          std::move(data) );
+   _lights[result->id] = result; // adding tdo instance table
+
+   if ( _num_lights < light_capacity ) { // adding
+      ++_num_lights;
+      _light_data     [_num_lights] = result->data;
+      _id_of_light_at [_num_lights] = result->id;
+   }
+
+   return result;
+}
+
 void SceneManager::draw( Viewport &view ) {
    auto &g_buffer = view.get_g_buffer();
 
    auto lighting_pass_loc = _lighting_shader_program->get_location();
    auto geometry_pass_loc = _geometry_shader_program->get_location();
-   
+
    //TODO: Make modelinstance supply unique ID to Callback Function and then in CAllback function compare the boundingbox of the modelinstance with the frustrum of all the active shadowcasters and recalculate shadowmap for any intersections
    if (_should_recalculate_shadowmap) {
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       this->update_shadowmap();
       _should_recalculate_shadowmap = false;
    }
-   
+
    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
    glUseProgram( geometry_pass_loc );
@@ -83,21 +122,21 @@ void SceneManager::draw( Viewport &view ) {
    glBindTexture(   GL_TEXTURE_2D, g_buffer_data.alb_tex_loc );
    glActiveTexture( GL_TEXTURE5) ;
    glBindTexture(   GL_TEXTURE_2D, g_buffer_data.emi_tex_loc );
-   glActiveTexture(GL_TEXTURE6);
-   glBindTexture(	GL_TEXTURE_2D, g_buffer_data.pic_tex_loc );
+   glActiveTexture( GL_TEXTURE6);
+   glBindTexture(	  GL_TEXTURE_2D, g_buffer_data.pic_tex_loc );
 
    glUniform3fv( glGetUniformLocation( lighting_pass_loc, "view_pos"),
                  1,
                  glm::value_ptr(view_pos));
 
    for (auto &e : _shadow_maps) {
-      glUniformMatrix4fv( 
+      glUniformMatrix4fv(
          glGetUniformLocation(lighting_pass_loc,
             "lightmatrix"),
          1,
          GL_FALSE,
          glm::value_ptr(e.first->get_matrix()));
-      Mat4 ello = e.first->get_matrix();
+      // Mat4 ello = e.first->get_matrix();
       glActiveTexture(GL_TEXTURE4);
       glBindTexture(GL_TEXTURE_2D, e.second);
 
@@ -107,10 +146,8 @@ void SceneManager::draw( Viewport &view ) {
 
    _lights_to_gpu();
    _render_to_quad();
-
-
-
 }
+
 void SceneManager::_render_to_quad() {
 
    static Uint32  quad_vao = 0;
@@ -207,15 +244,15 @@ void SceneManager::draw_debug_scene_inspection() {
 
             ImGui::Separator();
             ImGui::PopID();
-            
-            Vec3 oldPos = position;
-           
+
+            // Vec3 oldPos = position;
+
             Transform trans = Transform(Vec3(0.0f, 0.0f, 0.0f));
             //instance->set_transform(trans);
             //transform = instance->model_transform;
-            
+
             //instance->set_transform(trans);
-            
+
 
             //instance->set_transform(trans);
             transform = instance->model_transform;
@@ -224,7 +261,7 @@ void SceneManager::draw_debug_scene_inspection() {
 
             instance->set_transform(transform);
             transform = instance->model_transform;
-            
+
             //glm::rotation(Mat4(1.0f), rotation);
             transform.set_rotation(Vec3(1.0f, 0.0f, 0.0f), rotation.x);
             transform.set_rotation(Vec3(0.0f, 1.0f, 0.0f), rotation.y);
@@ -234,7 +271,7 @@ void SceneManager::draw_debug_scene_inspection() {
             //position = oldPos;
             //transform.get_rotation();
             //instance->set_transform(transform);
-          
+
 
             Transform new_transform( Vec3( position_array[0],
                                            position_array[1],
@@ -242,7 +279,7 @@ void SceneManager::draw_debug_scene_inspection() {
                                 /* temp */ transform.get_rotation(),
                                      Vec3( scale_array[0],
                                            scale_array[1],
-                                           scale_array[2] ) );          
+                                           scale_array[2] ) );
 
             //Transform new_transform(Vec3(0.0f, 0.0f,0.0f));
            ////new_transform.set_rotation(Transform::make_rotation(,));
@@ -250,9 +287,9 @@ void SceneManager::draw_debug_scene_inspection() {
             //new_transform.set_position(Vec3(position_array[0],
             //   position_array[1],
             //   position_array[2]));
-            
+
             instance->set_transform(new_transform);
-            
+
          }
          ++i; // increment counter
       }
@@ -305,7 +342,7 @@ void SceneManager::set_shadowcasting(SharedPtr<Shadowcaster> light)
    float borderColor[] = { 0.0,0.0,0.0, 0.0 };
    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 
-   Uint32 AttatchmentNmbr = _shadow_maps.size();
+   //Uint32 AttatchmentNmbr = _shadow_maps.size();
 
    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
    glDrawBuffer(GL_NONE);
@@ -393,23 +430,29 @@ SceneManager::SceneManager(SharedPtr<ShaderProgram> geo_pass, SharedPtr<ShaderPr
 // TODO: refactor light instances into classes that RAII wrap their lifetimes
 
 // NOTE! should only be used by Light's constructor (TODO: private+friend?)
+/*
 void SceneManager::add_light( Uint64 id, LightData data ) {
    _light_data[_num_lights] = data;
    _ids[_num_lights]        = id;
    ++_num_lights; // increment counter
 }
+*/
 
+/*
 LightData SceneManager::get_light_data( Uint64 id ) const {
    auto index = _find_light_index(id);
    return _light_data[index];
 }
+*/
 
+/*
 void SceneManager::set_light_data( Uint64 id, LightData data ) {
    auto index = _find_light_index(id);
    _light_data[index] = data;
-}
+}*/
 
 // NOTE! should only be used by Light's destructor (TODO: private+friend?)
+/*
 void SceneManager::remove_light( Uint64 id ) {
    auto index = _find_light_index(id);
 
@@ -420,8 +463,9 @@ void SceneManager::remove_light( Uint64 id ) {
    std::swap( _light_data[index], _light_data[_num_lights] );
    std::swap(        _ids[index],        _ids[_num_lights] );
 }
+*/
 
-
+/*
 Uint32 SceneManager::_find_light_index( Uint64 id ) const {
    auto index = -1;
    // find index of target id
@@ -437,7 +481,7 @@ Uint32 SceneManager::_find_light_index( Uint64 id ) const {
    assert( index != -1 && "Invalid index; no match." );
    return index;
 }
-
+*/
 
 void SceneManager::_lights_to_gpu() {
    auto lighting_pass_loc = _lighting_shader_program->get_location();
@@ -446,8 +490,8 @@ void SceneManager::_lights_to_gpu() {
 
    glUniform1i( lighting_pass_loc, num_lights );
 
-   for ( Uint32 i = 0; i <  _num_lights; ++i ) {
-      auto light = get_light_data(i); // light data of light at index 'i'
+   for ( Uint32 i = 0;  i < _num_lights;  ++i ) {
+      auto light = _light_data[i]; // light data of light at index 'i'
       auto str_i = std::to_string(i); // index 'i' as String
 
       glUniform1ui( glGetUniformLocation( lighting_pass_loc, ("lights["+str_i+"].type").c_str() ),
@@ -485,10 +529,28 @@ void SceneManager::_lights_to_gpu() {
                  (Uint32)config.render_mode );
 }
 
-Uint32 SceneManager::get_object_id_at_pixel(Uint32 x, Uint32 y, Viewport &view) 
+Uint32 SceneManager::get_object_id_at_pixel(Uint32 x, Uint32 y, Viewport &view)
 {
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, view.get_g_buffer().buffer_loc);
 	glReadBuffer(GL_COLOR_ATTACHMENT6);
+
+
+//	Uint32 pixel_info[4]{};
+//	//struct pixel_info_struct
+//	//{
+//	//	int x;
+//	//	int y;
+//	//	int z;
+//	//	int w;
+//	//};
+//	//pixel_info_struct pixel_info;
+//
+//	glReadPixels(x, y, 1, 1, GL_RGBA, GL_UNSIGNED_INT, (void*)&pixel_info);
+//
+//	Uint32 obj_id = (pixel_info[0] & 0xFF << 24)
+//                 + (pixel_info[1] & 0xFF << 16)
+//                 + (pixel_info[2] & 0xFF <<  8)
+//                 + (pixel_info[3] & 0xFF <<  0); // TODO: validate that we get the correct ids
 
 	//Uint32 pixel_info[4]{};
 	struct pixel_info_struct
@@ -499,16 +561,15 @@ Uint32 SceneManager::get_object_id_at_pixel(Uint32 x, Uint32 y, Viewport &view)
 		float w;
 	};
 	pixel_info_struct pixel_info;
-	
+
 	glReadPixels(x, y, 1, 1, GL_RGBA, GL_FLOAT, &pixel_info);
-	
+
 	Uint32 obj_id = ((int(pixel_info.x ) & 0xff) << 24) + ((int(pixel_info.y) & 0xff) << 16) + ((int(pixel_info.z) & 0xff) << 8) + ((int(pixel_info.w) & 0xff)); // TODO: validate that we get the correct ids
 
 	return obj_id;
 }
 
-SharedPtr<ModelInstance> SceneManager::get_instance_ptr(Uint32 obj_id)
-{
+SharedPtr<ModelInstance> SceneManager::get_instance_ptr( Uint32 obj_id ) {
 	for (auto &e : _instances) {
 		if (!e.expired()) {
 			auto e_ptr = e.lock();
@@ -516,7 +577,7 @@ SharedPtr<ModelInstance> SceneManager::get_instance_ptr(Uint32 obj_id)
 				return e_ptr;
 		}
 	}
-	assert(false && "[ERROR] Instance of id no longer exists.");
+	assert( false && "[ERROR] Instance of id no longer exists." );
 }
 
 
