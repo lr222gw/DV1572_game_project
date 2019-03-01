@@ -51,10 +51,11 @@ SharedPtr<Light> SceneManager::instantiate_light( Light::Data data )
    _lights[result->id] = result; // adding tdo instance table
 
    if ( _num_lights < light_capacity ) { // adding
-      ++_num_lights;
       _light_data     [_num_lights] = result->data;
       _id_of_light_at [_num_lights] = result->id;
+      ++_num_lights;
    }
+   else assert( false && "Add buffer for inactive lights. " );
 
    return result;
 }
@@ -412,11 +413,15 @@ void SceneManager::update_shadowmap()
 
 }
 
-SceneManager::SceneManager(SharedPtr<ShaderProgram> geo_pass, SharedPtr<ShaderProgram> light_pass, SharedPtr<ShaderProgram> shadow_depth)
+SceneManager::SceneManager( SharedPtr<ShaderProgram> geo_pass,
+                            SharedPtr<ShaderProgram> light_pass,
+                            SharedPtr<ShaderProgram> shadow_depth )
+:
+   _lighting_shader_program ( light_pass   ),
+   _geometry_shader_program ( geo_pass     ),
+   _shadow_depth_shader     ( shadow_depth ),
+   _num_lights              ( 0 )
 {
-   this->_geometry_shader_program = geo_pass;
-   this->_lighting_shader_program = light_pass;
-   this->_shadow_depth_shader = shadow_depth;
    _init_depth_map_FBO();
 }
 
@@ -486,9 +491,7 @@ Uint32 SceneManager::_find_light_index( Uint64 id ) const {
 void SceneManager::_lights_to_gpu() {
    auto lighting_pass_loc = _lighting_shader_program->get_location();
 
-   Uint32 const num_lights { _num_lights };
-
-   glUniform1i( lighting_pass_loc, num_lights );
+   glUniform1i( lighting_pass_loc, _num_lights );
 
    for ( Uint32 i = 0;  i < _num_lights;  ++i ) {
       auto light = _light_data[i]; // light data of light at index 'i'
@@ -523,7 +526,7 @@ void SceneManager::_lights_to_gpu() {
    }
 
    glUniform1ui( glGetUniformLocation( lighting_pass_loc, "num_lights"),
-                 num_lights );
+                 _num_lights );
 
    glUniform1ui( glGetUniformLocation( lighting_pass_loc, "render_mode"),
                  (Uint32)config.render_mode );
