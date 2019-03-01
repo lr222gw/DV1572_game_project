@@ -254,10 +254,14 @@ void SceneManager::set_shadowcasting(SharedPtr<Shadowcaster> light)
       GL_CLAMP_TO_BORDER);
 
    glTexParameteri(GL_TEXTURE_2D,
+      GL_TEXTURE_WRAP_T,
+      GL_CLAMP_TO_BORDER);
+
+   glTexParameteri(GL_TEXTURE_2D,
       GL_CLAMP_TO_BORDER,
       GL_CLAMP_TO_BORDER);
 
-   float borderColor[] = { 1.0,1.0,1.0, 1.0 };
+   float borderColor[] = { 0.0,0.0,0.0, 0.0 };
    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 
    Uint32 AttatchmentNmbr = _shadow_maps.size();

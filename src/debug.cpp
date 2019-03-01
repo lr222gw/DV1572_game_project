@@ -78,7 +78,7 @@ void debug::lightsource( Vec3 &position, Vec3 &direction, SceneManager &scene_ma
       ImGui::InputFloat( "", &direction.z, 1.0f, 0.1f, "%3.1f" );
       ImGui::PopID();
 
-      ImGui::PopItemWidth();
+        ImGui::PopItemWidth();
    }
    ImGui::End();
    ImGui::PopID();

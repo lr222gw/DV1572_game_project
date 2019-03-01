@@ -165,6 +165,8 @@ void main() {
 			float shadowBias = 0.005;
 			float shadow = currentDepth - shadowBias > closestDepth  ? 1.0 : 0.0;
 
+			
+
 			//TODO: Disable to not test last light...
 			//lighting += (ambient + (1.0 - shadow) * (diffuse + specular)) * albedo;
 			lighting += (ambient + (1.0 - shadow) * (diffuse + specular)) * albedo;

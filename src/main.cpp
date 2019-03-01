@@ -15,6 +15,8 @@
 
 #include "Light.h"
 
+#include "shadowcasterDebug.h"
+
 // #include "misc/stb_image.h"
 // #include <range/v3/all.hpp>
 
@@ -488,7 +490,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
                            0.0,
                            1.0  }) };
-   SharedPtr<Model> nanosuit_model = asset_manager.load_model( "ape.obj" );
+   SharedPtr<Model> ape_model = asset_manager.load_model( "ape.obj" );
 
    //SharedPtr<Model> isle = asset_manager.load_model("Small Tropical Island.obj");
 
@@ -496,9 +498,9 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
 
    Vec3 poss = Vec3(101.0f, 100.0f, 100.0f);
-   Vec3 dirr = Vec3(1.0f, 0.0f, 0.0f);
+   Vec3 dirr = Vec3(-45.0f, 0.0f, -45.0f);
    SharedPtr<Light>sun = std::make_shared<Light>(scene_manager, LightData{ LightType::directional,
-                          dirr,
+                          glm::normalize(poss - dirr),
                           poss,
                           Vec3(1.0f,  1.0f,   1.0f),
                            1.0,
@@ -507,7 +509,10 @@ Int32 main( Int32 argc, char const *argv[] ) {
                            1.0 });
 
    SharedPtr<Shadowcaster> light_sc = std::make_shared<Shadowcaster>(sun);
+   //Must initialize before first use (set_light_matrix(...) atleast once!)
+   light_sc->set_Light_matrix(0.1f, glm::length(poss - dirr), 50, -50, 50, -50, poss, dirr, Vec3(0.0f, 1.0f, 0.0f));
    scene_manager.set_shadowcasting( light_sc );
+
 
 
    Vector<SharedPtr<ModelInstance>> model_instances;
@@ -519,7 +524,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    for ( auto i=0;  i<64;  ++i ) {
       Float32 n = 9; // spacing
       model_instances.push_back(
-         scene_manager.instantiate_model( nanosuit_model,
+         scene_manager.instantiate_model(ape_model,
                                           geometry_program,
                                           Transform( Vec3( n*(i/8)-40,  0.0f,  n*(i%8)-40 ),
                                                      Vec3(       0.0f,  0.0f,        0.0f ),
@@ -528,13 +533,19 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
    SharedPtr<Model> floor = asset_manager.load_model("floor.obj");
    model_instances.push_back(scene_manager.instantiate_model(floor,
-      geometry_program,
-      Transform(Vec3(0.0, 0.0, 0.0),
+         geometry_program,
+         Transform(Vec3(0.0, 0.0, 0.0),
          Vec3(0.0f, 0.0f ,0.0f),
          //Vec3(0.0f, 0.0, 0.0f),
          Vec3(-18.0f, 1.0f, 18.0f))));
   
 
+   //Tool to see more clearly how Light frustrum looks like
+   ShadowcasterDebug sundbg = ShadowcasterDebug(light_sc, &asset_manager, &scene_manager, &model_instances, geometry_program, &poss, &dirr);
+ 
+   
+
+   //SunApe->set_transform()
 
    /* TODO */ Vec3       cam_rotations {  0.0f,   0.0f,   0.0f };
    /* TODO */ Vec3       cam_position  {  0.0f, -20.0f,  15.0f };
@@ -586,8 +597,12 @@ Int32 main( Int32 argc, char const *argv[] ) {
       ImGui::SliderFloat( "Move speed", &g_move_speed, 0.0f, 25.0f );
       ImGui::End();
 
+      Array<Float32,4> corners = light_sc->getCorners();
+
       debug::lightsource( poss, dirr, scene_manager );
-      light_sc->set_Light_matrix(0.1f, 200.f, -50, 50, -50, 50, poss, dirr, Vec3(0.0f, 1.0f, 0.0f));
+      light_sc->set_Light_matrix(0.1f, glm::length(poss-dirr), corners[0], corners[1], corners[2], corners[3], poss, dirr, Vec3(0.0f, 1.0f, 0.0f));
+      sundbg.light_caster_debugg_tool_render();
+
 
       process_mouse( window, view, scene_manager, delta_time_s );
       process_input( window, view, delta_time_s );
