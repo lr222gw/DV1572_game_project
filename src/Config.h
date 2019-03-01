@@ -8,7 +8,8 @@ enum RenderMode : Uint32 {       composite   = 0,
                                  specular    = 3,
                                  positional  = 4,
                                  emissive    = 5,
-                                 textureless = 6 };
+                                 textureless = 6,
+								 picking	 = 7 };
 
 enum class FileType   { model, texture };
 
@@ -36,7 +37,7 @@ struct Config {
 
 // TODO: split into source
 struct FilePath {
-   // konstruktor och sådant
+   // konstruktor och sï¿½dant
    FilePath( FileType type, String filename ):
       _type     ( type     ),
       _filename ( filename )

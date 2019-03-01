@@ -272,29 +272,20 @@ void Viewport::_g_buffer_init() {
                            _g_buffer.emi_tex_loc,
                            0 );
 
-// emission (RGBA) light texture for g-buffer
+// picking (RGBA) light texture for g-buffer
    glBindTexture(GL_TEXTURE_2D,
 	   _g_buffer.pic_tex_loc);
 
    glTexImage2D(GL_TEXTURE_2D,
 	   0,
-	   GL_RGB32F,
+	   GL_RGBA32F,
 	   width,
 	   height,
 	   0,
-	   GL_RGB,
+	   GL_RGBA,
 	   GL_FLOAT,
 	   NULL);
 
-   // setting minifier:
-   glTexParameteri(GL_TEXTURE_2D,
-	   GL_TEXTURE_MIN_FILTER,
-	   GL_NEAREST);
-
-   // setting magnifier:
-   glTexParameteri(GL_TEXTURE_2D,
-	   GL_TEXTURE_MAG_FILTER,
-	   GL_NEAREST);
 
    // attach the texture id to currently bound g-buffer
    glFramebufferTexture2D(GL_FRAMEBUFFER,
