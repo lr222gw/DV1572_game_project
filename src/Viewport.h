@@ -22,7 +22,7 @@ struct GBufferData {
 class Viewport {
 /*--------------- class member functions & operators ------------*/
 public:
-   Viewport( Vec3 position, GLFWwindow *window, Float32 fov = Config::fov_rad );
+   Viewport( Vec3 position, GLFWwindow *window, SharedPtr<ShaderProgram>, Float32 fov = Config::fov_rad );
    Viewport( Viewport  const &)            = delete;
    Viewport( Viewport && )                 = delete;
    Viewport& operator=( Viewport const & ) = delete;
@@ -32,7 +32,7 @@ public:
    void                             set_view(  Transform const & );
    [[nodiscard]] Transform          get_view()     const;
    [[nodiscard]] GBufferData const& get_g_buffer() const;
-   void                             bind_shader_program( ShaderProgram & );
+   void                             bind_shader_program( SharedPtr<ShaderProgram> );
    void                             set_fov( Float32 fov_in_radians );
    void                             update();
    void                             _g_buffer_init(); // TODO: make private
@@ -45,15 +45,15 @@ private:
 /*--------------- class member variables & constants ------------*/
 private:
    // TODO: (low priority) -- use Transform for projection as well?
-   GBufferData  _g_buffer;
-   Float32      _fov;
-   Float32      _aspect;
-   GLint        _width;
-   GLint        _height;
-   Transform    _view;
-   Mat4         _projection;
-   GLFWwindow  *_window;
-   GLuint       _location;
+   GBufferData              _g_buffer;
+   Float32                  _fov;
+   Float32                  _aspect;
+   GLint                    _width;
+   GLint                    _height;
+   Transform                _view;
+   Mat4                     _projection;
+   GLFWwindow              *_window;
+   SharedPtr<ShaderProgram> _shader_program;
 
 public:
    Vec3  forward; // TODO: refactor away

@@ -629,8 +629,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
    /* TODO */ Vec3       cam_position  {  0.0f, -20.0f,  15.0f };
    /* TODO */ Transform  cam_transform;
    /* TODO */ Float32    fov_rad { Config::fov_rad }; // 90 degrees
-   /* TODO */ Viewport view { cam_position, window, fov_rad };
-   /* TODO */ view.bind_shader_program( *geometry_program );
+   /* TODO */ Viewport view { cam_position, window, geometry_program, fov_rad };
+   /* TODO */ view.bind_shader_program( geometry_program );
    /* TODO */ //TODO: remove when we dont want to se dogass
    /* TODO */ view._g_buffer_init();
    /* TODO */ //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
