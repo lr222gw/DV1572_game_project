@@ -15,13 +15,11 @@
 
 #include "Light.h"
 
-<<<<<<< HEAD
 // temp:
 //    #include <cstdio>
 //    #include <unistd.h>
-=======
+
 #include "shadowcasterDebug.h"
->>>>>>> db25cc35e4d2105b126c77e14c1c9d631b0fad13
 
 // #include "misc/stb_image.h"
 // #include <range/v3/all.hpp>
@@ -89,7 +87,9 @@ void process_mouse( GLFWwindow *window, Viewport &cam, SceneManager scene, Float
       SharedPtr<ModelInstance> model = scene.get_instance_ptr(scene.get_object_id_at_pixel(x_pos, y_pos, cam));
       model->transform(Transform::make_rotation(Vec3(1.0, 1.0, 1.0)));
       std::cout << x_pos << ":" << y_pos << std::endl;
+
    }
+
 
 
    bool changed = last_x != x_pos || last_y != y_pos;
@@ -513,33 +513,28 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
    //SharedPtr<Model> isle = asset_manager.load_model("Small Tropical Island.obj");
 
-
-
-
    Vec3 poss = Vec3(101.0f, 100.0f, 100.0f);
    Vec3 dirr = Vec3(-45.0f, 0.0f, -45.0f);
-   Float32 intensity = 0.5f; //Percentage
-   Float32 radius = 570.0f;
-   Float32 degree = 0.0f;
+
+   Float32 intensity   = 0.5f; //Percentage
+   Float32 radius      = 570.0f;
+   Float32 degree      = 0.0f;
    Float32 specularity = 1.0f;
-<<<<<<< HEAD
-   auto sun  = scene_manager.instantiate_light( Light::Data{ Light::Type::directional,
-                                                             glm::normalize(poss - dirr),
-                                                             poss,
-                                                             Vec3( 1.0f,  1.0f,  1.0f ),
-                                                             intensity, //Percentage
-                                                             radius,
-                                                             degree,
-                                                             specularity } );
+
+   auto sun = scene_manager.instantiate_light( Light::Data{ Light::Type::directional,
+                                                            glm::normalize(poss - dirr),
+                                                            poss,
+                                                            Vec3( 1.0f,  1.0f,  1.0f ),
+                                                            intensity, //Percentage
+                                                            radius,
+                                                            degree,
+                                                            specularity } );
 
    SharedPtr<Shadowcaster> light_sc = std::make_shared<Shadowcaster>(sun);
+
    //Must initialize before first use (set_light_matrix(...) atleast once!)
    light_sc->set_Light_matrix(0.1f, glm::length(poss - dirr), 50, -50, 50, -50, poss, dirr, Vec3(0.0f, 1.0f, 0.0f));
    scene_manager.set_shadowcasting( light_sc );
-
-
-
-
 
    Vector<SharedPtr<ModelInstance>> model_instances;
    //model_instances.push_back(scene_manager.instantiate_model(isle,geometry_program, Transform(Vec3(1*(2 / 8) -40, 150.0f, 2*(2 % 8) - 40),
@@ -563,18 +558,11 @@ Int32 main( Int32 argc, char const *argv[] ) {
          Transform(Vec3(0.0, 0.0, 0.0),
          Vec3(0.0f, 0.0f ,0.0f),
          //Vec3(0.0f, 0.0, 0.0f),
-<<<<<<< HEAD
-         Vec3(-18.0f, 1.0f, 18.0f))));
-
-=======
          Vec3(18.0f, 1.0f, 18.0f))));
 
->>>>>>> e8107b6b2694a4f13f28410dbaedab143cf46ed2
 
    //Tool to see more clearly how Light frustrum looks like
    ShadowcasterDebug sundbg = ShadowcasterDebug(light_sc, &asset_manager, &scene_manager, &model_instances, geometry_program, &poss, &dirr);
-
-
 
    //SunApe->set_transform()
 
@@ -633,19 +621,20 @@ Int32 main( Int32 argc, char const *argv[] ) {
       Array<Float32,4> corners = light_sc->getCorners();
 
       debug::lightsource( poss, dirr, intensity, radius, degree, specularity, scene_manager );
-      sun->set_data(LightData{ LightType::directional,
-                          glm::normalize(poss - dirr),
-                          poss,
-                          Vec3(1.0f,  1.0f,   1.0f),
-                          intensity, //Percentage
-                          radius,
-                          degree,
-                          specularity });
 
+      // TODO: fråga Lowe
+      //sun->set_data( Light::Data{ Light::Type::directional,
 
       light_sc->set_Light_matrix(0.1f, glm::length(poss-dirr), corners[0], corners[1], corners[2], corners[3], poss, dirr, Vec3(0.0f, 1.0f, 0.0f));
       sundbg.light_caster_debugg_tool_render();
 
+      sun->set_direction( glm::normalize(poss - dirr) );
+      sun->set_position( poss );
+      // sun->set_color( Vec3(1.0f,  1.0f,   1.0f) );
+      sun->set_intensity( intensity );
+      sun->set_radius( radius );
+      sun->set_degree( degree );
+      sun->set_specularity( specularity );
 
       process_mouse( window, view, scene_manager, delta_time_s );
       process_input( window, view, delta_time_s );
@@ -665,8 +654,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
       //model_instances[10]->set_transform(mo);
 
       auto mo = model_instances[10];
-      mo->transform(Transform::make_rotation(Vec3(1.0f, 0.0f, 0.0f), glm::radians(30.0f)));
-
+      mo->transform( Transform::make_rotation(Vec3(1.0f, 0.0f, 0.0f), glm::radians(30.0f) ) );
 
       scene_manager.draw( view );
 

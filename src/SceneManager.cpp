@@ -5,7 +5,7 @@ SharedPtr<ModelInstance> SceneManager::instantiate_model(
    SharedPtr<ShaderProgram>  shader_program,
    Transform const&          transform)
 {
-   auto callback_lambda = [=]() {_should_recalculate_shadowmap = true; };
+   auto callback_lambda = [=]() { _should_recalculate_shadowmap = true; };
    // construct return value (shared pointer):
    auto instance_ptr = // TODO: switch to UniquePtr..?
       std::make_shared<ModelInstance>( model,
@@ -122,8 +122,8 @@ void SceneManager::draw( Viewport &view ) {
    glBindTexture(   GL_TEXTURE_2D, g_buffer_data.alb_tex_loc );
    glActiveTexture( GL_TEXTURE5) ;
    glBindTexture(   GL_TEXTURE_2D, g_buffer_data.emi_tex_loc );
-   glActiveTexture(GL_TEXTURE6);
-   glBindTexture(	GL_TEXTURE_2D, g_buffer_data.pic_tex_loc );
+   glActiveTexture( GL_TEXTURE6);
+   glBindTexture(	  GL_TEXTURE_2D, g_buffer_data.pic_tex_loc );
 
    glUniform3fv( glGetUniformLocation( lighting_pass_loc, "view_pos"),
                  1,
@@ -146,10 +146,8 @@ void SceneManager::draw( Viewport &view ) {
 
    _lights_to_gpu();
    _render_to_quad();
-
-
-
 }
+
 void SceneManager::_render_to_quad() {
 
    static Uint32  quad_vao = 0;
@@ -246,15 +244,15 @@ void SceneManager::draw_debug_scene_inspection() {
 
             ImGui::Separator();
             ImGui::PopID();
-            
-            Vec3 oldPos = position;
-           
+
+            // Vec3 oldPos = position;
+
             Transform trans = Transform(Vec3(0.0f, 0.0f, 0.0f));
             //instance->set_transform(trans);
             //transform = instance->model_transform;
-            
+
             //instance->set_transform(trans);
-            
+
 
             //instance->set_transform(trans);
             transform = instance->model_transform;
@@ -263,7 +261,7 @@ void SceneManager::draw_debug_scene_inspection() {
 
             instance->set_transform(transform);
             transform = instance->model_transform;
-            
+
             //glm::rotation(Mat4(1.0f), rotation);
             transform.set_rotation(Vec3(1.0f, 0.0f, 0.0f), rotation.x);
             transform.set_rotation(Vec3(0.0f, 1.0f, 0.0f), rotation.y);
@@ -273,7 +271,7 @@ void SceneManager::draw_debug_scene_inspection() {
             //position = oldPos;
             //transform.get_rotation();
             //instance->set_transform(transform);
-          
+
 
             Transform new_transform( Vec3( position_array[0],
                                            position_array[1],
@@ -281,7 +279,7 @@ void SceneManager::draw_debug_scene_inspection() {
                                 /* temp */ transform.get_rotation(),
                                      Vec3( scale_array[0],
                                            scale_array[1],
-                                           scale_array[2] ) );          
+                                           scale_array[2] ) );
 
             //Transform new_transform(Vec3(0.0f, 0.0f,0.0f));
            ////new_transform.set_rotation(Transform::make_rotation(,));
@@ -289,9 +287,9 @@ void SceneManager::draw_debug_scene_inspection() {
             //new_transform.set_position(Vec3(position_array[0],
             //   position_array[1],
             //   position_array[2]));
-            
+
             instance->set_transform(new_transform);
-            
+
          }
          ++i; // increment counter
       }
@@ -571,17 +569,15 @@ Uint32 SceneManager::get_object_id_at_pixel(Uint32 x, Uint32 y, Viewport &view)
 	return obj_id;
 }
 
-SharedPtr<ModelInstance> SceneManager::get_instance_ptr( Uint32 obj_id )
-{
-	// for (auto &e : _instances) {
-	// 	if (!e.expired()) {
-	// 		auto e_ptr = e.lock();
-	// 		if (e_ptr->id == obj_id)
-	// 			return e_ptr;
-	// 	}
-	// }
-   return nullptr;
-	//assert(false && "[ERROR] Instance of id no longer exists.");
+SharedPtr<ModelInstance> SceneManager::get_instance_ptr( Uint32 obj_id ) {
+	for (auto &e : _instances) {
+		if (!e.expired()) {
+			auto e_ptr = e.lock();
+			if (e_ptr->id == obj_id)
+				return e_ptr;
+		}
+	}
+	assert( false && "[ERROR] Instance of id no longer exists." );
 }
 
 
