@@ -56,7 +56,7 @@ private:
    GLuint       _location;
 
 public:
-   Vec3  forward; // TODO: refactor away
+   Vec3  forward = Vec3(1.0f); // TODO: refactor away
    GLint const &width  = _width;
    GLint const &height = _height;
 };

@@ -101,8 +101,24 @@ void Transform::translate(Vec3 const &offset) {
    _update_matrix();
 }
 
-void Transform::look_at(Vec3 const &forward, Vec3 const up) {
-   _rotation = glm::lookAt( Vec3(0.0f), forward, up );
+void Transform::look_at(Vec3 const &forward, Vec3 pos, Vec3 const up ) {
+
+   _rotation = glm::lookAt(Vec3(0.0f,0.0f,0.0f),forward, up );
+   //_rotation = glm::lookAt(pos, pos +forward, up );
+   //_rotation = glm::lookAt(_position, forward, up );
+
+   //glm::vec3 scale;
+   //glm::quat rotation;
+   //glm::vec3 translation;
+   //glm::vec3 skew;
+   //glm::vec4 perspective;
+   //glm::decompose(_rotation, scale, rotation, translation, skew, perspective);
+   //_rotation = glm::toMat4(rotation);
+
+   //this->_position = translation;
+   //this->_matrix = _rotation;
+   //_rotation = glm::toMat4(rotation);
+   
    _update_matrix();
 }
 
