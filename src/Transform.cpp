@@ -47,12 +47,16 @@ void Transform::set_rotation( Vec3 const &euler_angles ) {
 
 void Transform::set_rotation( Mat4 const &rotation_matrix ) {
    // TODO: verify veracity of matrix
+   
    _rotation = rotation_matrix;
+
    _update_matrix();
 }
 
 void Transform::set_rotation( Vec3 const &axis, Float32 angle_rad ) {
+
    _rotation = glm::rotate( _rotation, glm::radians(angle_rad), axis );
+
    _update_matrix();
 }
 
@@ -184,7 +188,7 @@ void Transform::_extract_data( Mat4 const &mat ) {
                   glm::length( Vec3( mat[2][0],
                                      mat[2][1],
                                      mat[2][2] ) ) );
-
+    
    Mat4 rot_mat ( 1.0f );
    rot_mat[0][0] = mat[0][0] / _scale[0];
    rot_mat[0][1] = mat[0][1] / _scale[0];
@@ -198,7 +202,7 @@ void Transform::_extract_data( Mat4 const &mat ) {
    rot_mat[2][1] = mat[2][1] / _scale[2];
    rot_mat[2][2] = mat[2][2] / _scale[2];
 
-  // _rotation = ... // TODO: bryt ut vec3 från mat4
+   //TODO: look up GLM::decompose
 
    _update_matrix();
 }
@@ -209,9 +213,25 @@ void Transform::_update_matrix() {
    // omvandlar skala och position till mat4 transformer
    // och uppdaterar sedan klasstransformen till en kombination
    // av dessa och rotationsmatrisen
-   _matrix = _rotation                                      // 3
-           * glm::translate( _identity_matrix, _position )  // 2
-           * glm::scale(     _identity_matrix, _scale    ); // 1
+
+   glm::vec3 scale;
+   glm::quat rotation;
+   glm::vec3 translation;
+   glm::vec3 skew;
+   glm::vec4 perspective;
+
+   glm::decompose(_rotation, scale, rotation, translation, skew, perspective);
+
+   
+   //_matrix = _rotation //glm::toMat4(rotation) //_rotation                                      // 3
+   //        * glm::translate( _identity_matrix, _position )  // 2
+   //        * glm::scale(     _identity_matrix, _scale    ); // 1
+
+   _matrix =  //glm::toMat4(rotation) //_rotation        
+       glm::translate(_identity_matrix, _position)  // 2
+      * _rotation
+      * glm::scale(_identity_matrix, _scale) ; // 1
+
 
    // handle W // _matrix[3][3]
    if ( _matrix[3][3] != 1.0f )

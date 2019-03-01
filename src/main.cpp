@@ -79,13 +79,16 @@ void process_mouse( GLFWwindow *window, Viewport &cam, SceneManager scene, Float
    }
 
     // mouse picking
-   if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1))
-   {
-	  SharedPtr<ModelInstance> model = scene.get_instance_ptr(scene.get_object_id_at_pixel(x_pos, y_pos, cam));
-	  model->transform(Transform::make_rotation(Vec3(1.0, 1.0, 1.0)));
-	  std::cout << x_pos << ":" << y_pos << std::endl;
+   if (false) { //Temporary switch to disable while using ImGui
+      if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1))
+      {
+         SharedPtr<ModelInstance> model = scene.get_instance_ptr(scene.get_object_id_at_pixel(x_pos, y_pos, cam));
+         model->transform(Transform::make_rotation(Vec3(1.0, 1.0, 1.0)));
+         std::cout << x_pos << ":" << y_pos << std::endl;
 
+      }
    }
+
 
    bool changed = last_x != x_pos || last_y != y_pos;
 
@@ -497,21 +500,27 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
    Vec3 poss = Vec3(101.0f, 100.0f, 100.0f);
    Vec3 dirr = Vec3(-45.0f, 0.0f, -45.0f);
+   Float32 intensity = 0.5f; //Percentage
+   Float32 radius = 570.0f; 
+   Float32 degree = 0.0f;
+   Float32 specularity = 1.0f;
    SharedPtr<Light>sun = std::make_shared<Light>(scene_manager, LightData{ LightType::directional,
                           glm::normalize(poss - dirr),
                           poss,
                           Vec3(1.0f,  1.0f,   1.0f),
-                           1.0,
-                          570.0,
-                           0.0,
-                           1.0 });
+                          intensity, //Percentage
+                          radius,
+                          degree,
+                          specularity });
 
    SharedPtr<Shadowcaster> light_sc = std::make_shared<Shadowcaster>(sun);
    //Must initialize before first use (set_light_matrix(...) atleast once!)
    light_sc->set_Light_matrix(0.1f, glm::length(poss - dirr), 50, -50, 50, -50, poss, dirr, Vec3(0.0f, 1.0f, 0.0f));
    scene_manager.set_shadowcasting( light_sc );
+   
 
-
+   
+   
 
    Vector<SharedPtr<ModelInstance>> model_instances;
    //model_instances.push_back(scene_manager.instantiate_model(isle,geometry_program, Transform(Vec3(1*(2 / 8) -40, 150.0f, 2*(2 % 8) - 40),
@@ -535,7 +544,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
          Transform(Vec3(0.0, 0.0, 0.0),
          Vec3(0.0f, 0.0f ,0.0f),
          //Vec3(0.0f, 0.0, 0.0f),
-         Vec3(-18.0f, 1.0f, 18.0f))));
+         Vec3(18.0f, 1.0f, 18.0f))));
   
 
    //Tool to see more clearly how Light frustrum looks like
@@ -565,6 +574,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
    glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_emit"   ), 5 );
 
    //glEnable(GL_CULL_FACE);
+
+   
 
 // glDisable( GL_BLEND );
 // main loop:
@@ -596,7 +607,17 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
       Array<Float32,4> corners = light_sc->getCorners();
 
-      debug::lightsource( poss, dirr, scene_manager );
+      debug::lightsource( poss, dirr, intensity, radius, degree, specularity, scene_manager );
+      sun->set_data(LightData{ LightType::directional,
+                          glm::normalize(poss - dirr),
+                          poss,
+                          Vec3(1.0f,  1.0f,   1.0f),
+                          intensity, //Percentage
+                          radius,
+                          degree,
+                          specularity });
+       
+         
       light_sc->set_Light_matrix(0.1f, glm::length(poss-dirr), corners[0], corners[1], corners[2], corners[3], poss, dirr, Vec3(0.0f, 1.0f, 0.0f));
       sundbg.light_caster_debugg_tool_render();
 
@@ -606,6 +627,21 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
       // glMatrixMode( GL_PROJECTION );
       // glLoadIdentity();
+
+      //auto mo = model_instances[10]->model_transform;
+      //auto pos = mo.get_position();
+      //mo.set_position(Vec3(0.0f, 0.0f, 0.0f));
+      ////mo.set_rotation(Vec3(1.0f, 0.0f, 0.0f), glm::radians(30.0f));
+      //
+      //   //set_rotation(Vec3(1.0f, 0.0f, 0.0f), glm::radians(30.0f));
+      //model_instances[10]->set_transform(mo);
+      //
+      //mo.set_position(pos);
+      //model_instances[10]->set_transform(mo);
+
+      auto mo = model_instances[10];
+      mo->transform(Transform::make_rotation(Vec3(1.0f, 0.0f, 0.0f), glm::radians(30.0f)));
+
 
       scene_manager.draw( view );
 
