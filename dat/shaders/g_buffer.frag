@@ -28,6 +28,6 @@ void main() {
 	g_spec     = texture( tex_spec, uv_fs );
 	g_albedo   = texture( tex_diff, uv_fs );
 	g_emit     = texture( tex_emit, uv_fs );
-	g_spec	   = obj_id;
+	// g_spec	   = obj_id; // här ifall jag vill se picking texturen 
 	g_picking  = obj_id;
 }
