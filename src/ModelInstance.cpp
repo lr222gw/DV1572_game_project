@@ -6,12 +6,14 @@ void ModelInstance::draw() {
                        1,
                        GL_FALSE,
                        &(_transform.matrix[0][0]) );
+   Uvec4 id_as_rgba { id >>  0 & 0xFF,
+                      id >>  8 & 0xFF,
+                      id >> 16 & 0xFF,
+                      id >> 24 & 0xFF };
    // index for picking
-   glUniform4ui( glGetUniformLocation(_shader_program->get_location(), "obj_id"),
-                _obj_id <<  0 & 0xFF,
-                _obj_id <<  8 & 0xFF,
-                _obj_id << 16 & 0xFF,
-                _obj_id << 24 & 0xFF );
+   glUniform4uiv( glGetUniformLocation(_shader_program->get_location(), "obj_id"),
+					1,
+					glm::value_ptr(id_as_rgba));
 
    // draw model:
    _model->draw(*_shader_program);

@@ -19,7 +19,7 @@ public:
       _shader_program        ( shader_program        ),
       _transform             ( transform             ),
       _callback_on_transform ( callback_on_transform ),
-      _obj_id                ( _generate_id()        ),
+      id                     ( _generate_id()        ),
       model_transform        ( _transform            )
    {
       //ShadowMap needs to be updated if a new model is loaded..
@@ -39,10 +39,10 @@ private:
    SharedPtr<ShaderProgram>  _shader_program;
    Transform                 _transform;
    std:: function<void()>    _callback_on_transform;
-   Uint32					     _obj_id;
    Uint32 _generate_id() const;
 
 public:
+   Uint32    const  id;
    Transform const &model_transform; // read-only exposure
 };
 

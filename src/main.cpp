@@ -16,8 +16,8 @@
 #include "Light.h"
 
 // temp:
-#include <cstdio>
-#include <unistd.h>
+//    #include <cstdio>
+//    #include <unistd.h>
 
 // #include "misc/stb_image.h"
 // #include <range/v3/all.hpp>
@@ -59,7 +59,7 @@ void create_demo_scene( /*...*/ ) {
 
 
 
-void process_mouse( GLFWwindow *window, Viewport &cam, Float32 delta_time_s  ) {
+void process_mouse( GLFWwindow *window, Viewport &cam, SceneManager scene, Float32 delta_time_s  ) {
    // yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a
    // direction vector pointing to the right so we initially rotate a bit to the left.
    static Float64 yaw         = -90.0f;
@@ -80,7 +80,13 @@ void process_mouse( GLFWwindow *window, Viewport &cam, Float32 delta_time_s  ) {
       first_mouse = false;
    }
 
-  // if(glfw_)
+    // mouse picking
+   if ( glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) ) {
+	  // SharedPtr<ModelInstance> model = scene.get_instance_ptr(scene.get_object_id_at_pixel(x_pos, y_pos, cam));
+	  // model->transform(Transform::make_rotation(Vec3(1.0, 1.0, 1.0)));
+	  // std::cout << x_pos << ":" << y_pos << std::endl;
+
+   }
 
    bool changed = last_x != x_pos || last_y != y_pos;
 
@@ -117,7 +123,10 @@ void process_mouse( GLFWwindow *window, Viewport &cam, Float32 delta_time_s  ) {
    }
 }
 
-
+//void process_picking(GLFWwindow *window, SceneManager scene, Viewport view)
+//{
+//
+//}
 
 void toggle_input_callback( GLFWwindow  *window,
                             Int32        key,
@@ -160,7 +169,7 @@ void process_input( GLFWwindow  *window,
                     Viewport    &cam,
                     Float32      time_delta_s )
 {
-   //glfwSetInputMode( window, GLFW_STICKY_KEYS, 1 );
+   // glfwSetInputMode( window, GLFW_STICKY_KEYS, 1 );
 
    Float32    move_distance = g_move_speed * time_delta_s;
    Transform  offset;
@@ -236,8 +245,6 @@ void process_input( GLFWwindow  *window,
    }
 */
 }
-
-
 
 
 /*
@@ -323,19 +330,17 @@ void draw_camera_debug_window( Vec3    &position,
 }
 
 
-void print_cwd() {
-   char path[1024] = "";
-   getcwd( path, 1024 );
-   printf( "%s\n", path ); //std::filesystem::current_path().c_str() );
-}
+// void print_cwd() {
+//    char path[1024] = "";
+//    getcwd( path, 1024 );
+//    printf( "%s\n", path ); //std::filesystem::current_path().c_str() );
+// }
 
 
 Int32 main( Int32 argc, char const *argv[] ) {
-   print_cwd();
-
 	// initialise GLFW
 	glewExperimental = true; // <- needed for core profile
-	if (!glfwInit()) {
+	if (! glfwInit() ) {
 		fprintf( stderr, "[ERROR] Failed to initialize GLFW.\n" );
 		return -1;
 	}
@@ -404,11 +409,11 @@ Int32 main( Int32 argc, char const *argv[] ) {
    ShaderManager shader_manager{};
    AssetManager  asset_manager{};
 
-   auto lighting_vert_shader  { shader_manager.load_shader( "lightSha.vert" ) }; // TODO: rename files
-   auto lighting_frag_shader  { shader_manager.load_shader( "lightSha.frag" ) }; // TODO: rename files
-   auto geometry_vert_shader  { shader_manager.load_shader( "g_buffer.vert" ) }; // TODO: rename files
-   auto geometry_frag_shader  { shader_manager.load_shader( "g_buffer.frag" ) }; // TODO: rename files
-   auto geometry_geom_shader  { shader_manager.load_shader( "g_buffer.geom" ) };
+   auto lighting_vert_shader   { shader_manager.load_shader( "lightSha.vert" ) }; // TODO: rename files
+   auto lighting_frag_shader   { shader_manager.load_shader( "lightSha.frag" ) }; // TODO: rename files
+   auto geometry_vert_shader   { shader_manager.load_shader( "g_buffer.vert" ) }; // TODO: rename files
+   auto geometry_frag_shader   { shader_manager.load_shader( "g_buffer.frag" ) }; // TODO: rename files
+   auto geometry_geom_shader   { shader_manager.load_shader( "g_buffer.geom" ) };
    auto shadowdepth_vert_shader{ shader_manager.load_shader("shadow_depth.vert") };
    auto shadowdepth_frag_shader{ shader_manager.load_shader("shadow_depth.frag") };
 
@@ -422,72 +427,78 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
    //Add Lightning program to Scenemanager
    SceneManager  scene_manager{ geometry_program, lighting_program , shadowdepth_program };
-   /*
-   Light lights[8] = { Light(scene_manager , LightData {LightType::point,
-                                                      Vec3(0.0f,   0.0f,   0.0f),
-                                                      Vec3(10.0f,  10.0f,  10.0f),
-                                                      Vec3(1.0f,   0.0f,   0.0f),
-                                                       0.1,
-                                                      14.0,
-                                                       0.0,
-                                                       1.0 }),
-                     Light(scene_manager , LightData {LightType::point,
-                                                      Vec3(0.0f,  0.0f,  0.0f),
-                                                      Vec3(1.0f,  4.0f,  5.0f),
-                                                      Vec3(1.0f,  1.0f,  0.0f),
-                                                      0.1,
-                                                      7.0,
-                                                      0.0,
-                                                      1.0 }),
-                     Light(scene_manager , LightData {LightType::point,
-                                                      Vec3(0.0f,  0.0f,  0.0f),
-                                                      Vec3(2.0f,  1.0f,  5.0f),
-                                                      Vec3(1.0f,  0.0f,  1.0f),
-                                                       0.1,
-                                                      17.0,
-                                                       0.0,
-                                                       1.0}) ,
-                     Light(scene_manager ,   LightData{  LightType::point,
-                                                      Vec3(0.0f,  0.0f,  0.0f),
-                                                      Vec3(1.0f,  5.0f,  6.0f),
-                                                      Vec3(0.0f,  1.0f,  0.0f),
-                                                       0.1,
-                                                      11.0,
-                                                       0.0,
-                                                       1.0 }),
-                        Light(scene_manager ,   LightData{  LightType::point,
-                          Vec3(0.0f,  0.0f,  1.0f),
-                          Vec3(3.0f,  3.0f,  1.0f),
-                          Vec3(0.0f,  1.0f,  1.0f),
-                          0.1,
-                          2.0,
-                          0.0,
-                          1.0 }),
-                        Light(scene_manager ,   LightData{   LightType::point,
-                          Vec3(0.0f,  0.0f,   0.0f),
-                          Vec3(1.0f,  2.0f,  10.0f),
-                          Vec3(0.0f,  0.0f,   1.0f),
-                          0.1,
-                          1.0,
-                          0.0,
-                          1.0}),
-                        Light(scene_manager ,   LightData{   LightType::point,
-                          Vec3(0.0f,  0.0f,  0.0f),
-                          Vec3(10.0f,  0.0f,  5.0f),
-                          Vec3(1.0f,  1.0f,  1.0f),
-                          0.1,
-                          7.0,
-                          0.0,
-                          1.0}),
-                        Light(scene_manager ,   LightData{LightType::point,
-                          Vec3(0.0f,  0.0f,   0.0f),
-                          Vec3(10.0f,  5.0f,  10.0f),
-                          Vec3(1.0f,  0.3f,   0.5f),
-                           0.1,
-                          17.0,
 
-                           0.0,
-                           1.0  }) };*/
+   scene_manager.instantiate_light( Light::Data { Light::Type::point,
+                                                  Vec3(  0.0f,   0.0f,   0.0f ),
+                                                  Vec3( 10.0f,  10.0f,  10.0f ),
+                                                  Vec3(  1.0f,   0.0f,   0.0f ),
+                                                   0.1,
+                                                  14.0,
+                                                   0.0,
+                                                   1.0 } );
+
+   scene_manager.instantiate_light( Light::Data { Light::Type::point,
+                                                  Vec3( 0.0f,  0.0f,  0.0f ),
+                                                  Vec3( 1.0f,  4.0f,  5.0f ),
+                                                  Vec3( 1.0f,  1.0f,  0.0f ),
+                                                  0.1,
+                                                  7.0,
+                                                  0.0,
+                                                  1.0 } );
+
+   scene_manager.instantiate_light( Light::Data { Light::Type::point,
+                                                  Vec3( 0.0f,  0.0f,  0.0f ),
+                                                  Vec3( 2.0f,  1.0f,  5.0f ),
+                                                  Vec3( 1.0f,  0.0f,  1.0f ),
+                                                   0.1,
+                                                  17.0,
+                                                   0.0,
+                                                   1.0} );
+
+   scene_manager.instantiate_light( Light::Data { Light::Type::point,
+                                                  Vec3( 0.0f,  0.0f,  0.0f ),
+                                                  Vec3( 1.0f,  5.0f,  6.0f ),
+                                                  Vec3( 0.0f,  1.0f,  0.0f ),
+                                                   0.1,
+                                                  11.0,
+                                                   0.0,
+                                                   1.0 } );
+
+   scene_manager.instantiate_light( Light::Data { Light::Type::point,
+                                    Vec3( 0.0f,  0.0f,  1.0f ),
+                                    Vec3( 3.0f,  3.0f,  1.0f ),
+                                    Vec3( 0.0f,  1.0f,  1.0f ),
+                                    0.1,
+                                    2.0,
+                                    0.0,
+                                    1.0 } );
+
+   scene_manager.instantiate_light( Light::Data { Light::Type::point,
+                                    Vec3( 0.0f,  0.0f,   0.0f ),
+                                    Vec3( 1.0f,  2.0f,  10.0f ),
+                                    Vec3( 0.0f,  0.0f,   1.0f ),
+                                    0.1,
+                                    1.0,
+                                    0.0,
+                                    1.0 } );
+
+   scene_manager.instantiate_light( Light::Data { Light::Type::point,
+                                    Vec3(  0.0f,  0.0f,  0.0f ),
+                                    Vec3( 10.0f,  0.0f,  5.0f ),
+                                    Vec3(  1.0f,  1.0f,  1.0f ),
+                                    0.1,
+                                    7.0,
+                                    0.0,
+                                    1.0 } );
+
+   scene_manager.instantiate_light( Light::Data { Light::Type::point,
+                                                Vec3(  0.0f,  0.0f,   0.0f ),
+                                                Vec3( 10.0f,  5.0f,  10.0f ),
+                                                Vec3(  1.0f,  0.3f,   0.5f ),
+                                                 0.1,
+                                                17.0,
+                                                 0.0,
+                                                 1.0 } );
 
    SharedPtr<Model> nanosuit_model = asset_manager.load_model( "ape.obj" );
 
@@ -498,14 +509,14 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
    Vec3 poss = Vec3(101.0f, 100.0f, 100.0f);
    Vec3 dirr = Vec3(1.0f, 0.0f, 0.0f);
-   SharedPtr<Light>sun = std::make_shared<Light>(scene_manager, LightData{ LightType::directional,
-                          dirr,
-                          poss,
-                          Vec3(1.0f,  1.0f,   1.0f),
-                           1.0,
-                          570.0,
-                           0.0,
-                           1.0 });
+   auto sun  = scene_manager.instantiate_light( Light::Data{ Light::Type::directional,
+                                                             dirr,
+                                                             poss,
+                                                             Vec3( 1.0f,  1.0f,  1.0f ),
+                                                               1.0,
+                                                             570.0,
+                                                               0.0,
+                                                               1.0 } );
 
    SharedPtr<Shadowcaster> light_sc = std::make_shared<Shadowcaster>(sun);
    scene_manager.set_shadowcasting( light_sc );
@@ -589,7 +600,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
       debug::lightsource( poss, dirr, scene_manager );
       light_sc->set_Light_matrix(0.1f, 200.f, -50, 50, -50, 50, poss, dirr, Vec3(0.0f, 1.0f, 0.0f));
 
-      process_mouse( window, view, delta_time_s );
+      process_mouse( window, view, scene_manager, delta_time_s );
       process_input( window, view, delta_time_s );
 
       // glMatrixMode( GL_PROJECTION );

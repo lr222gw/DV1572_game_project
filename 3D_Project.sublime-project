@@ -20,7 +20,7 @@
 		},
 
 		"sublimegdb_workingdir":  "${folder:${project_path:Makefile}}",
-		"sublimegdb_commandline": "gdb --interpreter=mi ./bin/program.bin",
+		"sublimegdb_commandline": "gdb --interpreter=mi -args ./bin/program.bin",
 	},
 }
 

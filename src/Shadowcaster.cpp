@@ -11,7 +11,7 @@ Shadowcaster::Shadowcaster(SharedPtr<Light> source, Float32 n_plane, Float32 f_p
 void Shadowcaster::set_Light_matrix(Float32 n_plane, Float32 f_plane, Float32 left, Float32 right, Float32 bottom, Float32 top, Vec3 pos, Vec3 target, Vec3 up)
 {
    _n_plane = n_plane;
-   _f_plane = f_plane; 
+   _f_plane = f_plane;
    _left = left;
    _right = right;
    _bottom = bottom;
@@ -31,3 +31,6 @@ Mat4 Shadowcaster::get_matrix()
 {
    return _light_matrix;
 }
+
+
+

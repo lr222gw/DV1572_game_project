@@ -9,12 +9,7 @@ Viewport::Viewport( Vec3 position, GLFWwindow *window, Float32 fov_rad ):
    _window ( window  ),
    forward (0.0f,0.0f,1.0f)
 {
-   // TODO: bind _camera and uniform buffer for Mat4
-   //_model = Mat4(1.0f);
-   // validate
    _view = Transform( position );
-   //_view.get_rotation()
-
    _update_aspect_ratio();
    _write_to_buffer();
 }
@@ -24,16 +19,12 @@ void Viewport::_update_aspect_ratio() {
    Float32 aspect = Float32(_width) / Float32(_height);
    if ( aspect != _aspect ) {
       _aspect = aspect;
-
       _g_buffer_init();
       _generate_perspective();
-
-      // TODO: Does this work?
       glfwMakeContextCurrent( _window );
       glfwGetFramebufferSize( _window, &_width, &_height );
       glViewport( 0, 0, _width, _height );
    }
-
 }
 
 void Viewport::_generate_perspective() {
@@ -74,7 +65,7 @@ void Viewport::bind_shader_program( ShaderProgram &shader_program ) {
 }
 
 void Viewport::update() {
-   debug::view_mat4( _view.matrix, "viewport._view");
+   debug::view_mat4( _view.matrix, "viewport._view" );
    _update_aspect_ratio();
    _write_to_buffer();
 
@@ -82,7 +73,7 @@ void Viewport::update() {
 
 void Viewport::_write_to_buffer() {
    glUniformMatrix4fv( glGetUniformLocation(_location, "view"),       1, GL_FALSE, &(_view.matrix[0][0]) );
-   glUniformMatrix4fv( glGetUniformLocation(_location, "projection"), 1, GL_FALSE, &_projection[0][0] );
+   glUniformMatrix4fv( glGetUniformLocation(_location, "projection"), 1, GL_FALSE, &(_projection[0][0]) );
 }
 
 // TODO: extract magnifier and minifier behavior to be changed in options
@@ -92,13 +83,15 @@ void Viewport::_g_buffer_init() {
    // albedo    =  albedo RGBA(= xyzw)
   if ( !initialized ) {
       //g-buffer init:
-      glGenFramebuffers( 1, &(_g_buffer.buffer_loc) );
+      glGenFramebuffers(  1, &(_g_buffer.buffer_loc) );
       // g-buffer Texture attatchments init:
       glGenTextures(      1, &(_g_buffer.pos_tex_loc) );
       glGenTextures(      1, &(_g_buffer.nor_tex_loc) );
       glGenTextures(      1, &(_g_buffer.spe_tex_loc) );
       glGenTextures(      1, &(_g_buffer.alb_tex_loc) );
       glGenTextures(      1, &(_g_buffer.emi_tex_loc) );
+	   glGenTextures(      1, &(_g_buffer.pic_tex_loc) );
+      //
       glGenRenderbuffers( 1, &(_g_buffer.depth_loc)   );
       initialized = true;
   }
@@ -271,36 +264,36 @@ void Viewport::_g_buffer_init() {
                            _g_buffer.emi_tex_loc,
                            0 );
 
-// emission (RGBA) light texture for g-buffer
-   glBindTexture(GL_TEXTURE_2D,
-	   _g_buffer.pic_tex_loc);
+// mouse picking texture for g-buffer
+   glBindTexture( GL_TEXTURE_2D,
+                  _g_buffer.pic_tex_loc );
 
-   glTexImage2D(GL_TEXTURE_2D,
-	   0,
-	   GL_RGB32F,
-	   width,
-	   height,
-	   0,
-	   GL_RGB,
-	   GL_FLOAT,
-	   NULL);
+   glTexImage2D( GL_TEXTURE_2D,
+                 0,
+                 GL_RGBA,
+                 width,
+                 height,
+                 0,
+                 GL_RGBA,
+                 GL_UNSIGNED_BYTE,
+                 NULL );
 
    // setting minifier:
-   glTexParameteri(GL_TEXTURE_2D,
-	   GL_TEXTURE_MIN_FILTER,
-	   GL_NEAREST);
+   glTexParameteri( GL_TEXTURE_2D,
+                    GL_TEXTURE_MIN_FILTER,
+                    GL_NEAREST);
 
    // setting magnifier:
-   glTexParameteri(GL_TEXTURE_2D,
-	   GL_TEXTURE_MAG_FILTER,
-	   GL_NEAREST);
+   glTexParameteri( GL_TEXTURE_2D,
+                    GL_TEXTURE_MAG_FILTER,
+                    GL_NEAREST);
 
    // attach the texture id to currently bound g-buffer
-   glFramebufferTexture2D(GL_FRAMEBUFFER,
-	   GL_COLOR_ATTACHMENT6,
-	   GL_TEXTURE_2D,
-	   _g_buffer.pic_tex_loc,
-	   0);
+   glFramebufferTexture2D( GL_FRAMEBUFFER,
+                           GL_COLOR_ATTACHMENT6,
+                           GL_TEXTURE_2D,
+                           _g_buffer.pic_tex_loc,
+                           0 );
 
 
 
@@ -311,7 +304,7 @@ void Viewport::_g_buffer_init() {
                             GL_COLOR_ATTACHMENT2,
                             GL_COLOR_ATTACHMENT3,
                             GL_COLOR_ATTACHMENT5,
-							GL_COLOR_ATTACHMENT6 };
+                            GL_COLOR_ATTACHMENT6 };
 
    glDrawBuffers( 6, attachments );
 

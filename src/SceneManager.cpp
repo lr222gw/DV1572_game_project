@@ -20,6 +20,45 @@ SharedPtr<ModelInstance> SceneManager::instantiate_model(
 }
 
 
+Uint64 SceneManager::_generate_light_id() {
+   return _next_light_id++;
+}
+
+void SceneManager::_light_destruction_listener( Uint64 id ) {
+   int match_index = -1;
+   for ( auto i=0;  i<_num_lights;  ++i )
+      if ( _id_of_light_at[i] == id )
+         match_index = id;
+
+   // if the light was in the light data buffer, remove it by swapping
+   if ( -1 != match_index ) { // the entry with the last entry and decrement count
+      Light::Data  temp_buffer = _light_data[match_index];
+      _light_data[match_index] = _light_data[--_num_lights];
+      _light_data[_num_lights] = temp_buffer;
+      // TODO: (if buffer for over-capacity lights gets added): check for new lights to insert
+   }
+
+   // TODO: "else { /* remove from over-capacity buffer */ }""
+}
+
+SharedPtr<Light> SceneManager::instantiate_light( Light::Data data )
+{
+   auto result = std::make_shared<Light>( std::bind( &SceneManager::_light_destruction_listener,
+                                                     this,
+                                                     std::placeholders::_1 ),
+                                          _generate_light_id(),
+                                          std::move(data) );
+   _lights[result->id] = result; // adding tdo instance table
+
+   if ( _num_lights < light_capacity ) { // adding
+      ++_num_lights;
+      _light_data     [_num_lights] = result->data;
+      _id_of_light_at [_num_lights] = result->id;
+   }
+
+   return result;
+}
+
 void SceneManager::draw( Viewport &view ) {
    auto &g_buffer = view.get_g_buffer();
 
@@ -83,6 +122,8 @@ void SceneManager::draw( Viewport &view ) {
    glBindTexture(   GL_TEXTURE_2D, g_buffer_data.alb_tex_loc );
    glActiveTexture( GL_TEXTURE5) ;
    glBindTexture(   GL_TEXTURE_2D, g_buffer_data.emi_tex_loc );
+   glActiveTexture(GL_TEXTURE6);
+   glBindTexture(GL_TEXTURE_2D, g_buffer_data.pic_tex_loc);
 
    glUniform3fv( glGetUniformLocation( lighting_pass_loc, "view_pos"),
                  1,
@@ -346,23 +387,29 @@ SceneManager::SceneManager(SharedPtr<ShaderProgram> geo_pass, SharedPtr<ShaderPr
 // TODO: refactor light instances into classes that RAII wrap their lifetimes
 
 // NOTE! should only be used by Light's constructor (TODO: private+friend?)
+/*
 void SceneManager::add_light( Uint64 id, LightData data ) {
    _light_data[_num_lights] = data;
    _ids[_num_lights]        = id;
    ++_num_lights; // increment counter
 }
+*/
 
+/*
 LightData SceneManager::get_light_data( Uint64 id ) const {
    auto index = _find_light_index(id);
    return _light_data[index];
 }
+*/
 
+/*
 void SceneManager::set_light_data( Uint64 id, LightData data ) {
    auto index = _find_light_index(id);
    _light_data[index] = data;
-}
+}*/
 
 // NOTE! should only be used by Light's destructor (TODO: private+friend?)
+/*
 void SceneManager::remove_light( Uint64 id ) {
    auto index = _find_light_index(id);
 
@@ -373,8 +420,9 @@ void SceneManager::remove_light( Uint64 id ) {
    std::swap( _light_data[index], _light_data[_num_lights] );
    std::swap(        _ids[index],        _ids[_num_lights] );
 }
+*/
 
-
+/*
 Uint32 SceneManager::_find_light_index( Uint64 id ) const {
    auto index = -1;
    // find index of target id
@@ -390,7 +438,7 @@ Uint32 SceneManager::_find_light_index( Uint64 id ) const {
    assert( index != -1 && "Invalid index; no match." );
    return index;
 }
-
+*/
 
 void SceneManager::_lights_to_gpu() {
    auto lighting_pass_loc = _lighting_shader_program->get_location();
@@ -399,8 +447,8 @@ void SceneManager::_lights_to_gpu() {
 
    glUniform1i( lighting_pass_loc, num_lights );
 
-   for ( Uint32 i = 0; i <  _num_lights; ++i ) {
-      auto light = get_light_data(i); // light data of light at index 'i'
+   for ( Uint32 i = 0;  i < _num_lights;  ++i ) {
+      auto light = _light_data[i]; // light data of light at index 'i'
       auto str_i = std::to_string(i); // index 'i' as String
 
       glUniform1ui( glGetUniformLocation( lighting_pass_loc, ("lights["+str_i+"].type").c_str() ),
@@ -443,13 +491,39 @@ Uint32 SceneManager::get_object_id_at_pixel(Uint32 x, Uint32 y, Viewport &view)
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, _geometry_shader_program->get_location());
 	glReadBuffer(GL_COLOR_ATTACHMENT6);
 
-	Uvec4 pixel_info;
-	glReadPixels(x, y, view.width, view.height, GL_RGBA, GL_UNSIGNED_INT, &pixel_info);
+	Uint32 pixel_info[4]{};
+	//struct pixel_info_struct
+	//{
+	//	int x;
+	//	int y;
+	//	int z;
+	//	int w;
+	//};
+	//pixel_info_struct pixel_info;
 
-	Uint32 obj_id = (pixel_info.x << 24) + (pixel_info.y << 16) + (pixel_info.z << 8) + pixel_info.w; // TODO: validate that we get the correct ids
+	glReadPixels(x, y, 1, 1, GL_RGBA, GL_UNSIGNED_INT, (void*)&pixel_info);
+
+	Uint32 obj_id = (pixel_info[0] & 0xFF << 24)
+                 + (pixel_info[1] & 0xFF << 16)
+                 + (pixel_info[2] & 0xFF <<  8)
+                 + (pixel_info[3] & 0xFF <<  0); // TODO: validate that we get the correct ids
 
 	return obj_id;
 }
+
+SharedPtr<ModelInstance> SceneManager::get_instance_ptr( Uint32 obj_id )
+{
+	// for (auto &e : _instances) {
+	// 	if (!e.expired()) {
+	// 		auto e_ptr = e.lock();
+	// 		if (e_ptr->id == obj_id)
+	// 			return e_ptr;
+	// 	}
+	// }
+   return nullptr;
+	//assert(false && "[ERROR] Instance of id no longer exists.");
+}
+
 
 
 /*
