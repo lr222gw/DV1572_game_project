@@ -155,7 +155,7 @@ void Transform::look_at(Vec3 const &forward, Vec3 pos, Vec3 const up ) {
    sameAsFixed[0][0] = -xAx.x;                     sameAsFixed[0][1] = yAx.x;                      sameAsFixed[0][2] = -zAx.x;                      sameAsFixed[0][3] = 0;
    sameAsFixed[1][0] = -xAx.y;                     sameAsFixed[1][1] = yAx.y;                      sameAsFixed[1][2] = -zAx.y;                      sameAsFixed[1][3] = 0;
    sameAsFixed[2][0] = -xAx.z;                     sameAsFixed[2][1] = yAx.z;                      sameAsFixed[2][2] = -zAx.z;                      sameAsFixed[2][3] = 0;
-   sameAsFixed[3][0] = -glm::dot(xAx, _position); sameAsFixed[3][1] = glm::dot(yAx, _position);  sameAsFixed[3][2] = -glm::dot(zAx, _position);  sameAsFixed[3][3] = 1;
+   sameAsFixed[3][0] = -glm::dot(xAx, -_position); sameAsFixed[3][1] = glm::dot(yAx, -_position);  sameAsFixed[3][2] = -glm::dot(zAx, -_position);  sameAsFixed[3][3] = 1;
 
 
    Mat4 donemat = _matrix;
