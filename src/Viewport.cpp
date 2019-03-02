@@ -18,8 +18,8 @@ Viewport::Viewport( Vec3                      position,
 
    //TODO: Kan denna vara här?
    //Ligger här för att vi nu måste uppdatera vår viewports transforms view med LookAt...
-   //_view.look_at(this->forward, _view.get_position() + this->forward); // rotate view
-   ///this->set_view(_view);
+   _view.look_at(this->forward, _view.get_position() + this->forward); // rotate view
+   this->set_view(_view);
 
    _update_aspect_ratio();
    _write_to_buffer();
@@ -51,9 +51,8 @@ void Viewport::transform( Transform const &transform ) {
 
    //TODO: Kan denna vara här?
    //Ligger här för att vi nu måste uppdatera vår viewports transforms view med LookAt...
-   //_view.look_at(this->forward, _view.get_position() + this->forward); // rotate view
-   //this->set_view(_view);
-
+   _view.look_at(this->forward, _view.get_position() + this->forward); // rotate view
+   this->set_view(_view);
    _write_to_buffer();
 }
 
