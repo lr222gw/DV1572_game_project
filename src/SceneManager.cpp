@@ -223,6 +223,9 @@ void SceneManager::_render_to_quad() {
 
 
 void SceneManager::draw_debug_scene_inspection() {
+   if ( !config.is_imgui_toggled )
+      return;
+
    ImGui::Begin( "Instances:" ); // begin our Inspection window:
    {  // draw our window GUI components and do I/O:
       Uint32 i = 0;

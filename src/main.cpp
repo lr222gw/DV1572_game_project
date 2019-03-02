@@ -244,6 +244,8 @@ void toggle_input_callback( GLFWwindow  *window,
       config.render_mode = RenderMode::textureless;
    if ( key == GLFW_KEY_F10 &&  action == GLFW_PRESS)
 	   config.render_mode = RenderMode::picking;
+   if ( key == GLFW_KEY_F12 &&  action == GLFW_PRESS )
+      config.is_imgui_toggled = !config.is_imgui_toggled;
 }
 
 
@@ -395,6 +397,9 @@ void draw_camera_debug_window( Vec3    &position,
                                Vec3    &rotation,
                                Float32 &fov_rad )
 {
+   if ( !config.is_imgui_toggled )
+      return;
+
    ImGui::Begin( "Camera:" ); // begin our Camera window:
    {  // draw our window GUI components and do I/O:
       ImGui::SliderAngle( "X-axis", &rotation.x );
@@ -707,9 +712,13 @@ Int32 main( Int32 argc, char const *argv[] ) {
       // myView.set_view( cam_transform );
       // myView.set_fov( fov_rad );
       scene_manager.draw_debug_scene_inspection();
-      ImGui::Begin( "Settings:" );
-      ImGui::SliderFloat( "Move speed", &g_move_speed, 0.0f, 25.0f );
-      ImGui::End();
+
+      // TODO: bryt ut till debug
+      if ( config.is_imgui_toggled ) {
+         ImGui::Begin( "Settings:" );
+         ImGui::SliderFloat( "Move speed", &g_move_speed, 0.0f, 25.0f );
+         ImGui::End();
+      }
 
       Array<Float32,4> corners = light_sc->getCorners();
 

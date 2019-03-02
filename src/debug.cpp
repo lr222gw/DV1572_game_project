@@ -5,6 +5,9 @@
 #include "misc/ImGui/imgui_impl_opengl3.h"
 
 void debug::view_mat4( Mat4 const &m, String name ) {
+   if ( !config.is_imgui_toggled )
+      return;
+
    String id = std::to_string( (Uint64)(&m) );
    ImGui::PushID( id.c_str() );
    ImGui::Begin( "Analysis:" ); // begin our Rotation window:
@@ -39,6 +42,9 @@ void debug::view_mat4( Mat4 const &m, String name ) {
 }
 
 void debug::lightsource( SharedPtr<Light> light, SceneManager &scene_man ) {
+   if ( !config.is_imgui_toggled )
+      return;
+
    ImGui::PushID( "Lightsource_debug" );
    char id_str[64];
    snprintf( id_str, 64, "Lightsource %lu:", light->get_id() );
