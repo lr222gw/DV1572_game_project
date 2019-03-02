@@ -28,13 +28,13 @@ Float32 g_move_speed            = 25.0f; // TODO: refactor away ugly globalness
 Bool    g_is_mouse_look_enabled = false;
 
 // For opengl debuging
-void APIENTRY glDebugOutput(GLenum source,
-	GLenum type,
-	GLuint id,
-	GLenum severity,
-	GLsizei length,
-	const GLchar *message,
-	const void *userParam)
+void APIENTRY glDebugOutput( GLenum        source,
+	                          GLenum        type,
+	                          GLuint        id,
+	                          GLenum        severity,
+	                          GLsizei       length,
+	                          const GLchar *message,
+	                          const void   *userParam )
 {
 	// ignore non-significant error/warning codes
 	if (id == 131169 || id == 131185 || id == 131218 || id == 131204) return;
@@ -242,7 +242,7 @@ void toggle_input_callback( GLFWwindow  *window,
       config.render_mode = RenderMode::emissive;
    if ( key == GLFW_KEY_F9  &&  action == GLFW_PRESS )
       config.render_mode = RenderMode::textureless;
-   if (key == GLFW_KEY_F10 && action == GLFW_PRESS)
+   if ( key == GLFW_KEY_F10 &&  action == GLFW_PRESS)
 	   config.render_mode = RenderMode::picking;
 }
 
@@ -675,9 +675,9 @@ Int32 main( Int32 argc, char const *argv[] ) {
    glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_norm"   ), 1 );
    glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_spec"   ), 2 );
    glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_albedo" ), 3 );
-   glUniform1i( glGetUniformLocation( lighting_program->get_location(), "shadowMap"    ), 4 );
-   glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_emit"   ), 5 );
-   glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_pic"    ), 6 );
+   glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_emit"   ), 4 );
+   glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_pic"    ), 5 );
+   glUniform1i( glGetUniformLocation( lighting_program->get_location(), "shadowMap"    ), 6 );
 
    //glEnable(GL_CULL_FACE);
 

@@ -107,16 +107,26 @@ public:
    Light& operator=( Light       && ) = delete;
 
    // NOTE: to be called via SceneManager::instantiate_light()
-   Light( std::function<void(Uint64)> on_destruction_callback, Uint64 id, Light::Data &&data ):
+   Light( std::function<void(Uint64)>   on_destruction_callback,
+          std::function<void(Uint64)>   on_change_callback,
+          Uint64                        id,
+          Light::Data                 &&data )
+   :
       _on_destruction_callback ( on_destruction_callback ),
+      _on_change_callback      ( on_change_callback      ),
       _data                    ( std::move(data)         ),
       data                     ( _data                   ),
       id                       ( id                      )
    {}
 
    // NOTE: to be called via SceneManager::instantiate_light()
-   Light( std::function<void(Uint64)> on_destruction_callback, Uint64 id, Light::Data const &data ):
+   Light( std::function<void(Uint64)>  on_destruction_callback,
+          std::function<void(Uint64)>  on_change_callback,
+          Uint64                       id,
+          Light::Data const           &data )
+   :
       _on_destruction_callback ( on_destruction_callback ),
+      _on_change_callback      ( on_change_callback      ),
       _data                    ( data                    ),
       data                     ( _data                   ),
       id                       ( id                      )
@@ -150,6 +160,7 @@ public:
 
 private:
    std::function<void(Uint64)> _on_destruction_callback;
+   std::function<void(Uint64)> _on_change_callback;
    Data                        _data;
 
 public:

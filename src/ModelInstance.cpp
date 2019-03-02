@@ -8,15 +8,15 @@ void ModelInstance::draw() {
                        GL_FALSE,
                        &(_transform.matrix[0][0]) );
 
-   Vec4 id_as_rgba { Float32(id >>  0 & 0xFF),
-                     Float32(id >>  8 & 0xFF),
-                     Float32(id >> 16 & 0xFF),
-                     Float32(id >> 24 & 0xFF) };
+   Uvec4 id_as_rgba { Uint32(id >>  0 & 0xFF),
+                      Uint32(id >>  8 & 0xFF),
+                      Uint32(id >> 16 & 0xFF),
+                      Uint32(id >> 24 & 0xFF) };
 
    // index for picking
-   glUniform4fv( glGetUniformLocation(_shader_program->get_location(), "obj_id"),
-                 1,
-                 glm::value_ptr(id_as_rgba) );
+   glUniform4uiv( glGetUniformLocation(_shader_program->get_location(), "obj_id"),
+                  1,
+                  glm::value_ptr(id_as_rgba) );
 
    // draw model:
    _model->draw(*_shader_program);

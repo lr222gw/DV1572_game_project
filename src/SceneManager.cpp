@@ -24,6 +24,23 @@ Uint64 SceneManager::_generate_light_id() {
    return _next_light_id++;
 }
 
+void SceneManager::_light_change_listener( Uint64 id ) {
+   auto light = _lights[id];
+   if ( !light.expired()  &&  light.lock()->get_type() == Light::Type::directional )
+      update_shadowmap();
+
+   int match_index = -1;
+   for ( auto i=0;  i<_num_lights;  ++i )
+      if ( _id_of_light_at[i] == id )
+         match_index = id;
+   if ( match_index != -1 ) {
+      auto light_match = light.lock();
+      auto new_data =  light_match->get_data();
+      auto old_data = _light_data[match_index];
+      _light_data[match_index] = new_data;
+   }
+}
+
 void SceneManager::_light_destruction_listener( Uint64 id ) {
    int match_index = -1;
    for ( auto i=0;  i<_num_lights;  ++i )
@@ -44,6 +61,9 @@ void SceneManager::_light_destruction_listener( Uint64 id ) {
 SharedPtr<Light> SceneManager::instantiate_light( Light::Data data )
 {
    auto result = std::make_shared<Light>( std::bind( &SceneManager::_light_destruction_listener,
+                                                     this,
+                                                     std::placeholders::_1 ),
+                                          std::bind( &SceneManager::_light_change_listener,
                                                      this,
                                                      std::placeholders::_1 ),
                                           _generate_light_id(),
@@ -68,7 +88,7 @@ void SceneManager::draw( Viewport &view ) {
    auto geometry_pass_loc = _geometry_shader_program->get_location();
 
    //TODO: Make modelinstance supply unique ID to Callback Function and then in CAllback function compare the boundingbox of the modelinstance with the frustrum of all the active shadowcasters and recalculate shadowmap for any intersections
-   if (_should_recalculate_shadowmap) {
+   if ( _should_recalculate_shadowmap ) {
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       this->update_shadowmap();
       _should_recalculate_shadowmap = false;
@@ -76,7 +96,7 @@ void SceneManager::draw( Viewport &view ) {
 
    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-   glUseProgram( geometry_pass_loc );
+   _geometry_shader_program->use(); // glUseProgram( geometry_pass_loc );
 
    glBindFramebuffer( GL_FRAMEBUFFER, g_buffer.buffer_loc );
    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -96,7 +116,7 @@ void SceneManager::draw( Viewport &view ) {
    // 1. Geometry Pass:
    // TODO: sortera instanserna efter ShaderProgram m.h.a. std::partition()
    for ( auto &instance : _instances )
-      if (!instance.expired())
+      if ( !instance.expired() )
          instance.lock()->draw();
 
    // disabling wireframe rendering so that the quad will render after the lighting pass
@@ -108,11 +128,11 @@ void SceneManager::draw( Viewport &view ) {
 
    glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-   glUseProgram( lighting_pass_loc );
+   _lighting_shader_program->use(); // glUseProgram( lighting_pass_loc );
 
    ////////////////////
 
-   auto g_buffer_data{ view.get_g_buffer() };
+   auto g_buffer_data { view.get_g_buffer() };
 
    glActiveTexture( GL_TEXTURE0 );
    glBindTexture(   GL_TEXTURE_2D, g_buffer_data.pos_tex_loc );
@@ -122,16 +142,16 @@ void SceneManager::draw( Viewport &view ) {
    glBindTexture(   GL_TEXTURE_2D, g_buffer_data.spe_tex_loc );
    glActiveTexture( GL_TEXTURE3) ;
    glBindTexture(   GL_TEXTURE_2D, g_buffer_data.alb_tex_loc );
-   glActiveTexture( GL_TEXTURE5) ;
+   glActiveTexture( GL_TEXTURE4) ;
    glBindTexture(   GL_TEXTURE_2D, g_buffer_data.emi_tex_loc );
-   glActiveTexture( GL_TEXTURE6);
+   glActiveTexture( GL_TEXTURE5);
    glBindTexture(	  GL_TEXTURE_2D, g_buffer_data.pic_tex_loc );
 
    glUniform3fv( glGetUniformLocation( lighting_pass_loc, "view_pos"),
                  1,
                  glm::value_ptr(view_pos));
 
-   for (auto &e : _shadow_maps) {
+   for ( auto &e : _shadow_maps ) {
       glUniformMatrix4fv(
          glGetUniformLocation(lighting_pass_loc,
             "lightmatrix"),
@@ -139,7 +159,7 @@ void SceneManager::draw( Viewport &view ) {
          GL_FALSE,
          glm::value_ptr(e.first->get_matrix()));
       // Mat4 ello = e.first->get_matrix();
-      glActiveTexture(GL_TEXTURE4);
+      glActiveTexture(GL_TEXTURE6);
       glBindTexture(GL_TEXTURE_2D, e.second);
 
       //glUniform1i(glGetUniformLocation(_light_pass_shader->get_location(), "shadowMap"), 4);
@@ -183,7 +203,7 @@ void SceneManager::_render_to_quad() {
          3,
          GL_FLOAT,
          GL_FALSE,
-         5 * sizeof(Float32),
+         5 * sizeof(Float32), // X,Y,Z,U,V = 5 Float32 channels
          (void*)0);
 
       glEnableVertexAttribArray(1);
@@ -219,9 +239,9 @@ void SceneManager::draw_debug_scene_inspection() {
             Vec3 position  = transform.get_position();
             Vec3 scale     = transform.get_scale();
 
-            Float32 position_array[3]   { position.x,
-                                          position.y,
-                                          position.z }; // temp
+            Float32 position_array[3] { position.x,
+                                        position.y,
+                                        position.z }; // temp
 
             Float32 scale_array[3] { scale.x,
                                      scale.y,
@@ -537,7 +557,7 @@ void SceneManager::_lights_to_gpu() {
 Uint32 SceneManager::get_object_id_at_pixel(Uint32 x, Uint32 y, Viewport &view)
 {
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, view.get_g_buffer().buffer_loc);
-	glReadBuffer(GL_COLOR_ATTACHMENT6);
+	glReadBuffer(GL_COLOR_ATTACHMENT5);
 
 
 //	Uint32 pixel_info[4]{};
@@ -557,28 +577,23 @@ Uint32 SceneManager::get_object_id_at_pixel(Uint32 x, Uint32 y, Viewport &view)
 //                 + (pixel_info[2] & 0xFF <<  8)
 //                 + (pixel_info[3] & 0xFF <<  0); // TODO: validate that we get the correct ids
 
-	//Uint32 pixel_info[4]{};
-	struct pixel_info_struct
-	{
-		float x;
-		float y;
-		float z;
-		float w;
-	};
-	pixel_info_struct pixel_info;
+	Uint8 pixel_info[4] {};
 
-	glReadPixels(x, y, 1, 1, GL_RGBA, GL_FLOAT, &pixel_info);
+	glReadPixels( x, y, 1, 1, GL_RGBA8, GL_UNSIGNED_BYTE, &pixel_info );
 
-	Uint32 obj_id = ((int(pixel_info.x ) & 0xff) << 24) + ((int(pixel_info.y) & 0xff) << 16) + ((int(pixel_info.z) & 0xff) << 8) + ((int(pixel_info.w) & 0xff)); // TODO: validate that we get the correct ids
+	Uint32 obj_id = ( (pixel_info[0] & 0xFF) << 24 )
+                 + ( (pixel_info[1] & 0xFF) << 16 )
+                 + ( (pixel_info[2] & 0xFF) <<  8 )
+                 + ( (pixel_info[3] & 0xFF) <<  0 );
 
 	return obj_id;
 }
 
 SharedPtr<ModelInstance> SceneManager::get_instance_ptr( Uint32 obj_id ) {
-	for (auto &e : _instances) {
-		if (!e.expired()) {
+	for ( auto &e : _instances ) {
+		if ( !e.expired() ) {
 			auto e_ptr = e.lock();
-			if (e_ptr->id == obj_id)
+			if ( e_ptr->id == obj_id )
 				return e_ptr;
 		}
 	}

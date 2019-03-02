@@ -2,16 +2,16 @@
 
 #include "misc/defs.h"
 
-enum RenderMode : Uint32 {       composite   = 0,
-                                 albedo      = 1,
-                                 normals     = 2,
-                                 specular    = 3,
-                                 positional  = 4,
-                                 emissive    = 5,
-                                 textureless = 6,
-								 picking	 = 7 };
+enum RenderMode : Uint32 { composite   = 0,
+                           albedo      = 1,
+                           normals     = 2,
+                           specular    = 3,
+                           positional  = 4,
+                           emissive    = 5,
+                           textureless = 6,
+                           picking	   = 7 };
 
-enum class FileType   { model, texture };
+enum class FileType { model, texture };
 
 struct Config {
    static constexpr Int32     start_height =  768,

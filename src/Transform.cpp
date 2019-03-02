@@ -86,6 +86,45 @@ void Transform::rotate(Vec3 const &axis, Float32 angle_rad) {
    _update_matrix();
 }
 
+// void Transform::rotate_around( Vec3 position, Vec3 const &euler_angles ) {
+//    auto relative_rotation   = _rotation * glm::toMat4( Quat( Vec4(euler_angles, 1.0f) ) );
+//    relative_rotation[3][0] -= position.x;
+//    relative_rotation[3][1] -= position.y;
+//    relative_rotation[3][2] -= position.z;
+//    _position *= relative_rotation;
+//    relative_rotation[3][0] -= .0f;
+//    relative_rotation[3][1] -= .0f;
+//    relative_rotation[3][2] -= .0f;
+//    _rotation = relative_rotation;
+//    _update_matrix();
+// }
+
+// void Transform::rotate_around( Vec3 position, Mat4 const &rotation_matrix ) {
+//    auto relative_rotation   = _rotation * rotation_matrix;
+//    relative_rotation[3][0] -= position.x;
+//    relative_rotation[3][1] -= position.y;
+//    relative_rotation[3][2] -= position.z;
+//    _position *= relative_rotation;
+//    relative_rotation[3][0] -= .0f;
+//    relative_rotation[3][1] -= .0f;
+//    relative_rotation[3][2] -= .0f;
+//    _rotation = relative_rotation;
+//    _update_matrix();
+// }
+
+// void Transform::rotate_around( Vec3 position, Vec3 const &axis, Float32 angle_rad ) {
+//    auto relative_rotation   = _rotation * glm::rotate( _rotation, angle_rad, axis );
+//    relative_rotation[3][0] -= position.x;
+//    relative_rotation[3][1] -= position.y;
+//    relative_rotation[3][2] -= position.z;
+//    _position *= relative_rotation;
+//    relative_rotation[3][0] -= .0f;
+//    relative_rotation[3][1] -= .0f;
+//    relative_rotation[3][2] -= .0f;
+//    _rotation = relative_rotation;
+//    _update_matrix();
+// }
+
 void Transform::rotate_deg(Vec3 const &axis, Float32 angle_deg) {
    _rotation *= glm::rotate( _rotation, glm::radians(angle_deg), axis );
    _update_matrix();
@@ -202,9 +241,6 @@ void Transform::look_at(Vec3 const &forward, Vec3 pos, Vec3 const up ) {
    //this->_position = translation;
    //this->_matrix = _rotation;
    //_rotation = glm::toMat4(rotation);
-
-
-
 }
 
 Transform Transform::make_translation( Vec3 const &offset ) {
@@ -321,13 +357,26 @@ void Transform::_update_matrix() {
    // omvandlar skala och position till mat4 transformer
    // och uppdaterar sedan klasstransformen till en kombination
    // av dessa och rotationsmatrisen
-
-   Mat4 pos  = glm::translate(_identity_matrix, _position);
-   _matrix = pos //glm::translate( _identity_matrix, _position )  // 3
-           * _rotation                                      // 2
-           * glm::scale(     _identity_matrix, _scale    ); // 1
+   _matrix = glm::translate( _identity_matrix, _position )
+           * _rotation
+           * glm::scale(     _identity_matrix, _scale    );
 
    // handle W // _matrix[3][3]
    if ( _matrix[3][3] != 1.0f )
       _matrix /= _matrix[3][3];
 }
+
+// void Transform::_update_matrix( Mat4 relative_rotation, Vec3 rotation_center_position={.0f, .0f, .0f} ) {
+//    // omvandlar skala och position till mat4 transformer
+//    // och uppdaterar sedan klasstransformen till en kombination
+//    // av dessa och rotationsmatrisen
+//    _matrix = glm::translate( _identity_matrix, _position );
+//            * relative_rotation
+//            * glm::translate( _identity_matrix, rotation_center_position )
+//            * _rotation
+//            * glm::scale(     _identity_matrix, _scale    );
+//
+//    // handle W // _matrix[3][3]
+//    if ( _matrix[3][3] != 1.0f )
+//       _matrix /= _matrix[3][3];
+// }

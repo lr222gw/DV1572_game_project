@@ -308,7 +308,7 @@ void Viewport::_g_buffer_init() {
 
    // attach the texture id to currently bound g-buffer
    glFramebufferTexture2D( GL_FRAMEBUFFER,
-                           GL_COLOR_ATTACHMENT5,
+                           GL_COLOR_ATTACHMENT4,
                            GL_TEXTURE_2D,
                            _g_buffer.emi_tex_loc,
                            0 );
@@ -327,19 +327,30 @@ void Viewport::_g_buffer_init() {
    glBindTexture(GL_TEXTURE_2D,
 	   _g_buffer.pic_tex_loc);
 
+
    glTexImage2D(GL_TEXTURE_2D,
 	   0,
-	   GL_RGBA32F,
+	   GL_RGBA8,
 	   width,
 	   height,
 	   0,
 	   GL_RGBA,
-	   GL_FLOAT,
-	   NULL);
+	   GL_UNSIGNED_BYTE,
+	   NULL );
+
+      // setting minifier:
+   glTexParameteri( GL_TEXTURE_2D,
+                    GL_TEXTURE_MIN_FILTER,
+                    GL_NEAREST );
+
+   // setting magnifier:
+   glTexParameteri( GL_TEXTURE_2D,
+                    GL_TEXTURE_MAG_FILTER,
+                    GL_NEAREST );
 
    // attach the texture id to currently bound g-buffer
    glFramebufferTexture2D( GL_FRAMEBUFFER,
-                           GL_COLOR_ATTACHMENT6,
+                           GL_COLOR_ATTACHMENT5,
                            GL_TEXTURE_2D,
                            _g_buffer.pic_tex_loc,
                            0 );
@@ -352,8 +363,8 @@ void Viewport::_g_buffer_init() {
                             GL_COLOR_ATTACHMENT1,
                             GL_COLOR_ATTACHMENT2,
                             GL_COLOR_ATTACHMENT3,
-                            GL_COLOR_ATTACHMENT5,
-                            GL_COLOR_ATTACHMENT6 };
+                            GL_COLOR_ATTACHMENT4,
+                            GL_COLOR_ATTACHMENT5 };
 
    glDrawBuffers( 6, attachments ); // TODO: BJÖRN SEE HÄR TILL MIGSJÄLV
 

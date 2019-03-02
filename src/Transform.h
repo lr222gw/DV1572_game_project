@@ -87,6 +87,11 @@ public:
    void rotate(       Vec3 const &euler_angles );
    void rotate(       Mat4 const &rotation_matrix );
    void rotate(       Vec3 const &axis, Float32 angle_rad );
+
+   void rotate_around(Vec3 position, Vec3 const &euler_angles );
+   void rotate_around(Vec3 position, Mat4 const &rotation_matrix );
+   void rotate_around(Vec3 position, Vec3 const &axis, Float32 angle_rad );
+
    void rotate_deg(   Vec3 const &axis, Float32 angle_deg);
    void look_at(      Vec3 const &target_position, Vec3 pos, Vec3 const up = { 0,1,0 });
 

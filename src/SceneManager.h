@@ -77,6 +77,7 @@ private:
 
    Uint64 _generate_light_id();
    void _light_destruction_listener( Uint64 id );
+   void _light_change_listener(      Uint64 id );
 
    void _lights_to_gpu();
    void _render_to_quad();
