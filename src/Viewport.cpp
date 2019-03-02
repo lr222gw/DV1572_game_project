@@ -15,6 +15,12 @@ Viewport::Viewport( Vec3                      position,
    forward         ( 0.0f, 0.0f, 1.0f )
 {
    _view = Transform( position );
+
+   //TODO: Kan denna vara här? 
+   //Ligger här för att vi nu måste uppdatera vår viewports transforms view med LookAt...
+   //_view.look_at(this->forward, _view.get_position() + this->forward); // rotate view
+   ///this->set_view(_view);
+
    _update_aspect_ratio();
    _write_to_buffer();
 }
@@ -45,8 +51,8 @@ void Viewport::transform( Transform const &transform ) {
 
    //TODO: Kan denna vara här? 
    //Ligger här för att vi nu måste uppdatera vår viewports transforms view med LookAt...
-   _view.look_at(this->forward, _view.get_position() + this->forward); // rotate view
-   this->set_view(_view);
+   //_view.look_at(this->forward, _view.get_position() + this->forward); // rotate view
+   //this->set_view(_view);
    
    _write_to_buffer();
 }
@@ -85,6 +91,7 @@ void Viewport::_write_to_buffer() {
    _shader_program->use();
    auto location = _shader_program->get_location();
 
+   
 
    //glm::vec3 scale;
    //glm::quat rotation;
@@ -112,7 +119,8 @@ void Viewport::_write_to_buffer() {
    Mat4 fixed = glm::lookAt(_view.get_position(), _view.get_position() + this->forward, Vec3(0.0f, 1.0f, 0.0f));
 
    //TODO: avgör om detta är rätt ställe att invertera viewmatrisen..   
-   glUniformMatrix4fv( glGetUniformLocation(location, "view"),       1, GL_FALSE, &(_view.matrix[0][0]) );
+   //glUniformMatrix4fv( glGetUniformLocation(location, "view"),       1, GL_FALSE, &(_view.matrix[0][0]) );
+   glUniformMatrix4fv( glGetUniformLocation(location, "view"),       1, GL_FALSE, &(fixed[0][0]) );
    //glUniformMatrix4fv( glGetUniformLocation(location, "view"),       1, GL_FALSE, &(_view.matrix[0][0]) );
    glUniformMatrix4fv( glGetUniformLocation(location, "projection"), 1, GL_FALSE, &(_projection[0][0]) );
 }

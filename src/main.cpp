@@ -263,7 +263,7 @@ void process_input( GLFWwindow  *window,
       offset = Transform::make_translation(
                   Vec3( 1.0f, 1.0f, move_distance )
                   *
-                  -cam.forward
+                  cam.forward
                );
       cam.transform( offset);
 
@@ -272,7 +272,7 @@ void process_input( GLFWwindow  *window,
       offset = Transform::make_translation(
                   Vec3( -1.0f, -1.0f, -move_distance )
                   *
-                  -cam.forward
+                  cam.forward
                );
       cam.transform(offset);
    }
@@ -280,7 +280,7 @@ void process_input( GLFWwindow  *window,
       offset = Transform::make_translation(
                   Vec3( move_distance, 1.0f, 1.0f )
                   *
-                  glm::cross( cam.forward, Vec3(0.0, 1.0f, 0.0f) )
+                  glm::cross( -cam.forward, Vec3(0.0, 1.0f, 0.0f) )
                );
       cam.transform(offset);
    }
@@ -288,20 +288,20 @@ void process_input( GLFWwindow  *window,
       offset = Transform::make_translation(
                   Vec3( -move_distance, -1.0f, -1.0f )
                   *
-                  glm::cross( cam.forward, Vec3(0.0f, 1.0f, 0.0f) )
+                  glm::cross( -cam.forward, Vec3(0.0f, 1.0f, 0.0f) )
                );
       cam.transform(offset);
    }
    if ( glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS ) {
       offset = Transform::make_translation(
-                  Vec3( 0.0f, move_distance, 0.0f)
+                  Vec3( 0.0f, -move_distance, 0.0f)
                );
       cam.transform(offset);
 
    }
    if ( glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS ) {
       offset = Transform::make_translation(
-                  Vec3( 0.0f, -move_distance, 0.0f )
+                  Vec3( 0.0f, move_distance, 0.0f )
                );
       cam.transform(offset);
       
@@ -660,7 +660,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    //SunApe->set_transform()
 
    /* TODO */ Vec3       cam_rotations {  0.0f,   0.0f,   0.0f };
-   /* TODO */ Vec3       cam_position  {  0.0f, -20.0f,  15.0f };
+   /* TODO */ Vec3       cam_position  {  0.0f, 20.0f,  15.0f };
    /* TODO */ Transform  cam_transform;
    /* TODO */ Float32    fov_rad { Config::fov_rad }; // 90 degrees
    /* TODO */ Viewport view { cam_position, window, geometry_program, fov_rad };
@@ -758,6 +758,20 @@ Int32 main( Int32 argc, char const *argv[] ) {
       ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );
       glfwMakeContextCurrent( window );
       glfwSwapBuffers( window );
+
+
+      //ImGui::Text( "\t%.1f FPS (avg %.3f ms/frame)",
+        //          ImGui::GetIO().Framerate,
+          //        1000.0f / ImGui::GetIO().Framerate
+      
+      auto fps = ImGui::GetIO().Framerate;
+
+      auto msps = 1000.0f / ImGui::GetIO().Framerate;
+      char title[1024] = {};
+      sprintf_s(title, "3D Project -- %3.1f FPS (%3.1fms/frame)", fps, msps);
+      glfwSetWindowTitle(window, title );
+      
+
 	} // main loop end
 
    // cleanup:
