@@ -128,15 +128,6 @@
     <ClInclude Include="src\misc\ImGui\imgui_impl_opengl3.h">
       <Filter>Header Files\misc\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="src\lop_Model.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\lop_mesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\lop_shader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\misc\stb_image.h">
       <Filter>Header Files\misc</Filter>
     </ClInclude>
