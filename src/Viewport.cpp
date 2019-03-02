@@ -75,9 +75,27 @@ void Viewport::update() {
 }
 
 void Viewport::_write_to_buffer() {
+   //TODO: Vad händer här? ingen "use" funktion på shaderProgram, location hämtas men används ej
    _shader_program->use();
    auto location = _shader_program->get_location();
-   glUniformMatrix4fv( glGetUniformLocation(location, "view"),       1, GL_FALSE, &(_view.matrix[0][0]) );
+
+
+   glm::vec3 scale;
+   glm::quat rotation;
+   glm::vec3 translation;
+   glm::vec3 skew;
+   glm::vec4 perspective;
+   
+   glm::decompose(_view.matrix, scale, rotation, translation, skew, perspective);
+   Mat4 rot = glm::toMat4(rotation) * glm::scale(Mat4(1.0f), scale) * glm::translate(Mat4(1.0f) , translation) ;
+   Mat4 rot3 = glm::toMat4(rotation) * glm::translate(Mat4(1.0f) , translation);
+   Mat4 rot4 = _view.get_rotation() * glm::translate(Mat4(1.0f) , translation);
+   Mat4 rot5 =  glm::translate(Mat4(1.0f) , translation) * _view.get_rotation();
+   Mat4 rot6 =  glm::translate(Mat4(1.0f) , translation) * glm::toMat4(rotation);
+   Mat4 rot2 = glm::toMat4(rotation);
+
+   glUniformMatrix4fv( glGetUniformLocation(location, "view"),       1, GL_FALSE, &(_view.get_rotation()[0][0]) );
+   //glUniformMatrix4fv( glGetUniformLocation(location, "view"),       1, GL_FALSE, &(_view.matrix[0][0]) );
    glUniformMatrix4fv( glGetUniformLocation(location, "projection"), 1, GL_FALSE, &(_projection[0][0]) );
 }
 

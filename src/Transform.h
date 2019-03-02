@@ -6,6 +6,7 @@ class Transform {
 public:
    Transform( Vec3 const &position = Vec3(0.0f) ):
       _position ( position         ),
+      //_rotation ( _identity_matrix ),
       _rotation ( _identity_matrix ),
       _scale    ( Vec3( 1.0f )     ),
       matrix    ( _matrix          )

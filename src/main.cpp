@@ -137,11 +137,14 @@ void process_mouse( GLFWwindow   *window,
    }
 
    // mouse picking
-   if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1)) {
-      SharedPtr<ModelInstance> model = scene.get_instance_ptr(scene.get_object_id_at_pixel(x_pos, y_pos, cam));
-      model->transform(Transform::make_rotation(Vec3(1.0, 1.0, 1.0)));
-      std::cout << x_pos << ":" << y_pos << std::endl;
+   if (false) { //Getting crashes again
+      if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1)) {
+         SharedPtr<ModelInstance> model = scene.get_instance_ptr(scene.get_object_id_at_pixel(x_pos, y_pos, cam));
+         model->transform(Transform::make_rotation(Vec3(1.0, 1.0, 1.0)));
+         std::cout << x_pos << ":" << y_pos << std::endl;
+      }
    }
+   
 
    Bool has_changed = last_x != x_pos || last_y != y_pos;
 
@@ -172,10 +175,11 @@ void process_mouse( GLFWwindow   *window,
       cam.forward.y = sin( glm::radians(pitch)                          );
       cam.forward.z = sin( glm::radians(yaw)) * cos(glm::radians(pitch) );
       cam.forward   = glm::normalize( cam.forward );
-      //auto view = cam.get_view();  // get view (pos, rot, scale)
+      
+      auto view = cam.get_view();  // get view (pos, rot, scale)
 
-      //view.look_at( cam.forward, view.get_position()); // rotate view
-      //cam.set_view(view);        // update cam view
+      view.look_at( cam.forward, view.get_position()); // rotate view
+      cam.set_view(view);        // update cam view
       //Transform().set_rotation()
 
       //auto hm = Transform(view.get_position(), cam.forward);
@@ -248,6 +252,7 @@ void process_input( GLFWwindow  *window,
                     Viewport    &cam,
                     Float32      time_delta_s )
 {
+
    // glfwSetInputMode( window, GLFW_STICKY_KEYS, 1 );
 
    Float32    move_distance = g_move_speed * time_delta_s;
