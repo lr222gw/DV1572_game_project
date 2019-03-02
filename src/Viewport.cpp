@@ -306,7 +306,7 @@ void Viewport::_g_buffer_init() {
                             GL_COLOR_ATTACHMENT5,
                             GL_COLOR_ATTACHMENT6 };
 
-   glDrawBuffers( 6, attachments );
+   glDrawBuffers( 6, attachments ); // TODO: BJÖRN SEE HÄR TILL MIGSJÄLV
 
 // Create a render buffer object for depth buffer
 
