@@ -62,7 +62,6 @@ private:
    Uint32                                     _depth_map_FBO_id;
    HashMap< SharedPtr<Shadowcaster>, Uint32>  _shadow_maps;// = { _shadowcasters ,  _depth_map_ids };
 
-
    Vector<WeakPtr<ModelInstance>>     _instances;
 
    HashMap<Uint64, WeakPtr<Light>>    _lights;

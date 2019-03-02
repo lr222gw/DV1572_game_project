@@ -107,6 +107,8 @@ void create_demo_scene( /*...*/ ) {
 }
 
 
+Mat4 a,b,c,d;
+
 
 
 void process_mouse( GLFWwindow   *window,
@@ -169,11 +171,11 @@ void process_mouse( GLFWwindow   *window,
       cam.forward.x = cos( glm::radians(yaw)) * cos(glm::radians(pitch) );
       cam.forward.y = sin( glm::radians(pitch)                          );
       cam.forward.z = sin( glm::radians(yaw)) * cos(glm::radians(pitch) );
-      cam.forward = glm::normalize( cam.forward );
-      auto view = cam.get_view();  // get view (pos, rot, scale)
+      cam.forward   = glm::normalize( cam.forward );
+      //auto view = cam.get_view();  // get view (pos, rot, scale)
 
-      view.look_at( cam.forward, view.get_position()); // rotate view
-      cam.set_view(view);        // update cam view
+      //view.look_at( cam.forward, view.get_position()); // rotate view
+      //cam.set_view(view);        // update cam view
       //Transform().set_rotation()
 
       //auto hm = Transform(view.get_position(), cam.forward);
@@ -182,15 +184,18 @@ void process_mouse( GLFWwindow   *window,
       //cam.transform(hm);
 
       //cam.transform(Transform::make_rotation(Vec3(1.0f, 0.0f, 0.0f), glm::radians(0.1f)));
-      
-      
-      
+
+      a = cam.get_view().matrix;
+      b = Mat4(1.0f);
+      c = b * a;
+      d = a * b;
+
       //cam.transform(Transform::make_rotation(Vec3(1.0f, 0.0f, 0.0f), cam.forward.x));
       //auto t = Transform::make_rotation(cam.forward);
       //cam.transform(t);
       //auto rotation = Transform::make_rotation(cam.forward);
-    
-      //TODO: 
+
+      //TODO:
 
    }
 }
@@ -714,6 +719,11 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
       process_mouse( window, view, scene_manager, delta_time_s );
       process_input( window, view, delta_time_s );
+
+      debug::view_mat4( a, "_a");
+      debug::view_mat4( b, "_b");
+      debug::view_mat4( c, "_c");
+      debug::view_mat4( d, "_d");
 
       // glMatrixMode( GL_PROJECTION );
       // glLoadIdentity();

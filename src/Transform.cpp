@@ -101,6 +101,12 @@ void Transform::translate(Vec3 const &offset) {
    _update_matrix();
 }
 
+
+//void Transform::look_at( Vec3 target_position, Vec3 up_direction={.0f, 1.0f, .0f} ) {
+//   _rotation = glm::lookAt( _position, target_position, up_direction );
+//   _update_matrix();
+//}
+
 void Transform::look_at(Vec3 const &forward, Vec3 pos, Vec3 const up ) {
 
    _rotation = glm::lookAt(Vec3(0.0f,0.0f,0.0f),forward, up );
@@ -118,7 +124,7 @@ void Transform::look_at(Vec3 const &forward, Vec3 pos, Vec3 const up ) {
    //this->_position = translation;
    //this->_matrix = _rotation;
    //_rotation = glm::toMat4(rotation);
-   
+
    _update_matrix();
 }
 
