@@ -16,7 +16,7 @@ Viewport::Viewport( Vec3                      position,
 {
    _view = Transform( position );
 
-   //TODO: Kan denna vara här? 
+   //TODO: Kan denna vara här?
    //Ligger här för att vi nu måste uppdatera vår viewports transforms view med LookAt...
    //_view.look_at(this->forward, _view.get_position() + this->forward); // rotate view
    ///this->set_view(_view);
@@ -49,11 +49,11 @@ void Viewport::_generate_perspective() {
 void Viewport::transform( Transform const &transform ) {
    _view *= transform;
 
-   //TODO: Kan denna vara här? 
+   //TODO: Kan denna vara här?
    //Ligger här för att vi nu måste uppdatera vår viewports transforms view med LookAt...
    //_view.look_at(this->forward, _view.get_position() + this->forward); // rotate view
    //this->set_view(_view);
-   
+
    _write_to_buffer();
 }
 
@@ -91,7 +91,7 @@ void Viewport::_write_to_buffer() {
    _shader_program->use();
    auto location = _shader_program->get_location();
 
-   
+
 
    //glm::vec3 scale;
    //glm::quat rotation;
@@ -106,21 +106,22 @@ void Viewport::_write_to_buffer() {
    //Mat4 rot5 =  glm::translate(Mat4(1.0f) , translation) * _view.get_rotation();
    //Mat4 rot6 =  glm::translate(Mat4(1.0f) , translation) * glm::toMat4(rotation);
    //Mat4 rot2 = glm::toMat4(rotation);
-   
-   Mat4 rotAlone = _view.get_rotation();
-   Mat4 posAlone = glm::translate(Mat4(1.0f), _view.get_position());
-   Mat4 scaleAlone = glm::scale(Mat4(1.0f), _view.get_scale());
-   Mat4 rot  = rotAlone *  posAlone * scaleAlone;
-   
-   Mat4 og = _view.matrix;
-   //Mat4 rot2 = posAlone *  rotAlone;
-   
-   Mat4 rot2 = posAlone * rotAlone * scaleAlone;
-   Mat4 fixed = glm::lookAt(_view.get_position(), _view.get_position() + this->forward, Vec3(0.0f, 1.0f, 0.0f));
 
-   //TODO: avgör om detta är rätt ställe att invertera viewmatrisen..   
-   //glUniformMatrix4fv( glGetUniformLocation(location, "view"),       1, GL_FALSE, &(_view.matrix[0][0]) );
-   glUniformMatrix4fv( glGetUniformLocation(location, "view"),       1, GL_FALSE, &(fixed[0][0]) );
+   //Mat4 rotAlone = _view.get_rotation();
+   //Mat4 posAlone = glm::translate(Mat4(1.0f), _view.get_position());
+   //Mat4 scaleAlone = glm::scale(Mat4(1.0f), _view.get_scale());
+   //Mat4 rot  = rotAlone *  posAlone * scaleAlone;
+
+   //Mat4 og = _view.matrix;
+   //Mat4 rot2 = posAlone *  rotAlone;
+
+   //Mat4 rot2 = posAlone * rotAlone * scaleAlone;
+
+   /*Mat4 fixed = glm::lookAt(_view.get_position(), _view.get_position() + this->forward, Vec3(0.0f, 1.0f, 0.0f));
+   glUniformMatrix4fv( glGetUniformLocation(location, "view"),       1, GL_FALSE, &(fixed[0][0]) ); //*/
+   //TODO: avgör om detta är rätt ställe att invertera viewmatrisen..
+   glUniformMatrix4fv( glGetUniformLocation(location, "view"),       1, GL_FALSE, &(_view.matrix[0][0]) );
+
    //glUniformMatrix4fv( glGetUniformLocation(location, "view"),       1, GL_FALSE, &(_view.matrix[0][0]) );
    glUniformMatrix4fv( glGetUniformLocation(location, "projection"), 1, GL_FALSE, &(_projection[0][0]) );
 }

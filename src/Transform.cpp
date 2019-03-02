@@ -111,25 +111,25 @@ void Transform::look_at(Vec3 const &forward, Vec3 pos, Vec3 const up ) {
 
    _rotation = glm::lookAt(Vec3(0.0f,0.0f,0.0f),forward, up );
 
-   
-   Mat4 rotAlone = _rotation;
-   Mat4 posAlone = glm::translate(Mat4(1.0f),_position);
-   Mat4 scaleAlone = glm::scale(Mat4(1.0f), _scale);
-   Mat4 rot = rotAlone * posAlone * scaleAlone;
 
-   Mat4 og = _matrix;
+   //Mat4 rotAlone = _rotation;
+   //Mat4 posAlone = glm::translate(Mat4(1.0f),_position);
+   //Mat4 scaleAlone = glm::scale(Mat4(1.0f), _scale);
+   //Mat4 rot = rotAlone * posAlone * scaleAlone;
+
+   //Mat4 og = _matrix;
    //Mat4 rot2 = posAlone *  rotAlone;
 
-   Mat4 rot2 = posAlone * rotAlone * scaleAlone;
-   Mat4 fixed = glm::lookAt(_position, _position + forward, Vec3(0.0f, 1.0f, 0.0f));
+   //Mat4 rot2 = posAlone * rotAlone * scaleAlone;
+   //Mat4 fixed = glm::lookAt(_position, _position + forward, Vec3(0.0f, 1.0f, 0.0f));
 
-   Vec3 xAx, yAx, zAx;   
+   Vec3 xAx, yAx, zAx;
    zAx = glm::normalize((_position + forward) - _position);
    xAx = glm::normalize(glm::cross(up, zAx));
    yAx = glm::cross(zAx, xAx);
 
-   Mat4 sameAsFixed; 
-   
+   Mat4 sameAsFixed;
+
    //sameAsFixed[0][0] = xAx.x;                     sameAsFixed[0][1] = yAx.x;                      sameAsFixed[0][2] = zAx.x;                      sameAsFixed[0][3] = 0;
    //sameAsFixed[1][0] = xAx.y;                     sameAsFixed[1][1] = yAx.y;                      sameAsFixed[1][2] = zAx.y;                      sameAsFixed[1][3] = 0;
    //sameAsFixed[2][0] = xAx.z;                     sameAsFixed[2][1] = yAx.z;                      sameAsFixed[2][2] = zAx.z;                      sameAsFixed[2][3] = 0;
@@ -151,29 +151,29 @@ void Transform::look_at(Vec3 const &forward, Vec3 pos, Vec3 const up ) {
    ////sameAsFixed[3][0] = 1; sameAsFixed[3][1] = 1;  sameAsFixed[3][2] = 1;  sameAsFixed[3][3] = 1;
 
 
-   //Double inverted... 
+   //Double inverted...
    sameAsFixed[0][0] = -xAx.x;                     sameAsFixed[0][1] = yAx.x;                      sameAsFixed[0][2] = -zAx.x;                      sameAsFixed[0][3] = 0;
    sameAsFixed[1][0] = -xAx.y;                     sameAsFixed[1][1] = yAx.y;                      sameAsFixed[1][2] = -zAx.y;                      sameAsFixed[1][3] = 0;
    sameAsFixed[2][0] = -xAx.z;                     sameAsFixed[2][1] = yAx.z;                      sameAsFixed[2][2] = -zAx.z;                      sameAsFixed[2][3] = 0;
    sameAsFixed[3][0] = -glm::dot(xAx, -_position); sameAsFixed[3][1] = glm::dot(yAx, -_position);  sameAsFixed[3][2] = -glm::dot(zAx, -_position);  sameAsFixed[3][3] = 1;
 
 
-   Mat4 donemat = _matrix;
-   Vec3 posInvert = _position;
+   //Mat4 donemat = _matrix;
+   //Vec3 posInvert = _position;
    Vec3 oldPos = _position;
    _position = Vec3(0.0f,0.0f,0.0f);// posInvert;
-   
+
 
    //sameAsFixed = glm::translate(Mat4(1.0f), posInvert) * sameAsFixed;
    _rotation =  sameAsFixed; //glm::translate(Mat4(1.0f), _position) *
-   
+
    //_rotation = posAlone * sameAsFixed;
    //_matrix = sameAsFixed;
 
    _update_matrix();
    _position = oldPos;
-   int f = 3;
-   
+   //int f = 3;
+
 
 
    //sameAsFixed = posAlone * sameAsFixed;
@@ -181,16 +181,16 @@ void Transform::look_at(Vec3 const &forward, Vec3 pos, Vec3 const up ) {
    //Mat4 Fel = glm::translate(_identity_matrix, _position)  // 3
    //   * _rotation                                      // 2
    //   * glm::scale(_identity_matrix, _scale); // 1
-   
+
    //_update_matrix();
 
 
-   
+
 
    //_rotation = glm::lookAt(pos, pos +forward, up );
    //_rotation = glm::lookAt(_position, forward, up );
    //_rotation = glm::lookAt(_position, _position + forward, up );
-   
+
    //glm::vec3 scale;
    //glm::quat rotation;
    //glm::vec3 translation;
@@ -203,8 +203,8 @@ void Transform::look_at(Vec3 const &forward, Vec3 pos, Vec3 const up ) {
    //this->_matrix = _rotation;
    //_rotation = glm::toMat4(rotation);
 
-   
-   
+
+
 }
 
 Transform Transform::make_translation( Vec3 const &offset ) {

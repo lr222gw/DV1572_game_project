@@ -15,6 +15,13 @@
 
 #include "Light.h"
 
+#ifdef __unix__
+    #define FORMAT_TO_STRING sprintf
+#elif defined(_WIN32) || defined(WIN32)
+   #define FORMAT_TO_STRING sprintf_s
+#endif
+
+
 // temp:
 //    #include <cstdio>
 //    #include <unistd.h>
@@ -763,14 +770,13 @@ Int32 main( Int32 argc, char const *argv[] ) {
       //ImGui::Text( "\t%.1f FPS (avg %.3f ms/frame)",
         //          ImGui::GetIO().Framerate,
           //        1000.0f / ImGui::GetIO().Framerate
-      
-      auto fps = ImGui::GetIO().Framerate;
 
-      auto msps = 1000.0f / ImGui::GetIO().Framerate;
-      char title[1024] = {};
-      sprintf_s(title, "3D Project -- %3.1f FPS (%3.1fms/frame)", fps, msps);
-      glfwSetWindowTitle(window, title );
-      
+      auto fps        = ImGui::GetIO().Framerate;
+      auto mspfps     = 1000.0f / ImGui::GetIO().Framerate;
+      char title[512] = {};
+      FORMAT_TO_STRING( title, "3D Project ─ %3.1f FPS (%3.1fms/frame)", fps, mspfps );
+      glfwSetWindowTitle( window, title );
+
 
 	} // main loop end
 
