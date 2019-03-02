@@ -30,22 +30,21 @@ void SceneManager::_light_change_listener( Uint64 id ) {
       update_shadowmap();
 
    int match_index = -1;
-   for ( auto i=0;  i<_num_lights;  ++i )
-      if ( _id_of_light_at[i] == id )
-         match_index = id;
+   for ( auto index=0;  index<_num_lights;  ++index )
+      if ( _id_of_light_at[index] == id )
+         match_index = index;
    if ( match_index != -1 ) {
-      auto light_match = light.lock();
-      auto new_data =  light_match->get_data();
-      auto old_data = _light_data[match_index];
+      auto light_match         = light.lock();
+      auto new_data            = light_match->get_data();
       _light_data[match_index] = new_data;
    }
 }
 
 void SceneManager::_light_destruction_listener( Uint64 id ) {
    int match_index = -1;
-   for ( auto i=0;  i<_num_lights;  ++i )
-      if ( _id_of_light_at[i] == id )
-         match_index = id;
+   for ( auto index=0;  index<_num_lights;  ++index )
+      if ( _id_of_light_at[index] == id )
+         match_index = index;
 
    // if the light was in the light data buffer, remove it by swapping
    if ( -1 != match_index ) { // the entry with the last entry and decrement count
@@ -76,7 +75,6 @@ SharedPtr<Light> SceneManager::instantiate_light( Light::Data data )
       ++_num_lights;
    }
    else assert( false && "Add buffer for inactive lights. " );
-
    return result;
 }
 
@@ -225,6 +223,9 @@ void SceneManager::_render_to_quad() {
 
 
 void SceneManager::draw_debug_scene_inspection() {
+   if ( !config.is_imgui_toggled )
+      return;
+
    ImGui::Begin( "Instances:" ); // begin our Inspection window:
    {  // draw our window GUI components and do I/O:
       Uint32 i = 0;
