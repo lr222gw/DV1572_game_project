@@ -109,10 +109,10 @@ void Transform::translate(Vec3 const &offset) {
 
 void Transform::look_at(Vec3 const &forward, Vec3 pos, Vec3 const up ) {
 
-   //_rotation = glm::lookAt(Vec3(0.0f,0.0f,0.0f),forward, up );
+   _rotation = glm::lookAt(Vec3(0.0f,0.0f,0.0f),forward, up );
    //_rotation = glm::lookAt(pos, pos +forward, up );
    //_rotation = glm::lookAt(_position, forward, up );
-   _rotation = glm::lookAt(_position, _position + forward, up );
+   //_rotation = glm::lookAt(_position, _position + forward, up );
    
    //glm::vec3 scale;
    //glm::quat rotation;
