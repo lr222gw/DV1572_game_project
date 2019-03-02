@@ -752,6 +752,51 @@ Int32 main( Int32 argc, char const *argv[] ) {
       auto mo = model_instances[10];
       mo->transform( Transform::make_rotation(Vec3(1.0f, 0.0f, 0.0f), glm::radians(30.0f) ) );
 
+      auto mo2 = model_instances[11];
+      
+      //auto t = Transform::make_translation(Vec3(0.10f, 0.0f, 0.0f));
+      //auto r = Transform::make_rotation(Vec3(0.0f, 1.0f, 0.0f), glm::radians(30.0f));
+      //r.look_at(Vec3(0.0, 0.0, 0.0), t.get_position());
+      //t.set_rotation(r.get_rotation());
+      auto mdl = mo2->model_transform;
+      //mdl.look_at(Vec3(13.0f, 0.0f, 0.0f), Vec3(0.0f, 0.0f, 0.00001f) );
+      static Float32 g = 0.0f;
+ 
+      
+      static bool hm = true;
+      if (true) {
+
+         if (g > 2) {
+            hm = false;
+         }
+         else if (g < -2) {
+            hm = true;
+         }
+
+         if (hm) {
+            g += 0.01f;
+         }
+         else {
+            g -= 0.01f;
+         }
+# define M_PI           3.14159265358979323846  
+         ;
+         for (int i = 0; i < 64; i++) {
+            Float32 size = 0.1f;
+            //mo2->transform(Transform::make_translation(Vec3(0.0,0.0,0.0)));
+            
+            model_instances[i]->set_transform(Transform::make_translation(model_instances[i]->model_transform.get_position()));
+            model_instances[i]->transform(Transform::make_rotation(Vec3(0.0f, (Float32)glm::cos((g*glm::pow(i, 0.2)*(g / 2))*((i % 3))), (Float32)glm::sin(g/2* (i % 2)))) * Transform::make_translation(Vec3((Float32)glm::sin(g*i)*((i % 3)* size), (Float32)glm::sin(g* (i % 2)* size)*0.02 , (Float32)glm::sin(g/10)*((i%5) % 2))));
+
+         }
+      }
+
+      //mdl.set_position(Vec3(1.0f ,0.0f,0.0f));
+      //mo2->transform(mdl);
+      
+      //mo2->set_transform(mdl);
+      
+
       scene_manager.draw( view );
 
       ImGui::Render();
