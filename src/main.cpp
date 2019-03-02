@@ -713,19 +713,20 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
       Array<Float32,4> corners = light_sc->getCorners();
 
-      debug::lightsource( poss, dirr, intensity, radius, degree, specularity, scene_manager );
+      for ( auto &light : light_instances )
+         debug::lightsource( light, scene_manager );
 
-      light_sc->set_Light_matrix(0.1f, glm::length(poss-dirr), corners[0], corners[1], corners[2], corners[3], poss, dirr, Vec3(0.0f, 1.0f, 0.0f));
+      light_sc->set_Light_matrix( 0.1f,
+                                  glm::length(poss-dirr),
+                                  corners[0],
+                                  corners[1],
+                                  corners[2],
+                                  corners[3],
+                                  sun->get_position(),
+                                  sun->get_direction(),
+                                  Vec3(0.0f, 1.0f, 0.0f) ); // up vector?
+
       sundbg.light_caster_debugg_tool_render();
-
-      sun->set_type( Light::Type::directional );
-      sun->set_direction( glm::normalize(poss - dirr) );
-      sun->set_position( poss );
-      // sun->set_color( Vec3(1.0f,  1.0f,   1.0f) );
-      sun->set_intensity( intensity );
-      sun->set_radius( radius );
-      sun->set_degree( degree );
-      sun->set_specularity( specularity );
 
       process_mouse( window, view, scene_manager, delta_time_s );
       process_input( window, view, delta_time_s );
@@ -753,7 +754,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
       mo->transform( Transform::make_rotation(Vec3(1.0f, 0.0f, 0.0f), glm::radians(30.0f) ) );
 
       auto mo2 = model_instances[11];
-      
+
       //auto t = Transform::make_translation(Vec3(0.10f, 0.0f, 0.0f));
       //auto r = Transform::make_rotation(Vec3(0.0f, 1.0f, 0.0f), glm::radians(30.0f));
       //r.look_at(Vec3(0.0, 0.0, 0.0), t.get_position());
@@ -761,8 +762,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
       auto mdl = mo2->model_transform;
       //mdl.look_at(Vec3(13.0f, 0.0f, 0.0f), Vec3(0.0f, 0.0f, 0.00001f) );
       static Float32 g = 0.0f;
- 
-      
+
+
       static bool hm = true;
       if (true) {
 
@@ -779,12 +780,12 @@ Int32 main( Int32 argc, char const *argv[] ) {
          else {
             g -= 0.01f;
          }
-# define M_PI           3.14159265358979323846  
+# define M_PI           3.14159265358979323846
          ;
          for (int i = 0; i < 64; i++) {
             Float32 size = 0.1f;
             //mo2->transform(Transform::make_translation(Vec3(0.0,0.0,0.0)));
-            
+
             model_instances[i]->set_transform(Transform::make_translation(model_instances[i]->model_transform.get_position()));
             model_instances[i]->transform(Transform::make_rotation(Vec3(0.0f, (Float32)glm::cos((g*glm::pow(i, 0.2)*(g / 2))*((i % 3))), (Float32)glm::sin(g/2* (i % 2)))) * Transform::make_translation(Vec3((Float32)glm::sin(g*i)*((i % 3)* size), (Float32)glm::sin(g* (i % 2)* size)*0.02 , (Float32)glm::sin(g/10)*((i%5) % 2))));
 
@@ -793,9 +794,9 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
       //mdl.set_position(Vec3(1.0f ,0.0f,0.0f));
       //mo2->transform(mdl);
-      
+
       //mo2->set_transform(mdl);
-      
+
 
       scene_manager.draw( view );
 

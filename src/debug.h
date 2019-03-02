@@ -5,6 +5,6 @@
 
 namespace debug {
    void view_mat4( Mat4 const &, String name ); // name also serves as window title & ID
-   void lightsource(Vec3 &position, Vec3 &direction, Float32 &intensity, Float32 &radius, Float32 &degree, Float32 &specularity, SceneManager &scene_man);
+   void lightsource( SharedPtr<Light>, SceneManager & );
 }; // namespace end
 
