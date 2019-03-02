@@ -257,6 +257,7 @@ void process_input( GLFWwindow  *window,
 
    Float32    move_distance = g_move_speed * time_delta_s;
    Transform  offset;
+   
 
    if ( glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS ) {
       offset = Transform::make_translation(
@@ -265,6 +266,7 @@ void process_input( GLFWwindow  *window,
                   -cam.forward
                );
       cam.transform( offset);
+
    }
    if ( glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS ) {
       offset = Transform::make_translation(
@@ -295,14 +297,17 @@ void process_input( GLFWwindow  *window,
                   Vec3( 0.0f, move_distance, 0.0f)
                );
       cam.transform(offset);
+
    }
    if ( glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS ) {
       offset = Transform::make_translation(
                   Vec3( 0.0f, -move_distance, 0.0f )
                );
       cam.transform(offset);
+      
    }
-
+   
+   
 /*
    if ( glfwGetKey(window, GLFW_KEY_W)            == GLFW_PRESS ) { // forward
       cam.transform( translation * forward );
