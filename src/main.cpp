@@ -144,7 +144,7 @@ void process_mouse( GLFWwindow   *window,
          std::cout << x_pos << ":" << y_pos << std::endl;
       }
    }
-   
+
 
    Bool has_changed = last_x != x_pos || last_y != y_pos;
 
@@ -175,7 +175,7 @@ void process_mouse( GLFWwindow   *window,
       cam.forward.y = sin( glm::radians(pitch)                          );
       cam.forward.z = sin( glm::radians(yaw)) * cos(glm::radians(pitch) );
       cam.forward   = glm::normalize( cam.forward );
-      
+
       auto view = cam.get_view();  // get view (pos, rot, scale)
 
       view.look_at( cam.forward, view.get_position()); // rotate view
@@ -257,7 +257,7 @@ void process_input( GLFWwindow  *window,
 
    Float32    move_distance = g_move_speed * time_delta_s;
    Transform  offset;
-   
+
 
    if ( glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS ) {
       offset = Transform::make_translation(
@@ -304,10 +304,10 @@ void process_input( GLFWwindow  *window,
                   Vec3( 0.0f, -move_distance, 0.0f )
                );
       cam.transform(offset);
-      
+
    }
-   
-   
+
+
 /*
    if ( glfwGetKey(window, GLFW_KEY_W)            == GLFW_PRESS ) { // forward
       cam.transform( translation * forward );
