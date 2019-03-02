@@ -98,7 +98,7 @@ void SceneManager::draw( Viewport &view ) {
 
    _geometry_shader_program->use(); // glUseProgram( geometry_pass_loc );
 
-   glBindFramebuffer( GL_FRAMEBUFFER, g_buffer.buffer_loc );
+   glBindFramebuffer( GL_DRAW_FRAMEBUFFER, g_buffer.buffer_loc );
    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
    // toggle wireframe mode if config is set to true
@@ -123,7 +123,7 @@ void SceneManager::draw( Viewport &view ) {
    glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
 // 2. Lighting pass:
-   glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+   glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0 );
    // TODO: refactor lighting pass code here
 
    glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
@@ -582,9 +582,11 @@ Uint32 SceneManager::get_object_id_at_pixel(Uint32 x, Uint32 y, Viewport &view)
 	glReadPixels( x, y, 1, 1, GL_RGBA8, GL_UNSIGNED_BYTE, &pixel_info );
 
 	Uint32 obj_id = ( (pixel_info[0] & 0xFF) << 24 )
-                 + ( (pixel_info[1] & 0xFF) << 16 )
-                 + ( (pixel_info[2] & 0xFF) <<  8 )
-                 + ( (pixel_info[3] & 0xFF) <<  0 );
+                  + ( (pixel_info[1] & 0xFF) << 16 )
+                  + ( (pixel_info[2] & 0xFF) <<  8 )
+                  + ( (pixel_info[3] & 0xFF) <<  0 );
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 
 	return obj_id;
 }

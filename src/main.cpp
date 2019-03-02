@@ -683,7 +683,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
 
 
-// glDisable( GL_BLEND );
+   glDisable( GL_BLEND );
 // main loop:
 	while ( !glfwWindowShouldClose(window) ) {
       Float32 delta_time_s { ImGui::GetIO().DeltaTime };
