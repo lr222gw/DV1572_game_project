@@ -30,11 +30,15 @@ ShaderProgram::ShaderProgram( Vector<SharedPtr<Shader>> const &shader_ptrs ):
    _transform_location = glGetUniformLocation( _program_location, "model_transform" );
 }
 
+void ShaderProgram::use() {
+   glUseProgram( _program_location );
+}
+
 ShaderProgram::ShaderProgram(const ShaderProgram & shader_program)
 {
-   this->_program_location = shader_program._program_location;
-   this->_shader_ptrs = shader_program._shader_ptrs;
-   this->_transform_location = shader_program._transform_location;
+   _program_location   = shader_program._program_location;
+   _shader_ptrs        = shader_program._shader_ptrs;
+   _transform_location = shader_program._transform_location;
 }
 
 GLuint ShaderProgram::get_location() const {

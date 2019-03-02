@@ -60,6 +60,7 @@ SharedPtr<Light> SceneManager::instantiate_light( Light::Data data )
    return result;
 }
 
+// TODO: use ShaderProgram::use()
 void SceneManager::draw( Viewport &view ) {
    auto &g_buffer = view.get_g_buffer();
 
@@ -336,9 +337,9 @@ void SceneManager::set_shadowcasting(SharedPtr<Shadowcaster> light)
       GL_TEXTURE_WRAP_T,
       GL_CLAMP_TO_BORDER);
 
-   glTexParameteri(GL_TEXTURE_2D,
-      GL_CLAMP_TO_BORDER,
-      GL_CLAMP_TO_BORDER);
+//   glTexParameteri(GL_TEXTURE_2D,
+//      GL_CLAMP_TO_BORDER, //  LOWE!
+//      GL_CLAMP_TO_BORDER);
 
    float borderColor[] = { 0.0,0.0,0.0, 0.0 };
    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
@@ -491,7 +492,8 @@ Uint32 SceneManager::_find_light_index( Uint64 id ) const {
 void SceneManager::_lights_to_gpu() {
    auto lighting_pass_loc = _lighting_shader_program->get_location();
 
-   glUniform1i( lighting_pass_loc, _num_lights );
+   glUniform1ui( glGetUniformLocation( lighting_pass_loc, "num_lights" ),
+                _num_lights );
 
    for ( Uint32 i = 0;  i < _num_lights;  ++i ) {
       auto light = _light_data[i]; // light data of light at index 'i'

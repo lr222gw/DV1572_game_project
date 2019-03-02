@@ -8,6 +8,7 @@ public:
    // initializer list finns i .cpp filen
    ShaderProgram( Vector<SharedPtr<Shader>> const &shader_ptrs );
    ShaderProgram(const ShaderProgram &shader_program);
+   void use();
    ~ShaderProgram();
    [[nodiscard]] GLuint get_location() const;
    [[nodiscard]] GLuint get_transform_location() const;

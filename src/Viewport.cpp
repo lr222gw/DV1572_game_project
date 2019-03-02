@@ -3,11 +3,16 @@
 
 // TODO: l�s ViewPort -> Viewport
 
-Viewport::Viewport( Vec3 position, GLFWwindow *window, Float32 fov_rad ):
-   _fov    ( fov_rad ),
-   _aspect ( -1.0f   ),
-   _window ( window  ),
-   forward (0.0f,0.0f,1.0f)
+Viewport::Viewport( Vec3                      position,
+                    GLFWwindow               *window,
+                    SharedPtr<ShaderProgram>  shader_program,
+                    Float32                   fov_rad )
+:
+   _fov            ( fov_rad          ),
+   _aspect         ( -1.0f            ),
+   _window         ( window           ),
+   _shader_program ( shader_program   ),
+   forward         ( 0.0f, 0.0f, 1.0f )
 {
    _view = Transform( position );
    _update_aspect_ratio();
@@ -58,22 +63,22 @@ void Viewport::set_fov( Float32 fov_rad ) {
    _generate_perspective();
 }
 
-void Viewport::bind_shader_program( ShaderProgram &shader_program ) {
-   _location = shader_program.get_location();
+void Viewport::bind_shader_program( SharedPtr<ShaderProgram> shader_program ) {
+   _shader_program = shader_program;
    _generate_perspective();
-   _write_to_buffer();
 }
 
 void Viewport::update() {
    debug::view_mat4( _view.matrix, "viewport._view" );
    _update_aspect_ratio();
    _write_to_buffer();
-
 }
 
 void Viewport::_write_to_buffer() {
-   glUniformMatrix4fv( glGetUniformLocation(_location, "view"),       1, GL_FALSE, &(_view.matrix[0][0]) );
-   glUniformMatrix4fv( glGetUniformLocation(_location, "projection"), 1, GL_FALSE, &(_projection[0][0]) );
+   _shader_program->use();
+   auto location = _shader_program->get_location();
+   glUniformMatrix4fv( glGetUniformLocation(location, "view"),       1, GL_FALSE, &(_view.matrix[0][0]) );
+   glUniformMatrix4fv( glGetUniformLocation(location, "projection"), 1, GL_FALSE, &(_projection[0][0]) );
 }
 
 // TODO: extract magnifier and minifier behavior to be changed in options

@@ -169,10 +169,29 @@ void process_mouse( GLFWwindow   *window,
       cam.forward.x = cos( glm::radians(yaw)) * cos(glm::radians(pitch) );
       cam.forward.y = sin( glm::radians(pitch)                          );
       cam.forward.z = sin( glm::radians(yaw)) * cos(glm::radians(pitch) );
-      glm::normalize( cam.forward );
+      cam.forward = glm::normalize( cam.forward );
       auto view = cam.get_view();  // get view (pos, rot, scale)
-      view.look_at( cam.forward ); // rotate view
-      cam.set_view( view );        // update cam view
+
+      view.look_at( cam.forward, view.get_position()); // rotate view
+      cam.set_view(view);        // update cam view
+      //Transform().set_rotation()
+
+      //auto hm = Transform(view.get_position(), cam.forward);
+      //auto hm = Transform::make_rotation(( cam.forward));
+
+      //cam.transform(hm);
+
+      //cam.transform(Transform::make_rotation(Vec3(1.0f, 0.0f, 0.0f), glm::radians(0.1f)));
+      
+      
+      
+      //cam.transform(Transform::make_rotation(Vec3(1.0f, 0.0f, 0.0f), cam.forward.x));
+      //auto t = Transform::make_rotation(cam.forward);
+      //cam.transform(t);
+      //auto rotation = Transform::make_rotation(cam.forward);
+    
+      //TODO: 
+
    }
 }
 
@@ -629,8 +648,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
    /* TODO */ Vec3       cam_position  {  0.0f, -20.0f,  15.0f };
    /* TODO */ Transform  cam_transform;
    /* TODO */ Float32    fov_rad { Config::fov_rad }; // 90 degrees
-   /* TODO */ Viewport view { cam_position, window, fov_rad };
-   /* TODO */ view.bind_shader_program( *geometry_program );
+   /* TODO */ Viewport view { cam_position, window, geometry_program, fov_rad };
+   /* TODO */ view.bind_shader_program( geometry_program );
    /* TODO */ //TODO: remove when we dont want to se dogass
    /* TODO */ view._g_buffer_init();
    /* TODO */ //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
