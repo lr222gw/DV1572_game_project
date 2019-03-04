@@ -600,8 +600,13 @@ SharedPtr<ModelInstance> SceneManager::get_instance_ptr( Uint32 obj_id ) {
 			if ( e_ptr->id == obj_id )
 				return e_ptr;
 		}
+		else
+		{
+			return nullptr;
+		}
 	}
-	assert( false && "[ERROR] Instance of id no longer exists." );
+	//assert( false && "[ERROR] Instance of id no longer exists." );
+	std::cout << "no model hit" << std::endl;
 }
 
 
