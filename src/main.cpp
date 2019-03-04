@@ -796,7 +796,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
             //mo2->transform(Transform::make_translation(Vec3(0.0,0.0,0.0)));
 
             model_instances[i]->set_transform(Transform::make_translation(model_instances[i]->model_transform.get_position()));
-            model_instances[i]->transform(Transform::make_rotation(Vec3(0.0f, (Float32)glm::cos((g*glm::pow(i, 0.2)*(g / 2))*((i % 3))), (Float32)glm::sin(g/2* (i % 2)))) * Transform::make_translation(Vec3((Float32)glm::sin(g*i)*((i % 3)* size), (Float32)glm::sin(g* (i % 2)* size)*0.02 , (Float32)glm::sin(g/10)*((i%5) % 2))));
+            model_instances[i]->transform(Transform::make_rotation(Vec3((Float32)glm::cos(15 * g*(((i % 4))% 2)), (Float32)glm::cos(12*g*((i % 3))), (Float32)glm::sin(g/2* (i % 2)))) * Transform::make_translation(Vec3((Float32)glm::sin(g*i)*((i % 3)* size), (Float32)glm::sin(g* (i % 2)* size)*0.02 , (Float32)glm::sin(g/10)*((i%5) % 2))));
 
          }
       }
