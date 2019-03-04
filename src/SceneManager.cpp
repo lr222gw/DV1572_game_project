@@ -563,14 +563,14 @@ Uint32 SceneManager::get_object_id_at_pixel(Uint32 x, Uint32 y, Viewport &view)
 	//glUseProgram(_geometry_shader_program)
 
 //	Uint32 pixel_info[4]{};
-//	//struct pixel_info_struct
-//	//{
-//	//	int x;
-//	//	int y;
-//	//	int z;
-//	//	int w;
-//	//};
-//	//pixel_info_struct pixel_info;
+	struct pixel_info_struct
+	{
+		float x;
+		float y;
+		float z;
+		float w;
+	};
+	pixel_info_struct pixel_info;
 //
 //	glReadPixels(x, y, 1, 1, GL_RGBA, GL_UNSIGNED_INT, (void*)&pixel_info);
 //
@@ -579,14 +579,14 @@ Uint32 SceneManager::get_object_id_at_pixel(Uint32 x, Uint32 y, Viewport &view)
 //                 + (pixel_info[2] & 0xFF <<  8)
 //                 + (pixel_info[3] & 0xFF <<  0); // TODO: validate that we get the correct ids
 
-	Uint8 pixel_info[4] {};
+	//Uint8 pixel_info[4] {};
 
-	glReadPixels( x, y, 1, 1, GL_RGBA8, GL_UNSIGNED_BYTE, &pixel_info );
+	glReadPixels( x, y, 1, 1, GL_RGBA, GL_FLOAT, &pixel_info );
 
-	Uint32 obj_id = (  (pixel_info[0] & 0xFF) << 24 )
-                  + ( (pixel_info[1] & 0xFF) << 16 )
-                  + ( (pixel_info[2] & 0xFF) <<  8 )
-                  + ( (pixel_info[3] & 0xFF) <<  0 );
+	Uint32 obj_id = ( ((int)(pixel_info.x * 255) & 0xFF))
+                  + ( ((int)(pixel_info.y * 255) & 0xFF))
+                  + ( ((int)(pixel_info.z * 255) & 0xFF))
+                  + ( ((int)(pixel_info.w * 255) & 0xFF));
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 

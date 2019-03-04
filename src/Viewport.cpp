@@ -330,12 +330,12 @@ void Viewport::_g_buffer_init() {
 
    glTexImage2D(GL_TEXTURE_2D,
 	   0,
-	   GL_RGBA8,
+	   GL_RGBA32F,
 	   width,
 	   height,
 	   0,
 	   GL_RGBA,
-	   GL_UNSIGNED_BYTE,
+	   GL_FLOAT,
 	   NULL );
 
       // setting minifier:
