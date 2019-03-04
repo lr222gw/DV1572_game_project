@@ -583,7 +583,7 @@ Uint32 SceneManager::get_object_id_at_pixel(Uint32 x, Uint32 y, Viewport &view)
 
 	glReadPixels( x, y, 1, 1, GL_RGBA8, GL_UNSIGNED_BYTE, &pixel_info );
 
-	Uint32 obj_id = ( (pixel_info[0] & 0xFF) << 24 )
+	Uint32 obj_id = (  (pixel_info[0] & 0xFF) << 24 )
                   + ( (pixel_info[1] & 0xFF) << 16 )
                   + ( (pixel_info[2] & 0xFF) <<  8 )
                   + ( (pixel_info[3] & 0xFF) <<  0 );
