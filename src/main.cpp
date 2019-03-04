@@ -26,6 +26,8 @@
 
 Float32 g_move_speed            = 25.0f; // TODO: refactor away ugly globalness
 Bool    g_is_mouse_look_enabled = false;
+// temp debug for mouse picking
+
 
 // For opengl debuging
 void APIENTRY glDebugOutput( GLenum        source,
@@ -137,7 +139,7 @@ void process_mouse( GLFWwindow   *window,
    }
 
    // mouse picking
-   if (false) { //Getting crashes again
+   if (true) { //Getting crashes again
       if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1)) {
          SharedPtr<ModelInstance> model = scene.get_instance_ptr(scene.get_object_id_at_pixel(x_pos, y_pos, cam));
          model->transform(Transform::make_rotation(Vec3(1.0, 1.0, 1.0)));
@@ -774,7 +776,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
 
       static bool hm = true;
-      if (true) {
+      if (false) {
 
          if (g > 2) {
             hm = false;

@@ -557,9 +557,10 @@ void SceneManager::_lights_to_gpu() {
 
 Uint32 SceneManager::get_object_id_at_pixel(Uint32 x, Uint32 y, Viewport &view)
 {
+	_geometry_shader_program->use();
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, view.get_g_buffer().buffer_loc);
 	glReadBuffer(GL_COLOR_ATTACHMENT5);
-
+	//glUseProgram(_geometry_shader_program)
 
 //	Uint32 pixel_info[4]{};
 //	//struct pixel_info_struct
