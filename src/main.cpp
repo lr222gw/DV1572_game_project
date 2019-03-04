@@ -130,7 +130,11 @@ void process_mouse( GLFWwindow   *window,
 
 
 
+
    glfwGetCursorPos( window, &x_pos, &y_pos );
+   
+  
+
 
    if ( first_mouse ) {
       last_x      = cam.forward.x;
@@ -158,9 +162,19 @@ void process_mouse( GLFWwindow   *window,
    Float64 y_offset = last_y - y_pos;
    last_x           = x_pos;
    last_y           = y_pos;
-
-   if ( !g_is_mouse_look_enabled )
-      return;
+   
+   if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) != GLFW_PRESS)) {
+      if (!g_is_mouse_look_enabled) {
+         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+         return;
+      }
+         
+   }
+   else {
+      
+      glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+   }
+   
 
    // 'http://justsomething.co/wp-content/uploads/2013/11/guns-replaced-thumbs-up-20.jpg'
 
@@ -224,13 +238,14 @@ void toggle_input_callback( GLFWwindow  *window,
    if ( key == GLFW_KEY_ESCAPE  &&  action == GLFW_PRESS )
       glfwSetWindowShouldClose( window, true );
 
-   if ( key == GLFW_KEY_F1  &&  action == GLFW_PRESS ) {
+   if ( (key == GLFW_KEY_F1 )  &&  action == GLFW_PRESS ) {
       g_is_mouse_look_enabled = !g_is_mouse_look_enabled;
       if ( g_is_mouse_look_enabled )
          glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_DISABLED );
       else
          glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_NORMAL );
    }
+   
 
    if ( key == GLFW_KEY_F2  &&  action == GLFW_PRESS )
       config.is_wireframe_mode = !config.is_wireframe_mode; // used in SceneManager::Draw()
@@ -252,6 +267,8 @@ void toggle_input_callback( GLFWwindow  *window,
 	   config.render_mode = RenderMode::picking;
    if ( key == GLFW_KEY_F12 &&  action == GLFW_PRESS )
       config.is_imgui_toggled = !config.is_imgui_toggled;
+
+  
 }
 
 
