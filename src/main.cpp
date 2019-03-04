@@ -145,7 +145,7 @@ void process_mouse( GLFWwindow   *window,
 		  if (instance_ptr != nullptr)
 		  {
 			  SharedPtr<ModelInstance> model = instance_ptr;
-			  model->transform(Transform::make_rotation(Vec3(1.0, 1.0, 1.0)));
+			  model->transform(Transform::make_rotation(Vec3(0.0, 1.0, 0.0)));
 		  }
          std::cout << x_pos << ":" << y_pos << std::endl;
       }
