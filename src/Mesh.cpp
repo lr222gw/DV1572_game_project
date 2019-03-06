@@ -66,29 +66,14 @@ void Mesh::_initialize_mesh() {
                           GL_FALSE, sizeof(VertexData),
                           (GLvoid*)offsetof(VertexData, uv) );
 
+   // bind OpenGL to standard values
    glBindVertexArray(0);
 }
 
 void Mesh::_draw( ShaderProgram &shader_program ) const {
-   auto shader_location = shader_program.get_location();
+   shader_program.use();
 
-   glUseProgram( shader_location );
-
-   glActiveTexture( GL_TEXTURE0 );
-   glUniform1i( glGetUniformLocation(shader_location, "tex_diff"), 0 );
-   glBindTexture( GL_TEXTURE_2D, _textures.diffuse->get_location() );
-
-   glActiveTexture( GL_TEXTURE1 );
-   glUniform1i( glGetUniformLocation(shader_location, "tex_spec"), 1 );
-   glBindTexture( GL_TEXTURE_2D, _textures.specular->get_location() );
-
-   glActiveTexture( GL_TEXTURE2 );
-   glUniform1i( glGetUniformLocation(shader_location, "tex_norm"), 2 );
-   glBindTexture( GL_TEXTURE_2D, _textures.normal->get_location() );
-
-   glActiveTexture( GL_TEXTURE5 );
-   glUniform1i( glGetUniformLocation(shader_location, "tex_emit"), 5 );
-   glBindTexture( GL_TEXTURE_2D, _textures.emissive->get_location() );
+   TextureSet::ScopedBindGuard pin { _textures, shader_program }; // RAII
 
    // glUniform1f( glGetUniformLocation(shader_program.get_location(), "material.shininess" ), 16.0f); TODO
    glBindVertexArray( _vao );
@@ -104,10 +89,4 @@ void Mesh::_draw( ShaderProgram &shader_program ) const {
 
    // bind OpenGL to standard values
    glBindVertexArray(0);
-
-   // unbind textures
-   for ( GLuint i = 0;  i < 4;  ++i ) {
-      glActiveTexture( GL_TEXTURE0 + i );
-      glBindTexture( GL_TEXTURE_2D, 0 );
-   }
 }

@@ -26,6 +26,7 @@ Uint64 SceneManager::_generate_light_id() {
 
 void SceneManager::_light_change_listener( Uint64 id ) {
    auto light = _lights[id];
+
    if ( !light.expired()  &&  light.lock()->get_type() == Light::Type::directional )
       update_shadowmap();
 
@@ -33,6 +34,7 @@ void SceneManager::_light_change_listener( Uint64 id ) {
    for ( auto index=0;  index<_num_lights;  ++index )
       if ( _id_of_light_at[index] == id )
          match_index = index;
+
    if ( match_index != -1 ) {
       auto light_match         = light.lock();
       auto new_data            = light_match->get_data();
@@ -132,16 +134,22 @@ void SceneManager::draw( Viewport &view ) {
 
    auto g_buffer_data { view.get_g_buffer() };
 
-   glActiveTexture( GL_TEXTURE0 );
-   glBindTexture(   GL_TEXTURE_2D, g_buffer_data.pos_tex_loc );
-   glActiveTexture( GL_TEXTURE1 );
-   glBindTexture(   GL_TEXTURE_2D, g_buffer_data.nor_tex_loc );
-   glActiveTexture( GL_TEXTURE2 );
-   glBindTexture(   GL_TEXTURE_2D, g_buffer_data.spe_tex_loc );
-   glActiveTexture( GL_TEXTURE3) ;
+// @TAG{TEXTURE_CHANNEL}
+   glActiveTexture( GL_TEXTURE0) ;
    glBindTexture(   GL_TEXTURE_2D, g_buffer_data.alb_tex_loc );
-   glActiveTexture( GL_TEXTURE4) ;
+
+   glActiveTexture( GL_TEXTURE1 );
+   glBindTexture(   GL_TEXTURE_2D, g_buffer_data.spe_tex_loc );
+
+   glActiveTexture( GL_TEXTURE2 );
+   glBindTexture(   GL_TEXTURE_2D, g_buffer_data.nor_tex_loc );
+
+   glActiveTexture( GL_TEXTURE3) ;
    glBindTexture(   GL_TEXTURE_2D, g_buffer_data.emi_tex_loc );
+
+   glActiveTexture( GL_TEXTURE4 );
+   glBindTexture(   GL_TEXTURE_2D, g_buffer_data.pos_tex_loc );
+
    glActiveTexture( GL_TEXTURE5);
    glBindTexture(	  GL_TEXTURE_2D, g_buffer_data.pic_tex_loc );
 

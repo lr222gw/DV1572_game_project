@@ -2,6 +2,7 @@
 
 #include "misc/defs.h"
 #include "Config.h"
+#include "ShaderProgram.h"
 
 enum class TextureType : Uint8 { diffuse  = 0,
                                  normal   = 1,
@@ -178,7 +179,23 @@ using SpecularTexture = Texture<TextureType::specular>;
 using DiffuseTexture  = Texture<TextureType::diffuse>;
 using EmissiveTexture = Texture<TextureType::emissive>;
 
-struct TextureSet {
+class TextureSet {
+public:
+   /* RAII wrapper for scoped bindings. */
+   class ScopedBindGuard {
+   public:
+      // binds textures at scope after construction
+      ScopedBindGuard( TextureSet      const &, ShaderProgram & );
+      ScopedBindGuard( ScopedBindGuard const &  ) = delete;
+      ScopedBindGuard( ScopedBindGuard       && ) = delete;
+      auto operator=(  ScopedBindGuard const &  ) = delete;
+      auto operator=(  ScopedBindGuard       && ) = delete;
+     ~ScopedBindGuard(); // unbinds textures at end of scope
+   private:
+      TextureSet const &_textures;
+   };
+
+// exposed member data:
    SharedPtr<DiffuseTexture>   diffuse;
    SharedPtr<NormalTexture>    normal;
    SharedPtr<SpecularTexture>  specular;

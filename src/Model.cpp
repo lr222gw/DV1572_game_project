@@ -52,7 +52,7 @@ void Model::_process_node( aiNode *node,  aiScene const *scene ) {
 
 void Model::draw( ShaderProgram &shader_program ) const {
    for ( auto &e : get_meshes() )  // for each mesh in the model
-      e->_draw( shader_program );   // call the mesh's draw function
+      e->_draw( shader_program );  // call the mesh's draw function
 }
 
 

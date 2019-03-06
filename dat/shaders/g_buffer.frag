@@ -12,11 +12,12 @@ uniform sampler2D tex_emit;
 
 uniform uvec4 obj_id;
 
-layout (location = 0) out  vec3 g_position;
-layout (location = 1) out  vec3 g_normal;
-layout (location = 2) out  vec4 g_spec;
-layout (location = 3) out  vec4 g_albedo;
-layout (location = 4) out  vec4 g_emit;
+// @TAG{TEXTURE_CHANNEL}
+layout (location = 0) out  vec4 g_albedo;
+layout (location = 1) out  vec4 g_spec;
+layout (location = 2) out  vec3 g_normal;
+layout (location = 3) out  vec4 g_emit;
+layout (location = 4) out  vec3 g_position;
 layout (location = 5) out  vec4 g_picking;
 
 void main() {

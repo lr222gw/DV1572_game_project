@@ -1,6 +1,7 @@
 #pragma once
 
 #define GLM_ENABLE_EXPERIMENTAL
+// #define GLM_SWIZZLE
 
 #include <cassert>
 
@@ -44,6 +45,8 @@
 
 #include "stb_image.h"
 
+// #define MIN(a,b) (((a)<(b))?(a):(b))
+// #define MAX(a,b) (((a)>(b))?(a):(b))
 
 // unsigned integer types:
                             using Uint8        = uint8_t;
@@ -102,4 +105,4 @@ template <class K, class V> using HashMap      = std::unordered_map<K,V>;
 // template <class T>          using Optional     = std::optional<T>;
 
 //constexpr Idx  const   invalid_idx = -1;
-constexpr char const * invalid_str = "ERROR";
+constexpr char const *invalid_str = "ERROR";

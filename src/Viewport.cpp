@@ -127,6 +127,8 @@ void Viewport::_write_to_buffer() {
 
 // TODO: extract magnifier and minifier behavior to be changed in options
 void Viewport::_g_buffer_init() {
+   // @TAG{TEXTURE_CHANNEL}
+
   static bool initialized = false;
    // specular  =  specular RGB (=xyz) + specular intensity (=w)
    // albedo    =  albedo RGBA(= xyzw)
@@ -150,18 +152,18 @@ void Viewport::_g_buffer_init() {
 
 
 
-// position texture for g-buffer:
+// albedo (RGBA) color texture for g-buffer
    glBindTexture( GL_TEXTURE_2D,
-                  _g_buffer.pos_tex_loc );
+                  _g_buffer.alb_tex_loc );
 
    glTexImage2D( GL_TEXTURE_2D,
                  0,
-                 GL_RGB16F,
+                 GL_RGBA,
                  width,
                  height,
                  0,
-                 GL_RGB,
-                 GL_FLOAT,
+                 GL_RGBA,
+                 GL_UNSIGNED_BYTE,
                  NULL );
 
    // setting minifier:
@@ -174,44 +176,11 @@ void Viewport::_g_buffer_init() {
                     GL_TEXTURE_MAG_FILTER,
                     GL_NEAREST );
 
-   // describe and attach the texture id for pos to currently bound g-buffer
+   // attach the texture id to currently bound g-buffer
    glFramebufferTexture2D( GL_FRAMEBUFFER,
                            GL_COLOR_ATTACHMENT0,
                            GL_TEXTURE_2D,
-                           _g_buffer.pos_tex_loc,
-                           0 );
-
-
-
-// normal texture for g-buffer:
-   glBindTexture( GL_TEXTURE_2D,
-                  _g_buffer.nor_tex_loc );
-
-   glTexImage2D( GL_TEXTURE_2D,
-                 0,
-                 GL_RGB16,
-                 width,
-                 height,
-                 0,
-                 GL_RGB,
-                 GL_FLOAT,
-                 NULL );
-
-   // setting minifier:
-   glTexParameteri( GL_TEXTURE_2D,
-                    GL_TEXTURE_MIN_FILTER,
-                    GL_NEAREST );
-
-   // setting magnifier:
-   glTexParameteri( GL_TEXTURE_2D,
-                    GL_TEXTURE_MAG_FILTER,
-                    GL_NEAREST );
-
-   // describe and attatch the texture id for norm to Currently bound g-buffer
-   glFramebufferTexture2D( GL_FRAMEBUFFER,
-                           GL_COLOR_ATTACHMENT1,
-                           GL_TEXTURE_2D,
-                           _g_buffer.nor_tex_loc,
+                           _g_buffer.alb_tex_loc,
                            0 );
 
 
@@ -242,25 +211,25 @@ void Viewport::_g_buffer_init() {
 
    // attach the texture id for spec to Currently bound g-buffer
    glFramebufferTexture2D( GL_FRAMEBUFFER,
-                           GL_COLOR_ATTACHMENT2,
+                           GL_COLOR_ATTACHMENT1,
                            GL_TEXTURE_2D,
                            _g_buffer.spe_tex_loc,
                            0 );
 
 
 
-// albedo (RGBA) color texture for g-buffer
+// normal texture for g-buffer:
    glBindTexture( GL_TEXTURE_2D,
-                  _g_buffer.alb_tex_loc );
+                  _g_buffer.nor_tex_loc );
 
    glTexImage2D( GL_TEXTURE_2D,
                  0,
-                 GL_RGBA,
+                 GL_RGB16,
                  width,
                  height,
                  0,
-                 GL_RGBA,
-                 GL_UNSIGNED_BYTE,
+                 GL_RGB,
+                 GL_FLOAT,
                  NULL );
 
    // setting minifier:
@@ -273,11 +242,11 @@ void Viewport::_g_buffer_init() {
                     GL_TEXTURE_MAG_FILTER,
                     GL_NEAREST );
 
-   // attach the texture id to currently bound g-buffer
+   // describe and attatch the texture id for norm to Currently bound g-buffer
    glFramebufferTexture2D( GL_FRAMEBUFFER,
-                           GL_COLOR_ATTACHMENT3,
+                           GL_COLOR_ATTACHMENT2,
                            GL_TEXTURE_2D,
-                           _g_buffer.alb_tex_loc,
+                           _g_buffer.nor_tex_loc,
                            0 );
 
 
@@ -308,35 +277,60 @@ void Viewport::_g_buffer_init() {
 
    // attach the texture id to currently bound g-buffer
    glFramebufferTexture2D( GL_FRAMEBUFFER,
-                           GL_COLOR_ATTACHMENT4,
+                           GL_COLOR_ATTACHMENT3,
                            GL_TEXTURE_2D,
                            _g_buffer.emi_tex_loc,
                            0 );
 
-//   glTexImage2D( GL_TEXTURE_2D,
-//                 0,
-//                 GL_RGBA,
-//                 width,
-//                 height,
-//                 0,
-//                 GL_RGBA,
-//                 GL_UNSIGNED_BYTE,
-//                 NULL );
+
+
+// position texture for g-buffer:
+   glBindTexture( GL_TEXTURE_2D,
+                  _g_buffer.pos_tex_loc );
+
+   glTexImage2D( GL_TEXTURE_2D,
+                 0,
+                 GL_RGB16F,
+                 width,
+                 height,
+                 0,
+                 GL_RGB,
+                 GL_FLOAT,
+                 NULL );
+
+   // setting minifier:
+   glTexParameteri( GL_TEXTURE_2D,
+                    GL_TEXTURE_MIN_FILTER,
+                    GL_NEAREST );
+
+   // setting magnifier:
+   glTexParameteri( GL_TEXTURE_2D,
+                    GL_TEXTURE_MAG_FILTER,
+                    GL_NEAREST );
+
+   // describe and attach the texture id for pos to currently bound g-buffer
+   glFramebufferTexture2D( GL_FRAMEBUFFER,
+                           GL_COLOR_ATTACHMENT4,
+                           GL_TEXTURE_2D,
+                           _g_buffer.pos_tex_loc,
+                           0 );
+
+
 
 // picking (RGBA) light texture for g-buffer
-   glBindTexture(GL_TEXTURE_2D,
-	   _g_buffer.pic_tex_loc);
+   glBindTexture( GL_TEXTURE_2D,
+	               _g_buffer.pic_tex_loc);
 
 
-   glTexImage2D(GL_TEXTURE_2D,
-	   0,
-	   GL_RGBA8,
-	   width,
-	   height,
-	   0,
-	   GL_RGBA,
-	   GL_UNSIGNED_BYTE,
-	   NULL );
+   glTexImage2D( GL_TEXTURE_2D,
+	              0,
+	              GL_RGBA8,
+	              width,
+	              height,
+	              0,
+	              GL_RGBA,
+	              GL_UNSIGNED_BYTE,
+	              NULL );
 
       // setting minifier:
    glTexParameteri( GL_TEXTURE_2D,

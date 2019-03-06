@@ -36,7 +36,7 @@ public:
    struct ParticleData {
    public:
       // member data fields:
-      constexpr Uint32       maximum_count = Config::particle_max_count;
+      constexpr Uint32       maximum_count = Config::particle_max_count; // TODO: rename to make it more obvious that the limit is on a per ParticleSystem basic
       Uint32                 current_count;
    // Vec3[max_capacity]     color;
       Vec3[max_capacity]     position;

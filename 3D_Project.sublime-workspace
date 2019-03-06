@@ -4,6 +4,14 @@
 		"selected_items":
 		[
 			[
+				"particl",
+				"_particles\t  Data"
+			],
+			[
+				"_update",
+				"_update_vbo_data()\t  void"
+			],
+			[
 				"_light",
 				"_light_data"
 			],
@@ -100,190 +108,45 @@
 	"buffers":
 	[
 		{
-			"file": "src/Viewport.cpp",
+			"file": "src/ParticleSystem.cpp",
 			"settings":
 			{
-				"buffer_size": 12101,
+				"buffer_size": 10449,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"contents": "Searching 33 files for \"GL_COLOR_ATTACHMENT4\" (case sensitive)\n\n/home/falk/Code/DV1568_3DProjekt/src/Viewport.cpp:\n  309     // attach the texture id to currently bound g-buffer\n  310     glFramebufferTexture2D( GL_FRAMEBUFFER,\n  311:                            GL_COLOR_ATTACHMENT4,\n  312                             GL_TEXTURE_2D,\n  313                             _g_buffer.emi_tex_loc,\n  ...\n  364                              GL_COLOR_ATTACHMENT2,\n  365                              GL_COLOR_ATTACHMENT3,\n  366:                             GL_COLOR_ATTACHMENT4,\n  367                              GL_COLOR_ATTACHMENT5 };\n  368  \n\n2 matches in 1 file\n\n\nSearching 33 files for \"GL_TEXTURE4\" (case sensitive)\n\n/home/falk/Code/DV1568_3DProjekt/src/SceneManager.cpp:\n  123     glActiveTexture( GL_TEXTURE3) ;\n  124     glBindTexture(   GL_TEXTURE_2D, g_buffer_data.alb_tex_loc );\n  125:    glActiveTexture( GL_TEXTURE4) ;\n  126     glBindTexture(   GL_TEXTURE_2D, g_buffer_data.emi_tex_loc );\n  127     glActiveTexture( GL_TEXTURE5);\n\n1 match in 1 file\n",
+			"file": "src/ParticleSystem.h",
 			"settings":
 			{
-				"buffer_size": 1053,
-				"line_ending": "Unix",
-				"name": "Find Results",
-				"scratch": true
+				"buffer_size": 4476,
+				"line_ending": "Unix"
 			}
 		},
 		{
-			"contents": "#include \"SceneManager.h\"\n\nSharedPtr<ModelInstance> SceneManager::instantiate_model(\n   SharedPtr<Model>          model,\n   SharedPtr<ShaderProgram>  shader_program,\n   Transform const&          transform)\n{\n   auto callback_lambda = [=]() { _should_recalculate_shadowmap = true; };\n   // construct return value (shared pointer):\n   auto instance_ptr = // TODO: switch to UniquePtr..?\n      std::make_shared<ModelInstance>( model,\n                                       shader_program,\n                                       transform,\n                                       callback_lambda );\n\n   // add a weak pointer to the scene manager's instance list before returning:\n   _instances.push_back( instance_ptr );\n\n   return instance_ptr;\n}\n\n\nUint64 SceneManager::_generate_light_id() {\n   return _next_light_id++;\n}\n\nvoid SceneManager::_light_change_listener( Uint64 id ) {\n   auto light = _lights[id];\n   if ( !light.expired()  &&  light.lock()->get_type() == Light::Type::directional )\n      update_shadowmap();\n\n   int match_index = -1;\n   for ( auto i=0;  i<_num_lights;  ++i )\n      if ( _id_of_light_at[i] == id )\n         match_index = id;\n   if ( match_index != -1 ) {\n      auto light_match         = light.lock();\n      auto new_data            = light_match->get_data();\n      _light_data[match_index] = new_data;\n   }\n}\n\nvoid SceneManager::_light_destruction_listener( Uint64 id ) {\n   int match_index = -1;\n   for ( auto i=0;  i<_num_lights;  ++i )\n      if ( _id_of_light_at[i] == id )\n         match_index = id;\n\n   // if the light was in the light data buffer, remove it by swapping\n   if ( -1 != match_index ) { // the entry with the last entry and decrement count\n      Light::Data  temp_buffer = _light_data[match_index];\n      _light_data[match_index] = _light_data[--_num_lights];\n      _light_data[_num_lights] = temp_buffer;\n      // TODO: (if buffer for over-capacity lights gets added): check for new lights to insert\n   }\n\n   // TODO: \"else { /* remove from over-capacity buffer */ }\"\"\n}\n\nSharedPtr<Light> SceneManager::instantiate_light( Light::Data data )\n{\n   auto result = std::make_shared<Light>( std::bind( &SceneManager::_light_destruction_listener,\n                                                     this,\n                                                     std::placeholders::_1 ),\n                                          std::bind( &SceneManager::_light_change_listener,\n                                                     this,\n                                                     std::placeholders::_1 ),\n                                          _generate_light_id(),\n                                          std::move(data) );\n   _lights[result->id] = result; // adding tdo instance table\n\n   if ( _num_lights < light_capacity ) { // adding\n      _light_data     [_num_lights] = result->data;\n      _id_of_light_at [_num_lights] = result->id;\n      ++_num_lights;\n   }\n   else assert( false && \"Add buffer for inactive lights. \" );\nss  w w \n   return result;\n}\n\n// TODO: use ShaderProgram::use()\nvoid SceneManager::draw( Viewport &view ) {\n   auto &g_buffer = view.get_g_buffer();\n\n   auto lighting_pass_loc = _lighting_shader_program->get_location();\n   auto geometry_pass_loc = _geometry_shader_program->get_location();\n\n   //TODO: Make modelinstance supply unique ID to Callback Function and then in CAllback function compare the boundingbox of the modelinstance with the frustrum of all the active shadowcasters and recalculate shadowmap for any intersections\n   if ( _should_recalculate_shadowmap ) {\n      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);\n      this->update_shadowmap();\n      _should_recalculate_shadowmap = false;\n   }\n\n   //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);\n\n   _geometry_shader_program->use(); // glUseProgram( geometry_pass_loc );\n\n   glBindFramebuffer( GL_FRAMEBUFFER, g_buffer.buffer_loc );\n   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );\n\n   // toggle wireframe mode if config is set to true\n   if ( config.is_wireframe_mode )\n      glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );\n\n   //Send view_pos to g_buffer.geom shader\n   view.update();\n   auto view_pos = view.get_view().get_position();\n   glUniform3fv( glGetUniformLocation( geometry_pass_loc, \"view_pos\"),\n                 1,\n                 glm::value_ptr(view_pos));\n\n\n   // 1. Geometry Pass:\n   // TODO: sortera instanserna efter ShaderProgram m.h.a. std::partition()\n   for ( auto &instance : _instances )\n      if ( !instance.expired() )\n         instance.lock()->draw();\n\n   // disabling wireframe rendering so that the quad will render after the lighting pass\n   glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );\n\n// 2. Lighting pass:\n   glBindFramebuffer( GL_FRAMEBUFFER, 0 );\n   // TODO: refactor lighting pass code here\n\n   glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );\n   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );\n   _lighting_shader_program->use(); // glUseProgram( lighting_pass_loc );\n\n   ////////////////////\n\n   auto g_buffer_data { view.get_g_buffer() };\n\n   glActiveTexture( GL_TEXTURE0 );\n   glBindTexture(   GL_TEXTURE_2D, g_buffer_data.pos_tex_loc );\n   glActiveTexture( GL_TEXTURE1 );\n   glBindTexture(   GL_TEXTURE_2D, g_buffer_data.nor_tex_loc );\n   glActiveTexture( GL_TEXTURE2 );\n   glBindTexture(   GL_TEXTURE_2D, g_buffer_data.spe_tex_loc );\n   glActiveTexture( GL_TEXTURE3) ;\n   glBindTexture(   GL_TEXTURE_2D, g_buffer_data.alb_tex_loc );\n   glActiveTexture( GL_TEXTURE4) ;\n   glBindTexture(   GL_TEXTURE_2D, g_buffer_data.emi_tex_loc );\n   glActiveTexture( GL_TEXTURE5);\n   glBindTexture(\t  GL_TEXTURE_2D, g_buffer_data.pic_tex_loc );\n\n   glUniform3fv( glGetUniformLocation( lighting_pass_loc, \"view_pos\"),\n                 1,\n                 glm::value_ptr(view_pos));\n\n   for ( auto &e : _shadow_maps ) {\n      glUniformMatrix4fv(\n         glGetUniformLocation(lighting_pass_loc,\n            \"lightmatrix\"),\n         1,\n         GL_FALSE,\n         glm::value_ptr(e.first->get_matrix()));\n      // Mat4 ello = e.first->get_matrix();\n      glActiveTexture(GL_TEXTURE6);\n      glBindTexture(GL_TEXTURE_2D, e.second);\n\n      //glUniform1i(glGetUniformLocation(_light_pass_shader->get_location(), \"shadowMap\"), 4);\n   }\n\n\n   _lights_to_gpu();\n   _render_to_quad();\n}\n\nvoid SceneManager::_render_to_quad() {\n\n   static Uint32  quad_vao = 0;\n   static Uint32  quad_vbo;\n\n   if ( 0 == quad_vao ) {\n      Float32 quad_verts[] = {\n         //   X      Y     Z       U     V\n            -1.0f,  1.0f, 0.0f,   0.0f, 1.0f,\n            -1.0f, -1.0f, 0.0f,   0.0f, 0.0f,\n             1.0f,  1.0f, 0.0f,   1.0f, 1.0f,\n             1.0f, -1.0f, 0.0f,   1.0f, 0.0f,\n      };\n\n      // setup plane VAO\n      glGenVertexArrays(1, &quad_vao);\n      glGenBuffers(1, &quad_vbo);\n      glBindVertexArray(quad_vao);\n\n      glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);\n\n      glBufferData(GL_ARRAY_BUFFER,\n         sizeof(quad_verts),\n         &quad_verts,\n         GL_STATIC_DRAW);\n\n      glEnableVertexAttribArray(0);\n\n      //Screen 2D Pos\n      glVertexAttribPointer(0,\n         3,\n         GL_FLOAT,\n         GL_FALSE,\n         5 * sizeof(Float32), // X,Y,Z,U,V = 5 Float32 channels\n         (void*)0);\n\n      glEnableVertexAttribArray(1);\n\n      //Screen 2D uv\n      glVertexAttribPointer( 1,\n                             2,\n                             GL_FLOAT,\n                             GL_FALSE,\n                             5 * sizeof(Float32),\n                             (void*)(3 * sizeof(Float32)));\n   }\n   glBindVertexArray( quad_vao );\n\n   glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );\n\n   glBindVertexArray(0);\n}\n\n\nvoid SceneManager::draw_debug_scene_inspection() {\n   ImGui::Begin( \"Instances:\" ); // begin our Inspection window:\n   {  // draw our window GUI components and do I/O:\n      Uint32 i = 0;\n\n      for ( auto &e : _instances ) {\n         if ( !e.expired() ) {\n            auto instance = e.lock();\n\n            auto transform   = instance->model_transform;\n\n            // Vec3 rotation  = transform.get_rotation();\n            Vec3 position  = transform.get_position();\n            Vec3 scale     = transform.get_scale();\n\n            Float32 position_array[3] { position.x,\n                                        position.y,\n                                        position.z }; // temp\n\n            Float32 scale_array[3] { scale.x,\n                                     scale.y,\n                                     scale.z }; // temp\n\n            Vec3 rotation(0.0f);\n\n            // temp\n            String id = instance->get_model()->get_name() +\"::\"+ std::to_string(i);\n\n            ImGui::PushID( id.c_str() );\n            ImGui::NewLine();\n            ImGui::Text( \"%s:\", id.c_str() );\n            ImGui::InputFloat3( \"Position\", position_array, \"%.1f\");\n\n            ImGui::SliderAngle( \"X rotation\", &rotation.x );\n            ImGui::SliderAngle( \"Y rotation\", &rotation.y );\n            ImGui::SliderAngle( \"Z rotation\", &rotation.z );\n\n            ImGui::InputFloat3( \"Scale\", scale_array, \"%.2f\" );\n            ImGui::NewLine();\n\n            ImGui::Separator();\n            ImGui::PopID();\n\n            // Vec3 oldPos = position;\n\n            Transform trans = Transform(Vec3(0.0f, 0.0f, 0.0f));\n            //instance->set_transform(trans);\n            //transform = instance->model_transform;\n\n            //instance->set_transform(trans);\n\n\n            //instance->set_transform(trans);\n            transform = instance->model_transform;\n\n            transform.set_position(Vec3(0.0f,0.0f,0.0f));\n\n            instance->set_transform(transform);\n            transform = instance->model_transform;\n\n            //glm::rotation(Mat4(1.0f), rotation);\n            transform.set_rotation(Vec3(1.0f, 0.0f, 0.0f), rotation.x);\n            transform.set_rotation(Vec3(0.0f, 1.0f, 0.0f), rotation.y);\n            transform.set_rotation(Vec3(0.0f, 0.0f, 1.0f), rotation.z);\n\n            //transform.set_rotation(transform.get_rotation());\n            //position = oldPos;\n            //transform.get_rotation();\n            //instance->set_transform(transform);\n\n\n            Transform new_transform( Vec3( position_array[0],\n                                           position_array[1],\n                                           position_array[2] ),\n                                /* temp */ transform.get_rotation(),\n                                     Vec3( scale_array[0],\n                                           scale_array[1],\n                                           scale_array[2] ) );\n\n            //Transform new_transform(Vec3(0.0f, 0.0f,0.0f));\n           ////new_transform.set_rotation(Transform::make_rotation(,));\n            //instance->set_transform(new_transform);\n            //new_transform.set_position(Vec3(position_array[0],\n            //   position_array[1],\n            //   position_array[2]));\n\n            instance->set_transform(new_transform);\n\n         }\n         ++i; // increment counter\n      }\n   } ImGui::End(); // end our Inspection window\n}\n\nvoid SceneManager::set_shadowcasting(SharedPtr<Shadowcaster> light)\n{\n   //TODO: If-statement to check validity of light, is it directional?\n   use_depth_map_FBO();\n\n   Uint32 depthMap, width, height;\n   glGenTextures(1, &depthMap);\n\n   width  = 1024;\n   height = 1024; //TODO: Enable SetSize of Width and height\n\n   glBindTexture(GL_TEXTURE_2D, depthMap);\n\n   glTexImage2D(GL_TEXTURE_2D,\n      0,\n      GL_DEPTH_COMPONENT,\n      width,\n      height,\n      0,\n      GL_DEPTH_COMPONENT,\n      GL_FLOAT,\n      NULL);\n\n   glTexParameteri(GL_TEXTURE_2D,\n      GL_TEXTURE_MIN_FILTER,\n      GL_NEAREST);\n\n   glTexParameteri(GL_TEXTURE_2D,\n      GL_TEXTURE_MAG_FILTER,\n      GL_NEAREST);\n\n   glTexParameteri(GL_TEXTURE_2D,\n      GL_TEXTURE_WRAP_S,\n      GL_CLAMP_TO_BORDER);\n\n   glTexParameteri(GL_TEXTURE_2D,\n      GL_TEXTURE_WRAP_T,\n      GL_CLAMP_TO_BORDER);\n\n//   glTexParameteri(GL_TEXTURE_2D,\n//      GL_CLAMP_TO_BORDER, //  LOWE!\n//      GL_CLAMP_TO_BORDER);\n\n   float borderColor[] = { 0.0,0.0,0.0, 0.0 };\n   glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);\n\n   //Uint32 AttatchmentNmbr = _shadow_maps.size();\n\n   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);\n   glDrawBuffer(GL_NONE);\n   glReadBuffer(GL_NONE);\n\n   _shadow_maps.emplace(light, depthMap);\n   glBindFramebuffer(GL_FRAMEBUFFER, 0);\n}\n\nvoid SceneManager::_init_depth_map_FBO()\n{\n   glGenFramebuffers(1, &_depth_map_FBO_id);\n}\n\nvoid SceneManager::use_depth_map_FBO()\n{\n   glBindFramebuffer(GL_FRAMEBUFFER, _depth_map_FBO_id);\n}\n\nvoid SceneManager::update_shadowmap()\n{\n   if (_shadow_maps.size() == 0) {\n      return;\n   }\n\n   //glBindFramebuffer(GL_FRAMEBUFFER, this->_depth_map_FBO_id);\n   use_depth_map_FBO();\n   glUseProgram(_shadow_depth_shader->get_location());\n\n   GLuint count = 0;\n   GLint oldSize[4];\n   glGetIntegerv(GL_VIEWPORT, oldSize);\n\n\n   for (auto &e : _shadow_maps) {\n      //_shadowcasters[i]\n      //send lightMatrix to\n      glUniformMatrix4fv(\n         glGetUniformLocation(_shadow_depth_shader->get_location(),\n            \"lightmatrix\"),\n         1,\n         GL_FALSE,\n         glm::value_ptr(e.first->get_matrix()));\n\n      glViewport(0, 0, 1024, 1024);//TODO: do not hardcode, decide based on Shadowcaster\n\n\n      glClear(GL_DEPTH_BUFFER_BIT);\n\n      //TODO: Increment GL_TEXTURE\n      //glActiveTexture(GL_TEXTURE0/*+ count*/);\n\n      //Render from light pov\n      for (auto &instance : _instances) {\n         if (!instance.expired()) {\n            SharedPtr<ShaderProgram> previous = instance.lock()->get_shader_program();\n            instance.lock()->set_shader_program(this->_shadow_depth_shader);\n            instance.lock()->draw();\n            instance.lock()->set_shader_program(previous);\n         }\n      }\n\n      count++;\n   }\n   glBindFramebuffer(GL_FRAMEBUFFER, 0);\n   glViewport(0, 0, oldSize[2], oldSize[3]);\n\n}\n\nSceneManager::SceneManager( SharedPtr<ShaderProgram> geo_pass,\n                            SharedPtr<ShaderProgram> light_pass,\n                            SharedPtr<ShaderProgram> shadow_depth )\n:\n   _lighting_shader_program ( light_pass   ),\n   _geometry_shader_program ( geo_pass     ),\n   _shadow_depth_shader     ( shadow_depth ),\n   _num_lights              ( 0 )\n{\n   _init_depth_map_FBO();\n}\n\n//SceneManager::SceneManager( SharedPtr<ShaderProgram> geometry_pass,\n//                            SharedPtr<ShaderProgram> lighting_pass )\n//{\n//   _geometry_shader_program = geometry_pass;\n//   _lighting_shader_program = lighting_pass;\n//}\n\n// TODO: refactor light instances into classes that RAII wrap their lifetimes\n\n// NOTE! should only be used by Light's constructor (TODO: private+friend?)\n/*\nvoid SceneManager::add_light( Uint64 id, LightData data ) {\n   _light_data[_num_lights] = data;\n   _ids[_num_lights]        = id;\n   ++_num_lights; // increment counter\n}\n*/\n\n/*\nLightData SceneManager::get_light_data( Uint64 id ) const {\n   auto index = _find_light_index(id);\n   return _light_data[index];\n}\n*/\n\n/*\nvoid SceneManager::set_light_data( Uint64 id, LightData data ) {\n   auto index = _find_light_index(id);\n   _light_data[index] = data;\n}*/\n\n// NOTE! should only be used by Light's destructor (TODO: private+friend?)\n/*\nvoid SceneManager::remove_light( Uint64 id ) {\n   auto index = _find_light_index(id);\n\n   --_num_lights; // decrement counter\n\n   // swap target element with last element\n   // (the removed item will be moved out of the active partition of the array)\n   std::swap( _light_data[index], _light_data[_num_lights] );\n   std::swap(        _ids[index],        _ids[_num_lights] );\n}\n*/\n\n/*\nUint32 SceneManager::_find_light_index( Uint64 id ) const {\n   auto index = -1;\n   // find index of target id\n   //for ( auto i = 0;  index < _num_lights;  ++index )\n   //   if ( _ids[i] == id)\n   //      index = i;\n\n   for ( auto i = 0; i < _num_lights; ++i )\n      if ( _ids[i] == id )\n         index = i;\n\n   //TODO:P Should this assert be here with these conditions?\n   assert( index != -1 && \"Invalid index; no match.\" );\n   return index;\n}\n*/\n\nvoid SceneManager::_lights_to_gpu() {\n   auto lighting_pass_loc = _lighting_shader_program->get_location();\n\n   glUniform1ui( glGetUniformLocation( lighting_pass_loc, \"num_lights\" ),\n                _num_lights );\n\n   for ( Uint32 i = 0;  i < _num_lights;  ++i ) {\n      auto light = _light_data[i]; // light data of light at index 'i'\n      auto str_i = std::to_string(i); // index 'i' as String\n\n      glUniform1ui( glGetUniformLocation( lighting_pass_loc, (\"lights[\"+str_i+\"].type\").c_str() ),\n                    light.type );\n\n      glUniform3fv( glGetUniformLocation( lighting_pass_loc, (\"lights[\"+str_i+\"].dir\").c_str() ),\n                    1,\n                    glm::value_ptr(light.direction) );\n\n      glUniform3fv( glGetUniformLocation( lighting_pass_loc, (\"lights[\"+str_i+\"].pos\").c_str() ),\n                    1,\n                    glm::value_ptr(light.position) );\n\n      glUniform3fv( glGetUniformLocation( lighting_pass_loc, (\"lights[\"+str_i+\"].rgb\").c_str() ),\n                    1,\n                    glm::value_ptr(light.color) );\n\n      glUniform1f( glGetUniformLocation( lighting_pass_loc, (\"lights[\"+str_i+\"].intensity\").c_str() ),\n                   light.intensity );\n\n      glUniform1f( glGetUniformLocation( lighting_pass_loc, (\"lights[\"+str_i+\"].radius\").c_str() ),\n                   light.radius );\n\n      glUniform1f( glGetUniformLocation( lighting_pass_loc, (\"lights[\"+str_i+\"].degree\").c_str() ),\n                   light.degree );\n\n      glUniform1f( glGetUniformLocation( lighting_pass_loc, (\"lights[\"+str_i+\"].specularity\").c_str() ),\n                   light.specularity );\n   }\n\n   glUniform1ui( glGetUniformLocation( lighting_pass_loc, \"num_lights\"),\n                 _num_lights );\n\n   glUniform1ui( glGetUniformLocation( lighting_pass_loc, \"render_mode\"),\n                 (Uint32)config.render_mode );\n}\n\nUint32 SceneManager::get_object_id_at_pixel(Uint32 x, Uint32 y, Viewport &view)\n{\n\tglBindFramebuffer(GL_READ_FRAMEBUFFER, view.get_g_buffer().buffer_loc);\n\tglReadBuffer(GL_COLOR_ATTACHMENT5);\n\n\n//\tUint32 pixel_info[4]{};\n//\t//struct pixel_info_struct\n//\t//{\n//\t//\tint x;\n//\t//\tint y;\n//\t//\tint z;\n//\t//\tint w;\n//\t//};\n//\t//pixel_info_struct pixel_info;\n//\n//\tglReadPixels(x, y, 1, 1, GL_RGBA, GL_UNSIGNED_INT, (void*)&pixel_info);\n//\n//\tUint32 obj_id = (pixel_info[0] & 0xFF << 24)\n//                 + (pixel_info[1] & 0xFF << 16)\n//                 + (pixel_info[2] & 0xFF <<  8)\n//                 + (pixel_info[3] & 0xFF <<  0); // TODO: validate that we get the correct ids\n\n\tUint8 pixel_info[4] {};\n\n\tglReadPixels( x, y, 1, 1, GL_RGBA8, GL_UNSIGNED_BYTE, &pixel_info );\n\n\tUint32 obj_id = ( (pixel_info[0] & 0xFF) << 24 )\n                 + ( (pixel_info[1] & 0xFF) << 16 )\n                 + ( (pixel_info[2] & 0xFF) <<  8 )\n                 + ( (pixel_info[3] & 0xFF) <<  0 );\n\n\treturn obj_id;\n}\n\nSharedPtr<ModelInstance> SceneManager::get_instance_ptr( Uint32 obj_id ) {\n\tfor ( auto &e : _instances ) {\n\t\tif ( !e.expired() ) {\n\t\t\tauto e_ptr = e.lock();\n\t\t\tif ( e_ptr->id == obj_id )\n\t\t\t\treturn e_ptr;\n\t\t}\n\t}\n\tassert( false && \"[ERROR] Instance of id no longer exists.\" );\n}\n\n\n\n/*\n   lights[0] = LightData{ LightType::point,\n                          Vec3(0.0f,   0.0f,   0.0f),\n                          Vec3(10.0f,  10.0f,  10.0f),\n                          Vec3(1.0f,   0.0f,   0.0f),\n                           1.0,\n                          14.0,\n                           0.0,\n                           1.0 };\n\n   lights[1] = LightData{ LightType::point,\n                          Vec3(0.0f,  0.0f,  0.0f),\n                          Vec3(1.0f,  4.0f,  5.0f),\n                          Vec3(1.0f,  1.0f,  0.0f),\n                          1.0,\n                          7.0,\n                          0.0,\n                          1.0 };\n\n   lights[2] = LightData{ LightType::point,\n                          Vec3(0.0f,  0.0f,  0.0f),\n                          Vec3(2.0f,  1.0f,  5.0f),\n                          Vec3(1.0f,  0.0f,  1.0f),\n                           1.0,\n                          17.0,\n                           0.0,\n                           1.0 };\n\n   lights[3] = LightData{ LightType::point,\n                          Vec3(0.0f,  0.0f,  0.0f),\n                          Vec3(1.0f,  5.0f,  6.0f),\n                          Vec3(0.0f,  1.0f,  0.0f),\n                           1.0,\n                          11.0,\n                           0.0,\n                           1.0 };\n\n   lights[4] = LightData{ LightType::point,\n                          Vec3(0.0f,  0.0f,  1.0f),\n                          Vec3(3.0f,  3.0f,  1.0f),\n                          Vec3(0.0f,  1.0f,  1.0f),\n                          1.0,\n                          2.0,\n                          0.0,\n                          1.0 };\n\n   lights[5] = LightData{ LightType::point,\n                          Vec3(0.0f,  0.0f,   0.0f),\n                          Vec3(1.0f,  2.0f,  10.0f),\n                          Vec3(0.0f,  0.0f,   1.0f),\n                          1.0,\n                          1.0,\n                          0.0,\n                          1.0 };\n\n   lights[6] = LightData{ LightType::point,\n                          Vec3(0.0f,  0.0f,  0.0f),\n                          Vec3(10.0f,  0.0f,  5.0f),\n                          Vec3(1.0f,  1.0f,  1.0f),\n                          1.0,\n                          7.0,\n                          0.0,\n                          1.0 };\n\n   lights[7] = LightData{ LightType::point,\n                          Vec3(0.0f,  0.0f,   0.0f),\n                          Vec3(10.0f,  5.0f,  10.0f),\n                          Vec3(1.0f,  0.3f,   0.5f),\n                           1.0,\n                          17.0,\n                           0.0,\n                           1.0 };*/\n",
-			"file": "src/SceneManager.cpp",
-			"file_size": 21834,
-			"file_write_time": 131960270855000235,
+			"file": "dat/shaders/particle_system.frag",
 			"settings":
 			{
-				"buffer_size": 21842,
+				"buffer_size": 806,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "/home/falk/.config/sublime-text-3/Packages/User/SublimeGDB.sublime-settings",
+			"file": "dat/shaders/particle_system.geom",
 			"settings":
 			{
-				"buffer_size": 293,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "inc/glm/detail/type_vec3.inl",
-			"settings":
-			{
-				"buffer_size": 27209,
+				"buffer_size": 774,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "/home/falk/.config/sublime-text-3/Packages/SublimeGDB/SublimeGDB.sublime-settings",
+			"file": "dat/shaders/particle_system.vert",
 			"settings":
 			{
-				"buffer_size": 7374,
-				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"contents": "\n  UNSTAGED CHANGES\n\n--\ndiff --cc imgui.ini\nindex d372839,0de2fe9..0000000\n--- a/imgui.ini\n+++ b/imgui.ini\n@@@ -34,7 -34,7 +34,12 @@@ Size=267,7\n  Collapsed=0\n  \n  [Window][Lightsource:]\n++<<<<<<< HEAD\n +Pos=691,15\n +Size=353,212\n++=======\n+ Pos=15,109\n+ Size=352,212\n++>>>>>>> 87c0c6995a0f481cdbf53a8b55d16899ffde9834\n  Collapsed=0\n  \n",
-			"settings":
-			{
-				"buffer_size": 336,
-				"line_ending": "Unix",
-				"name": "DIFF: DV1568_3DProjekt",
-				"read_only": true,
-				"scratch": true
-			}
-		},
-		{
-			"file": "imgui.ini",
-			"settings":
-			{
-				"buffer_size": 1057,
-				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "/usr/include/c++/8/ext/new_allocator.h",
-			"settings":
-			{
-				"buffer_size": 4805,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/SceneManager.h",
-			"settings":
-			{
-				"buffer_size": 3483,
-				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/ModelInstance.cpp",
-			"settings":
-			{
-				"buffer_size": 1359,
-				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "dat/shaders/g_buffer.frag",
-			"settings":
-			{
-				"buffer_size": 1003,
-				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "dat/shaders/shadow_depth.frag",
-			"settings":
-			{
-				"buffer_size": 166,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "dat/shaders/g_buffer.vert",
-			"settings":
-			{
-				"buffer_size": 1001,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/Light.cpp",
-			"settings":
-			{
-				"buffer_size": 2754,
-				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/debug.h",
-			"settings":
-			{
-				"buffer_size": 249,
-				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/debug.cpp",
-			"settings":
-			{
-				"buffer_size": 4641,
-				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/misc/ImGui/imgui.h",
-			"settings":
-			{
-				"buffer_size": 202443,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/Light.h",
-			"settings":
-			{
-				"buffer_size": 5042,
-				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "dat/shaders/shadow_depth.vert",
-			"settings":
-			{
-				"buffer_size": 201,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "dat/shaders/lightSha.frag",
-			"settings":
-			{
-				"buffer_size": 8117,
+				"buffer_size": 2041,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -292,80 +155,9 @@
 			"file": "src/main.cpp",
 			"settings":
 			{
-				"buffer_size": 32133,
+				"buffer_size": 32324,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/Config.h",
-			"settings":
-			{
-				"buffer_size": 2017,
-				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/Transform.cpp",
-			"settings":
-			{
-				"buffer_size": 13418,
-				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/Transform.h",
-			"settings":
-			{
-				"buffer_size": 4008,
-				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"contents": "",
-			"settings":
-			{
-				"buffer_size": 0,
-				"line_ending": "Unix",
-				"name": "GDB Variables",
-				"read_only": true,
-				"scratch": true
-			}
-		},
-		{
-			"contents": "",
-			"settings":
-			{
-				"buffer_size": 0,
-				"line_ending": "Unix",
-				"name": "GDB Callstack",
-				"read_only": true,
-				"scratch": true
-			}
-		},
-		{
-			"contents": "-1 - watch: \n   \n1 - /home/falk/Code/DV1568_3DProjekt/src/SceneManager.cpp:72\n",
-			"settings":
-			{
-				"buffer_size": 78,
-				"line_ending": "Unix",
-				"name": "GDB Breakpoints",
-				"read_only": true,
-				"scratch": true
-			}
-		},
-		{
-			"contents": "",
-			"settings":
-			{
-				"buffer_size": 0,
-				"line_ending": "Unix",
-				"name": "GDB Console",
-				"read_only": true,
-				"scratch": true
 			}
 		}
 	],
@@ -417,11 +209,11 @@
 			],
 			[
 				"Packages/Makefile/Make.sublime-build",
-				"Remake"
+				""
 			]
 		]
 	],
-	"build_varint": "",
+	"build_varint": "Remake",
 	"command_palette":
 	{
 		"height": 0.0,
@@ -429,32 +221,44 @@
 		"selected_items":
 		[
 			[
-				"push",
-				"git: push"
+				"c++",
+				"Set Syntax: C++"
 			],
 			[
-				"commit",
-				"git: commit including unstaged files"
+				"synta",
+				"Set Syntax: C++"
+			],
+			[
+				"package",
+				"Package Control: List Packages"
 			],
 			[
 				"git push",
 				"git: push"
 			],
 			[
-				"diff",
-				"git: diff"
+				"pull",
+				"git: pull"
 			],
 			[
 				"git pull",
 				"git: pull"
 			],
 			[
-				"pull",
-				"git: pull"
+				"push",
+				"git: push"
 			],
 			[
 				"git commit",
 				"git: commit including unstaged files"
+			],
+			[
+				"commit",
+				"git: commit including unstaged files"
+			],
+			[
+				"diff",
+				"git: diff"
 			],
 			[
 				"gdb",
@@ -471,10 +275,6 @@
 			[
 				"lsp",
 				"LSP: Restart Servers"
-			],
-			[
-				"c++",
-				"Set Syntax: C++"
 			],
 			[
 				"git comm",
@@ -573,10 +373,6 @@
 				"Convert Case: Upper Case"
 			],
 			[
-				"package",
-				"Package Control: Remove Package"
-			],
-			[
 				"vim",
 				"ActualVim: Disable (Global)"
 			],
@@ -635,56 +431,63 @@
 	],
 	"file_history":
 	[
+		"/home/falk/Code/DV1568_3DProjekt/src/Viewport.cpp",
+		"/home/falk/Code/DV1568_3DProjekt/src/Viewport.h",
+		"/home/falk/Code/DV1568_3DProjekt/src/Transform.h",
+		"/home/falk/Code/DV1568_3DProjekt/dat/shaders/g_buffer.geom",
+		"/home/falk/Code/DV1568_3DProjekt/dat/shaders/g_buffer.frag",
+		"/home/falk/Code/DV1568_3DProjekt/src/main.cpp",
+		"/home/falk/Code/DV1568_3DProjekt/Makefile",
+		"/home/falk/Code/DV1568_3DProjekt/doc/TODO.md",
+		"/home/falk/Code/DV1568_3DProjekt/dat/shaders/g_buffer.vert",
+		"/home/falk/Code/DV1568_3DProjekt/src/SceneManager.cpp",
+		"/home/falk/Code/DV1568_3DProjekt/dat/shaders/particle_system.frag",
+		"/home/falk/Code/DV1568_3DProjekt/dat/shaders/particle_system.geom",
+		"/home/falk/Code/DV1568_3DProjekt/src/Texture.h",
+		"/home/falk/Code/DV1568_3DProjekt/src/Config.h",
+		"/home/falk/Code/DV1568_3DProjekt/src/misc/defs.h",
+		"/home/falk/Code/DV1568_3DProjekt/src/ParticleSystem.cpp",
+		"/home/falk/Code/DV1568_3DProjekt/src/ParticleSystem.h",
+		"/home/falk/Code/DV1568_3DProjekt/dat/shaders/particle_system.vert",
+		"/home/falk/Code/DV1568_3DProjekt/inc/glm/detail/type_vec3.inl",
+		"/home/falk/.config/sublime-text-3/Packages/SublimeGDB/SublimeGDB.sublime-settings",
+		"/home/falk/Code/DV1568_3DProjekt/imgui.ini",
+		"/usr/include/c++/8/ext/new_allocator.h",
+		"/home/falk/Code/DV1568_3DProjekt/src/SceneManager.h",
+		"/home/falk/Code/DV1568_3DProjekt/src/ModelInstance.cpp",
+		"/home/falk/Code/DV1568_3DProjekt/dat/shaders/shadow_depth.frag",
+		"/home/falk/Code/DV1568_3DProjekt/src/Light.cpp",
+		"/home/falk/Code/DV1568_3DProjekt/src/debug.h",
+		"/home/falk/Code/DV1568_3DProjekt/src/debug.cpp",
+		"/home/falk/Code/DV1568_3DProjekt/src/ShaderProgram.cpp",
+		"/home/falk/Code/DV1568_3DProjekt/src/misc/ImGui/imgui.h",
+		"/home/falk/Code/DV1568_3DProjekt/src/Light.h",
+		"/home/falk/Code/DV1568_3DProjekt/dat/shaders/shadow_depth.vert",
+		"/home/falk/Code/DV1568_3DProjekt/dat/shaders/lightSha.frag",
+		"/home/falk/Code/DV1568_3DProjekt/src/Transform.cpp",
+		"/home/falk/.config/sublime-text-3/Packages/User/SublimeGDB.sublime-settings",
 		"/home/falk/.config/sublime-text-3/Packages/User/Default (Linux).sublime-keymap",
 		"/home/falk/.config/sublime-text-3/Packages/SublimeGDB/Default.sublime-keymap",
-		"/home/falk/Code/DV1568_3DProjekt/src/Transform.cpp",
-		"/home/falk/Code/DV1568_3DProjekt/src/Transform.h",
-		"/home/falk/Code/DV1568_3DProjekt/src/Viewport.h",
-		"/home/falk/Code/DV1568_3DProjekt/src/main.cpp",
-		"/home/falk/Code/DV1568_3DProjekt/src/debug.cpp",
-		"/home/falk/Code/DV1568_3DProjekt/src/Viewport.cpp",
-		"/home/falk/Code/DV1568_3DProjekt/src/misc/defs.h",
-		"/home/falk/Code/DV1568_3DProjekt/src/SceneManager.cpp",
-		"/home/falk/Code/DV1568_3DProjekt/src/SceneManager.h",
-		"/home/falk/Code/DV1568_3DProjekt/src/Light.cpp",
-		"/home/falk/.config/sublime-text-3/Packages/SublimeGDB/SublimeGDB.sublime-settings",
-		"/home/falk/Code/DV1568_3DProjekt/src/Light.h",
-		"/home/falk/Code/DV1568_3DProjekt/src/ShaderProgram.cpp",
 		"/home/falk/Code/DV1568_3DProjekt/src/ShaderProgram.h",
-		"/home/falk/Code/DV1568_3DProjekt/imgui.ini",
-		"/home/falk/Code/DV1568_3DProjekt/Makefile",
-		"/home/falk/Code/DV1568_3DProjekt/dat/shaders/lightSha.frag",
-		"/home/falk/.config/sublime-text-3/Packages/User/SublimeGDB.sublime-settings",
 		"/home/falk/Code/DV1568_3DProjekt/src/shadowcasterDebug.cpp",
-		"/home/falk/Code/DV1568_3DProjekt/dat/shaders/g_buffer.frag",
-		"/home/falk/Code/DV1568_3DProjekt/dat/shaders/g_buffer.geom",
-		"/home/falk/Code/DV1568_3DProjekt/dat/shaders/g_buffer.vert",
-		"/home/falk/Code/DV1568_3DProjekt/src/ModelInstance.cpp",
 		"/home/falk/Code/DV1568_3DProjekt/dat/shaders/lightSha.vert",
 		"/home/falk/Code/DV1568_3DProjekt/dat/shaders/New Text Document.txt",
 		"/home/falk/Code/DV1568_3DProjekt/src/ModelInstance.h",
 		"/home/falk/Code/DV1568_3DProjekt/3D_Project.sublime-project",
 		"/home/falk/Code/DV1568_3DProjekt/src/Shadowcaster.cpp",
 		"/home/falk/Code/DV1568_3DProjekt/inc/glm/ext/matrix_transform.inl",
-		"/home/falk/Code/DV1568_3DProjekt/inc/glm/detail/type_vec3.inl",
 		"/media/falk/Astrala/code/sandbox/main.cpp",
 		"/usr/include/c++/8/functional",
 		"/home/falk/Code/DV1568_3DProjekt/src/ShaderManager.cpp",
 		"/home/falk/Code/DV1568_3DProjekt/src/Shadowcaster.h",
-		"/home/falk/Code/DV1568_3DProjekt/src/Texture.h",
 		"/home/falk/Code/DV1568_3DProjekt/src/ShaderManager.h",
-		"/home/falk/Code/DV1568_3DProjekt/doc/TODO.md",
 		"/home/falk/Code/DV1568_3DProjekt/dat/models/ape.mtl",
-		"/home/falk/Code/DV1568_3DProjekt/src/debug.h",
 		"/home/falk/Code/DV1568_3DProjekt/src/Mesh.cpp",
 		"/home/falk/Code/DV1568_3DProjekt/src/Model.cpp",
-		"/home/falk/Code/DV1568_3DProjekt/src/misc/ImGui/imgui.h",
 		"/home/falk/Code/DV1568_3DProjekt/inc/glm/integer.hpp",
 		"/home/falk/Code/DV1568_3DProjekt/src/Texture.cpp",
 		"/home/falk/Code/DV1568_3DProjekt/inc/GL/glew.h",
 		"/home/falk/Code/DV1568_3DProjekt/dat/shadersMY/lightSha.frag",
-		"/home/falk/Code/DV1568_3DProjekt/dat/shaders/shadow_depth.vert",
-		"/home/falk/Code/DV1568_3DProjekt/src/Config.h",
 		"/home/falk/Code/OpenGL/main.cpp",
 		"/home/falk/Documents/Fysik_001.md",
 		"/home/falk/3D_Project/src/main.cpp",
@@ -755,18 +558,11 @@
 		"/home/falk/code/osdev/bareBones/defs.h",
 		"/home/falk/code/osdev/bareBones/x86.h",
 		"/home/falk/code/osdev/ syscall.txt",
-		"/home/falk/code/osdev/bareBones/Makefile",
-		"/home/falk/code/osdev/bareBones/makePrefix.bash",
-		"/home/falk/code/osdev/bareBones/makeBootp.bash",
-		"/home/falk/code/osdev/bareBones/init.c",
-		"/home/falk/code/osdev/bareBones/ints.c",
-		"/home/falk/code/osdev/bareBones/tickhandler.c",
-		"/home/falk/code/osdev/bareBones/termhandler.c",
-		"/home/falk/code/osdev/bareBones/___window_system.c"
+		"/home/falk/code/osdev/bareBones/Makefile"
 	],
 	"find":
 	{
-		"height": 32.0
+		"height": 39.0
 	},
 	"find_in_files":
 	{
@@ -782,6 +578,9 @@
 		"case_sensitive": true,
 		"find_history":
 		[
+			"glVertexAttribPointer",
+			"glUseProgram",
+			"ImGui::Begin",
 			"color",
 			"intens",
 			"emit_rgb",
@@ -827,1052 +626,89 @@
 	"groups":
 	[
 		{
-			"selected": 2,
+			"selected": 5,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "src/Viewport.cpp",
+					"file": "src/ParticleSystem.cpp",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 12101,
+						"buffer_size": 10449,
 						"regions":
 						{
-						},
-						"selection":
-						[
-							[
-								10275,
-								10275
-							]
-						],
-						"settings":
-						{
-							"color_helper.box_height": 22,
-							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
-							"color_helper.file_palette":
-							[
-							],
-							"color_helper.scan":
-							{
-								"current_ext": ".cpp",
-								"current_syntax": "C++/C++",
-								"enabled": false,
-								"last_updated": 1551551479.47
-							},
-							"git_gutter_is_enabled": true,
-							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
-							"lsp_language":
-							{
-								"clangd": "cpp"
-							},
-							"markdonw_live_preview_last_run": 1551534824.48,
-							"show_definitions": false,
-							"syntax": "Packages/C++/C++.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 7361.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 15,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1053,
-						"regions":
-						{
-							"match":
-							{
-								"flags": 112,
-								"regions":
-								[
-									[
-										262,
-										282
-									],
-									[
-										545,
-										565
-									],
-									[
-										907,
-										918
-									]
-								],
-								"scope": ""
-							}
-						},
-						"selection":
-						[
-							[
-								215,
-								215
-							]
-						],
-						"settings":
-						{
-							"color_helper.box_height": 22,
-							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
-							"color_helper.file_palette":
-							[
-							],
-							"color_helper.scan":
-							{
-								"current_ext": null,
-								"current_syntax": "Default/Find Results",
-								"enabled": false,
-								"last_updated": 1551551479.47
-							},
-							"detect_indentation": false,
-							"git_gutter_is_enabled": false,
-							"line_numbers": false,
-							"output_tag": 2,
-							"result_base_dir": "",
-							"result_file_regex": "^([^ \t].*):$",
-							"result_line_regex": "^ +([0-9]+):",
-							"scroll_past_end": true,
-							"syntax": "Packages/Default/Find Results.hidden-tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 14,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "src/SceneManager.cpp",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 21842,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2990,
-								2990
-							]
-						],
-						"settings":
-						{
-							"auto_complete_triggers":
-							[
-								{
-									"characters": "<",
-									"selector": "text.html"
-								},
-								{
-									"characters": ".>:",
-									"selector": "source.c++"
-								}
-							],
-							"color_helper.box_height": 22,
-							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
-							"color_helper.file_palette":
-							[
-							],
-							"color_helper.preview_meta":
-							{
-							},
-							"color_helper.scan":
-							{
-								"current_ext": ".cpp",
-								"current_syntax": "C++/C++",
-								"enabled": false,
-								"last_updated": 1551554925.55
-							},
-							"git_gutter_is_enabled": true,
-							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
-							"lsp_language":
-							{
-								"clangd": "cpp"
-							},
-							"markdonw_live_preview_last_run": 1551534831.37,
-							"show_definitions": false,
-							"syntax": "Packages/C++/C++.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 1581.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 0,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "/home/falk/.config/sublime-text-3/Packages/User/SublimeGDB.sublime-settings",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 293,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								293,
-								293
-							]
-						],
-						"settings":
-						{
-							"color_helper.box_height": 22,
-							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
-							"color_helper.file_palette":
-							[
-							],
-							"color_helper.preview_meta":
-							{
-							},
-							"color_helper.scan":
-							{
-								"current_ext": ".sublime-settings",
-								"current_syntax": "JavaScript/JSON",
-								"enabled": false,
-								"last_updated": 1551554925.55
-							},
-							"git_gutter_is_enabled": false,
-							"markdonw_live_preview_last_run": 1551554935.85,
-							"syntax": "Packages/JavaScript/JSON.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 7,
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "inc/glm/detail/type_vec3.inl",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 27209,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								8209,
-								8209
-							]
-						],
-						"settings":
-						{
-							"color_helper.box_height": 22,
-							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
-							"color_helper.file_palette":
-							[
-							],
-							"color_helper.preview_meta":
-							{
-							},
-							"color_helper.scan":
-							{
-								"current_ext": ".inl",
-								"current_syntax": "C++/C++",
-								"enabled": false,
-								"last_updated": 1551554925.55
-							},
-							"git_gutter_is_enabled": true,
-							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
-							"lsp_language":
-							{
-								"clangd": "cpp"
-							},
-							"markdonw_live_preview_last_run": 1551539495.04,
-							"show_definitions": false,
-							"syntax": "Packages/C++/C++.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 6300.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 5,
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "/home/falk/.config/sublime-text-3/Packages/SublimeGDB/SublimeGDB.sublime-settings",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 7374,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								5875,
-								5875
-							]
-						],
-						"settings":
-						{
-							"color_helper.box_height": 22,
-							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
-							"color_helper.file_palette":
-							[
-							],
-							"color_helper.preview_meta":
-							{
-							},
-							"color_helper.scan":
-							{
-								"current_ext": ".sublime-settings",
-								"current_syntax": "JavaScript/JSON",
-								"enabled": false,
-								"last_updated": 1551554925.55
-							},
-							"git_gutter_is_enabled": false,
-							"markdonw_live_preview_last_run": 1551554943.07,
-							"syntax": "Packages/JavaScript/JSON.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 2001.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 6,
-					"type": "text"
-				},
-				{
-					"buffer": 6,
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 336,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								101,
-								101
-							]
-						],
-						"settings":
-						{
-							"color_helper.box_height": 22,
-							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
-							"color_helper.file_palette":
-							[
-							],
-							"color_helper.scan":
-							{
-								"current_ext": null,
-								"current_syntax": "GitSavvy/syntax/diff_view",
-								"enabled": false,
-								"last_updated": 1551551479.47
-							},
-							"git_gutter_is_enabled": false,
-							"git_savvy.diff_view": true,
-							"git_savvy.diff_view.base_commit": null,
-							"git_savvy.diff_view.disable_stage": false,
-							"git_savvy.diff_view.history":
-							[
-							],
-							"git_savvy.diff_view.ignore_whitespace": false,
-							"git_savvy.diff_view.in_cached_mode": false,
-							"git_savvy.diff_view.just_hunked": "",
-							"git_savvy.diff_view.raw_diff": "diff --cc imgui.ini\nindex d372839,0de2fe9..0000000\n--- a/imgui.ini\n+++ b/imgui.ini\n@@@ -34,7 -34,7 +34,12 @@@ Size=267,7\n  Collapsed=0\n  \n  [Window][Lightsource:]\n++<<<<<<< HEAD\n +Pos=691,15\n +Size=353,212\n++=======\n+ Pos=15,109\n+ Size=352,212\n++>>>>>>> 87c0c6995a0f481cdbf53a8b55d16899ffde9834\n  Collapsed=0\n  \n",
-							"git_savvy.diff_view.show_diffstat": true,
-							"git_savvy.diff_view.show_word_diff": false,
-							"git_savvy.diff_view.target_commit": null,
-							"git_savvy.file_path": null,
-							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
-							"result_base_dir": "/home/falk/Code/DV1568_3DProjekt",
-							"result_file_regex": "^(?:\\s(?=.*\\s+\\|\\s+\\d+\\s)|--- a\\/|\\+{3} b\\/|diff .+b\\/)(\\S[^|]*?)(?:\\s+\\||$)",
-							"result_line_regex": "^@@ [^+]*\\+(\\d+)",
-							"syntax": "Packages/GitSavvy/syntax/diff_view.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 17,
-					"type": "text"
-				},
-				{
-					"buffer": 7,
-					"file": "imgui.ini",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1057,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								446,
-								446
-							]
-						],
-						"settings":
-						{
-							"color_helper.box_height": 13,
-							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
-							"color_helper.file_palette":
-							[
-							],
-							"color_helper.scan":
-							{
-								"current_ext": ".ini",
-								"current_syntax": "Text/Plain text",
-								"enabled": false,
-								"last_updated": 1551551479.47
-							},
-							"git_gutter_is_enabled": true,
-							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
-							"markdonw_live_preview_last_run": 1551552504.51,
-							"syntax": "Packages/Text/Plain text.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 420.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 16,
-					"type": "text"
-				},
-				{
-					"buffer": 8,
-					"file": "/usr/include/c++/8/ext/new_allocator.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 4805,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								4094,
-								4094
-							]
-						],
-						"settings":
-						{
-							"color_helper.box_height": 22,
-							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
-							"color_helper.file_palette":
-							[
-							],
-							"color_helper.scan":
-							{
-								"current_ext": ".h",
-								"current_syntax": "C++/C++",
-								"enabled": false,
-								"last_updated": 1551544983.36
-							},
-							"git_gutter_is_enabled": false,
-							"lsp_language":
-							{
-								"clangd": "cpp"
-							},
-							"markdonw_live_preview_last_run": 1551549668.81,
-							"show_definitions": false,
-							"syntax": "Packages/C++/C++.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 2850.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 20,
-					"type": "text"
-				},
-				{
-					"buffer": 9,
-					"file": "src/SceneManager.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 3483,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1617,
-								1617
-							]
-						],
-						"settings":
-						{
-							"color_helper.box_height": 22,
-							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
-							"color_helper.file_palette":
-							[
-							],
-							"color_helper.scan":
-							{
-								"current_ext": ".h",
-								"current_syntax": "C++/C++",
-								"enabled": false,
-								"last_updated": 1551553625.65
-							},
-							"git_gutter_is_enabled": true,
-							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
-							"lsp_language":
-							{
-								"clangd": "cpp"
-							},
-							"markdonw_live_preview_last_run": 1551549155.86,
-							"show_definitions": false,
-							"syntax": "Packages/C++/C++.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 690.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 12,
-					"type": "text"
-				},
-				{
-					"buffer": 10,
-					"file": "src/ModelInstance.cpp",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1359,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								56,
-								56
-							]
-						],
-						"settings":
-						{
-							"auto_complete_triggers":
-							[
-								{
-									"characters": "<",
-									"selector": "text.html"
-								},
-								{
-									"characters": ".>:",
-									"selector": "source.c++"
-								}
-							],
-							"color_helper.box_height": 22,
-							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
-							"color_helper.file_palette":
-							[
-							],
-							"color_helper.scan":
-							{
-								"current_ext": ".cpp",
-								"current_syntax": "C++/C++",
-								"enabled": false,
-								"last_updated": 1551554089.51
-							},
-							"git_gutter_is_enabled": true,
-							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
-							"lsp_language":
-							{
-								"clangd": "cpp"
-							},
-							"markdonw_live_preview_last_run": 1551535065.27,
-							"show_definitions": false,
-							"syntax": "Packages/C++/C++.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 8,
-					"type": "text"
-				},
-				{
-					"buffer": 11,
-					"file": "dat/shaders/g_buffer.frag",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1003,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								454,
-								454
-							]
-						],
-						"settings":
-						{
-							"color_helper.box_height": 22,
-							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
-							"color_helper.file_palette":
-							[
-							],
-							"color_helper.scan":
-							{
-								"current_ext": ".frag",
-								"current_syntax": "OpenGL Shading Language (GLSL)/GLSL",
-								"enabled": false,
-								"last_updated": 1551544983.36
-							},
-							"git_gutter_is_enabled": true,
-							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
-							"history_list_is_closing": true,
-							"markdonw_live_preview_last_run": 1551534838.16,
-							"syntax": "Packages/OpenGL Shading Language (GLSL)/GLSL.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 219.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 25,
-					"type": "text"
-				},
-				{
-					"buffer": 12,
-					"file": "dat/shaders/shadow_depth.frag",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 166,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"color_helper.box_height": 22,
-							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
-							"color_helper.file_palette":
-							[
-							],
-							"color_helper.scan":
-							{
-								"current_ext": ".frag",
-								"current_syntax": "OpenGL Shading Language (GLSL)/GLSL",
-								"enabled": false,
-								"last_updated": 1551544983.36
-							},
-							"git_gutter_is_enabled": true,
-							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
-							"markdonw_live_preview_last_run": 1551546828.64,
-							"syntax": "Packages/OpenGL Shading Language (GLSL)/GLSL.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 24,
-					"type": "text"
-				},
-				{
-					"buffer": 13,
-					"file": "dat/shaders/g_buffer.vert",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1001,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"color_helper.box_height": 22,
-							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
-							"color_helper.file_palette":
-							[
-							],
-							"color_helper.scan":
-							{
-								"current_ext": ".vert",
-								"current_syntax": "OpenGL Shading Language (GLSL)/GLSL",
-								"enabled": false,
-								"last_updated": 1551544983.36
-							},
-							"git_gutter_is_enabled": true,
-							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
-							"markdonw_live_preview_last_run": 1551546908.42,
-							"syntax": "Packages/OpenGL Shading Language (GLSL)/GLSL.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 276.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 21,
-					"type": "text"
-				},
-				{
-					"buffer": 14,
-					"file": "src/Light.cpp",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 2754,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1334,
-								1334
-							]
-						],
-						"settings":
-						{
-							"color_helper.box_height": 22,
-							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
-							"color_helper.file_palette":
-							[
-							],
-							"color_helper.scan":
-							{
-								"current_ext": ".cpp",
-								"current_syntax": "C++/C++",
-								"enabled": false,
-								"last_updated": 1551550656.12
-							},
-							"git_gutter_is_enabled": true,
-							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
-							"lsp_language":
-							{
-								"clangd": "cpp"
-							},
-							"markdonw_live_preview_last_run": 1551548829.65,
-							"show_definitions": false,
-							"syntax": "Packages/C++/C++.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 828.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 18,
-					"type": "text"
-				},
-				{
-					"buffer": 15,
-					"file": "src/debug.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 249,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								248,
-								248
-							]
-						],
-						"settings":
-						{
-							"auto_complete_triggers":
-							[
-								{
-									"characters": "<",
-									"selector": "text.html"
-								},
-								{
-									"characters": ".>:",
-									"selector": "source.c++"
-								}
-							],
-							"color_helper.box_height": 22,
-							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
-							"color_helper.file_palette":
-							[
-							],
-							"color_helper.scan":
-							{
-								"current_ext": ".h",
-								"current_syntax": "C++/C++",
-								"enabled": false,
-								"last_updated": 1551553625.65
-							},
-							"git_gutter_is_enabled": true,
-							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
-							"lsp_language":
-							{
-								"clangd": "cpp"
-							},
-							"markdonw_live_preview_last_run": 1551550304.99,
-							"show_definitions": false,
-							"syntax": "Packages/C++/C++.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 13,
-					"type": "text"
-				},
-				{
-					"buffer": 16,
-					"file": "src/debug.cpp",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 4641,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2013,
-								2013
-							]
-						],
-						"settings":
-						{
-							"auto_complete_triggers":
-							[
-								{
-									"characters": "<",
-									"selector": "text.html"
-								},
-								{
-									"characters": ".>:",
-									"selector": "source.c++"
-								}
-							],
-							"color_helper.box_height": 22,
-							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
-							"color_helper.file_palette":
-							[
-							],
-							"color_helper.scan":
-							{
-								"current_ext": ".cpp",
-								"current_syntax": "C++/C++",
-								"enabled": false,
-								"last_updated": 1551554089.51
-							},
-							"git_gutter_is_enabled": true,
-							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
-							"lsp_language":
-							{
-								"clangd": "cpp"
-							},
-							"markdonw_live_preview_last_run": 1551550310.85,
-							"show_definitions": false,
-							"syntax": "Packages/C++/C++.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 1301.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 10,
-					"type": "text"
-				},
-				{
-					"buffer": 17,
-					"file": "src/misc/ImGui/imgui.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 202443,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								189880,
-								189880
-							]
-						],
-						"settings":
-						{
-							"color_helper.box_height": 22,
-							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
-							"color_helper.file_palette":
-							[
-							],
-							"color_helper.scan":
-							{
-								"current_ext": ".h",
-								"current_syntax": "C++/C++",
-								"enabled": false,
-								"last_updated": 1551554089.51
-							},
-							"git_gutter_is_enabled": true,
-							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
-							"lsp_language":
-							{
-								"clangd": "cpp"
-							},
-							"markdonw_live_preview_last_run": 1551554331.63,
-							"show_definitions": false,
-							"syntax": "Packages/C++/C++.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 45073.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 9,
-					"type": "text"
-				},
-				{
-					"buffer": 18,
-					"file": "src/Light.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 5042,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								4274,
-								4274
-							]
-						],
-						"settings":
-						{
-							"color_helper.box_height": 22,
-							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
-							"color_helper.file_palette":
-							[
-							],
-							"color_helper.scan":
-							{
-								"current_ext": ".h",
-								"current_syntax": "C++/C++",
-								"enabled": false,
-								"last_updated": 1551550656.12
-							},
-							"git_gutter_is_enabled": true,
-							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
-							"lsp_language":
-							{
-								"clangd": "cpp"
-							},
-							"markdonw_live_preview_last_run": 1551548838.31,
-							"show_definitions": false,
-							"syntax": "Packages/C++/C++.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 3174.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 19,
-					"type": "text"
-				},
-				{
-					"buffer": 19,
-					"file": "dat/shaders/shadow_depth.vert",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 201,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								201,
-								201
-							]
-						],
-						"settings":
-						{
-							"color_helper.box_height": 22,
-							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
-							"color_helper.file_palette":
-							[
-							],
-							"color_helper.scan":
-							{
-								"current_ext": ".vert",
-								"current_syntax": "OpenGL Shading Language (GLSL)/GLSL",
-								"enabled": false,
-								"last_updated": 1551544983.36
-							},
-							"git_gutter_is_enabled": true,
-							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
-							"markdonw_live_preview_last_run": 1551546831.53,
-							"syntax": "Packages/OpenGL Shading Language (GLSL)/GLSL.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 22,
-					"type": "text"
-				},
-				{
-					"buffer": 20,
-					"file": "dat/shaders/lightSha.frag",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 8117,
-						"regions":
-						{
-							"col_FFC0CBFF":
+							"col_0000FFFF":
 							{
 								"flags": 16,
 								"regions":
 								[
 									[
-										8000,
-										8004
+										1220,
+										1224
 									]
 								],
-								"scope": "col_FFC0CBFF"
+								"scope": "col_0000FFFF"
 							},
-							"col_FFC0CBFF_icon":
+							"col_0000FFFF_icon":
 							{
 								"flags": 16,
-								"icon": "Packages/User/Color Highlight.cache/col_FFC0CBFF_circle.png",
+								"icon": "Packages/User/Color Highlight.cache/col_0000FFFF_circle.png",
 								"regions":
 								[
 									[
-										7947,
-										7947
+										1154,
+										1154
+									]
+								],
+								"scope": "col_gutter"
+							},
+							"col_008000FF":
+							{
+								"flags": 16,
+								"regions":
+								[
+									[
+										1148,
+										1153
+									]
+								],
+								"scope": "col_008000FF"
+							},
+							"col_008000FF_icon":
+							{
+								"flags": 16,
+								"icon": "Packages/User/Color Highlight.cache/col_008000FF_circle.png",
+								"regions":
+								[
+									[
+										1082,
+										1082
+									]
+								],
+								"scope": "col_gutter"
+							},
+							"col_FF0000FF":
+							{
+								"flags": 16,
+								"regions":
+								[
+									[
+										1078,
+										1081
+									]
+								],
+								"scope": "col_FF0000FF"
+							},
+							"col_FF0000FF_icon":
+							{
+								"flags": 16,
+								"icon": "Packages/User/Color Highlight.cache/col_FF0000FF_circle.png",
+								"regions":
+								[
+									[
+										1012,
+										1012
 									]
 								],
 								"scope": "col_gutter"
@@ -1881,376 +717,13 @@
 						"selection":
 						[
 							[
-								7712,
-								7712
+								8359,
+								8359
 							]
 						],
 						"settings":
 						{
-							"color_helper.box_height": 22,
-							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
-							"color_helper.file_palette":
-							[
-							],
-							"color_helper.scan":
-							{
-								"current_ext": ".frag",
-								"current_syntax": "OpenGL Shading Language (GLSL)/GLSL",
-								"enabled": false,
-								"last_updated": 1551544983.36
-							},
-							"git_gutter_is_enabled": true,
-							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
-							"markdonw_live_preview_last_run": 1551534842.29,
-							"syntax": "Packages/OpenGL Shading Language (GLSL)/GLSL.sublime-syntax",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 3312.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 23,
-					"type": "text"
-				},
-				{
-					"buffer": 21,
-					"file": "src/main.cpp",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 32133,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								28344,
-								28344
-							]
-						],
-						"settings":
-						{
-							"auto_complete_triggers":
-							[
-								{
-									"characters": "<",
-									"selector": "text.html"
-								},
-								{
-									"characters": ".>:",
-									"selector": "source.c++"
-								}
-							],
-							"color_helper.box_height": 22,
-							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
-							"color_helper.file_palette":
-							[
-							],
-							"color_helper.scan":
-							{
-								"current_ext": ".cpp",
-								"current_syntax": "C++/C++",
-								"enabled": false,
-								"last_updated": 1551554089.51
-							},
-							"git_gutter_is_enabled": true,
-							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
-							"lsp_language":
-							{
-								"clangd": "cpp"
-							},
-							"markdonw_live_preview_last_run": 1551534851.41,
-							"show_definitions": false,
-							"syntax": "Packages/C++/C++.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 16193.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 11,
-					"type": "text"
-				},
-				{
-					"buffer": 22,
-					"file": "src/Config.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 2017,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								385,
-								385
-							]
-						],
-						"settings":
-						{
-							"color_helper.box_height": 22,
-							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
-							"color_helper.file_palette":
-							[
-							],
-							"color_helper.scan":
-							{
-								"current_ext": ".h",
-								"current_syntax": "C++/C++",
-								"enabled": false,
-								"last_updated": 1551544983.36
-							},
-							"git_gutter_is_enabled": true,
-							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
-							"lsp_language":
-							{
-								"clangd": "cpp"
-							},
-							"markdonw_live_preview_last_run": 1551543155.88,
-							"show_definitions": false,
-							"syntax": "Packages/C++/C++.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 26,
-					"type": "text"
-				},
-				{
-					"buffer": 23,
-					"file": "src/Transform.cpp",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 13418,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								4183,
-								4183
-							]
-						],
-						"settings":
-						{
-							"auto_complete_triggers":
-							[
-								{
-									"characters": "<",
-									"selector": "text.html"
-								},
-								{
-									"characters": ".>:",
-									"selector": "source.c++"
-								}
-							],
-							"color_helper.box_height": 22,
-							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
-							"color_helper.file_palette":
-							[
-							],
-							"color_helper.scan":
-							{
-								"current_ext": ".cpp",
-								"current_syntax": "C++/C++",
-								"enabled": false,
-								"last_updated": 1551536036.23
-							},
-							"git_gutter_is_enabled": true,
-							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
-							"lsp_language":
-							{
-								"clangd": "cpp"
-							},
-							"markdonw_live_preview_last_run": 1551536940.43,
-							"show_definitions": false,
-							"syntax": "Packages/C++/C++.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 2799.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 28,
-					"type": "text"
-				},
-				{
-					"buffer": 24,
-					"file": "src/Transform.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 4008,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2510,
-								2510
-							]
-						],
-						"settings":
-						{
-							"auto_complete_triggers":
-							[
-								{
-									"characters": "<",
-									"selector": "text.html"
-								},
-								{
-									"characters": ".>:",
-									"selector": "source.c++"
-								}
-							],
-							"color_helper.box_height": 22,
-							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
-							"color_helper.file_palette":
-							[
-							],
-							"color_helper.scan":
-							{
-								"current_ext": ".h",
-								"current_syntax": "C++/C++",
-								"enabled": false,
-								"last_updated": 1551542999.22
-							},
-							"git_gutter_is_enabled": true,
-							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
-							"lsp_language":
-							{
-								"clangd": "cpp"
-							},
-							"markdonw_live_preview_last_run": 1551537166.04,
-							"show_definitions": false,
-							"syntax": "Packages/C++/C++.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 1656.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 27,
-					"type": "text"
-				}
-			]
-		},
-		{
-			"selected": 0,
-			"sheets":
-			[
-				{
-					"buffer": 25,
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 0,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"color_helper.file_palette":
-							[
-							],
-							"color_helper.scan":
-							{
-								"current_ext": null,
-								"current_syntax": "C++/C++",
-								"enabled": false,
-								"last_updated": 1551554925.55
-							},
-							"git_gutter_is_enabled": false,
-							"syntax": "Packages/C++/C++.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 3,
-					"type": "text"
-				}
-			]
-		},
-		{
-			"selected": 0,
-			"sheets":
-			[
-				{
-					"buffer": 26,
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 0,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"color_helper.file_palette":
-							[
-							],
-							"color_helper.scan":
-							{
-								"current_ext": null,
-								"current_syntax": "C++/C++",
-								"enabled": false,
-								"last_updated": 1551554925.55
-							},
-							"git_gutter_is_enabled": false,
-							"syntax": "Packages/C++/C++.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				}
-			]
-		},
-		{
-			"selected": 0,
-			"sheets":
-			[
-				{
-					"buffer": 27,
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 78,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								78,
-								78
-							]
-						],
-						"settings":
-						{
-							"color_helper.box_height": 13,
+							"color_helper.box_height": 16,
 							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
 							"color_helper.file_palette":
 							[
@@ -2260,34 +733,35 @@
 							},
 							"color_helper.scan":
 							{
-								"current_ext": null,
-								"current_syntax": "Text/Plain text",
+								"current_ext": ".cpp",
+								"current_syntax": "C++/C++",
 								"enabled": false,
-								"last_updated": 1551554925.55
+								"last_updated": 1551712646.65
 							},
-							"git_gutter_is_enabled": false,
-							"syntax": "Packages/Text/Plain text.tmLanguage",
-							"word_wrap": false
+							"git_gutter_is_enabled": true,
+							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
+							"lsp_language":
+							{
+								"clangd": "cpp"
+							},
+							"markdonw_live_preview_last_run": 1551733033.42,
+							"show_definitions": false,
+							"syntax": "Packages/C++/C++.sublime-syntax"
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 2331.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 4,
 					"type": "text"
-				}
-			]
-		},
-		{
-			"selected": 0,
-			"sheets":
-			[
+				},
 				{
-					"buffer": 28,
+					"buffer": 1,
+					"file": "src/ParticleSystem.h",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 0,
+						"buffer_size": 4476,
 						"regions":
 						{
 						},
@@ -2300,36 +774,259 @@
 						],
 						"settings":
 						{
+							"color_helper.box_height": 16,
+							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
 							"color_helper.file_palette":
 							[
 							],
+							"color_helper.preview_meta":
+							{
+							},
 							"color_helper.scan":
 							{
-								"current_ext": null,
-								"current_syntax": "Text/Plain text",
+								"current_ext": ".h",
+								"current_syntax": "C++/C++",
 								"enabled": false,
-								"last_updated": 1551554925.55
+								"last_updated": 1551712646.65
 							},
-							"git_gutter_is_enabled": false,
-							"syntax": "Packages/Text/Plain text.tmLanguage"
+							"git_gutter_is_enabled": true,
+							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
+							"lsp_language":
+							{
+								"clangd": "cpp"
+							},
+							"markdonw_live_preview_last_run": 1551733035.67,
+							"show_definitions": false,
+							"syntax": "Packages/C++/C++.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 408.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "dat/shaders/particle_system.frag",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 806,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								806,
+								806
+							]
+						],
+						"settings":
+						{
+							"color_helper.box_height": 16,
+							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
+							"color_helper.file_palette":
+							[
+							],
+							"color_helper.preview_meta":
+							{
+							},
+							"color_helper.scan":
+							{
+								"current_ext": ".frag",
+								"current_syntax": "OpenGL Shading Language (GLSL)/GLSL",
+								"enabled": false,
+								"last_updated": 1551712646.65
+							},
+							"git_gutter_is_enabled": true,
+							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
+							"markdonw_live_preview_last_run": 1551733037.44,
+							"syntax": "Packages/OpenGL Shading Language (GLSL)/GLSL.sublime-syntax"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "dat/shaders/particle_system.geom",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 774,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"color_helper.box_height": 16,
+							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
+							"color_helper.file_palette":
+							[
+							],
+							"color_helper.preview_meta":
+							{
+							},
+							"color_helper.scan":
+							{
+								"current_ext": ".geom",
+								"current_syntax": "OpenGL Shading Language (GLSL)/GLSL",
+								"enabled": false,
+								"last_updated": 1551712646.65
+							},
+							"git_gutter_is_enabled": true,
+							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
+							"markdonw_live_preview_last_run": 1551733047.43,
+							"syntax": "Packages/OpenGL Shading Language (GLSL)/GLSL.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "dat/shaders/particle_system.vert",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2041,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1231,
+								1231
+							]
+						],
+						"settings":
+						{
+							"color_helper.box_height": 16,
+							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
+							"color_helper.file_palette":
+							[
+							],
+							"color_helper.preview_meta":
+							{
+							},
+							"color_helper.scan":
+							{
+								"current_ext": ".vert",
+								"current_syntax": "OpenGL Shading Language (GLSL)/GLSL",
+								"enabled": false,
+								"last_updated": 1551712646.65
+							},
+							"git_gutter_is_enabled": true,
+							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
+							"markdonw_live_preview_last_run": 1551733049.75,
+							"syntax": "Packages/OpenGL Shading Language (GLSL)/GLSL.sublime-syntax",
+							"tab_size": 3,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "src/main.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 32324,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								25443,
+								25443
+							]
+						],
+						"settings":
+						{
+							"color_helper.box_height": 16,
+							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
+							"color_helper.file_palette":
+							[
+							],
+							"color_helper.preview_meta":
+							{
+							},
+							"color_helper.scan":
+							{
+								"current_ext": ".cpp",
+								"current_syntax": "C++/C++",
+								"enabled": false,
+								"last_updated": 1551712646.65
+							},
+							"git_gutter_is_enabled": true,
+							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
+							"lsp_language":
+							{
+								"clangd": "cpp"
+							},
+							"markdonw_live_preview_last_run": 1551737779.33,
+							"show_definitions": false,
+							"syntax": "Packages/C++/C++.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 10795.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
 					"type": "text"
 				}
+			]
+		},
+		{
+			"sheets":
+			[
+			]
+		},
+		{
+			"sheets":
+			[
+			]
+		},
+		{
+			"sheets":
+			[
+			]
+		},
+		{
+			"sheets":
+			[
 			]
 		}
 	],
 	"incremental_find":
 	{
-		"height": 32.0
+		"height": 26.0
 	},
 	"input":
 	{
-		"height": 46.0
+		"height": 48.0
 	},
 	"layout":
 	{
@@ -2370,13 +1067,13 @@
 		[
 			0.0,
 			0.33,
-			0.66,
+			0.973958333333,
 			1.0
 		],
 		"rows":
 		[
 			0.0,
-			0.75,
+			0.939467312349,
 			1.0
 		]
 	},
@@ -2391,11 +1088,11 @@
 	},
 	"output.diagnostics":
 	{
-		"height": 121.0
+		"height": 29.0
 	},
 	"output.exec":
 	{
-		"height": 282.0
+		"height": 261.0
 	},
 	"output.find_results":
 	{
@@ -2417,7 +1114,7 @@
 	"project": "3D_Project.sublime-project",
 	"replace":
 	{
-		"height": 60.0
+		"height": 48.0
 	},
 	"save_all_on_build": true,
 	"select_file":
@@ -2427,16 +1124,48 @@
 		"selected_items":
 		[
 			[
-				"scene",
+				"partic",
+				"dat/shaders/particle_system.vert"
+			],
+			[
+				"part",
+				"dat/shaders/particle_system.frag"
+			],
+			[
+				"scen",
 				"src/SceneManager.cpp"
 			],
 			[
-				"imgui",
-				"src/misc/ImGui/imgui.h"
+				"make",
+				"Makefile"
+			],
+			[
+				"sceneman",
+				"src/SceneManager.cpp"
+			],
+			[
+				"makef",
+				"Makefile"
 			],
 			[
 				"main",
 				"src/main.cpp"
+			],
+			[
+				"ShaderProgra",
+				"src/ShaderProgram.cpp"
+			],
+			[
+				"scene",
+				"src/SceneManager.cpp"
+			],
+			[
+				"confi",
+				"src/Config.h"
+			],
+			[
+				"imgui",
+				"src/misc/ImGui/imgui.h"
 			],
 			[
 				"debu",
@@ -2543,16 +1272,8 @@
 				"src/ShaderProgram.cpp"
 			],
 			[
-				"ShaderProgra",
-				"src/ShaderProgram.cpp"
-			],
-			[
 				"viewpo",
 				"src/Viewport.h"
-			],
-			[
-				"sceneman",
-				"src/SceneManager.cpp"
 			],
 			[
 				"",
@@ -2627,10 +1348,6 @@
 				"src/SceneManager.cpp"
 			],
 			[
-				"make",
-				"Makefile"
-			],
-			[
 				"modelinstance",
 				"src/ModelInstance.h"
 			]
@@ -2663,7 +1380,7 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 218.0,
+	"side_bar_width": 219.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{

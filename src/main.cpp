@@ -34,45 +34,44 @@ void APIENTRY glDebugOutput( GLenum        source,
 	                          GLenum        severity,
 	                          GLsizei       length,
 	                          const GLchar *message,
-	                          const void   *userParam )
-{
+	                          const void   *userParam ) {
 	// ignore non-significant error/warning codes
-	if (id == 131169 || id == 131185 || id == 131218 || id == 131204) return;
+	if ( id == 131169 || id == 131185 || id == 131218 || id == 131204 )
+      return;
 
-	std::cout << "---------------" << std::endl;
-	std::cout << "Debug message (" << id << "): " << message << std::endl;
+	std::cout << "--------------------\n";;
+	std::cout << "DEBUG MESSAGE (" << id << "): " << message << "\n";
 
-	switch (source)
-	{
-	case GL_DEBUG_SOURCE_API:             std::cout << "Source: API"; break;
-	case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   std::cout << "Source: Window System"; break;
-	case GL_DEBUG_SOURCE_SHADER_COMPILER: std::cout << "Source: Shader Compiler"; break;
-	case GL_DEBUG_SOURCE_THIRD_PARTY:     std::cout << "Source: Third Party"; break;
-	case GL_DEBUG_SOURCE_APPLICATION:     std::cout << "Source: Application"; break;
-	case GL_DEBUG_SOURCE_OTHER:           std::cout << "Source: Other"; break;
-	} std::cout << std::endl;
+	switch ( source ) {
+   	case GL_DEBUG_SOURCE_API:             std::cout << "SOURCE: API";             break;
+   	case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   std::cout << "SOURCE: Window System";   break;
+   	case GL_DEBUG_SOURCE_SHADER_COMPILER: std::cout << "SOURCE: Shader Compiler"; break;
+   	case GL_DEBUG_SOURCE_THIRD_PARTY:     std::cout << "SOURCE: Third Party";     break;
+   	case GL_DEBUG_SOURCE_APPLICATION:     std::cout << "SOURCE: Application";     break;
+   	case GL_DEBUG_SOURCE_OTHER:           std::cout << "SOURCE: Other";           break;
+	}
+   std::cout << "\n";
 
-	switch (type)
-	{
-	case GL_DEBUG_TYPE_ERROR:               std::cout << "Type: Error"; break;
-	case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: std::cout << "Type: Deprecated Behaviour"; break;
-	case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:  std::cout << "Type: Undefined Behaviour"; break;
-	case GL_DEBUG_TYPE_PORTABILITY:         std::cout << "Type: Portability"; break;
-	case GL_DEBUG_TYPE_PERFORMANCE:         std::cout << "Type: Performance"; break;
-	case GL_DEBUG_TYPE_MARKER:              std::cout << "Type: Marker"; break;
-	case GL_DEBUG_TYPE_PUSH_GROUP:          std::cout << "Type: Push Group"; break;
-	case GL_DEBUG_TYPE_POP_GROUP:           std::cout << "Type: Pop Group"; break;
-	case GL_DEBUG_TYPE_OTHER:               std::cout << "Type: Other"; break;
-	} std::cout << std::endl;
+	switch ( type ) {
+   	case GL_DEBUG_TYPE_ERROR:               std::cout << "TYPE: Error";                break;
+   	case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: std::cout << "TYPE: Deprecated Behaviour"; break;
+   	case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:  std::cout << "TYPE: Undefined Behaviour";  break;
+   	case GL_DEBUG_TYPE_PORTABILITY:         std::cout << "TYPE: Portability";          break;
+   	case GL_DEBUG_TYPE_PERFORMANCE:         std::cout << "TYPE: Performance";          break;
+   	case GL_DEBUG_TYPE_MARKER:              std::cout << "TYPE: Marker";               break;
+   	case GL_DEBUG_TYPE_PUSH_GROUP:          std::cout << "TYPE: Push Group";           break;
+   	case GL_DEBUG_TYPE_POP_GROUP:           std::cout << "TYPE: Pop Group";            break;
+   	case GL_DEBUG_TYPE_OTHER:               std::cout << "TYPE: Other";                break;
+	}
+   std::cout << "\n";
 
-	switch (severity)
-	{
-	case GL_DEBUG_SEVERITY_HIGH:         std::cout << "Severity: high"; break;
-	case GL_DEBUG_SEVERITY_MEDIUM:       std::cout << "Severity: medium"; break;
-	case GL_DEBUG_SEVERITY_LOW:          std::cout << "Severity: low"; break;
-	case GL_DEBUG_SEVERITY_NOTIFICATION: std::cout << "Severity: notification"; break;
-	} std::cout << std::endl;
-	std::cout << std::endl;
+	switch ( severity ) {
+   	case GL_DEBUG_SEVERITY_HIGH:         std::cout << "SEVERITY: high";         break;
+   	case GL_DEBUG_SEVERITY_MEDIUM:       std::cout << "SEVERITY: medium";       break;
+   	case GL_DEBUG_SEVERITY_LOW:          std::cout << "SEVERITY: low";          break;
+   	case GL_DEBUG_SEVERITY_NOTIFICATION: std::cout << "SEVERITY: notification"; break;
+	}
+   std::cout << "\n\n";
 }
 
 void create_demo_scene( /*...*/ ) {
@@ -105,10 +104,6 @@ void create_demo_scene( /*...*/ ) {
    std::transform( s.begin(), s.end(), s.begin(), ::toupper );
    return s;
 }
-
-
-Mat4 a,b,c,d;
-
 
 
 void process_mouse( GLFWwindow   *window,
@@ -179,7 +174,7 @@ void process_mouse( GLFWwindow   *window,
       auto view = cam.get_view();  // get view (pos, rot, scale)
 
       view.look_at( cam.forward, view.get_position()); // rotate view
-      cam.set_view(view);        // update cam view
+      cam.set_view( view );        // update cam view
       //Transform().set_rotation()
 
       //auto hm = Transform(view.get_position(), cam.forward);
@@ -188,11 +183,6 @@ void process_mouse( GLFWwindow   *window,
       //cam.transform(hm);
 
       //cam.transform(Transform::make_rotation(Vec3(1.0f, 0.0f, 0.0f), glm::radians(0.1f)));
-
-      a = cam.get_view().matrix;
-      b = Mat4(1.0f);
-      c = b * a;
-      d = a * b;
 
       //cam.transform(Transform::make_rotation(Vec3(1.0f, 0.0f, 0.0f), cam.forward.x));
       //auto t = Transform::make_rotation(cam.forward);
@@ -435,7 +425,7 @@ void draw_camera_debug_window( Vec3    &position,
 Int32 main( Int32 argc, char const *argv[] ) {
 	// initialise GLFW
 	glewExperimental = true; // <- needed for core profile
-	if (! glfwInit() ) {
+	if ( !glfwInit() ) {
 		fprintf( stderr, "[ERROR] Failed to initialize GLFW.\n" );
 		return -1;
 	}
@@ -610,13 +600,13 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
    //SharedPtr<Model> isle = asset_manager.load_model("Small Tropical Island.obj");
 
-   Vec3 poss = Vec3(101.0f, 100.0f, 100.0f);
-   Vec3 dirr = Vec3(-45.0f, 0.0f, -45.0f);
+   Vec3 poss = Vec3( 101.0f,  100.0f,  100.0f );
+   Vec3 dirr = Vec3( -45.0f,    0.0f,  -45.0f );
 
-   Float32 intensity   = 0.5f; //Percentage
+   Float32 intensity   =   0.5f; // 50%
    Float32 radius      = 570.0f;
-   Float32 degree      = 0.0f;
-   Float32 specularity = 1.0f;
+   Float32 degree      =   0.0f;
+   Float32 specularity =   1.0f;
 
    auto sun = scene_manager.instantiate_light( Light::Data{ Light::Type::directional,
                                                             glm::normalize(poss - dirr),
@@ -676,11 +666,12 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
    glUseProgram( lighting_program->get_location() );
 
-   glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_pos"    ), 0 );
-   glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_norm"   ), 1 );
-   glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_spec"   ), 2 );
-   glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_albedo" ), 3 );
-   glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_emit"   ), 4 );
+   // @TAG{TEXTURE_CHANNEL}
+   glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_albedo" ), 0 );
+   glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_spec"   ), 1 );
+   glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_norm"   ), 2 );
+   glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_emit"   ), 3 );
+   glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_pos"    ), 4 );
    glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_pic"    ), 5 );
    glUniform1i( glGetUniformLocation( lighting_program->get_location(), "shadowMap"    ), 6 );
 
@@ -739,11 +730,6 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
       process_mouse( window, view, scene_manager, delta_time_s );
       process_input( window, view, delta_time_s );
-
-      debug::view_mat4( a, "_a");
-      debug::view_mat4( b, "_b");
-      debug::view_mat4( c, "_c");
-      debug::view_mat4( d, "_d");
 
       // glMatrixMode( GL_PROJECTION );
       // glLoadIdentity();
