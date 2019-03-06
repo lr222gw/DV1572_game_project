@@ -53,6 +53,5 @@ void ModelInstance::set_shader_program( SharedPtr<ShaderProgram> shader_program 
 
 Uint32 ModelInstance::_generate_id() const {
 	static Uint32 next_id = 1;
-	next_id++;
-	return next_id*50;
+	return next_id++;
 }
