@@ -794,10 +794,23 @@ Int32 main( Int32 argc, char const *argv[] ) {
       auto mdl = mo2->model_transform;
       //mdl.look_at(Vec3(13.0f, 0.0f, 0.0f), Vec3(0.0f, 0.0f, 0.00001f) );
       static Float32 g = 0.0f;
+      static Float32 h = 0.0f;
 
 
       static bool hm = true;
-      if (true) {
+      static bool isPressed = false;
+      static float time = ImGui::GetTime();       
+      float curTime = ImGui::GetTime();
+
+      float timepast = curTime - time;
+
+      if (glfwGetKey(window, GLFW_KEY_P)&& timepast > 0.25) {
+         isPressed = !isPressed;
+
+         
+         time = ImGui::GetTime();
+      }
+      if (true && isPressed) {
 
          if (g > 2) {
             hm = false;
@@ -826,7 +839,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
          auto cur = model_instances[63]->model_transform;
          //model_instances[63]->transform(Transform::make_translation(glm::normalize(Vec3(0.f, 0.f, 20.0f))));
          //model_instances[63]->transform(Transform::make_translation(glm::normalize(Vec3(1 * glm::cos(2 * g + cur.get_position().y) + cur.get_position().x, 1 * glm::sin(2 * g + cur.get_position().x) + cur.get_position().y, 0))));
-         model_instances[63]->transform(Transform::make_translation(glm::normalize(Vec3( 1 * glm::cos(2 * g /*+ cur.get_position().x*/) /*+ cur.get_position().y*/, 0, 1 * glm::sin(2 * g /* + cur.get_position().y*/) /*+ cur.get_position().x*/))));
+         model_instances[63]->transform(Transform::make_translation(glm::normalize(Vec3( 1 * glm::sin(2 * h /*+ cur.get_position().x*/) /*+ cur.get_position().y*/, 0, 1 * glm::sin(2 * h /* + cur.get_position().y*/) /*+ cur.get_position().x*/))));
          
       }
 
