@@ -10,7 +10,7 @@ uniform sampler2D tex_spec;
 uniform sampler2D tex_norm;
 uniform sampler2D tex_emit;
 
-uniform uvec4 obj_id;
+uniform vec4 obj_id;
 
 layout (location = 0) out  vec3 g_position;
 layout (location = 1) out  vec3 g_normal;
@@ -28,8 +28,7 @@ void main() {
 	g_spec     = texture( tex_spec, uv_fs );
 	g_albedo   = texture( tex_diff, uv_fs );
 	g_emit     = texture( tex_emit, uv_fs );
-	// TODO: maybe move the /255 and float() to cpu if its better for preformance
-	g_picking  = vec4(float(obj_id.x)/255.f,float(obj_id.y)/255.f,float(obj_id.z)/255.f,float(obj_id.w)/255.f );//texture(tex_pick, uv_fs);
+	g_picking  = vec4(obj_id.x, obj_id.y, obj_id.z, obj_id.w );
 
 
 }

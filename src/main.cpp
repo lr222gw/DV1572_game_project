@@ -145,13 +145,14 @@ void process_mouse( GLFWwindow   *window,
    // mouse picking
    if (true) { //Getting crashes again
       if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1)) {
-		  auto instance_ptr = scene.get_instance_ptr(scene.get_object_id_at_pixel(x_pos, y_pos, cam));
+		  int obj_id = scene.get_object_id_at_pixel(x_pos, y_pos, cam);
+		  auto instance_ptr = scene.get_instance_ptr(obj_id);
 		  if (instance_ptr != nullptr)
 		  {
 			  SharedPtr<ModelInstance> model = instance_ptr;
 			  model->transform(Transform::make_rotation(Vec3(0.0, 1.0, 0.0)));
 		  }
-         std::cout << x_pos << ":" << y_pos << std::endl;
+         std::cout << x_pos << ":" << y_pos << ".  Model id: " << obj_id << std::endl;
       }
    }
 
