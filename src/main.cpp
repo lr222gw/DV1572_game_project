@@ -825,7 +825,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
          else {
             g -= 0.01f;
          }
-
+         h += 0.01f;
          
          for (int i = 0; i < 64-1; i++) {
             Float32 size = 0.1f;
@@ -839,7 +839,11 @@ Int32 main( Int32 argc, char const *argv[] ) {
          auto cur = model_instances[63]->model_transform;
          //model_instances[63]->transform(Transform::make_translation(glm::normalize(Vec3(0.f, 0.f, 20.0f))));
          //model_instances[63]->transform(Transform::make_translation(glm::normalize(Vec3(1 * glm::cos(2 * g + cur.get_position().y) + cur.get_position().x, 1 * glm::sin(2 * g + cur.get_position().x) + cur.get_position().y, 0))));
-         model_instances[63]->transform(Transform::make_translation(glm::normalize(Vec3( 1 * glm::sin(2 * h /*+ cur.get_position().x*/) /*+ cur.get_position().y*/, 0, 1 * glm::sin(2 * h /* + cur.get_position().y*/) /*+ cur.get_position().x*/))));
+         //model_instances[63]->transform(Transform::make_translation((Vec3((0.5 ) * glm::cos(2 * h + cur.get_position().x) /*+ cur.get_position().y*/, 0, (0.5 ) * glm::sin(2 * h /* + cur.get_position().y*/) /*+ cur.get_position().x*/))));
+         Float32 radius = 30;
+         Vec3 rotateAround(0.0,0.0,0.0);//Might be wrong
+         Float32 speed = 5;
+         model_instances[63]->set_transform(Transform::make_translation((Vec3((radius) * glm::cos(speed * h + rotateAround.x) + rotateAround.y, rotateAround.z, (radius) * glm::sin(speed * h  + rotateAround.x) + rotateAround.y))));
          
       }
 
