@@ -2,7 +2,6 @@
 
 in vec2 uv_fs;
 in vec3 pos_fs;
-in vec3 nor_fs;
 in mat3 tbn_fs;
 
 uniform sampler2D tex_diff;
