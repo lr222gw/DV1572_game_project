@@ -133,8 +133,8 @@ void SceneManager::draw( Viewport &view ) {
 
    // Particle system:
    glEnable(GL_BLEND);
-   //glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-   glBlendFunci(g_buffer.alb_tex_loc, GL_ZERO, GL_ONE);
+   glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+   //glBlendFunci(g_buffer.alb_tex_loc, GL_ZERO, GL_ONE);
 
    /*CHANGE*/ _particle_shader->use(); // gets called once per PS as well.. TODO: clean up
    /*CHANGE*/ view.bind_shader_program( _particle_shader );
