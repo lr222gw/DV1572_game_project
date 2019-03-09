@@ -75,7 +75,7 @@ ParticleSystem::ParticleSystem( Transform              &&transform,
 {
 // Initialize particle data
    _initializer( _particles );
-   //_partition();
+   _partition();
 
    glGenVertexArrays( 1, &_vao_loc );
    glBindVertexArray( _vao_loc );
@@ -132,19 +132,21 @@ void ParticleSystem::update( Float32 delta_time_ms ) {
 
 // Run update algorithm to update particle data:
    _updater( _particles, delta_time_ms );
-   //_partition();
+   _partition();
 }
 
 
 // Drawer
 void ParticleSystem::draw( Vec3 const &viewport_position,  ShaderProgram &shader_program ) {
-   //_sort_back_to_front( viewport_position ); // necessary to avoid transparency issues
+   _sort_back_to_front( viewport_position ); // necessary to avoid transparency issues
    _update_vbo_data();
 
 // Bind shader program:
    shader_program.use();
 
    glBindVertexArray( _vao_loc );
+
+   glEnable( GL_BLEND );
 
    TextureSet::ScopedBindGuard pin { _textures, shader_program }; // RAII
 

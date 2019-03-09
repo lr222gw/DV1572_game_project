@@ -46,6 +46,8 @@ void APIENTRY glDebugOutput( GLenum        source,
 	if ( id == 131169 || id == 131185 || id == 131218 || id == 131204 )
       return;
 
+   if ( severity == GL_DEBUG_SEVERITY_NOTIFICATION ) return;
+
 	std::cout << "--------------------\n";;
 	std::cout << "DEBUG MESSAGE (" << id << "): " << message << "\n";
 
@@ -703,7 +705,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
    glUniform1i( glGetUniformLocation( lighting_program->get_location(), "shadowMap"    ), 6 );
 
    //glEnable(GL_CULL_FACE);
-   //glDisable( GL_BLEND );
+   glEnable( GL_BLEND );
+   glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
    
    /* @TAG{PS} */
@@ -714,7 +717,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    /* PS */ // static Float32 const ms_between_births  { 1'000.f / births_per_s };
    /* PS */    static Float32 const avg_lifespan_ms    { 60'000.0f              };
    /* PS */    static Float32 const avg_mass_kg        {     0.01f              };
-   /* PS */    static Float32 const avg_scale          {    1.00f               };
+   /* PS */    static Float32 const avg_scale          {     0.10f              };
    /* PS */    static Uvec4   const colour_rgba        { 255, 255, 255, 255     };
    /* PS */    static Float32 const radius_m           { 30.f                   };
    /* PS */    static Float32       time_pool_ms       { .0f                    };
@@ -725,7 +728,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    /* PS */    for ( auto i = 0;  i < data.count;  ++i ) {
    /* PS */        auto &particle          =  data.data[i]; // TODO: rename in ParticleSystem
    /* PS */        particle.spatial[1]    +=  -.0001f * delta_t_ms;
-   /* PS */        // particle.time_ms_left  -=  delta_t_ms;
+   /* PS */        particle.time_ms_left  -=  delta_t_ms;
    /* PS */    }
    /* PS */
    /* PS */    std::random_device rd;
@@ -758,12 +761,9 @@ Int32 main( Int32 argc, char const *argv[] ) {
       Float32 delta_time_ms { ImGui::GetIO().DeltaTime / 1000.f };
       scene_manager.update( delta_time_ms * 1'000'000.f );
 
-      /* PS */ static Uint32 frame = 0;
-      if ( ++frame < 128 ) {
-         printf( "\n================================ Frame %d! ================================\n", frame );
-      }
-      else {
-         printf( "\n================================ Frame %d. ================================\n", frame );
+      if constexpr ( Config::is_debugging ) {
+         static Uint32 frame = 0;
+         printf( "────────────────────────────────── Frame %5d ──────────────────────────────────\n", frame++ );
       }
 
 		// poll & handle events such as window resizing and input from the keyboard or mouse

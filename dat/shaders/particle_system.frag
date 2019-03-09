@@ -23,6 +23,6 @@ void main() {
    g_normal   = normalize( g_normal * 2.0 - 1.0 ); // TODO: verify necessity
    g_normal   = normalize( tbn_fs * g_normal );
    g_spec     = texture(   tex_spec, uv_fs );
-   g_albedo   = texture(   tex_diff, uv_fs ) * col_fs;
+   g_albedo   = texture(   tex_diff, uv_fs ); //* col_fs; // TODO: reactivate
    g_emit     = texture(   tex_emit, uv_fs );
 }

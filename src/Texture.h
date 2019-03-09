@@ -59,12 +59,18 @@ private:
 
       if ( image_data ) {
          GLenum format;
-         if      ( 1 == channel_count )
+         if      ( 1 == channel_count ) {
             format = GL_RED;
-         else if ( 3 == channel_count )
+            printf( "Loading GL_RED texture '%s'\n", path.relative_path().c_str() );
+         }
+         else if ( 3 == channel_count ) {
             format = GL_RGB;
-         else if ( 4 == channel_count )
+            printf( "Loading GL_RGB texture '%s'\n", path.relative_path().c_str() );
+         }
+         else if ( 4 == channel_count ) {
             format = GL_RGBA;
+            printf( "Loading GL_RGBA texture '%s'\n", path.relative_path().c_str() );
+         }
          else assert( false && "Unexpected texture format channel count." );
 
          glBindTexture( GL_TEXTURE_2D, texture_id );
