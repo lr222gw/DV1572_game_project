@@ -32,6 +32,7 @@
     <ClCompile Include="src\misc\ImGui\imgui_widgets.cpp" />
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\ModelInstance.cpp" />
+    <ClCompile Include="src\ParticleSystem.cpp" />
     <ClCompile Include="src\SceneManager.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\ShaderManager.cpp" />
@@ -61,6 +62,7 @@
     <ClInclude Include="src\misc\stb_image.h" />
     <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\ModelInstance.h" />
+    <ClInclude Include="src\ParticleSystem.h" />
     <ClInclude Include="src\SceneManager.h" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\ShaderManager.h" />
@@ -78,6 +80,9 @@
     <None Include="dat\shaders\g_buffer.vert" />
     <None Include="dat\shaders\lightSha.frag" />
     <None Include="dat\shaders\lightSha.vert" />
+    <None Include="dat\shaders\particle_system.frag" />
+    <None Include="dat\shaders\particle_system.geom" />
+    <None Include="dat\shaders\particle_system.vert" />
     <None Include="dat\shaders\quad.frag" />
     <None Include="dat\shaders\quad.vert" />
     <None Include="dat\shaders\shadow_depth.frag" />
