@@ -153,6 +153,9 @@ void Viewport::_g_buffer_init() {
 
 
 // albedo (RGBA) color texture for g-buffer
+
+
+
    glBindTexture( GL_TEXTURE_2D,
                   _g_buffer.alb_tex_loc );
 
@@ -182,7 +185,7 @@ void Viewport::_g_buffer_init() {
                            GL_TEXTURE_2D,
                            _g_buffer.alb_tex_loc,
                            0 );
-
+ 
 
 
 // specularity (specularity color + specularity intensity) for g-buffer:

@@ -29,7 +29,7 @@ void main() {
 
    vec3  tangent    = view_up;                      // kontrollera normalisering om buggar
    vec3  bitangent  = view_right;                   // kontrollera normalisering om buggar
-   vec3  normal     = cross( view_up, view_right ); // kontrollera normalisering om buggar
+   vec3  normal     = cross( view_right, view_up ); // kontrollera normalisering om buggar
 
    // vec3 normal     = normalize( view_position - particle_coord );
    // vec3 tangent?   = cross( view_up, normal );

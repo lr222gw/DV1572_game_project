@@ -132,8 +132,8 @@ void SceneManager::draw( Viewport &view ) {
          instance.lock()->draw();
 
    // Particle system:
-   glEnable(GL_BLEND);
-   glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+  //glEnable(GL_BLEND);
+  //glBlendFunc(GL_SRC_ALPHA, GL_ONE);
    //glBlendFunci(g_buffer.alb_tex_loc, GL_ZERO, GL_ONE);
 
    /*CHANGE*/ _particle_shader->use(); // gets called once per PS as well.. TODO: clean up
@@ -142,7 +142,8 @@ void SceneManager::draw( Viewport &view ) {
       if ( !ps.expired() )
          ps.lock()->draw( view_pos, *_particle_shader );
 
-   glDisable(GL_BLEND);
+
+   //glDisable(GL_BLEND);
 
    // disabling wireframe rendering so that the quad will render after the lighting pass
    glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
