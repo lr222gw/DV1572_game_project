@@ -38,9 +38,9 @@ TextureSet::ScopedBindGuard::ScopedBindGuard( TextureSet const &target,
 
 // destructor unbinds textures at the end of the scope of creation
 TextureSet::ScopedBindGuard::~ScopedBindGuard() {
-   for ( GLuint i = 0;  i < 4;  ++i ) {
-      glActiveTexture( GL_TEXTURE0 + i );
-      glBindTexture(   GL_TEXTURE_2D, 0 );
-   }
+    for ( GLuint i = 0;  i < 4;  ++i ) {
+       glActiveTexture( GL_TEXTURE0 + i );
+       glBindTexture(   GL_TEXTURE_2D, 0 );
+    }
 }
 

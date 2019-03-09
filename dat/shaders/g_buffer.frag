@@ -1,6 +1,6 @@
 #version 440 core
 
-in vec2 uv_fs;
+in vec2  uv_fs;
 in vec3 pos_fs;
 in mat3 tbn_fs;
 

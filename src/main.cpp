@@ -741,12 +741,12 @@ Int32 main( Int32 argc, char const *argv[] ) {
    /* PS */    }
    /* PS */ };
    /* PS */
-   /* PS */ TextureSet snowflake_tex {
-   /* PS */    std::make_shared<DiffuseTexture>  ( FilePath{ FileType::texture, "snowflake_dif.png"  }),
-   /* PS */    std::make_shared<NormalTexture>   ( FilePath{ FileType::texture, "snowflake_nor.png"  }),
-   /* PS */    std::make_shared<SpecularTexture> ( FilePath{ FileType::texture, "snowflake_spec.png" }),
-   /* PS */    std::make_shared<EmissiveTexture> ( FilePath{ FileType::texture, "snowflake_emit.png" })
-   /* PS */ };
+   /* PS */ auto snowflake_dif  = std::make_shared<DiffuseTexture>  ( FilePath{ FileType::texture, "snowflake_dif.png"  });
+   /* PS */ auto snowflake_nor  = std::make_shared<NormalTexture>   ( FilePath{ FileType::texture, "snowflake_nor.png"  });
+   /* PS */ auto snowflake_spec = std::make_shared<SpecularTexture> ( FilePath{ FileType::texture, "snowflake_spec.png" });
+   /* PS */ auto snowflake_emit = std::make_shared<EmissiveTexture> ( FilePath{ FileType::texture, "snowflake_emit.png" });
+   /* PS */
+   /* PS */ TextureSet snowflake_tex { snowflake_dif, snowflake_nor, snowflake_spec, snowflake_emit };
    /* PS */
    /* PS */ auto ps { std::make_shared<ParticleSystem>( Transform::make_translation(Vec3{.0f, 3.0f, .0f}), snowflake_tex, ps_logic ) };
    /* PS */ scene_manager.instantiate_particle_system( ps ); // TODO: revamp in SceneManager

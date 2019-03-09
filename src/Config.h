@@ -30,7 +30,7 @@ struct Config {
 
 /*------------------------------ global variables -------------------------------*/
    Bool is_wireframe_mode = false; // used in SceneManager::Draw()
-   Bool is_imgui_toggled  = true;
+   Bool is_imgui_toggled  = false;
    RenderMode render_mode = RenderMode::composite;
 
 
