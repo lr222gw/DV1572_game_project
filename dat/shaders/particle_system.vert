@@ -74,4 +74,8 @@ void main() {
    pos_gs    = particle_coord
              + particle_scale * view_right * vertex.x
              + particle_scale * view_up    * vertex.y;
+
+   pos_gs = vec4( 0.5, 0.5, 0.5 );
+
+   gl_Position = projection * view * vec4( pos_gs, 1 ); //vec4( pos_gs, 1.0f );
 }
