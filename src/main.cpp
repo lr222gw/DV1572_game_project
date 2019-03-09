@@ -48,7 +48,6 @@ void APIENTRY glDebugOutput( GLenum        source,
 
    if ( severity == GL_DEBUG_SEVERITY_NOTIFICATION ) return;
 
-	std::cout << "--------------------\n";;
 	std::cout << "DEBUG MESSAGE (" << id << "): " << message << "\n";
 
 	switch ( source ) {
@@ -705,16 +704,16 @@ Int32 main( Int32 argc, char const *argv[] ) {
    glUniform1i( glGetUniformLocation( lighting_program->get_location(), "shadowMap"    ), 6 );
 
    //glEnable(GL_CULL_FACE);
-   glEnable( GL_BLEND );
-   glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+   //glEnable( GL_BLEND );
+   //glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
-   
+
    /* @TAG{PS} */
    /* PS */ auto ps_logic = [] ( ParticleSystem::Data &data, Float32 delta_t_ms ) {
    /* PS */    using  Particle = ParticleSystem::Data::Particle;
    /* PS */
-   /* PS */ // static Float32 const births_per_s       { 1.0f                   };
-   /* PS */ // static Float32 const ms_between_births  { 1'000.f / births_per_s };
+   /* PS */    static Float32 const births_per_s       { 1.0f                   };
+   /* PS */    static Float32 const ms_between_births  { 1'000.f / births_per_s };
    /* PS */    static Float32 const avg_lifespan_ms    {  6'000.0f              };
    /* PS */    static Float32 const avg_mass_kg        {     0.01f              };
    /* PS */    static Float32 const avg_scale          {     0.50f              };
@@ -722,7 +721,6 @@ Int32 main( Int32 argc, char const *argv[] ) {
    /* PS */    static Float32 const radius_m           { 30.f                   };
    /* PS */    static Float32       time_pool_ms       { .0f                    };
    /* PS */
-   /* PS */    static int counter = 0;
    /* PS */    time_pool_ms += (delta_t_ms);
    /* PS */
    /* PS */    for ( auto i = 0;  i < data.count;  ++i ) {
@@ -735,13 +733,13 @@ Int32 main( Int32 argc, char const *argv[] ) {
    /* PS */    std::mt19937 mt( rd() );
    /* PS */    std::uniform_real_distribution<Float32> dist( -radius_m, +radius_m );
    /* PS */
-   /* PS */    while ( time_pool_ms > 50.0f && (counter++ < 512) ) {
+   /* PS */    while ( time_pool_ms > ms_between_births ) {
    /* PS */       data.add( Particle { colour_rgba,
    /* PS */                            Vec4 { dist(mt), dist(mt), dist(mt), avg_scale }, // random position
    /* PS */                            Vec3 { .0f, -.01f, .0f },
    /* PS */                            avg_lifespan_ms,
    /* PS */                            avg_mass_kg } );
-   /* PS */       time_pool_ms -= 50.0f;
+   /* PS */       time_pool_ms -= ms_between_births;
    /* PS */    }
    /* PS */ };
    /* PS */
@@ -763,7 +761,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
       if constexpr ( Config::is_debugging ) {
          static Uint32 frame = 0;
-         printf( "────────────────────────────────── Frame %5d ──────────────────────────────────\n", frame++ );
+         printf( "-------------------------------- Frame %5d --------------------------------\n", frame++ );
       }
 
 		// poll & handle events such as window resizing and input from the keyboard or mouse
