@@ -716,7 +716,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    /* PS */ // static Float32 const ms_between_births  { 1'000.f / births_per_s };
    /* PS */    static Float32 const avg_lifespan_ms    { 60'000.0f              };
    /* PS */    static Float32 const avg_mass_kg        {     0.01f              };
-   /* PS */    static Float32 const avg_scale          {    1.00f               };
+   /* PS */    static Float32 const avg_scale          {     0.10f              };
    /* PS */    static Uvec4   const colour_rgba        { 255, 255, 255, 255     };
    /* PS */    static Float32 const radius_m           { 30.f                   };
    /* PS */    static Float32       time_pool_ms       { .0f                    };
@@ -760,12 +760,9 @@ Int32 main( Int32 argc, char const *argv[] ) {
       Float32 delta_time_ms { ImGui::GetIO().DeltaTime / 1000.f };
       scene_manager.update( delta_time_ms * 1'000'000.f );
 
-      /* PS */ static Uint32 frame = 0;
-      if ( ++frame < 128 ) {
-         printf( "\n================================ Frame %d! ================================\n", frame );
-      }
-      else {
-         printf( "\n================================ Frame %d. ================================\n", frame );
+      if constexpr ( Config::is_debugging ) {
+         static Uint32 frame = 0;
+         printf( "================================ Frame %d! ================================\n", frame++ );
       }
 
 		// poll & handle events such as window resizing and input from the keyboard or mouse

@@ -24,6 +24,8 @@ struct Config {
                               fov_rad            =  1.2708f, // 90 degrees in radians
                               start_aspect_ratio = (Float32)start_height / (Float32)start_width;
 
+   static constexpr Bool      is_debugging = true;
+
    static String const  shader_path;
    static String const   model_path;
    static String const texture_path; //TODO: unneeded?

@@ -11,17 +11,20 @@ class Light; // Forward Declaration; we only point to Light class, does not stor
 
 class Shadowcaster {
 public:
-   
-   Shadowcaster(SharedPtr<Light> source) : _source(source) { std::cout << "Make sure to run 'set_light_matrix()' atleast once!" << std::endl; };
-   Shadowcaster(           SharedPtr<Light> source, 
-                           Float32 n_plane, 
-                           Float32 f_plane, 
-                           Float32 left, 
-                           Float32 right, 
-                           Float32 bottom, 
-                           Float32 top, 
-                           Vec3 pos, 
-                           Vec3 target,   
+
+   Shadowcaster(SharedPtr<Light> source) : _source(source) {
+      // std::cout << "Make sure to run 'set_light_matrix()' atleast once!" << std::endl;
+   };
+
+   Shadowcaster(           SharedPtr<Light> source,
+                           Float32 n_plane,
+                           Float32 f_plane,
+                           Float32 left,
+                           Float32 right,
+                           Float32 bottom,
+                           Float32 top,
+                           Vec3 pos,
+                           Vec3 target,
                            Vec3 up = Vec3(0.0f,1.0f,0.0f));
 
    void set_Light_matrix(  Float32 n_plane,
