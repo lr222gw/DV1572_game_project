@@ -534,8 +534,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
 
    auto geometry_program      { shader_manager.create_program( { geometry_frag_shader,
-                                                                 geometry_vert_shader,
-                                                                 geometry_geom_shader } ) };
+                                                                 geometry_vert_shader } ) };
 
    auto lighting_program      { shader_manager.create_program({ lighting_frag_shader, lighting_vert_shader }) };
 
