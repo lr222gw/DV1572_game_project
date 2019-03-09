@@ -723,7 +723,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    /* PS */
    /* PS */    for ( auto i = 0;  i < data.count;  ++i ) {
    /* PS */        auto &particle          =  data.data[i]; // TODO: rename in ParticleSystem
-   /* PS */        particle.spatial[1]    +=  -.5f * delta_t_ms;
+   /* PS */        particle.spatial[1]    +=  -.0001f * delta_t_ms;
    /* PS */        // particle.time_ms_left  -=  delta_t_ms;
    /* PS */    }
    /* PS */
@@ -731,13 +731,13 @@ Int32 main( Int32 argc, char const *argv[] ) {
    /* PS */    std::mt19937 mt( rd() );
    /* PS */    std::uniform_real_distribution<Float32> dist( -radius_m, +radius_m );
    /* PS */
-   /* PS */    while ( time_pool_ms > 500.0f && (counter++ < 512) ) {
+   /* PS */    while ( time_pool_ms > 50.0f && (counter++ < 512) ) {
    /* PS */       data.add( Particle { colour_rgba,
    /* PS */                            Vec4 { dist(mt), dist(mt), dist(mt), avg_scale }, // random position
-   /* PS */                            Vec3 { .0f, -.1f, .0f },
+   /* PS */                            Vec3 { .0f, -.01f, .0f },
    /* PS */                            avg_lifespan_ms,
    /* PS */                            avg_mass_kg } );
-   /* PS */       time_pool_ms -= 500.0f;
+   /* PS */       time_pool_ms -= 50.0f;
    /* PS */    }
    /* PS */ };
    /* PS */
