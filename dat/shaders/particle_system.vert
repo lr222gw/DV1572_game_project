@@ -72,10 +72,10 @@ void main() {
 
    // world space coordinate:
    pos_fs    = particle_coord
-             + particle_scale * view_right * vertex.x
-             + particle_scale * view_up    * vertex.y;
+             + view_right * vertex.x * particle_scale
+             + view_up    * vertex.y * particle_scale;
 
-   pos_fs = vec3( 0.5, 0.5, 0.5 );
+   //pos_fs = vec3( 0.5, 0.5, 0.5 );
 
-   gl_Position = projection * view * vec4( pos_fs, 1 ); //vec4( pos_gs, 1.0f );
+   gl_Position = projection * view * vec4( pos_fs, 1.0f ); //vec4( pos_gs, 1.0f );
 }

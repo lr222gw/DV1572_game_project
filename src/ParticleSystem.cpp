@@ -10,7 +10,7 @@ void ParticleSystem::_sort_back_to_front( Vec3 const &view_position ) { // @TODO
               [&view_position] ( Data::Particle &lhs, Data::Particle &rhs ) {
                                   return  lhs.time_ms_left > 0.0f
                                        && length( Vec3{lhs.spatial} - view_position )
-                                        > length( Vec3{rhs.spatial} - view_position );
+                                        < length( Vec3{rhs.spatial} - view_position );
                                } );
 }
 
@@ -75,7 +75,7 @@ ParticleSystem::ParticleSystem( Transform              &&transform,
 {
 // Initialize particle data
    _initializer( _particles );
-   _partition();
+   // _partition(); /*REENABLE*/
 
    glGenVertexArrays( 1, &_vao_loc );
    glBindVertexArray( _vao_loc );
@@ -113,6 +113,44 @@ ParticleSystem::ParticleSystem( Transform              &&transform,
                  sizeof(GLubyte) * 4 * Config::particle_max_count, // size
                  nullptr,                                          // pointer to data (will be set each frame)
                  GL_STREAM_DRAW );                                 // usage
+
+
+
+   glBindVertexArray( 0 );
+}
+
+
+// Destructor
+ParticleSystem::~ParticleSystem() {
+   // TODO: unbind stuff
+}
+
+
+// Updater
+void ParticleSystem::update( Float32 delta_time_ms ) {
+   if ( !_is_running ) return;
+
+// Run update algorithm to update particle data:
+   _updater( _particles, delta_time_ms );
+  //  _partition();                 /*REENABLE*/
+}
+
+
+// Drawer
+void ParticleSystem::draw( Vec3 const &viewport_position,  ShaderProgram &shader_program ) {
+   /*REENABLE*/ //_sort_back_to_front( viewport_position ); // necessary to avoid transparency issues
+   _update_vbo_data();
+
+// Bind shader program:
+   shader_program.use();
+
+   glBindVertexArray( _vao_loc );
+
+   TextureSet::ScopedBindGuard pin { _textures, shader_program }; // RAII
+
+   // (Note: We're using instancing to speed up rendering;
+   //        other alternatives include using a big VBO or emitting faces in a geometry shader.)
+
 
 // Orphan and then update spatial VBO:
    glBindBuffer(    GL_ARRAY_BUFFER,                                  // target
@@ -171,40 +209,6 @@ ParticleSystem::ParticleSystem( Transform              &&transform,
                               0,                    // stride offset
                               (void*)0 );           // array buffer offset (TODO: nullptr?)
 
-   glBindVertexArray( 0 );
-}
-
-
-// Destructor
-ParticleSystem::~ParticleSystem() {
-   // TODO: unbind stuff
-}
-
-
-// Updater
-void ParticleSystem::update( Float32 delta_time_ms ) {
-   if ( !_is_running ) return;
-
-// Run update algorithm to update particle data:
-   _updater( _particles, delta_time_ms );
-   _partition();                            // data pointer
-}
-
-
-// Drawer
-void ParticleSystem::draw( Vec3 const &viewport_position,  ShaderProgram &shader_program ) {
-   _sort_back_to_front( viewport_position ); // necessary to avoid transparency issues
-   _update_vbo_data();
-
-// Bind shader program:
-   shader_program.use();
-
-   glBindVertexArray( _vao_loc );
-
-   TextureSet::ScopedBindGuard pin { _textures, shader_program }; // RAII
-
-   // (Note: We're using instancing to speed up rendering;
-   //        other alternatives include using a big VBO or emitting faces in a geometry shader.)
 
 // Draw billboard instances:
    glVertexAttribDivisor( 0,                        // attribute layout number  (0 = vertex VBO)
