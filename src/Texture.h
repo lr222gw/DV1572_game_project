@@ -63,8 +63,10 @@ private:
             format = GL_RED;
          else if ( 3 == channel_count )
             format = GL_RGB;
-         else if ( 4 == channel_count )
+         else if ( 4 == channel_count ) {
             format = GL_RGBA;
+            printf( "\nGL_RGBA for %s", path.relative_path().c_str() ); // TEMP
+         }
          else assert( false && "Unexpected texture format channel count." );
 
          glBindTexture( GL_TEXTURE_2D, texture_id );

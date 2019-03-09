@@ -6,7 +6,6 @@ layout (location = 2) in vec4 colour;  // r,g,b,a
 
 uniform mat4 view;
 uniform mat4 projection;    // TODO: combine view and projection
-// uniform vec3 view_position; // TODO
 
 out vec2  uv_fs;
 out vec3 pos_fs;
