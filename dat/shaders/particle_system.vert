@@ -8,9 +8,9 @@ uniform mat4 view;
 uniform mat4 projection;    // TODO: combine view and projection
 uniform vec3 view_position; // TODO
 
-out vec2  uv_gs;
-out vec3 pos_gs;
-out mat3 tbn_gs;
+out vec2  uv_fs;
+out vec3 pos_fs;
+out mat3 tbn_fs;
 
 // TODO: forward colour to fragment shader and combine with albedo!
 
@@ -48,7 +48,7 @@ void main() {
 
    // calculating texture coordinates:
    // (by mapping from local space [-0.5,+0.5] range to UV space [0,1])
-   vec2 uv_gs = { vertex.x + 0.5, vertex.y + 0.5 };
+   vec2 uv_fs = { vertex.x + 0.5, vertex.y + 0.5 };
 
    // extract right vector and up vector from view matrix:
    vec3  view_right = { view[0][0], view[1][0], view[2][0] }; //
@@ -68,14 +68,14 @@ void main() {
    // vec3 norm = normalize( vec3(model_transform * vec4(normal,    0.0) ) );
 
    // matrix for normals calculation:
-   tbn_gs    = mat3( tangent, bitangent, normal );
+   tbn_fs    = mat3( tangent, bitangent, normal );
 
    // world space coordinate:
-   pos_gs    = particle_coord
+   pos_fs    = particle_coord
              + particle_scale * view_right * vertex.x
              + particle_scale * view_up    * vertex.y;
 
-   pos_gs = vec4( 0.5, 0.5, 0.5 );
+   pos_fs = vec3( 0.5, 0.5, 0.5 );
 
-   gl_Position = projection * view * vec4( pos_gs, 1 ); //vec4( pos_gs, 1.0f );
+   gl_Position = projection * view * vec4( pos_fs, 1 ); //vec4( pos_gs, 1.0f );
 }
