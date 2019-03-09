@@ -707,24 +707,25 @@ Int32 main( Int32 argc, char const *argv[] ) {
    //glEnable( GL_BLEND );
    //glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
+
    /* @TAG{PS} */
    /* PS */ auto ps_logic = [] ( ParticleSystem::Data &data, Float32 delta_t_ms ) {
    /* PS */    using  Particle = ParticleSystem::Data::Particle;
    /* PS */
-   /* PS */    static Float32 const births_per_s       { 1.0f                   };
+   /* PS */    static Float32 const births_per_s       { 60.0f                  };
    /* PS */    static Float32 const ms_between_births  { 1'000.f / births_per_s };
-   /* PS */    static Float32 const avg_lifespan_ms    {  6'000.0f              };
+   /* PS */    static Float32 const avg_lifespan_ms    { 9'000.0f               };
    /* PS */    static Float32 const avg_mass_kg        {     0.01f              };
    /* PS */    static Float32 const avg_scale          {     0.50f              };
    /* PS */    static Uvec4   const colour_rgba        { 255, 255, 255, 255     };
-   /* PS */    static Float32 const radius_m           { 30.f                   };
+   /* PS */    static Float32 const radius_m           { 60.f                   };
    /* PS */    static Float32       time_pool_ms       { .0f                    };
    /* PS */
    /* PS */    time_pool_ms += (delta_t_ms);
    /* PS */
    /* PS */    for ( auto i = 0;  i < data.count;  ++i ) {
    /* PS */        auto &particle          =  data.data[i]; // TODO: rename in ParticleSystem
-   /* PS */        particle.spatial[1]    +=  -.01f * delta_t_ms;
+   /* PS */        particle.spatial[1]    +=  -.005f * delta_t_ms;
    /* PS */        particle.time_ms_left  -=  delta_t_ms;
    /* PS */    }
    /* PS */
@@ -734,7 +735,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    /* PS */
    /* PS */    while ( time_pool_ms > ms_between_births ) {
    /* PS */       data.add( Particle { colour_rgba,
-   /* PS */                            Vec4 { dist(mt), dist(mt), dist(mt), avg_scale }, // random position
+   /* PS */                            Vec4 { dist(mt), 40.0f, dist(mt), avg_scale }, // random position
    /* PS */                            Vec3 { .0f, -.01f, .0f },
    /* PS */                            avg_lifespan_ms,
    /* PS */                            avg_mass_kg } );
