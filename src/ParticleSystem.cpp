@@ -221,14 +221,14 @@ void ParticleSystem::draw( Vec3 const &viewport_position,  ShaderProgram &shader
                           1 );                      // stride per instance      (one colour per billboard)
 
 
-   glEnable(GL_BLEND);
+   //glEnable(GL_BLEND);
    //glBlendFunc(GL_SRC_ALPHA, GL_ONE);
    //glBlendFunci()
    glDrawArraysInstanced( GL_TRIANGLE_STRIP,        // draw mode
                           0,                        // first index
                           4,                        // indices to draw
                           _particles.count );       // instance count
-   glDisable(GL_BLEND);
+   //glDisable(GL_BLEND);
 
 // Clean-up:
 
