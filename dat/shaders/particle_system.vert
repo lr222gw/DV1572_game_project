@@ -27,8 +27,8 @@ void main() {
    vec3  view_right = { view[0][0], view[1][0], view[2][0] }; //
    vec3  view_up    = { view[0][1], view[1][1], view[2][1] }; //
 
-   vec3  tangent    = view_up;                      // kontrollera normalisering om buggar
-   vec3  bitangent  = view_right;                   // kontrollera normalisering om buggar
+   vec3  bitangent  = view_up;                      // kontrollera normalisering om buggar
+   vec3  tangent    = view_right;                   // kontrollera normalisering om buggar
    vec3  normal     = cross( view_up, view_right ); // kontrollera normalisering om buggar
 
    // vec3 normal     = normalize( view_position - particle_coord );
