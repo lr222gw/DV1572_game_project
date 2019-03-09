@@ -584,18 +584,17 @@ void SceneManager::_lights_to_gpu() {
 
 Uint32 SceneManager::get_object_id_at_pixel(Uint32 x, Uint32 y, Viewport &view)
 {
-	_geometry_shader_program->use();
+	//_geometry_shader_program->use();
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, view.get_g_buffer().buffer_loc);
 	glReadBuffer(GL_COLOR_ATTACHMENT5);
-	//glUseProgram(_geometry_shader_program)
 
 //	Uint32 pixel_info[4]{};
 	struct pixel_info_struct
 	{
-		float x;
-		float y;
-		float z;
-		float w;
+		Float32 x;
+		Float32 y;
+		Float32 z;
+		Float32 w;
 	};
 	pixel_info_struct pixel_info;
 //
@@ -608,12 +607,13 @@ Uint32 SceneManager::get_object_id_at_pixel(Uint32 x, Uint32 y, Viewport &view)
 
 	//Uint8 pixel_info[4] {};
 
-	glReadPixels( x, y, 1, 1, GL_RGBA, GL_FLOAT, &pixel_info );
+	glReadPixels( x, view.height-y, 1, 1, GL_RGBA, GL_FLOAT, &pixel_info );
 
-	Uint32 obj_id = ( ((int)(pixel_info.x * 255) & 0xFF))
-                  + ( ((int)(pixel_info.y * 255) & 0xFF))
-                  + ( ((int)(pixel_info.z * 255) & 0xFF))
-                  + ( ((int)(pixel_info.w * 255) & 0xFF));
+	// probably don't need the & 0xFF since we send up in increments of 8 bytes
+	Uint32 obj_id = ( ((Int32)(pixel_info.x * 255) & 0xFF) <<  0)
+                  + ( ((Int32)(pixel_info.y * 255) & 0xFF) <<  8)
+                  + ( ((Int32)(pixel_info.z * 255) & 0xFF) << 16)
+				  + ( ((Int32)(pixel_info.w * 255) & 0xFF) << 24);
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 

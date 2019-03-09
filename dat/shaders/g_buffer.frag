@@ -2,7 +2,6 @@
 
 in vec2 uv_fs;
 in vec3 pos_fs;
-in vec3 nor_fs;
 in mat3 tbn_fs;
 
 uniform sampler2D tex_diff;
@@ -29,7 +28,7 @@ void main() {
 	g_spec     = texture( tex_spec, uv_fs );
 	g_albedo   = texture( tex_diff, uv_fs );
 	g_emit     = texture( tex_emit, uv_fs );
-	g_picking  = vec4(obj_id.x, obj_id.y, obj_id.z, obj_id.w );
+	g_picking  = obj_id;
 
 
 }
