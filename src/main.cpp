@@ -714,9 +714,9 @@ Int32 main( Int32 argc, char const *argv[] ) {
    /* PS */
    /* PS */ // static Float32 const births_per_s       { 1.0f                   };
    /* PS */ // static Float32 const ms_between_births  { 1'000.f / births_per_s };
-   /* PS */    static Float32 const avg_lifespan_ms    { 60'000.0f              };
+   /* PS */    static Float32 const avg_lifespan_ms    {  6'000.0f              };
    /* PS */    static Float32 const avg_mass_kg        {     0.01f              };
-   /* PS */    static Float32 const avg_scale          {     0.10f              };
+   /* PS */    static Float32 const avg_scale          {     0.50f              };
    /* PS */    static Uvec4   const colour_rgba        { 255, 255, 255, 255     };
    /* PS */    static Float32 const radius_m           { 30.f                   };
    /* PS */    static Float32       time_pool_ms       { .0f                    };
@@ -726,7 +726,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    /* PS */
    /* PS */    for ( auto i = 0;  i < data.count;  ++i ) {
    /* PS */        auto &particle          =  data.data[i]; // TODO: rename in ParticleSystem
-   /* PS */        particle.spatial[1]    +=  -.0001f * delta_t_ms;
+   /* PS */        particle.spatial[1]    +=  -.01f * delta_t_ms;
    /* PS */        particle.time_ms_left  -=  delta_t_ms;
    /* PS */    }
    /* PS */
