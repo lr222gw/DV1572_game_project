@@ -762,7 +762,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
       if constexpr ( Config::is_debugging ) {
          static Uint32 frame = 0;
-         printf( "================================ Frame %d! ================================\n", frame++ );
+         printf( "────────────────────────────────── Frame %5d ──────────────────────────────────\n", frame++ );
       }
 
 		// poll & handle events such as window resizing and input from the keyboard or mouse
