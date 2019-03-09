@@ -709,33 +709,35 @@ Int32 main( Int32 argc, char const *argv[] ) {
    /* PS */ auto ps_logic = [] ( ParticleSystem::Data &data, Float32 delta_t_ms ) {
    /* PS */    using  Particle = ParticleSystem::Data::Particle;
    /* PS */
-   /* PS */    static Float32 const birthrate_per_ms   { 12.0f / 1'000      }; // 12 per s
-   /* PS */    static Float32 const avg_lifespan_ms    { 60'000.0f          };
-   /* PS */    static Float32 const avg_mass_kg        {     0.01f          };
-   /* PS */    static Float32 const avg_scale          {   100.00f          };
-   /* PS */    static Uvec4   const colour_rgba        { 255, 255, 255, 255 };
-   /* PS */    static Float32 const radius_m           { 30.f               };
-   /* PS */    static Float32       time_pool_ms       { .0f                };
+   /* PS */ // static Float32 const births_per_s       { 1.0f                   };
+   /* PS */ // static Float32 const ms_between_births  { 1'000.f / births_per_s };
+   /* PS */    static Float32 const avg_lifespan_ms    { 60'000.0f              };
+   /* PS */    static Float32 const avg_mass_kg        {     0.01f              };
+   /* PS */    static Float32 const avg_scale          {    1.00f               };
+   /* PS */    static Uvec4   const colour_rgba        { 255, 255, 255, 255     };
+   /* PS */    static Float32 const radius_m           { 30.f                   };
+   /* PS */    static Float32       time_pool_ms       { .0f                    };
    /* PS */
-   /* PS */    time_pool_ms += delta_t_ms;
+   /* PS */    static int counter = 0;
+   /* PS */    time_pool_ms += (delta_t_ms);
    /* PS */
    /* PS */    for ( auto i = 0;  i < data.count;  ++i ) {
    /* PS */        auto &particle          =  data.data[i]; // TODO: rename in ParticleSystem
-   /* PS */        particle.spatial[1]    +=  -.1f * delta_t_ms;
-   /* PS */        particle.time_ms_left  -=  delta_t_ms;
+   /* PS */        particle.spatial[1]    +=  -.5f * delta_t_ms;
+   /* PS */        // particle.time_ms_left  -=  delta_t_ms;
    /* PS */    }
    /* PS */
    /* PS */    std::random_device rd;
    /* PS */    std::mt19937 mt( rd() );
    /* PS */    std::uniform_real_distribution<Float32> dist( -radius_m, +radius_m );
    /* PS */
-   /* PS */    while ( time_pool_ms > birthrate_per_ms ) {
+   /* PS */    while ( time_pool_ms > 500.0f && (counter++ < 512) ) {
    /* PS */       data.add( Particle { colour_rgba,
    /* PS */                            Vec4 { dist(mt), dist(mt), dist(mt), avg_scale }, // random position
    /* PS */                            Vec3 { .0f, -.1f, .0f },
    /* PS */                            avg_lifespan_ms,
    /* PS */                            avg_mass_kg } );
-   /* PS */       time_pool_ms -= birthrate_per_ms;
+   /* PS */       time_pool_ms -= 500.0f;
    /* PS */    }
    /* PS */ };
    /* PS */
@@ -753,7 +755,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 // main loop:
 	while ( !glfwWindowShouldClose(window) ) {
       Float32 delta_time_ms { ImGui::GetIO().DeltaTime / 1000.f };
-      scene_manager.update( delta_time_ms );
+      scene_manager.update( delta_time_ms * 1'000'000.f );
 
       /* PS */ static Uint32 frame = 0;
       if ( ++frame < 128 ) {

@@ -6,11 +6,12 @@ layout (location = 2) in vec4 colour;  // r,g,b,a
 
 uniform mat4 view;
 uniform mat4 projection;    // TODO: combine view and projection
-uniform vec3 view_position; // TODO
+// uniform vec3 view_position; // TODO
 
 out vec2  uv_fs;
 out vec3 pos_fs;
 out mat3 tbn_fs;
+out vec4 col_fs;
 
 // TODO: forward colour to fragment shader and combine with albedo!
 
@@ -74,6 +75,8 @@ void main() {
    pos_fs    = particle_coord
              + view_right * vertex.x * particle_scale
              + view_up    * vertex.y * particle_scale;
+
+   col_fs    = colour;
 
    //pos_fs = vec3( 0.5, 0.5, 0.5 );
 

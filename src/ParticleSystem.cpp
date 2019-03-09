@@ -6,11 +6,11 @@
 // sorts the particles based on distance to the camera so that transparency handles properly.
 void ParticleSystem::_sort_back_to_front( Vec3 const &view_position ) { // @TODO_TAG{swizzle}
    std::sort(  _particles.data,
-              &_particles.data[Data::capacity],
+              &_particles.data[_particles.count],
               [&view_position] ( Data::Particle &lhs, Data::Particle &rhs ) {
                                   return  lhs.time_ms_left > 0.0f
                                        && length( Vec3{lhs.spatial} - view_position )
-                                        < length( Vec3{rhs.spatial} - view_position );
+                                        > length( Vec3{rhs.spatial} - view_position );
                                } );
 }
 
@@ -75,7 +75,7 @@ ParticleSystem::ParticleSystem( Transform              &&transform,
 {
 // Initialize particle data
    _initializer( _particles );
-   // _partition(); /*REENABLE*/
+   //_partition();
 
    glGenVertexArrays( 1, &_vao_loc );
    glBindVertexArray( _vao_loc );
@@ -132,13 +132,13 @@ void ParticleSystem::update( Float32 delta_time_ms ) {
 
 // Run update algorithm to update particle data:
    _updater( _particles, delta_time_ms );
-  //  _partition();                 /*REENABLE*/
+   //_partition();
 }
 
 
 // Drawer
 void ParticleSystem::draw( Vec3 const &viewport_position,  ShaderProgram &shader_program ) {
-   /*REENABLE*/ //_sort_back_to_front( viewport_position ); // necessary to avoid transparency issues
+   //_sort_back_to_front( viewport_position ); // necessary to avoid transparency issues
    _update_vbo_data();
 
 // Bind shader program:

@@ -29,6 +29,4 @@ void main() {
 	g_albedo   = texture( tex_diff, uv_fs );
 	g_emit     = texture( tex_emit, uv_fs );
 	g_picking  = obj_id;
-
-
 }

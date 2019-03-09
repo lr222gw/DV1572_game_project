@@ -107,7 +107,8 @@ void SceneManager::draw( Viewport &view ) {
 
    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-   _geometry_shader_program->use(); // glUseProgram( geometry_pass_loc );
+  /*CHANGE*/ _geometry_shader_program->use(); // glUseProgram( geometry_pass_loc );
+  /*CHANGE*/ view.bind_shader_program( _geometry_shader_program );
 
    glBindFramebuffer( GL_DRAW_FRAMEBUFFER, g_buffer.buffer_loc );
    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -130,7 +131,9 @@ void SceneManager::draw( Viewport &view ) {
       if ( !instance.expired() )
          instance.lock()->draw();
 
-   // TODO: put _particle_shader->use() here instead of inside ParticleSystem::Draw()?
+   // Particle system:
+   /*CHANGE*/ _particle_shader->use(); // gets called once per PS as well.. TODO: clean up
+   /*CHANGE*/ view.bind_shader_program( _particle_shader );
    for ( auto &ps : _particle_systems )
       if ( !ps.expired() )
          ps.lock()->draw( view_pos, *_particle_shader );
