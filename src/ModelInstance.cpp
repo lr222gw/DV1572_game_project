@@ -7,13 +7,6 @@ void ModelInstance::draw() {
                        1,
                        GL_FALSE,
                        &(_transform.matrix[0][0]) );
-<<<<<<< HEAD
-
-   Vec4 id_as_rgba { (Float32((id) >>  0 & 0xFF)) / 255,
-                     (Float32((id) >>  8 & 0xFF)) / 255,
-                     (Float32((id) >> 16 & 0xFF)) / 255,
-                     (Float32((id) >> 24 & 0xFF)) / 255 };
-=======
    //int test_id;
    //if (id < 33)
    //{
@@ -24,10 +17,9 @@ void ModelInstance::draw() {
 	  // test_id = 63;
    //}
    Vec4 id_as_rgba {  (Float32((id) >>  0 & 0xFF)) / 255,
-					  (Float32((id) >>  8 & 0xFF)) / 255,
-					  (Float32((id) >> 16 & 0xFF)) / 255,
-					  (Float32((id) >> 24 & 0xFF)) / 255 };
->>>>>>> c2588c7f02dea81dccce9b57ed91beff4bcb736f
+                      (Float32((id) >>  8 & 0xFF)) / 255,
+                      (Float32((id) >> 16 & 0xFF)) / 255,
+                      (Float32((id) >> 24 & 0xFF)) / 255 };
 
    // index for picking
    glUniform4fv( glGetUniformLocation(_shader_program->get_location(), "obj_id"),
