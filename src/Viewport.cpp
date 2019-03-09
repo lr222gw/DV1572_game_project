@@ -318,19 +318,34 @@ void Viewport::_g_buffer_init() {
 
 
 // picking (RGBA) light texture for g-buffer
-   glBindTexture( GL_TEXTURE_2D,
-	               _g_buffer.pic_tex_loc);
+
+//   glBindTexture( GL_TEXTURE_2D,
+//	               _g_buffer.pic_tex_loc);
+//
+//
+//   glTexImage2D( GL_TEXTURE_2D,
+//	              0,
+//	              GL_RGBA8,
+//	              width,
+//	              height,
+//	              0,
+//	              GL_RGBA,
+//	              GL_UNSIGNED_BYTE,
+//	              NULL );
+
+   glBindTexture(GL_TEXTURE_2D,
+	   _g_buffer.pic_tex_loc);
 
 
-   glTexImage2D( GL_TEXTURE_2D,
-	              0,
-	              GL_RGBA8,
-	              width,
-	              height,
-	              0,
-	              GL_RGBA,
-	              GL_UNSIGNED_BYTE,
-	              NULL );
+   glTexImage2D(GL_TEXTURE_2D,
+	   0,
+	   GL_RGBA32F,
+	   width,
+	   height,
+	   0,
+	   GL_RGBA,
+	   GL_FLOAT,
+	   NULL );
 
       // setting minifier:
    glTexParameteri( GL_TEXTURE_2D,

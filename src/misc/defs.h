@@ -88,6 +88,8 @@
                             using Size         = size_t;
 // boolean type:
                             using Bool         = bool;
+// void type:
+                            using Void         = void; // TODO: find-and-replace 'void' with 'Void'
 // function type:
 template< class R, class... Args >
                             using Function     = std::function<R(Args...)>;

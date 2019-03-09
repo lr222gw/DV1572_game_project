@@ -24,6 +24,10 @@ Uint64 SceneManager::_generate_light_id() {
    return _next_light_id++;
 }
 
+void SceneManager::instantiate_particle_system( WeakPtr<ParticleSystem> ps ) { /* @TAG{PS} */
+   _particle_systems.emplace_back( ps );
+}
+
 void SceneManager::_light_change_listener( Uint64 id ) {
    auto light = _lights[id];
 
@@ -80,6 +84,13 @@ SharedPtr<Light> SceneManager::instantiate_light( Light::Data data )
    return result;
 }
 
+void SceneManager::update( Float32 delta_time_ms ) {
+      for ( auto &ps : _particle_systems )
+         if ( !ps.expired() )
+            ps.lock()->update( delta_time_ms );
+}
+
+
 // TODO: use ShaderProgram::use()
 void SceneManager::draw( Viewport &view ) {
    auto &g_buffer = view.get_g_buffer();
@@ -98,7 +109,7 @@ void SceneManager::draw( Viewport &view ) {
 
    _geometry_shader_program->use(); // glUseProgram( geometry_pass_loc );
 
-   glBindFramebuffer( GL_FRAMEBUFFER, g_buffer.buffer_loc );
+   glBindFramebuffer( GL_DRAW_FRAMEBUFFER, g_buffer.buffer_loc );
    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
    // toggle wireframe mode if config is set to true
@@ -119,16 +130,22 @@ void SceneManager::draw( Viewport &view ) {
       if ( !instance.expired() )
          instance.lock()->draw();
 
+   // TODO: put _particle_shader->use() here instead of inside ParticleSystem::Draw()?
+   for ( auto &ps : _particle_systems )
+      if ( !ps.expired() )
+         ps.lock()->draw( view_pos, *_particle_shader );
+
    // disabling wireframe rendering so that the quad will render after the lighting pass
    glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
 // 2. Lighting pass:
-   glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+   glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0 );
    // TODO: refactor lighting pass code here
 
    glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
    _lighting_shader_program->use(); // glUseProgram( lighting_pass_loc );
+
 
    ////////////////////
 
@@ -445,11 +462,13 @@ void SceneManager::update_shadowmap()
 
 SceneManager::SceneManager( SharedPtr<ShaderProgram> geo_pass,
                             SharedPtr<ShaderProgram> light_pass,
-                            SharedPtr<ShaderProgram> shadow_depth )
+                            SharedPtr<ShaderProgram> shadow_depth,
+                            SharedPtr<ShaderProgram> particle_shader ) /* @TAG{PS} */
 :
    _lighting_shader_program ( light_pass   ),
    _geometry_shader_program ( geo_pass     ),
    _shadow_depth_shader     ( shadow_depth ),
+   _particle_shader         ( particle_shader ), /* @TAG{PS} */
    _num_lights              ( 0 )
 {
    _init_depth_map_FBO();
@@ -565,19 +584,20 @@ void SceneManager::_lights_to_gpu() {
 
 Uint32 SceneManager::get_object_id_at_pixel(Uint32 x, Uint32 y, Viewport &view)
 {
+	_geometry_shader_program->use();
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, view.get_g_buffer().buffer_loc);
 	glReadBuffer(GL_COLOR_ATTACHMENT5);
-
+	//glUseProgram(_geometry_shader_program)
 
 //	Uint32 pixel_info[4]{};
-//	//struct pixel_info_struct
-//	//{
-//	//	int x;
-//	//	int y;
-//	//	int z;
-//	//	int w;
-//	//};
-//	//pixel_info_struct pixel_info;
+	struct pixel_info_struct
+	{
+		float x;
+		float y;
+		float z;
+		float w;
+	};
+	pixel_info_struct pixel_info;
 //
 //	glReadPixels(x, y, 1, 1, GL_RGBA, GL_UNSIGNED_INT, (void*)&pixel_info);
 //
@@ -586,14 +606,16 @@ Uint32 SceneManager::get_object_id_at_pixel(Uint32 x, Uint32 y, Viewport &view)
 //                 + (pixel_info[2] & 0xFF <<  8)
 //                 + (pixel_info[3] & 0xFF <<  0); // TODO: validate that we get the correct ids
 
-	Uint8 pixel_info[4] {};
+	//Uint8 pixel_info[4] {};
 
-	glReadPixels( x, y, 1, 1, GL_RGBA8, GL_UNSIGNED_BYTE, &pixel_info );
+	glReadPixels( x, y, 1, 1, GL_RGBA, GL_FLOAT, &pixel_info );
 
-	Uint32 obj_id = ( (pixel_info[0] & 0xFF) << 24 )
-                 + ( (pixel_info[1] & 0xFF) << 16 )
-                 + ( (pixel_info[2] & 0xFF) <<  8 )
-                 + ( (pixel_info[3] & 0xFF) <<  0 );
+	Uint32 obj_id = ( ((int)(pixel_info.x * 255) & 0xFF))
+                  + ( ((int)(pixel_info.y * 255) & 0xFF))
+                  + ( ((int)(pixel_info.z * 255) & 0xFF))
+                  + ( ((int)(pixel_info.w * 255) & 0xFF));
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 
 	return obj_id;
 }
@@ -606,7 +628,9 @@ SharedPtr<ModelInstance> SceneManager::get_instance_ptr( Uint32 obj_id ) {
 				return e_ptr;
 		}
 	}
-	assert( false && "[ERROR] Instance of id no longer exists." );
+	//assert( false && "[ERROR] Instance of id no longer exists." );
+	std::cout << "no model hit" << std::endl;
+   return nullptr;
 }
 
 

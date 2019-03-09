@@ -12,7 +12,7 @@
 #include "Transform.h"
 #include "Viewport.h"
 #include "Shadowcaster.h"
-
+#include "ParticleSystem.h"
 #include "Light.h"
 
 constexpr Uint32  light_capacity = 32; // TODO: refactor into config
@@ -28,10 +28,12 @@ public:
 
    SharedPtr<Light> instantiate_light( Light::Data );
 
+   void instantiate_particle_system( WeakPtr<ParticleSystem> ); /* @TAG{PS} */
 
 // [[nodiscard]] LightData get_light_data( Uint64 id ) const; // NOTE! should only be used by Light's constructor (TODO: private+friend?)
 //   void                    set_light_data( Uint64 id, LightData );
    // void                    remove_light( Uint64 id );         // NOTE! should only be used by Light's destructor (TODO: private+friend?)
+   void update( Float32 delta_time_ms );
    void draw( Viewport & );
    void draw_debug_scene_inspection();
 
@@ -44,7 +46,10 @@ public:
    void use_depth_map_FBO();   // TODO: rename
    void update_shadowmap();
 
-   SceneManager( SharedPtr<ShaderProgram> geo_pass, SharedPtr<ShaderProgram> light_pass, SharedPtr<ShaderProgram> shadow_depth );
+   SceneManager( SharedPtr<ShaderProgram> geo_pass,
+                 SharedPtr<ShaderProgram> light_pass,
+                 SharedPtr<ShaderProgram> shadow_depth,
+                 SharedPtr<ShaderProgram> particle_shader ); /* @TAG{PS} */
 
    Uint32 get_object_id_at_pixel( Uint32 x, Uint32 y, Viewport & );
 
@@ -57,12 +62,15 @@ private:
    SharedPtr<ShaderProgram>        _lighting_shader_program;
    SharedPtr<ShaderProgram>        _geometry_shader_program;
    SharedPtr<ShaderProgram>        _shadow_depth_shader;
+   SharedPtr<ShaderProgram>        _particle_shader; /* @TAG{PS} */
 
    //DepthMap stuff for Shadowmapping
    Uint32                                     _depth_map_FBO_id;
    HashMap< SharedPtr<Shadowcaster>, Uint32>  _shadow_maps;// = { _shadowcasters ,  _depth_map_ids };
 
    Vector<WeakPtr<ModelInstance>>     _instances;
+
+   Vector<WeakPtr<ParticleSystem>>    _particle_systems;
 
    HashMap<Uint64, WeakPtr<Light>>    _lights;
    Array<Light::Data, light_capacity> _light_data;

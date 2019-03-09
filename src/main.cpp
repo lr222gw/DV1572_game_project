@@ -24,8 +24,15 @@
 // #include "misc/stb_image.h"
 // #include <range/v3/all.hpp>
 
+/* @TAG{PS} */
+#include "ParticleSystem.h"
+#include <random> /* used by particle system algorithm defined in main */
+
+
 Float32 g_move_speed            = 25.0f; // TODO: refactor away ugly globalness
 Bool    g_is_mouse_look_enabled = false;
+// temp debug for mouse picking
+
 
 // For opengl debuging
 void APIENTRY glDebugOutput( GLenum        source,
@@ -121,8 +128,6 @@ void process_mouse( GLFWwindow   *window,
 
    Float64 x_pos, y_pos;
 
-
-
    glfwGetCursorPos( window, &x_pos, &y_pos );
 
    if ( first_mouse ) {
@@ -132,11 +137,16 @@ void process_mouse( GLFWwindow   *window,
    }
 
    // mouse picking
-   if (false) { //Getting crashes again
-      if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1)) {
-         SharedPtr<ModelInstance> model = scene.get_instance_ptr(scene.get_object_id_at_pixel(x_pos, y_pos, cam));
-         model->transform(Transform::make_rotation(Vec3(1.0, 1.0, 1.0)));
-         std::cout << x_pos << ":" << y_pos << std::endl;
+   if (true) { //Getting crashes again
+      if ( glfwGetMouseButton( window, GLFW_MOUSE_BUTTON_1) ) {
+		  Uint32     obj_id = scene.get_object_id_at_pixel(x_pos, y_pos, cam);
+		  auto instance_ptr = scene.get_instance_ptr(obj_id);
+		  if ( instance_ptr != nullptr )
+		  {
+			  SharedPtr<ModelInstance> model = instance_ptr;
+			  model->transform( Transform::make_rotation(Vec3(0.0, 1.0, 0.0)) );
+		  }
+         std::cout << x_pos << ":" << y_pos << ".  Model id: " << obj_id << std::endl;
       }
    }
 
@@ -148,8 +158,16 @@ void process_mouse( GLFWwindow   *window,
    last_x           = x_pos;
    last_y           = y_pos;
 
-   if ( !g_is_mouse_look_enabled )
-      return;
+   if ( glfwGetMouseButton( window, GLFW_MOUSE_BUTTON_MIDDLE) != GLFW_PRESS ) {
+      if ( !g_is_mouse_look_enabled ) {
+         glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_NORMAL );
+         return;
+      }
+   }
+   else {
+      glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_DISABLED );
+   }
+
 
    // 'http://justsomething.co/wp-content/uploads/2013/11/guns-replaced-thumbs-up-20.jpg'
 
@@ -208,13 +226,14 @@ void toggle_input_callback( GLFWwindow  *window,
    if ( key == GLFW_KEY_ESCAPE  &&  action == GLFW_PRESS )
       glfwSetWindowShouldClose( window, true );
 
-   if ( key == GLFW_KEY_F1  &&  action == GLFW_PRESS ) {
+   if ( (key == GLFW_KEY_F1 )  &&  action == GLFW_PRESS ) {
       g_is_mouse_look_enabled = !g_is_mouse_look_enabled;
       if ( g_is_mouse_look_enabled )
          glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_DISABLED );
       else
          glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_NORMAL );
    }
+
 
    if ( key == GLFW_KEY_F2  &&  action == GLFW_PRESS )
       config.is_wireframe_mode = !config.is_wireframe_mode; // used in SceneManager::Draw()
@@ -236,18 +255,20 @@ void toggle_input_callback( GLFWwindow  *window,
 	   config.render_mode = RenderMode::picking;
    if ( key == GLFW_KEY_F12 &&  action == GLFW_PRESS )
       config.is_imgui_toggled = !config.is_imgui_toggled;
+
+
 }
 
 
 
 void process_input( GLFWwindow  *window,
                     Viewport    &cam,
-                    Float32      time_delta_s )
+                    Float32      time_delta_ms )
 {
 
    // glfwSetInputMode( window, GLFW_STICKY_KEYS, 1 );
 
-   Float32    move_distance = g_move_speed * time_delta_s;
+   Float32    move_distance = g_move_speed * (time_delta_ms * 1000);
    Transform  offset;
 
 
@@ -500,13 +521,17 @@ Int32 main( Int32 argc, char const *argv[] ) {
    ShaderManager shader_manager{};
    AssetManager  asset_manager{};
 
-   auto lighting_vert_shader   { shader_manager.load_shader( "lightSha.vert" ) }; // TODO: rename files
-   auto lighting_frag_shader   { shader_manager.load_shader( "lightSha.frag" ) }; // TODO: rename files
-   auto geometry_vert_shader   { shader_manager.load_shader( "g_buffer.vert" ) }; // TODO: rename files
-   auto geometry_frag_shader   { shader_manager.load_shader( "g_buffer.frag" ) }; // TODO: rename files
-   auto geometry_geom_shader   { shader_manager.load_shader( "g_buffer.geom" ) };
-   auto shadowdepth_vert_shader{ shader_manager.load_shader("shadow_depth.vert") };
-   auto shadowdepth_frag_shader{ shader_manager.load_shader("shadow_depth.frag") };
+   auto lighting_vert_shader    { shader_manager.load_shader( "lightSha.vert" )        }; // TODO: rename files
+   auto lighting_frag_shader    { shader_manager.load_shader( "lightSha.frag" )        }; // TODO: rename files
+   auto geometry_vert_shader    { shader_manager.load_shader( "g_buffer.vert" )        }; // TODO: rename files
+   auto geometry_frag_shader    { shader_manager.load_shader( "g_buffer.frag" )        }; // TODO: rename files
+   auto geometry_geom_shader    { shader_manager.load_shader( "g_buffer.geom" )        };
+   auto shadowdepth_vert_shader { shader_manager.load_shader( "shadow_depth.vert" )    };
+   auto shadowdepth_frag_shader { shader_manager.load_shader( "shadow_depth.frag" )    };
+   /* PS */ auto ps_vert_shader { shader_manager.load_shader( "particle_system.vert" ) }; //
+   /* PS */ auto ps_geom_shader { shader_manager.load_shader( "particle_system.geom" ) }; //  /* @TAG{PS} */
+   /* PS */ auto ps_frag_shader { shader_manager.load_shader( "particle_system.frag" ) }; //
+
 
    auto geometry_program      { shader_manager.create_program( { geometry_frag_shader,
                                                                  geometry_vert_shader,
@@ -516,8 +541,10 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
    auto shadowdepth_program   { shader_manager.create_program({ shadowdepth_frag_shader, shadowdepth_vert_shader }) };
 
+   auto particle_program      { shader_manager.create_program({ ps_vert_shader, ps_geom_shader, ps_frag_shader }) };    /* @TAG{PS} */
+
    //Add Lightning program to Scenemanager
-   SceneManager  scene_manager{ geometry_program, lighting_program , shadowdepth_program };
+   SceneManager  scene_manager{ geometry_program, lighting_program , shadowdepth_program, particle_program }; /* @TAG{PS} */
 
    Vector<SharedPtr<Light>> light_instances;
 
@@ -676,13 +703,65 @@ Int32 main( Int32 argc, char const *argv[] ) {
    glUniform1i( glGetUniformLocation( lighting_program->get_location(), "shadowMap"    ), 6 );
 
    //glEnable(GL_CULL_FACE);
+   glDisable( GL_BLEND );
 
+   /* @TAG{PS} */
+   /* PS */ auto ps_logic = [] ( ParticleSystem::Data &data, Float32 delta_t_ms ) {
+   /* PS */    using  Particle = ParticleSystem::Data::Particle;
+   /* PS */
+   /* PS */    static Float32 const birthrate_per_ms   { 12.0f / 1'000      }; // 12 per s
+   /* PS */    static Float32 const avg_lifespan_ms    { 60'000.0f          };
+   /* PS */    static Float32 const avg_mass_kg        {     0.01f          };
+   /* PS */    static Float32 const avg_scale          {   100.00f          };
+   /* PS */    static Uvec4   const colour_rgba        { 255, 255, 255, 255 };
+   /* PS */    static Float32 const radius_m           { 30.f               };
+   /* PS */    static Float32       time_pool_ms       { .0f                };
+   /* PS */
+   /* PS */    time_pool_ms += delta_t_ms;
+   /* PS */
+   /* PS */    for ( auto i = 0;  i < data.count;  ++i ) {
+   /* PS */        auto &particle          =  data.data[i]; // TODO: rename in ParticleSystem
+   /* PS */        particle.spatial[1]    +=  -.1f * delta_t_ms;
+   /* PS */        particle.time_ms_left  -=  delta_t_ms;
+   /* PS */    }
+   /* PS */
+   /* PS */    std::random_device rd;
+   /* PS */    std::mt19937 mt( rd() );
+   /* PS */    std::uniform_real_distribution<Float32> dist( -radius_m, +radius_m );
+   /* PS */
+   /* PS */    while ( time_pool_ms > birthrate_per_ms ) {
+   /* PS */       data.add( Particle { colour_rgba,
+   /* PS */                            Vec4 { dist(mt), dist(mt), dist(mt), avg_scale }, // random position
+   /* PS */                            Vec3 { .0f, -.1f, .0f },
+   /* PS */                            avg_lifespan_ms,
+   /* PS */                            avg_mass_kg } );
+   /* PS */       time_pool_ms -= birthrate_per_ms;
+   /* PS */    }
+   /* PS */ };
+   /* PS */
+   /* PS */ TextureSet snowflake_tex {
+   /* PS */    std::make_shared<DiffuseTexture>  ( FilePath{ FileType::texture, "snowflake_dif.png"  }),
+   /* PS */    std::make_shared<NormalTexture>   ( FilePath{ FileType::texture, "snowflake_nor.png"  }),
+   /* PS */    std::make_shared<SpecularTexture> ( FilePath{ FileType::texture, "snowflake_spec.png" }),
+   /* PS */    std::make_shared<EmissiveTexture> ( FilePath{ FileType::texture, "snowflake_emit.png" })
+   /* PS */ };
+   /* PS */
+   /* PS */ auto ps { std::make_shared<ParticleSystem>( Transform::make_translation(Vec3{.0f, 3.0f, .0f}), snowflake_tex, ps_logic ) };
+   /* PS */ scene_manager.instantiate_particle_system( ps ); // TODO: revamp in SceneManager
+   /* PS */ ps->start();
 
-
-// glDisable( GL_BLEND );
 // main loop:
 	while ( !glfwWindowShouldClose(window) ) {
-      Float32 delta_time_s { ImGui::GetIO().DeltaTime };
+      Float32 delta_time_ms { ImGui::GetIO().DeltaTime / 1000.f };
+      scene_manager.update( delta_time_ms );
+
+      /* PS */ static Uint32 frame = 0;
+      if ( ++frame < 128 ) {
+         printf( "\n================================ Frame %d! ================================\n", frame );
+      }
+      else {
+         printf( "\n================================ Frame %d. ================================\n", frame );
+      }
 
 		// poll & handle events such as window resizing and input from the keyboard or mouse
 		// use io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if imgui wants to use the user's input
@@ -728,8 +807,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
       sundbg.light_caster_debugg_tool_render();
 
-      process_mouse( window, view, scene_manager, delta_time_s );
-      process_input( window, view, delta_time_s );
+      process_mouse( window, view, scene_manager, delta_time_ms );
+      process_input( window, view, delta_time_ms );
 
       // glMatrixMode( GL_PROJECTION );
       // glLoadIdentity();
@@ -757,10 +836,23 @@ Int32 main( Int32 argc, char const *argv[] ) {
       auto mdl = mo2->model_transform;
       //mdl.look_at(Vec3(13.0f, 0.0f, 0.0f), Vec3(0.0f, 0.0f, 0.00001f) );
       static Float32 g = 0.0f;
+      static Float32 h = 0.0f;
 
 
       static bool hm = true;
-      if (true) {
+      static bool isPressed = false;
+      static float time = ImGui::GetTime();
+      float curTime = ImGui::GetTime();
+
+      float timepast = curTime - time;
+
+      if (glfwGetKey(window, GLFW_KEY_P)&& timepast > 0.25) {
+         isPressed = !isPressed;
+
+
+         time = ImGui::GetTime();
+      }
+      if (true && isPressed) {
 
          if (g > 2) {
             hm = false;
@@ -775,16 +867,26 @@ Int32 main( Int32 argc, char const *argv[] ) {
          else {
             g -= 0.01f;
          }
-# define M_PI           3.14159265358979323846
-         ;
-         for (int i = 0; i < 64; i++) {
+         h += 0.01f;
+
+         for (int i = 0; i < 64-1; i++) {
             Float32 size = 0.1f;
             //mo2->transform(Transform::make_translation(Vec3(0.0,0.0,0.0)));
 
             model_instances[i]->set_transform(Transform::make_translation(model_instances[i]->model_transform.get_position()));
-            model_instances[i]->transform(Transform::make_rotation(Vec3(0.0f, (Float32)glm::cos((g*glm::pow(i, 0.2)*(g / 2))*((i % 3))), (Float32)glm::sin(g/2* (i % 2)))) * Transform::make_translation(Vec3((Float32)glm::sin(g*i)*((i % 3)* size), (Float32)glm::sin(g* (i % 2)* size)*0.02 , (Float32)glm::sin(g/10)*((i%5) % 2))));
+            model_instances[i]->transform(Transform::make_rotation(Vec3((Float32)glm::cos(15 * g*(((i % 4))% 2)), (Float32)glm::cos(12*g*((i % 3))), (Float32)glm::sin(g/2* (i % 2)))) * Transform::make_translation(Vec3((Float32)glm::sin(g*i)*((i % 3)* size), (Float32)glm::sin(g* (i % 2)* size)*0.02 , (Float32)glm::sin(g/10)*((i%5) % 2))));
 
          }
+         //model_instances[63]->set_transform(Transform::make_translation(model_instances[63]->model_transform.get_position()));
+         auto cur = model_instances[63]->model_transform;
+         //model_instances[63]->transform(Transform::make_translation(glm::normalize(Vec3(0.f, 0.f, 20.0f))));
+         //model_instances[63]->transform(Transform::make_translation(glm::normalize(Vec3(1 * glm::cos(2 * g + cur.get_position().y) + cur.get_position().x, 1 * glm::sin(2 * g + cur.get_position().x) + cur.get_position().y, 0))));
+         //model_instances[63]->transform(Transform::make_translation((Vec3((0.5 ) * glm::cos(2 * h + cur.get_position().x) /*+ cur.get_position().y*/, 0, (0.5 ) * glm::sin(2 * h /* + cur.get_position().y*/) /*+ cur.get_position().x*/))));
+         Float32 radius = 30;
+         Vec3 rotateAround(0.0,0.0,0.0);//Might be wrong
+         Float32 speed = 5;
+         model_instances[63]->set_transform(Transform::make_translation((Vec3((radius) * glm::cos(speed * h + rotateAround.x) + rotateAround.y, rotateAround.z, (radius) * glm::sin(speed * h  + rotateAround.x) + rotateAround.y))));
+
       }
 
       //mdl.set_position(Vec3(1.0f ,0.0f,0.0f));
