@@ -660,7 +660,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    for ( auto i=0;  i<64;  ++i ) {
       Float32 n = 9; // spacing
       model_instances.push_back(
-         scene_manager.instantiate_model(ape_model,
+         scene_manager.instantiate_model( ape_model,
                                           geometry_program,
                                           Transform( Vec3( n*(i/8)-40,  0.0f,  n*(i%8)-40 ),
                                                      Vec3(       0.0f,  0.0f,        0.0f ),
@@ -673,7 +673,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
          Transform(Vec3(0.0, 0.0, 0.0),
          Vec3(0.0f, 0.0f ,0.0f),
          //Vec3(0.0f, 0.0, 0.0f),
-         Vec3(18.0f, 1.0f, 18.0f))));
+         Vec3(100.0f, 1.0f, 100.0f))));
 
 
    //Tool to see more clearly how Light frustrum looks like
