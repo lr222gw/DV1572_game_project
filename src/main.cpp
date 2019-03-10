@@ -723,15 +723,22 @@ Int32 main( Int32 argc, char const *argv[] ) {
    /* PS */    elapsed_time += delta_t_ms;
    /* PS */    time_pool_ms += (delta_t_ms);
    /* PS */
+               static Float32 sin[8] {};
+               static Float32 cos[8] {};
+               for ( int i=0;  i<8;  ++i ) {
+                  sin[i] = (0.10 * glm::sin(glm::radians((elapsed_time * 0.01 + i*53))));
+                  cos[i] = (0.05 * glm::cos(glm::radians((elapsed_time * 0.01 + i*37))));
+               }
+
    /* PS */    for ( auto i = 0;  i < data.count;  ++i ) {
    /* PS */        auto &particle          =  data.data[i]; // TODO: rename in ParticleSystem
    /* PS */        //Pos
    /* PS */        particle.spatial[1]    +=  (-.005f -(i % 20)/43) * delta_t_ms;
-   /* PS */        particle.spatial[0]    +=  (0.1 * glm::sin(glm::radians((elapsed_time * 0.01 + i*3)  )));
-   /* PS */        particle.spatial[2]    += (0.05 * glm::cos(glm::radians((elapsed_time * 0.01 + i * 7))));
+   /* PS */        particle.spatial[0]    += sin[(i+31)%8];
+   /* PS */        particle.spatial[2]    += cos[(i+47)%8];
    /* PS */        //Scale
-   /* PS */        particle.spatial[3]    = avg_scale * (1-(avg_lifespan_ms-particle.time_ms_left)/avg_lifespan_ms);
-   /* PS */        particle.time_ms_left  -=  delta_t_ms;
+   /* PS */        particle.spatial[3]     = avg_scale * (1-(avg_lifespan_ms-particle.time_ms_left)/avg_lifespan_ms);
+   /* PS */        particle.time_ms_left  -= delta_t_ms;
    /* PS */
    /* PS */    }
    /* PS */
