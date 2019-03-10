@@ -138,16 +138,17 @@ void process_mouse( GLFWwindow   *window,
    }
 
    // mouse picking
-   if (true) { //Getting crashes again
-      if ( glfwGetMouseButton( window, GLFW_MOUSE_BUTTON_1) ) {
-		  Uint32     obj_id = scene.get_object_id_at_pixel(x_pos, y_pos, cam);
-		  auto instance_ptr = scene.get_instance_ptr(obj_id);
-		  if ( instance_ptr != nullptr )
-		  {
-			  SharedPtr<ModelInstance> model = instance_ptr;
-			  model->transform( Transform::make_rotation(Vec3(0.0, 1.0, 0.0)) );
-		  }
-         std::cout << x_pos << ":" << y_pos << ".  Model id: " << obj_id << std::endl;
+   if ( true ) { // getting crashes again
+      if ( glfwGetMouseButton( window, GLFW_MOUSE_BUTTON_1 ) ) {
+         Uint32     obj_id = scene.get_object_id_at_pixel(x_pos, y_pos, cam);
+         auto instance_ptr = scene.get_instance_ptr(obj_id);
+         if ( instance_ptr != nullptr ) {
+            SharedPtr<ModelInstance> model = instance_ptr;
+            model->transform( Transform::make_rotation(Vec3(0.0, 1.0, 0.0)) );
+         }
+         if constexpr ( Config::is_debugging )
+            std::cout << "[MOUSE_PICKING]" << x_pos  << ":" << y_pos
+                      << ". Model id: "    << obj_id << "\n";
       }
    }
 
@@ -165,9 +166,7 @@ void process_mouse( GLFWwindow   *window,
          return;
       }
    }
-   else {
-      glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_DISABLED );
-   }
+   else glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_DISABLED );
 
 
    // 'http://justsomething.co/wp-content/uploads/2013/11/guns-replaced-thumbs-up-20.jpg'
