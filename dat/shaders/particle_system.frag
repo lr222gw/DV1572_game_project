@@ -29,7 +29,8 @@ void main() {
    g_albedo   = texture(   tex_diff, uv_fs ); //* col_fs; // TODO: reactivate
    g_emit     = texture(   tex_emit, uv_fs );
 
-	if(g_albedo.w == 0){
+   //TODO: Use glEnable(GL_BLEND) instead, first fix particle system to not store stuff in the RGBA <- A channel...
+	if(g_albedo.w < 0.525){
 		discard;
 	}
 }
