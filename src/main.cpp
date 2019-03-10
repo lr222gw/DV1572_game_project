@@ -731,10 +731,10 @@ Int32 main( Int32 argc, char const *argv[] ) {
    /* PS */    std::random_device rd;
    /* PS */    std::mt19937 mt( rd() );
    /* PS */    std::uniform_real_distribution<Float32> dist( -radius_m, +radius_m );
-   /* PS */
+   /* PS */    std::uniform_real_distribution<Float32> scale_dist( -.30f, +.30f );
    /* PS */    while ( time_pool_ms > ms_between_births ) {
    /* PS */       data.add( Particle { colour_rgba,
-   /* PS */                            Vec4 { dist(mt), 40.0f, dist(mt), avg_scale }, // random position
+   /* PS */                            Vec4 { dist(mt), 40.0f, dist(mt), avg_scale + scale_dist(mt) }, // random position
    /* PS */                            Vec3 { .0f, -.01f, .0f },
    /* PS */                            avg_lifespan_ms,
    /* PS */                            avg_mass_kg } );
