@@ -719,13 +719,20 @@ Int32 main( Int32 argc, char const *argv[] ) {
    /* PS */    static Uvec4   const colour_rgba        { 255, 255, 255, 255     };
    /* PS */    static Float32 const radius_m           { 60.f                   };
    /* PS */    static Float32       time_pool_ms       { .0f                    };
-   /* PS */
+   /* PS */    static Float32       elapsed_time       {  0                  };     
+               elapsed_time += delta_t_ms;
    /* PS */    time_pool_ms += (delta_t_ms);
    /* PS */
    /* PS */    for ( auto i = 0;  i < data.count;  ++i ) {
    /* PS */        auto &particle          =  data.data[i]; // TODO: rename in ParticleSystem
-   /* PS */        particle.spatial[1]    +=  -.005f * delta_t_ms;
-   /* PS */        particle.time_ms_left  -=  delta_t_ms;
+                   //Pos
+   /* PS */        particle.spatial[1]    +=  -.005f * delta_t_ms * (i * 0.005);
+                   particle.spatial[0]    +=  (0.1 * glm::sin(glm::radians((elapsed_time * 0.01 + i*3)  )));
+                   particle.spatial[2]    += (0.05 * glm::cos(glm::radians((elapsed_time * 0.01 + i * 7))));
+   /* PS */        //Scale
+                   //particle.spatial[3]    += 
+                   particle.time_ms_left  -=  delta_t_ms;
+                   
    /* PS */    }
    /* PS */
    /* PS */    std::random_device rd;
@@ -734,7 +741,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    /* PS */
    /* PS */    while ( time_pool_ms > ms_between_births ) {
    /* PS */       data.add( Particle { colour_rgba,
-   /* PS */                            Vec4 { dist(mt), 40.0f, dist(mt), avg_scale }, // random position
+   /* PS */                            Vec4 { dist(mt), 60.0f, dist(mt), avg_scale }, // random position
    /* PS */                            Vec3 { .0f, -.01f, .0f },
    /* PS */                            avg_lifespan_ms,
    /* PS */                            avg_mass_kg } );
