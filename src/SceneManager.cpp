@@ -132,8 +132,27 @@ void SceneManager::draw( Viewport &view ) {
          instance.lock()->draw();
 
    // Particle system:
-  //glEnable(GL_BLEND);
-  //glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+
+  // glBindFramebuffer(GL_FRAMEBUFFER,
+  //    g_buffer.buffer_loc);
+  //
+  // glBindTexture(GL_TEXTURE_2D,
+  //    g_buffer.alb_tex_loc);   
+  //
+  // glEnable(GL_BLEND);
+  // glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+  //
+  // glBindTexture(GL_TEXTURE_2D,
+  //    0);
+  //
+  // glFramebufferTexture2D(GL_FRAMEBUFFER,
+  //    GL_COLOR_ATTACHMENT0,
+  //    GL_TEXTURE_2D,
+  //    g_buffer.alb_tex_loc,
+  //    0);
+  //
+  // glDisable(GL_BLEND);
+   
    //glBlendFunci(g_buffer.alb_tex_loc, GL_ZERO, GL_ONE);
 
    /*CHANGE*/ _particle_shader->use(); // gets called once per PS as well.. TODO: clean up
@@ -142,8 +161,9 @@ void SceneManager::draw( Viewport &view ) {
       if ( !ps.expired() )
          ps.lock()->draw( view_pos, *_particle_shader );
 
+  
 
-   //glDisable(GL_BLEND);
+   
 
    // disabling wireframe rendering so that the quad will render after the lighting pass
    glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
@@ -162,8 +182,9 @@ void SceneManager::draw( Viewport &view ) {
    auto g_buffer_data { view.get_g_buffer() };
 
 // @TAG{TEXTURE_CHANNEL}
+   
    glActiveTexture( GL_TEXTURE0) ;
-   glBindTexture(   GL_TEXTURE_2D, g_buffer_data.alb_tex_loc );
+   glBindTexture(   GL_TEXTURE_2D, g_buffer_data.alb_tex_loc );   
 
    glActiveTexture( GL_TEXTURE1 );
    glBindTexture(   GL_TEXTURE_2D, g_buffer_data.spe_tex_loc );

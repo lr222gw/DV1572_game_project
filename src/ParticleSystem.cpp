@@ -146,7 +146,7 @@ void ParticleSystem::draw( Vec3 const &viewport_position,  ShaderProgram &shader
 
    glBindVertexArray( _vao_loc );
 
-   glEnable( GL_BLEND );
+   
 
    TextureSet::ScopedBindGuard pin { _textures, shader_program }; // RAII
 

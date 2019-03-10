@@ -18,6 +18,9 @@ layout (location = 3) out vec4 g_emit;
 layout (location = 4) out vec3 g_position;
 
 void main() {
+	
+	
+
    g_position = pos_fs;
    g_normal   = texture(   tex_norm, uv_fs ).xyz;
    g_normal   = normalize( g_normal * 2.0 - 1.0 ); // TODO: verify necessity
@@ -25,4 +28,8 @@ void main() {
    g_spec     = texture(   tex_spec, uv_fs );
    g_albedo   = texture(   tex_diff, uv_fs ); //* col_fs; // TODO: reactivate
    g_emit     = texture(   tex_emit, uv_fs );
+
+	if(g_albedo.w == 0){
+		discard;
+	}
 }

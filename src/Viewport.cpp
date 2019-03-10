@@ -153,12 +153,12 @@ void Viewport::_g_buffer_init() {
 
 
 // albedo (RGBA) color texture for g-buffer
-
-
+   
+  
 
    glBindTexture( GL_TEXTURE_2D,
                   _g_buffer.alb_tex_loc );
-
+  
    glTexImage2D( GL_TEXTURE_2D,
                  0,
                  GL_RGBA,
@@ -185,7 +185,8 @@ void Viewport::_g_buffer_init() {
                            GL_TEXTURE_2D,
                            _g_buffer.alb_tex_loc,
                            0 );
- 
+  
+   
 
 
 // specularity (specularity color + specularity intensity) for g-buffer:
@@ -398,6 +399,8 @@ void Viewport::_g_buffer_init() {
    // control the status of the frame buffer
    if ( glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE )
       assert( false && "G-buffer status is not complete. " );
+
+   
 
    // Bind to default buffer
    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
