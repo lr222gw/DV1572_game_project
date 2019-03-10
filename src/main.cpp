@@ -711,21 +711,28 @@ Int32 main( Int32 argc, char const *argv[] ) {
    /* PS */ auto ps_logic = [] ( ParticleSystem::Data &data, Float32 delta_t_ms ) {
    /* PS */    using  Particle = ParticleSystem::Data::Particle;
    /* PS */
-   /* PS */    static Float32 const births_per_s       { 60.0f                  };
+   /* PS */    static Float32 const births_per_s       { 240.0f                 };
    /* PS */    static Float32 const ms_between_births  { 1'000.f / births_per_s };
    /* PS */    static Float32 const avg_lifespan_ms    { 9'000.0f               };
    /* PS */    static Float32 const avg_mass_kg        {     0.01f              };
    /* PS */    static Float32 const avg_scale          {     0.50f              };
    /* PS */    static Uvec4   const colour_rgba        { 255, 255, 255, 255     };
-   /* PS */    static Float32 const radius_m           { 60.f                   };
+   /* PS */    static Float32 const radius_m           { 120.f                  };
    /* PS */    static Float32       time_pool_ms       { .0f                    };
-   /* PS */
+   /* PS */    static Float32       elapsed_time       {  0                     };
+   /* PS */    elapsed_time += delta_t_ms;
    /* PS */    time_pool_ms += (delta_t_ms);
    /* PS */
    /* PS */    for ( auto i = 0;  i < data.count;  ++i ) {
    /* PS */        auto &particle          =  data.data[i]; // TODO: rename in ParticleSystem
-   /* PS */        particle.spatial[1]    +=  -.005f * delta_t_ms;
+   /* PS */        //Pos
+   /* PS */        particle.spatial[1]    +=  (-.005f -(i % 20)/43) * delta_t_ms;
+   /* PS */        particle.spatial[0]    +=  (0.1 * glm::sin(glm::radians((elapsed_time * 0.01 + i*3)  )));
+   /* PS */        particle.spatial[2]    += (0.05 * glm::cos(glm::radians((elapsed_time * 0.01 + i * 7))));
+   /* PS */        //Scale
+   /* PS */        particle.spatial[3]    = avg_scale * (1-(avg_lifespan_ms-particle.time_ms_left)/avg_lifespan_ms);
    /* PS */        particle.time_ms_left  -=  delta_t_ms;
+   /* PS */
    /* PS */    }
    /* PS */
    /* PS */    std::random_device rd;
@@ -734,7 +741,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    /* PS */    std::uniform_real_distribution<Float32> scale_dist( -.30f, +.30f );
    /* PS */    while ( time_pool_ms > ms_between_births ) {
    /* PS */       data.add( Particle { colour_rgba,
-   /* PS */                            Vec4 { dist(mt), 40.0f, dist(mt), avg_scale + scale_dist(mt) }, // random position
+   /* PS */                            Vec4 { dist(mt), 40.0f, dist(mt), avg_scale }, // random position
    /* PS */                            Vec3 { .0f, -.01f, .0f },
    /* PS */                            avg_lifespan_ms,
    /* PS */                            avg_mass_kg } );
