@@ -22,9 +22,14 @@ class SceneManager {
 // friend class Handle<ParticleSystem>;
 // friend class Handle<Light>;
 public:
-   SharedPtr<ModelInstance> instantiate_model( SharedPtr<Model>,
-                                               SharedPtr<ShaderProgram>,
-                                               Transform const & );
+   SharedPtr<ModelInstance<false>> instantiate_model(             SharedPtr<Model>,
+                                                                  SharedPtr<ShaderProgram>,
+                                                                  Transform const & );
+
+   SharedPtr<ModelInstance<true>> instantiate_tessellated_model(  SharedPtr<Model>,
+                                                                  SharedPtr<ShaderProgram>,
+                                                                  Transform const &);
+
 
    SharedPtr<Light> instantiate_light( Light::Data );
 
@@ -47,7 +52,8 @@ public:
    void update_shadowmap();
 
    SceneManager( SharedPtr<ShaderProgram> geo_pass,
-                 SharedPtr<ShaderProgram> light_pass,
+                 SharedPtr<ShaderProgram> geo_pass_tessellated,
+                 SharedPtr<ShaderProgram> light_pass,                 
                  SharedPtr<ShaderProgram> shadow_depth,
                  SharedPtr<ShaderProgram> particle_shader ); /* @TAG{PS} */
 
@@ -63,6 +69,7 @@ private:
    SharedPtr<ShaderProgram>        _geometry_shader_program;
    SharedPtr<ShaderProgram>        _shadow_depth_shader;
    SharedPtr<ShaderProgram>        _particle_shader; /* @TAG{PS} */
+   SharedPtr<ShaderProgram>        _tessellation_shader_program;
 
    //DepthMap stuff for Shadowmapping
    Uint32                                     _depth_map_FBO_id;

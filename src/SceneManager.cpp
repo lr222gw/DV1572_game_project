@@ -1,6 +1,6 @@
 #include "SceneManager.h"
 
-SharedPtr<ModelInstance> SceneManager::instantiate_model(
+SharedPtr<ModelInstance<false>> SceneManager::instantiate_model(
    SharedPtr<Model>          model,
    SharedPtr<ShaderProgram>  shader_program,
    Transform const&          transform)
@@ -8,13 +8,32 @@ SharedPtr<ModelInstance> SceneManager::instantiate_model(
    auto callback_lambda = [=]() { _should_recalculate_shadowmap = true; };
    // construct return value (shared pointer):
    auto instance_ptr = // TODO: switch to UniquePtr..?
-      std::make_shared<ModelInstance>( model,
+      std::make_shared<ModelInstance<false>>( model,
                                        shader_program,
                                        transform,
                                        callback_lambda );
 
    // add a weak pointer to the scene manager's instance list before returning:
    _instances.push_back( instance_ptr );
+
+   return instance_ptr;
+}
+
+SharedPtr<ModelInstance<true>> SceneManager::instantiate_tessellated_model(
+   SharedPtr<Model>          model,
+   SharedPtr<ShaderProgram>  tessellated_shader_program,
+   Transform const&          transform)
+{
+   auto callback_lambda = [=]() { _should_recalculate_shadowmap = true; };
+   // construct return value (shared pointer):
+   auto instance_ptr = // TODO: switch to UniquePtr..?
+      std::make_shared<ModelInstance<true>>( model,
+                                             tessellated_shader_program,
+                                             transform,
+                                             callback_lambda);
+
+   // add a weak pointer to the scene manager's instance list before returning:
+   _instances.push_back(instance_ptr);
 
    return instance_ptr;
 }
@@ -492,15 +511,17 @@ void SceneManager::update_shadowmap()
 }
 
 SceneManager::SceneManager( SharedPtr<ShaderProgram> geo_pass,
+                            SharedPtr<ShaderProgram> geo_pass_tessellated,
                             SharedPtr<ShaderProgram> light_pass,
                             SharedPtr<ShaderProgram> shadow_depth,
                             SharedPtr<ShaderProgram> particle_shader ) /* @TAG{PS} */
 :
-   _lighting_shader_program ( light_pass   ),
-   _geometry_shader_program ( geo_pass     ),
-   _shadow_depth_shader     ( shadow_depth ),
-   _particle_shader         ( particle_shader ), /* @TAG{PS} */
-   _num_lights              ( 0 )
+   _geometry_shader_program      ( geo_pass     ),
+   _tessellation_shader_program  ( geo_pass_tessellated),
+   _lighting_shader_program      ( light_pass   ),
+   _shadow_depth_shader          ( shadow_depth ),
+   _particle_shader              ( particle_shader ), /* @TAG{PS} */
+   _num_lights                   ( 0 )
 {
    _init_depth_map_FBO();
 }

@@ -56,6 +56,10 @@ Shader::Type ShaderManager::_extract_type( StringView filename ) const {
           return Shader::Type::geometry;
       else if ( extension == "frag" )
           return Shader::Type::fragment;
+      else if (extension == "tese")
+         return  Shader::Type::tess_eval;
+      else if (extension == "tesc")
+         return  Shader::Type::tess_ctrl;
       else {
          assert(false && "Unaccounted for Shader-extension");
          return Shader::Type::error;

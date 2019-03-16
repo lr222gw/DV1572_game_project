@@ -6,7 +6,7 @@
 
 class Shader {
 public:
-   enum class Type { vertex, geometry, fragment, error };
+   enum class Type { vertex, geometry, fragment, tess_eval, tess_ctrl, error };
 
    Shader( char const *shader_str, Type const type);
    ~Shader();
