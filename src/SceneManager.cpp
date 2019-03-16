@@ -6,7 +6,10 @@ SharedPtr<ModelInstance> SceneManager::instantiate_model(
    Transform const&          transform,
    Bool                      tessellation_enabled )
 {
-   auto callback_lambda = [=]() { _should_recalculate_shadowmap = true; };
+   auto callback_lambda = [=]() {
+      _should_recalculate_shadowmap = true; // for lightmap recalculation
+      _sort_by_distance();                  // for front-to-back rendering
+   };
    // construct return value (shared pointer):
    auto instance_ptr = // TODO: switch to UniquePtr..?
       std::make_shared<ModelInstance>( model,
@@ -99,8 +102,6 @@ void SceneManager::update( Float32 delta_time_ms ) {
 
 // TODO: use ShaderProgram::use()
 void SceneManager::draw( Viewport &view ) {
-   _sort_by_distance( view ); // front-to-back
-
    auto &g_buffer = view.get_g_buffer();
 
    auto lighting_pass_loc = _lighting_shader_program->get_location();
