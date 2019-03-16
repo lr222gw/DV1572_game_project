@@ -82,25 +82,6 @@ void APIENTRY glDebugOutput( GLenum        source,
    std::cout << "\n\n";
 }
 
-void create_demo_scene( /*...*/ ) {
-   // TODO: setup the viewport camera
-
-   // load the statue into memory
-   //auto statue_handle = assets.load_model( "12330_Statue_v1_L2.obj" );
-
-   // create 9 statues arranged thusly:
-   //   0  1  2
-   //   3  4  5
-   //   6  7  8
-   for ( int i=0;  i<9;  ++i ) {
-      glm::vec3 position { i/3, i%3, 0 };
-      //auto instance_id = scene.add_object( statue_handle, position );
-   }
-}
-
-
-
-
 [[nodiscard]] String lowercase( char const *base ) {
    String s ( base );
    std::transform( s.begin(), s.end(), s.begin(), ::tolower );
@@ -112,7 +93,6 @@ void create_demo_scene( /*...*/ ) {
    std::transform( s.begin(), s.end(), s.begin(), ::toupper );
    return s;
 }
-
 
 void process_mouse( GLFWwindow   *window,
                     Viewport     &cam,
@@ -546,7 +526,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
                                                                         geo_tess_vert_shader,
                                                                         geo_tess_tesc_shader,
                                                                         geo_tess_tese_shader}) };
-   
+
    auto lighting_program      { shader_manager.create_program({ lighting_frag_shader, lighting_vert_shader }) };
 
    auto shadowdepth_program   { shader_manager.create_program({ shadowdepth_frag_shader, shadowdepth_vert_shader }) };
@@ -555,7 +535,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
    //Add Lightning program to Scenemanager
    SceneManager  scene_manager{ geometry_program, geometry_tessellation_program, lighting_program , shadowdepth_program, particle_program }; /* @TAG{PS} */
-   
+
    Vector<SharedPtr<Light>> light_instances;
 
    light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,
@@ -687,7 +667,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
 
    //Tool to see more clearly how Light frustrum looks like
-   ShadowcasterDebug sundbg = ShadowcasterDebug(light_sc, &asset_manager, &scene_manager, &model_instances, geometry_program, &poss, &dirr);
+   //ShadowcasterDebug sundbg = ShadowcasterDebug(light_sc, &asset_manager, &scene_manager, &model_instances, geometry_program, &poss, &dirr);
 
    //SunApe->set_transform()
 
@@ -832,7 +812,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
                                   sun->get_direction(),
                                   Vec3(0.0f, 1.0f, 0.0f) ); // up vector?
 
-      sundbg.light_caster_debugg_tool_render();
+      //sundbg.light_caster_debugg_tool_render();
 
       process_mouse( window, view, scene_manager, delta_time_ms );
       process_input( window, view, delta_time_ms );

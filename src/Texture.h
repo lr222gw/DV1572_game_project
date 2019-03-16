@@ -4,10 +4,11 @@
 #include "Config.h"
 #include "ShaderProgram.h"
 
-enum class TextureType : Uint8 { diffuse  = 0,
-                                 normal   = 1,
-                                 specular = 2,
-                                 emissive = 3 };
+enum class TextureType : Uint8 { diffuse      = 0,
+                                 normal       = 1,
+                                 specular     = 2,
+                                 emissive     = 3,
+                                 displacement = 4 };
 
 template <TextureType T_type>
 class Texture {
@@ -142,6 +143,12 @@ private:
          pixel_data[2] = 0;
          format        = GL_RGBA;
       }
+      else if      ( type == TextureType::displacement ) {
+         pixel_data[0] = 0;
+         pixel_data[1] = 0;
+         pixel_data[2] = 0;
+         format        = GL_RGB; // TODO: use single channel
+      }
       else assert( false && "Unaccounted for texture type!" );
 
       glBindTexture( GL_TEXTURE_2D, texture_id );
@@ -180,10 +187,11 @@ private:
 
 [[nodiscard]] String to_string( TextureType );
 
-using NormalTexture   = Texture<TextureType::normal>;
-using SpecularTexture = Texture<TextureType::specular>;
-using DiffuseTexture  = Texture<TextureType::diffuse>;
-using EmissiveTexture = Texture<TextureType::emissive>;
+using NormalTexture       = Texture<TextureType::normal>;
+using SpecularTexture     = Texture<TextureType::specular>;
+using DiffuseTexture      = Texture<TextureType::diffuse>;
+using EmissiveTexture     = Texture<TextureType::emissive>;
+using DisplacementTexture = Texture<TextureType::displacement>;
 
 class TextureSet {
 public:
@@ -202,9 +210,10 @@ public:
    };
 
 // exposed member data:
-   SharedPtr<DiffuseTexture>   diffuse;
-   SharedPtr<NormalTexture>    normal;
-   SharedPtr<SpecularTexture>  specular;
-   SharedPtr<EmissiveTexture>  emissive;
+   SharedPtr<DiffuseTexture>       diffuse;
+   SharedPtr<NormalTexture>        normal;
+   SharedPtr<SpecularTexture>      specular;
+   SharedPtr<EmissiveTexture>      emissive;
+   SharedPtr<DisplacementTexture>  displacement;
 };
 
