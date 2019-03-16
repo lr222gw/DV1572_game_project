@@ -9,9 +9,11 @@ Shader::Shader( char const *shader_str, Type const type ):
    GLint compile_result { 0 };
 
    switch ( type ) {
-      case Type::vertex:   _shader_location = glCreateShader( GL_VERTEX_SHADER   ); break;
-      case Type::geometry: _shader_location = glCreateShader( GL_GEOMETRY_SHADER ); break;
-      case Type::fragment: _shader_location = glCreateShader( GL_FRAGMENT_SHADER ); break;
+      case Type::vertex:   _shader_location = glCreateShader( GL_VERTEX_SHADER          );  break;
+      case Type::geometry: _shader_location = glCreateShader( GL_GEOMETRY_SHADER        );  break;
+      case Type::fragment: _shader_location = glCreateShader( GL_FRAGMENT_SHADER        );  break;
+      case Type::tess_ctrl: _shader_location = glCreateShader( GL_TESS_CONTROL_SHADER   );  break;
+      case Type::tess_eval: _shader_location = glCreateShader( GL_TESS_EVALUATION_SHADER);  break;
       default: assert( false && "TODO: add new ShaderType for Shader.cpp" ); // TODO: exception?
    }
 

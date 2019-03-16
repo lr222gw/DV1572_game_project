@@ -526,6 +526,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    auto geometry_vert_shader    { shader_manager.load_shader( "g_buffer.vert" )        }; // TODO: rename files
    auto geometry_frag_shader    { shader_manager.load_shader( "g_buffer.frag" )        }; // TODO: rename files
    auto geometry_geom_shader    { shader_manager.load_shader( "g_buffer.geom" )        };
+   auto geo_tess_geom_shader    { shader_manager.load_shader( "g_buffer_tess.geom" )   };
    auto geo_tess_vert_shader    { shader_manager.load_shader( "g_buffer_tess.vert")    };
    auto geo_tess_tesc_shader    { shader_manager.load_shader( "g_buffer.tesc")         };
    auto geo_tess_tese_shader    { shader_manager.load_shader( "g_buffer.tese")         };
@@ -541,11 +542,11 @@ Int32 main( Int32 argc, char const *argv[] ) {
                                                                  geometry_vert_shader } ) };
 
    auto geometry_tessellation_program{ shader_manager.create_program({  geometry_frag_shader,
-                                                                        geometry_geom_shader,
+                                                                        geo_tess_geom_shader,
                                                                         geo_tess_vert_shader,
                                                                         geo_tess_tesc_shader,
                                                                         geo_tess_tese_shader}) };
-
+   
    auto lighting_program      { shader_manager.create_program({ lighting_frag_shader, lighting_vert_shader }) };
 
    auto shadowdepth_program   { shader_manager.create_program({ shadowdepth_frag_shader, shadowdepth_vert_shader }) };
@@ -554,7 +555,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
    //Add Lightning program to Scenemanager
    SceneManager  scene_manager{ geometry_program, geometry_tessellation_program, lighting_program , shadowdepth_program, particle_program }; /* @TAG{PS} */
-
+   
    Vector<SharedPtr<Light>> light_instances;
 
    light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,
@@ -678,11 +679,11 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
    SharedPtr<Model> floor = asset_manager.load_model("floor.obj");
    model_instances.push_back(scene_manager.instantiate_model(floor,
-         geometry_program,
+         geometry_tessellation_program,
          Transform(Vec3(0.0, 0.0, 0.0),
          Vec3(0.0f, 0.0f ,0.0f),
          //Vec3(0.0f, 0.0, 0.0f),
-         Vec3(100.0f, 1.0f, 100.0f))));
+         Vec3(100.0f, 1.0f, 100.0f)),true));
 
 
    //Tool to see more clearly how Light frustrum looks like

@@ -54,10 +54,15 @@ Vector<SharedPtr<Mesh>> const & Model::get_meshes() const {
 }
 
 void Model::_draw( ShaderProgram &shader_program, Bool should_tessellate ) const {
-   for ( auto &e : get_meshes() )  // for each mesh in the model
+   
+   for ( auto &e : get_meshes() ){  // for each mesh in the model
+      
       if ( should_tessellate )
          e->_draw_tessellated( shader_program ); // call the mesh's tessellated draw function
       else e->_draw( shader_program );           // call the mesh's draw function
+      
+      
+   }
 }
 
 

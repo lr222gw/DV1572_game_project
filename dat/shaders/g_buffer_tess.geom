@@ -7,7 +7,6 @@ in vec2 uv_gs[];
 in vec3 pos_gs[];
 in mat3 tbn_gs[];
 
-
 out vec2 uv_fs;
 out vec3 pos_fs;
 out mat3 tbn_fs;

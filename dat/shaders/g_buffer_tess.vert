@@ -25,6 +25,7 @@ void main() {
 	pos_tc         = pos_world.xyz;
 
 	//Output for vertex to Tessepipeline should not be in ClipSpace...
-	gl_Position    = pos_world;
+	//TODO: problem? Raden under kanske ska vara enabled
+	//gl_Position    = pos_world;
 	//gl_Position    = projection * view  * pos_world;
 }

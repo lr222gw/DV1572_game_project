@@ -135,9 +135,15 @@ void SceneManager::draw( Viewport &view ) {
 
    // 1. Geometry Pass:
    // TODO: sortera instanserna efter ShaderProgram m.h.a. std::partition()
-   for ( auto &instance : _instances )
-      if ( !instance.expired() )
+   int counter = 0;
+   for (auto &instance : _instances) {
+      if (!instance.expired())
          instance.lock()->draw();
+
+      counter++;
+      int h = 0;
+   }
+      
 
    // Particle system:
 

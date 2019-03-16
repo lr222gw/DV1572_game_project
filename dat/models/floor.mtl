@@ -13,3 +13,4 @@ illum 2
 map_Kd floor_diffuse.png
 map_Kn floor_normal.png
 map_Ks floor_specular.png
+disp floor_displacement.png
