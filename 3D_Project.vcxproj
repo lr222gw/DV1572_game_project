@@ -83,8 +83,6 @@
     <None Include="dat\shaders\particle_system.frag" />
     <None Include="dat\shaders\particle_system.geom" />
     <None Include="dat\shaders\particle_system.vert" />
-    <None Include="dat\shaders\quad.frag" />
-    <None Include="dat\shaders\quad.vert" />
     <None Include="dat\shaders\shadow_depth.frag" />
     <None Include="dat\shaders\shadow_depth.vert" />
     <None Include="dat\shaders\vertSha.vert" />
