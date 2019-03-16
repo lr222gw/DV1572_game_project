@@ -39,15 +39,15 @@ void main()
 	tbn_gs = mat3(tangent, bitangent, normal);
 
 	//TODO: Conversion:  to vec4 or gl_TessCoord to vec3?
-	vec4 p1 = mix(vec4(pos_te[1],1.0f),vec4(pos_te[0],1.0f),gl_TessCoord.x);
-	vec4 p2 = mix(vec4(pos_te[2],1.0f),vec4(pos_te[3],1.0f),gl_TessCoord.x);
-	vec4 pos = mix(p1, p2, gl_TessCoord.y);
+	vec3 p1 = mix(pos_te[1],pos_te[0],gl_TessCoord.x);
+	vec3 p2 = mix(pos_te[2],pos_te[3],gl_TessCoord.x);
+	vec3 pos = mix(p1, p2, gl_TessCoord.y);
 
 	float displacement = texture(displacement_map, uv_gs.xy).x;
 	// Displace the vertex along the normal
 	pos_gs = (pos.xyz + normal * displacement * 23); //TODO: add Factor instead of hardcoded "23"
 
-	gl_Position = projection * view * vec4(pos_gs,1.0f);
+	gl_Position = projection * view * vec4(pos,1.0f);//vec4(pos_gs,1.0f);
 
 
 } 
