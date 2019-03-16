@@ -137,7 +137,7 @@ void SceneManager::draw( Viewport &view ) {
   //    g_buffer.buffer_loc);
   //
   // glBindTexture(GL_TEXTURE_2D,
-  //    g_buffer.alb_tex_loc);   
+  //    g_buffer.alb_tex_loc);
   //
   // glEnable(GL_BLEND);
   // glBlendFunc(GL_SRC_ALPHA, GL_ONE);
@@ -152,7 +152,7 @@ void SceneManager::draw( Viewport &view ) {
   //    0);
   //
   // glDisable(GL_BLEND);
-   
+
    //glBlendFunci(g_buffer.alb_tex_loc, GL_ZERO, GL_ONE);
 
    /*CHANGE*/ _particle_shader->use(); // gets called once per PS as well.. TODO: clean up
@@ -161,9 +161,9 @@ void SceneManager::draw( Viewport &view ) {
       if ( !ps.expired() )
          ps.lock()->draw( view_pos, *_particle_shader );
 
-  
 
-   
+
+
 
    // disabling wireframe rendering so that the quad will render after the lighting pass
    glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
@@ -182,9 +182,9 @@ void SceneManager::draw( Viewport &view ) {
    auto g_buffer_data { view.get_g_buffer() };
 
 // @TAG{TEXTURE_CHANNEL}
-   
+
    glActiveTexture( GL_TEXTURE0) ;
-   glBindTexture(   GL_TEXTURE_2D, g_buffer_data.alb_tex_loc );   
+   glBindTexture(   GL_TEXTURE_2D, g_buffer_data.alb_tex_loc );
 
    glActiveTexture( GL_TEXTURE1 );
    glBindTexture(   GL_TEXTURE_2D, g_buffer_data.spe_tex_loc );
@@ -666,7 +666,30 @@ SharedPtr<ModelInstance> SceneManager::get_instance_ptr( Uint32 obj_id ) {
    return nullptr;
 }
 
-
+void SceneManager::_sort_by_distance( Viewport const &viewport ) {
+   auto const &cam_pos = viewport.get_view().get_position();
+   std::sort( _instances.begin(), _instances.end(), [&cam_pos]( InstanceStorage const &lhs, InstanceStorage const &rhs ) {
+                                                       // start off with high distances (in case they've expired):
+                                                       auto  lhs_dist { std::numeric_limits<float>::infinity() };
+                                                       auto  rhs_dist { std::numeric_limits<float>::infinity() };
+                                                       // extract the two elements' potential sizes:
+                                                       for ( auto const &[storage_ptr_var, dist] : { std::make_pair(lhs, lhs_dist), std::make_pair(rhs, rhs_dist) } ) {
+                                                          if ( std::holds_alternative<WeakPtr<ModelInstance>(storage_ptr_var) ) {
+                                                             auto const storage_ptr = storage_ptr_var.get<WeakPtr<ModelInstance>();
+                                                             if ( !storage_ptr.expired() )
+                                                                dist = glm::distance( cam_pos, storage_ptr.lock()->get_position() );
+                                                          }
+                                                          else {
+                                                             assert( std::holds_alternative<WeakPtr<TessellatedInstance>(e) );
+                                                             auto const storage_ptr = storage_ptr_var.get<WeakPtr<TessellatedInstance>();
+                                                             if ( !storage_ptr.expired() )
+                                                                dist = glm::distance( cam_pos, storage_ptr.lock()->get_position() );
+                                                          }
+                                                       }
+                                                       // compare the two distances:
+                                                       return lhs_dist = rhs_dist;
+                                                    } );
+}
 
 /*
    lights[0] = LightData{ LightType::point,
@@ -740,3 +763,5 @@ SharedPtr<ModelInstance> SceneManager::get_instance_ptr( Uint32 obj_id ) {
                           17.0,
                            0.0,
                            1.0 };*/
+
+
