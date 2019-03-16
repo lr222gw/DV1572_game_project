@@ -2,7 +2,7 @@
 
 // Number of Controlpoints per patch
 layout (vertices = 4) out; //TODO: More vertrices? 
-uniform vec3 cam_pos;
+uniform vec3 view_pos;
 
 // input data per Controlpoint
 in vec3 pos_tc[];
@@ -35,10 +35,10 @@ void main()
     tbn_te[gl_InvocationID] = tbn_tc[gl_InvocationID];
 
 	// Distance from camera to the ControlPoints of our patch
-    float cam_to_left_side		= distance(cam_pos, pos_tc[0]);
-    float cam_to_bottom_side	= distance(cam_pos, pos_tc[1]);
-    float cam_to_right_side		= distance(cam_pos, pos_tc[2]);
-	float cam_to_top_side		= distance(cam_pos, pos_tc[2]);
+    float cam_to_left_side		= distance(view_pos, pos_tc[0]);
+    float cam_to_bottom_side	= distance(view_pos, pos_tc[1]);
+    float cam_to_right_side		= distance(view_pos, pos_tc[2]);
+	float cam_to_top_side		= distance(view_pos, pos_tc[2]);
 
     // Calculate the tessellation levels
     gl_TessLevelOuter[0] = distance_to_tesslevel(cam_to_bottom_side,	cam_to_right_side	);

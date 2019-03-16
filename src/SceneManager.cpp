@@ -119,6 +119,18 @@ void SceneManager::draw( Viewport &view ) {
 
    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+   _tessellation_shader_program->use();   
+   /*CHANGE*/ view.bind_shader_program(_tessellation_shader_program);
+
+   view.update();
+   auto view_pos = view.get_view().get_position();
+   glUniform3fv(glGetUniformLocation(_tessellation_shader_program->get_location(), "view_pos"),
+      1,
+      glm::value_ptr(view_pos));
+
+
+
+
   /*CHANGE*/ _geometry_shader_program->use(); // glUseProgram( geometry_pass_loc );
   /*CHANGE*/ view.bind_shader_program( _geometry_shader_program );
 
@@ -131,7 +143,7 @@ void SceneManager::draw( Viewport &view ) {
 
    //Send view_pos to g_buffer.geom shader
    view.update();
-   auto view_pos = view.get_view().get_position();
+   view_pos = view.get_view().get_position();
    glUniform3fv( glGetUniformLocation( geometry_pass_loc, "view_pos"),
                  1,
                  glm::value_ptr(view_pos));
