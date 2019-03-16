@@ -58,6 +58,7 @@ void main(void) {
 
 
 	if(result > 0.0 ){
+
 	    gl_Position = gl_in[0].gl_Position;
 		//gs_color = vs_color[0];
 		uv_fs  = uv_gs[0];

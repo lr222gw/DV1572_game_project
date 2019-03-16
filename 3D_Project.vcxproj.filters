@@ -223,5 +223,11 @@
     <None Include="dat\shaders\particle_system.frag">
       <Filter>Resource Files\Shaders</Filter>
     </None>
+    <None Include="dat\shaders\g_buffer.tesc">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="dat\shaders\g_buffer.tese">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
