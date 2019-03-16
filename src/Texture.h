@@ -144,9 +144,9 @@ private:
          format        = GL_RGBA;
       }
       else if      ( type == TextureType::displacement ) {
-         pixel_data[0] = 0;
-         pixel_data[1] = 0;
-         pixel_data[2] = 0;
+         pixel_data[0] = 127;
+         pixel_data[1] = 127;
+         pixel_data[2] = 127;
          format        = GL_RGB; // TODO: use single channel
       }
       else assert( false && "Unaccounted for texture type!" );
@@ -210,10 +210,11 @@ public:
    };
 
 // exposed member data:
-   SharedPtr<DiffuseTexture>       diffuse;
-   SharedPtr<NormalTexture>        normal;
-   SharedPtr<SpecularTexture>      specular;
-   SharedPtr<EmissiveTexture>      emissive;
-   SharedPtr<DisplacementTexture>  displacement;
+   SharedPtr<DiffuseTexture>       diffuse;      // 0
+   SharedPtr<NormalTexture>        normal;       // 1
+   SharedPtr<SpecularTexture>      specular;     // 2
+   SharedPtr<EmissiveTexture>      emissive;     // 3
+   SharedPtr<DisplacementTexture>  displacement; // 4
+   static constexpr Uint32         channel_count  = 5; // remember to update when adding channels
 };
 

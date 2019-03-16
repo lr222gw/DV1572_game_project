@@ -233,6 +233,8 @@ void toggle_input_callback( GLFWwindow  *window,
       config.render_mode = RenderMode::textureless;
    if ( key == GLFW_KEY_F10 &&  action == GLFW_PRESS)
 	   config.render_mode = RenderMode::picking;
+   if ( key == GLFW_KEY_F11 &&  action == GLFW_PRESS)
+      config.render_mode = RenderMode::displacement;
    if ( key == GLFW_KEY_F12 &&  action == GLFW_PRESS )
       config.is_imgui_toggled = !config.is_imgui_toggled;
 
@@ -688,9 +690,10 @@ Int32 main( Int32 argc, char const *argv[] ) {
    glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_spec"   ), 1 );
    glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_norm"   ), 2 );
    glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_emit"   ), 3 );
-   glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_pos"    ), 4 );
-   glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_pic"    ), 5 );
-   glUniform1i( glGetUniformLocation( lighting_program->get_location(), "shadowMap"    ), 6 );
+   glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_disp"   ), 4 );
+   glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_pos"    ), 5 );
+   glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_pic"    ), 6 );
+   glUniform1i( glGetUniformLocation( lighting_program->get_location(), "shadowMap"    ), 7 );
 
    //glEnable(GL_CULL_FACE);
    //glEnable( GL_BLEND );
@@ -749,12 +752,13 @@ Int32 main( Int32 argc, char const *argv[] ) {
    /* PS */    }
    /* PS */ };
    /* PS */
-   /* PS */ auto snowflake_dif  = std::make_shared<DiffuseTexture>  ( FilePath{ FileType::texture, "snowflake_dif.png"  });
-   /* PS */ auto snowflake_nor  = std::make_shared<NormalTexture>   ( FilePath{ FileType::texture, "snowflake_nor.png"  });
-   /* PS */ auto snowflake_spec = std::make_shared<SpecularTexture> ( FilePath{ FileType::texture, "snowflake_spec.png" });
-   /* PS */ auto snowflake_emit = std::make_shared<EmissiveTexture> ( FilePath{ FileType::texture, "snowflake_emit.png" });
+   /* PS */ auto snowflake_dif  = std::make_shared<DiffuseTexture>      ( FilePath{ FileType::texture, "snowflake_dif.png"  });
+   /* PS */ auto snowflake_nor  = std::make_shared<NormalTexture>       ( FilePath{ FileType::texture, "snowflake_nor.png"  });
+   /* PS */ auto snowflake_spec = std::make_shared<SpecularTexture>     ( FilePath{ FileType::texture, "snowflake_spec.png" });
+   /* PS */ auto snowflake_emit = std::make_shared<EmissiveTexture>     ( FilePath{ FileType::texture, "snowflake_emit.png" });
+   /* PS */ auto snowflake_disp = std::make_shared<DisplacementTexture> ( /* no displacement texture */ );
    /* PS */
-   /* PS */ TextureSet snowflake_tex { snowflake_dif, snowflake_nor, snowflake_spec, snowflake_emit };
+   /* PS */ TextureSet snowflake_tex { snowflake_dif, snowflake_nor, snowflake_spec, snowflake_emit, snowflake_disp };
    /* PS */
    /* PS */ auto ps { std::make_shared<ParticleSystem>( Transform::make_translation(Vec3{.0f, 3.0f, .0f}), snowflake_tex, ps_logic ) };
    /* PS */ scene_manager.instantiate_particle_system( ps ); // TODO: revamp in SceneManager

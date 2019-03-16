@@ -187,7 +187,7 @@ void SceneManager::draw( Viewport &view ) {
    glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
 // 2. Lighting pass:
-   glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0 );
+   glBindFramebuffer( GL_DRAW_FRAMEBUFFER, 0 );
    // TODO: refactor lighting pass code here
 
    glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
@@ -200,7 +200,6 @@ void SceneManager::draw( Viewport &view ) {
    auto g_buffer_data { view.get_g_buffer() };
 
 // @TAG{TEXTURE_CHANNEL}
-
    glActiveTexture( GL_TEXTURE0) ;
    glBindTexture(   GL_TEXTURE_2D, g_buffer_data.alb_tex_loc );
 
@@ -214,9 +213,12 @@ void SceneManager::draw( Viewport &view ) {
    glBindTexture(   GL_TEXTURE_2D, g_buffer_data.emi_tex_loc );
 
    glActiveTexture( GL_TEXTURE4 );
+   glBindTexture(   GL_TEXTURE_2D, g_buffer_data.dis_tex_loc );
+
+   glActiveTexture( GL_TEXTURE5 );
    glBindTexture(   GL_TEXTURE_2D, g_buffer_data.pos_tex_loc );
 
-   glActiveTexture( GL_TEXTURE5);
+   glActiveTexture( GL_TEXTURE6 );
    glBindTexture(   GL_TEXTURE_2D, g_buffer_data.pic_tex_loc );
 
    glUniform3fv( glGetUniformLocation( lighting_pass_loc, "view_pos"),
@@ -231,7 +233,7 @@ void SceneManager::draw( Viewport &view ) {
          GL_FALSE,
          glm::value_ptr(e.first->get_matrix()));
       // Mat4 ello = e.first->get_matrix();
-      glActiveTexture(GL_TEXTURE6);
+      glActiveTexture(GL_TEXTURE7);
       glBindTexture(GL_TEXTURE_2D, e.second);
 
       //glUniform1i(glGetUniformLocation(_light_pass_shader->get_location(), "shadowMap"), 4);
@@ -406,57 +408,57 @@ void SceneManager::set_shadowcasting(SharedPtr<Shadowcaster> light)
 
    glBindTexture(GL_TEXTURE_2D, depthMap);
 
-   glTexImage2D(GL_TEXTURE_2D,
-      0,
-      GL_DEPTH_COMPONENT,
-      width,
-      height,
-      0,
-      GL_DEPTH_COMPONENT,
-      GL_FLOAT,
-      NULL);
+   glTexImage2D( GL_TEXTURE_2D,
+                 0,
+                 GL_DEPTH_COMPONENT,
+                 width,
+                 height,
+                 0,
+                 GL_DEPTH_COMPONENT,
+                 GL_FLOAT,
+                 NULL);
 
-   glTexParameteri(GL_TEXTURE_2D,
-      GL_TEXTURE_MIN_FILTER,
-      GL_NEAREST);
+   glTexParameteri( GL_TEXTURE_2D,
+                    GL_TEXTURE_MIN_FILTER,
+                    GL_NEAREST);
 
-   glTexParameteri(GL_TEXTURE_2D,
-      GL_TEXTURE_MAG_FILTER,
-      GL_NEAREST);
+   glTexParameteri( GL_TEXTURE_2D,
+                    GL_TEXTURE_MAG_FILTER,
+                    GL_NEAREST);
 
-   glTexParameteri(GL_TEXTURE_2D,
-      GL_TEXTURE_WRAP_S,
-      GL_CLAMP_TO_BORDER);
+   glTexParameteri( GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_S,
+                    GL_CLAMP_TO_BORDER);
 
-   glTexParameteri(GL_TEXTURE_2D,
-      GL_TEXTURE_WRAP_T,
-      GL_CLAMP_TO_BORDER);
+   glTexParameteri( GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_T,
+                    GL_CLAMP_TO_BORDER);
 
 //   glTexParameteri(GL_TEXTURE_2D,
 //      GL_CLAMP_TO_BORDER, //  LOWE!
 //      GL_CLAMP_TO_BORDER);
 
    float borderColor[] = { 0.0,0.0,0.0, 0.0 };
-   glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+   glTexParameterfv( GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor );
 
    //Uint32 AttatchmentNmbr = _shadow_maps.size();
 
-   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
-   glDrawBuffer(GL_NONE);
-   glReadBuffer(GL_NONE);
+   glFramebufferTexture2D( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0 );
+   glDrawBuffer( GL_NONE );
+   glReadBuffer( GL_NONE );
 
-   _shadow_maps.emplace(light, depthMap);
-   glBindFramebuffer(GL_FRAMEBUFFER, 0);
+   _shadow_maps.emplace( light, depthMap );
+   glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 }
 
 void SceneManager::_init_depth_map_FBO()
 {
-   glGenFramebuffers(1, &_depth_map_FBO_id);
+   glGenFramebuffers( 1, &_depth_map_FBO_id );
 }
 
 void SceneManager::use_depth_map_FBO()
 {
-   glBindFramebuffer(GL_FRAMEBUFFER, _depth_map_FBO_id);
+   glBindFramebuffer( GL_FRAMEBUFFER, _depth_map_FBO_id );
 }
 
 void SceneManager::update_shadowmap()

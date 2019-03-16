@@ -16,6 +16,7 @@ uniform  sampler2D  g_tex_norm;
 uniform  sampler2D  g_tex_spec;
 uniform  sampler2D  g_tex_albedo;
 uniform  sampler2D  g_tex_emit;
+uniform  sampler2D  g_tex_disp;
 uniform  sampler2D  g_tex_pic;
 out      vec4       rgba_rasterizer;
 
@@ -34,14 +35,15 @@ const uint        point_light_t = 0,
                    spot_light_t = 1,
             directional_light_t = 2;
 
-const uint mode_composite   = 0,
-           mode_albedo      = 1,
-           mode_normals     = 2,
-           mode_specular    = 3,
-           mode_positional  = 4,
-           mode_emissive    = 5,
-           mode_textureless = 6,
-           mode_picking	    = 7;
+const uint mode_composite    = 0,
+           mode_albedo       = 1,
+           mode_specular     = 2,
+           mode_normals      = 3,
+           mode_emissive     = 4,
+           mode_displacement = 5,
+           mode_positional   = 6,
+           mode_textureless  = 7,
+           mode_picking	     = 8;
 
 const int lights_cap = 32;
 
@@ -60,21 +62,23 @@ void main() {
    float spec_str = texture( g_tex_spec,   fs_in.uv ).w;   // TODO: check texture channels
    vec4  emissive = texture( g_tex_emit,   fs_in.uv );
    vec3  emit_rgb = emissive.xyz;
-   vec4  picking  = texture(g_tex_pic, fs_in.uv);
+   vec3  disp_rgb = texture( g_tex_disp,   fs_in.uv ).rgb;
+   vec4  picking  = texture( g_tex_pic,    fs_in.uv );
 
    vec3 view_dir  = normalize( view_pos - pos );
 
    vec3 lighting;
 
    switch ( render_mode ) {
-      case mode_albedo:      lighting = albedo;      break;
-      case mode_normals:     lighting = norm;        break;
-      case mode_specular:    lighting = spec_rgb;    break; // TODO: check texture channels
-      case mode_positional:  lighting = pos;         break;
-      case mode_emissive:    lighting = emit_rgb;    break;
-      case mode_picking:     lighting = vec3( min( 255, picking.rgb.x*20 ),
-                                              min( 255, picking.rgb.y*20 ),
-                                              min( 255, picking.rgb.z*20 ) ); break; //picking.rgb; break;
+      case mode_albedo:        lighting = albedo;      break;
+      case mode_normals:       lighting = norm;        break;
+      case mode_specular:      lighting = spec_rgb;    break;
+      case mode_positional:    lighting = pos;         break;
+      case mode_emissive:      lighting = emit_rgb;    break;
+      case mode_displacement:  lighting = disp_rgb;    break;
+      case mode_picking:       lighting = vec3( min( 255, picking.rgb.x*10 ),
+                                                min( 255, picking.rgb.y*10 ),
+                                                min( 255, picking.rgb.z*10 ) ); break; //picking.rgb; break;
       case mode_textureless: if ( pos.x+pos.y+pos.z!=0 ) albedo = vec3( 1.0 ); // no break so that the mode_composite code gets run
       case mode_composite:
          lighting = emit_rgb;

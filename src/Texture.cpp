@@ -34,11 +34,17 @@ TextureSet::ScopedBindGuard::ScopedBindGuard( TextureSet const &target,
    glActiveTexture( GL_TEXTURE3 );
    glUniform1i( glGetUniformLocation( shader_location, "tex_emit"), 3 );
    glBindTexture( GL_TEXTURE_2D, _textures.emissive->get_location() );
+
+   glActiveTexture( GL_TEXTURE4 );
+   glUniform1i( glGetUniformLocation( shader_location, "tex_disp"), 4 );
+   glBindTexture( GL_TEXTURE_2D, _textures.displacement->get_location() );
+
+   // remember to update TextureSet::channel_count when adding new channels!
 }
 
 // destructor unbinds textures at the end of the scope of creation
 TextureSet::ScopedBindGuard::~ScopedBindGuard() {
-    for ( GLuint i = 0;  i < 4;  ++i ) {
+    for ( GLuint i = 0;  i < TextureSet::channel_count;  ++i ) {
        glActiveTexture( GL_TEXTURE0 + i );
        glBindTexture(   GL_TEXTURE_2D, 0 );
     }
