@@ -1,122 +1,52 @@
+#version 440 core
+
+// Number of Controlpoints per patch
+layout (vertices = 4) out; //TODO: More vertrices? 
+uniform vec3 cam_pos;
+
+// input data per Controlpoint
+in vec3 pos_tc[];
+in vec2 uv_tc[];
+in mat3 tbn_tc[]; 
 
 
+// output data per Controlpoint
+out vec3 pos_te[];
+out vec2 uv_te[];
+out mat3 tbn_te[];
 
-
-#version 430 core
-layout (vertices = 3) out;
-
-//the LoD function
-float level (vec4 poz1, vec4 poz2){
-    float lod=1;
-	float d=distance(poz1, poz2);
-	if(d<10) lod=10;
-	if(10<=d && d<30) lod=5;
-	if(30<=d && d<50) lod=2;
-	if(50<=d) lod=1;
-
-	return lod;
-}
-
-void main(void){
-
-    if( gl_InvocationID == 0){
-		vec3 d1=gl_in[1].gl_Position.xyz+(gl_in[2].gl_Position.xyz-gl_in[1].gl_Position.xyz)/2;
-		vec3 d2=gl_in[0].gl_Position.xyz+(gl_in[2].gl_Position.xyz-gl_in[0].gl_Position.xyz)/2;
-		vec3 d3=gl_in[0].gl_Position.xyz+(gl_in[1].gl_Position.xyz-gl_in[0].gl_Position.xyz)/2;
-		
-		float e0=level(vec4(d1,1.0),vec4(eye_position,1.0));
-		float e1=level(vec4(d2,1.0),vec4(eye_position,1.0));
-		float e2=level(vec4(d3,1.0),vec4(eye_position,1.0));
-		float m=min(e0,min(e1,e2));
-		
-		gl_TessLevelInner[0] = floor((min(e0,min(e1,e2))+max(e0,max(e1,e2)))/2);
-		gl_TessLevelOuter[0] = e0;
-		gl_TessLevelOuter[1] = e1;
-		gl_TessLevelOuter[2] = e2;
-	}
-    gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#version 430 core
-//you need to specify the OpenGL version, of course
-//specify the number of vertices per patch
-layout (vertices = 3) out;
-void main(void){
-    if (gl_InvocationID == 0){
-        gl_TessLevelInner[0] = 7.0;
-        gl_TessLevelOuter[0] = 2.0;
-        gl_TessLevelOuter[1] = 3.0;
-        gl_TessLevelOuter[2] = 7.0;
-
-//in case of quad, you have to specify both gl_TessLevelInner[1] and //gl_TessLevelOuter[3]
-    } 
-    gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
-}
-
-
-
-
-
-
-
-
-#version 410 core
-// define the number of CPs in the output patch
-layout (vertices = 3) out;
-uniform vec3 gEyeWorldPos;
-
-// attributes of the input CPs
-in vec3 WorldPos_CS_in[];
-in vec2 TexCoord_CS_in[];
-in vec3 Normal_CS_in[];
-
-// attributes of the output CPs
-out vec3 WorldPos_ES_in[];
-out vec2 TexCoord_ES_in[];
-out vec3 Normal_ES_in[];
-
-float GetTessLevel(float Distance0, float Distance1)
+float distance_to_tesslevel(float first, float second)
 {
-    float AvgDistance = (Distance0 + Distance1) / 2.0;
-    if (AvgDistance <= 2.0)		 { return 10.0;}
-    else if (AvgDistance <= 5.0) {return 7.0; }       
-    else						 { return 3.0;}
+	//Decides the level of detail based on distance to campos
+    float average = (first + second) * 0.5;
+	if (average <= 1.0)		 { return 20.0;}
+    else if (average <= 2.0) { return 15.0;}
+    else if (average <= 6.0) { return 10.0;}       
+	else if (average <= 10.0){ return 5.0; }
+	else if (average <= 14.0){ return 4.0; }
+    else					 { return 2.0; }
 } 
 
 void main()
 {
     // Set the control points of the output patch
-    TexCoord_ES_in[gl_InvocationID] = TexCoord_CS_in[gl_InvocationID];
-    Normal_ES_in[gl_InvocationID] = Normal_CS_in[gl_InvocationID];
-    WorldPos_ES_in[gl_InvocationID] = WorldPos_CS_in[gl_InvocationID];
-	    // Calculate the distance from the camera to the three control points
-    float EyeToVertexDistance0 = distance(gEyeWorldPos, WorldPos_ES_in[0]);
-    float EyeToVertexDistance1 = distance(gEyeWorldPos, WorldPos_ES_in[1]);
-    float EyeToVertexDistance2 = distance(gEyeWorldPos, WorldPos_ES_in[2]);
+    pos_te[gl_InvocationID] = pos_tc[gl_InvocationID]; //TODO: use gl_out[ gl_InvocationID].gl_Position Or in Evalshader? 
+    uv_te[gl_InvocationID]  = uv_tc[gl_InvocationID];
+    tbn_te[gl_InvocationID] = tbn_tc[gl_InvocationID];
+
+	// Distance from camera to the ControlPoints of our patch
+    float cam_to_left_side		= distance(cam_pos, pos_tc[0]);
+    float cam_to_bottom_side	= distance(cam_pos, pos_tc[1]);
+    float cam_to_right_side		= distance(cam_pos, pos_tc[2]);
+	float cam_to_top_side		= distance(cam_pos, pos_tc[2]);
 
     // Calculate the tessellation levels
-    gl_TessLevelOuter[0] = GetTessLevel(EyeToVertexDistance1, EyeToVertexDistance2);
-    gl_TessLevelOuter[1] = GetTessLevel(EyeToVertexDistance2, EyeToVertexDistance0);
-    gl_TessLevelOuter[2] = GetTessLevel(EyeToVertexDistance0, EyeToVertexDistance1);
-    gl_TessLevelInner[0] = gl_TessLevelOuter[2];
+    gl_TessLevelOuter[0] = distance_to_tesslevel(cam_to_bottom_side,	cam_to_right_side	);
+    gl_TessLevelOuter[1] = distance_to_tesslevel(cam_to_right_side,		cam_to_top_side		);
+    gl_TessLevelOuter[2] = distance_to_tesslevel(cam_to_top_side,		cam_to_left_side	);
+	gl_TessLevelOuter[3] = distance_to_tesslevel(cam_to_left_side,		cam_to_bottom_side	);
+
+	//inner tessellation level are based on the outer tessellated levels for the corresponding side (horizontal and vertical)
+    gl_TessLevelInner[0] = (gl_TessLevelOuter[0] + gl_TessLevelOuter[2])/4;
+	gl_TessLevelInner[1] = (gl_TessLevelOuter[1] + gl_TessLevelOuter[3])/4;
 } 

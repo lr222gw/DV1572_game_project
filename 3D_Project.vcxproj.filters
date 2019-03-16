@@ -229,5 +229,11 @@
     <None Include="dat\shaders\g_buffer.tese">
       <Filter>Resource Files\Shaders</Filter>
     </None>
+    <None Include="dat\shaders\g_buffer_tess.vert">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="dat\shaders\g_buffer_tess.geom">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
