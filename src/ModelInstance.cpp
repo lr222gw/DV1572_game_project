@@ -21,6 +21,8 @@ ModelInstance::ModelInstance( SharedPtr<Model>   model,
 
 void ModelInstance::draw() {
    // transfer transform (model) matrix to the shader pogram:
+
+   _shader_program->use();
    glUniformMatrix4fv( _shader_program->get_transform_location(),
                        1,
                        GL_FALSE,
