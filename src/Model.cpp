@@ -49,10 +49,15 @@ void Model::_process_node( aiNode *node,  aiScene const *scene ) {
       _process_node( node->mChildren[i], scene );      // extract and proccess it
 }
 
-template <Bool tessellated>
-void Model::draw( ShaderProgram &shader_program ) const {
+Vector<SharedPtr<Mesh>> const & Model::get_meshes() const {
+   return _meshes;
+}
+
+void Model::_draw( ShaderProgram &shader_program, Bool should_tessellate ) const {
    for ( auto &e : get_meshes() )  // for each mesh in the model
-      e->_draw<tessellated>( shader_program );  // call the mesh's draw function
+      if ( should_tessellate )
+         e->_draw_tessellated( shader_program ); // call the mesh's tessellated draw function
+      else e->_draw( shader_program );           // call the mesh's draw function
 }
 
 

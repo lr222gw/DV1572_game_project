@@ -1,17 +1,20 @@
 #include "SceneManager.h"
 
-SharedPtr<ModelInstance<false>> SceneManager::instantiate_model(
+SharedPtr<ModelInstance> SceneManager::instantiate_model(
    SharedPtr<Model>          model,
    SharedPtr<ShaderProgram>  shader_program,
-   Transform const&          transform)
+   Transform const&          transform,
+   Bool                      tessellation_enabled )
 {
    auto callback_lambda = [=]() { _should_recalculate_shadowmap = true; };
    // construct return value (shared pointer):
    auto instance_ptr = // TODO: switch to UniquePtr..?
-      std::make_shared<ModelInstance<false>>( model,
+      std::make_shared<ModelInstance>( model,
                                        shader_program,
                                        transform,
-                                       callback_lambda );
+                                       callback_lambda,
+                                       tessellation_enabled,
+                                       _generate_light_id() );
 
    // add a weak pointer to the scene manager's instance list before returning:
    _instances.push_back( instance_ptr );
@@ -19,28 +22,12 @@ SharedPtr<ModelInstance<false>> SceneManager::instantiate_model(
    return instance_ptr;
 }
 
-SharedPtr<ModelInstance<true>> SceneManager::instantiate_tessellated_model(
-   SharedPtr<Model>          model,
-   SharedPtr<ShaderProgram>  tessellated_shader_program,
-   Transform const&          transform)
-{
-   auto callback_lambda = [=]() { _should_recalculate_shadowmap = true; };
-   // construct return value (shared pointer):
-   auto instance_ptr = // TODO: switch to UniquePtr..?
-      std::make_shared<ModelInstance<true>>( model,
-                                             tessellated_shader_program,
-                                             transform,
-                                             callback_lambda);
-
-   // add a weak pointer to the scene manager's instance list before returning:
-   _instances.push_back(instance_ptr);
-
-   return instance_ptr;
+Uint32 SceneManager::_generate_light_id() {
+   return _next_light_id++;
 }
 
-
-Uint64 SceneManager::_generate_light_id() {
-   return _next_light_id++;
+Uint32 SceneManager::_generate_model_id() {
+   return _next_model_id++;
 }
 
 void SceneManager::instantiate_particle_system( WeakPtr<ParticleSystem> ps ) { /* @TAG{PS} */
@@ -112,6 +99,8 @@ void SceneManager::update( Float32 delta_time_ms ) {
 
 // TODO: use ShaderProgram::use()
 void SceneManager::draw( Viewport &view ) {
+   _sort_by_distance( view ); // front-to-back
+
    auto &g_buffer = view.get_g_buffer();
 
    auto lighting_pass_loc = _lighting_shader_program->get_location();
@@ -687,31 +676,6 @@ SharedPtr<ModelInstance> SceneManager::get_instance_ptr( Uint32 obj_id ) {
    return nullptr;
 }
 
-void SceneManager::_sort_by_distance( Viewport const &viewport ) {
-   auto const &cam_pos = viewport.get_view().get_position();
-   std::sort( _instances.begin(), _instances.end(), [&cam_pos]( InstanceStorage const &lhs, InstanceStorage const &rhs ) {
-                                                       // start off with high distances (in case they've expired):
-                                                       auto  lhs_dist { std::numeric_limits<float>::infinity() };
-                                                       auto  rhs_dist { std::numeric_limits<float>::infinity() };
-                                                       // extract the two elements' potential sizes:
-                                                       for ( auto const &[storage_ptr_var, dist] : { std::make_pair(lhs, lhs_dist), std::make_pair(rhs, rhs_dist) } ) {
-                                                          if ( std::holds_alternative<WeakPtr<ModelInstance>(storage_ptr_var) ) {
-                                                             auto const storage_ptr = storage_ptr_var.get<WeakPtr<ModelInstance>();
-                                                             if ( !storage_ptr.expired() )
-                                                                dist = glm::distance( cam_pos, storage_ptr.lock()->get_position() );
-                                                          }
-                                                          else {
-                                                             assert( std::holds_alternative<WeakPtr<TessellatedInstance>(e) );
-                                                             auto const storage_ptr = storage_ptr_var.get<WeakPtr<TessellatedInstance>();
-                                                             if ( !storage_ptr.expired() )
-                                                                dist = glm::distance( cam_pos, storage_ptr.lock()->get_position() );
-                                                          }
-                                                       }
-                                                       // compare the two distances:
-                                                       return lhs_dist = rhs_dist;
-                                                    } );
-}
-
 /*
    lights[0] = LightData{ LightType::point,
                           Vec3(0.0f,   0.0f,   0.0f),
@@ -786,3 +750,22 @@ void SceneManager::_sort_by_distance( Viewport const &viewport ) {
                            1.0 };*/
 
 
+
+
+void SceneManager::_sort_by_distance( Viewport const &viewport ) {
+   auto const &cam_pos = viewport.get_view().get_position();
+   std::sort( _instances.begin(),
+              _instances.end(),
+              [&cam_pos]( WeakPtr<ModelInstance> const &lhs, WeakPtr<ModelInstance> const &rhs ) { // comparator lambda
+                    // start off with high distances (in case they've expired):
+                    auto lhs_dist { std::numeric_limits<float>::infinity() };
+                    auto rhs_dist { std::numeric_limits<float>::infinity() };
+                    // extract the two elements' potential distances:
+                    if ( !lhs.expired() )
+                       lhs_dist = glm::distance( cam_pos, lhs.lock()->model_transform.get_position() );
+                    if ( !rhs.expired() )
+                       rhs_dist = glm::distance( cam_pos, rhs.lock()->model_transform.get_position() );
+                    // compare the two distances:
+                    return lhs_dist < rhs_dist;
+                 } );
+}
