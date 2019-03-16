@@ -119,7 +119,7 @@ void SceneManager::draw( Viewport &view ) {
 
    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-   _tessellation_shader_program->use();   
+   _tessellation_shader_program->use();
    /*CHANGE*/ view.bind_shader_program(_tessellation_shader_program);
 
    view.update();
@@ -151,14 +151,9 @@ void SceneManager::draw( Viewport &view ) {
 
    // 1. Geometry Pass:
    // TODO: sortera instanserna efter ShaderProgram m.h.a. std::partition()
-   int counter = 0;
-   for (auto &instance : _instances) {
-      if (!instance.expired())
+   for ( auto &instance : _instances )
+      if ( !instance.expired() )
          instance.lock()->draw();
-
-      counter++;
-      int h = 0; // TODO: remove
-   }
 
 
    // Particle system:
