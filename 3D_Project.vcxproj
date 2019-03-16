@@ -80,6 +80,8 @@
     <None Include="dat\shaders\g_buffer.tesc" />
     <None Include="dat\shaders\g_buffer.tese" />
     <None Include="dat\shaders\g_buffer.vert" />
+    <None Include="dat\shaders\g_buffer_tess.geom" />
+    <None Include="dat\shaders\g_buffer_tess.vert" />
     <None Include="dat\shaders\lightSha.frag" />
     <None Include="dat\shaders\lightSha.vert" />
     <None Include="dat\shaders\particle_system.frag" />

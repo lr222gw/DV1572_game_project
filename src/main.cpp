@@ -526,7 +526,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    auto geometry_vert_shader    { shader_manager.load_shader( "g_buffer.vert" )        }; // TODO: rename files
    auto geometry_frag_shader    { shader_manager.load_shader( "g_buffer.frag" )        }; // TODO: rename files
    auto geometry_geom_shader    { shader_manager.load_shader( "g_buffer.geom" )        };
-   //auto geo_tess_vert_shader    { shader_manager.load_shader( "g_buffer_tess.vert") };
+   auto geo_tess_vert_shader    { shader_manager.load_shader( "g_buffer_tess.vert")    };
    auto geo_tess_tesc_shader    { shader_manager.load_shader( "g_buffer.tesc")         };
    auto geo_tess_tese_shader    { shader_manager.load_shader( "g_buffer.tese")         };
    auto shadowdepth_vert_shader { shader_manager.load_shader( "shadow_depth.vert" )    };
@@ -542,7 +542,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
    auto geometry_tessellation_program{ shader_manager.create_program({  geometry_frag_shader,
                                                                         geometry_geom_shader,
-                                                                        geometry_vert_shader,
+                                                                        geo_tess_vert_shader,
                                                                         geo_tess_tesc_shader,
                                                                         geo_tess_tese_shader}) };
 
