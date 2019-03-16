@@ -10,6 +10,7 @@
 #include "assimp/Importer.hpp"
 
 class Model {
+   friend class ModelInstance; // gives Model access to Mesh's private members
 public:
    Model( String const &filename );
 
@@ -24,15 +25,8 @@ public:
    Model & operator=( Model const  & ) = delete;
    Model & operator=( Model       && ) = delete;
 
-   // TODO: refactor to source
-   [[nodiscard]] Vector<SharedPtr<Mesh>> const & get_meshes() const {
-      return _meshes;
-   }
-
+   [[nodiscard]] Vector<SharedPtr<Mesh>> const & get_meshes() const;
    [[nodiscard]] String get_name() const;
-
-   template <Bool tessellated>
-   void draw( ShaderProgram & ) const;
 
 private:
    String const             _name;
@@ -41,4 +35,5 @@ private:
    void                          _process_node( aiNode *, const aiScene * );
    [[nodiscard]] SharedPtr<Mesh> _process_mesh( aiMesh *, const aiScene * );
    void                          _load_model(   String const &filename );
+   void                          _draw( ShaderProgram &, Bool should_tessellate ) const;
 };

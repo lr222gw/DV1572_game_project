@@ -90,3 +90,10 @@ void Mesh::_draw( ShaderProgram &shader_program ) const {
    // bind OpenGL to standard values
    glBindVertexArray(0);
 }
+
+
+void Mesh::_draw_tessellated( ShaderProgram &shader_program_tessellated ) const {
+   shader_program_tessellated.use();
+   TextureSet::ScopedBindGuard pin { _textures, shader_program_tessellated }; // RAII
+   assert( false && "IMPLEMENT!" ); // TODO
+}

@@ -22,14 +22,10 @@ class SceneManager {
 // friend class Handle<ParticleSystem>;
 // friend class Handle<Light>;
 public:
-   SharedPtr<ModelInstance<false>> instantiate_model(             SharedPtr<Model>,
-                                                                  SharedPtr<ShaderProgram>,
-                                                                  Transform const & );
-
-   SharedPtr<ModelInstance<true>> instantiate_tessellated_model(  SharedPtr<Model>,
-                                                                  SharedPtr<ShaderProgram>,
-                                                                  Transform const &);
-
+   SharedPtr<ModelInstance> instantiate_model( SharedPtr<Model>,
+                                               SharedPtr<ShaderProgram>,
+                                               Transform const &,
+                                               Bool tessellation_enabled = false );
 
    SharedPtr<Light> instantiate_light( Light::Data );
 
@@ -53,7 +49,7 @@ public:
 
    SceneManager( SharedPtr<ShaderProgram> geo_pass,
                  SharedPtr<ShaderProgram> geo_pass_tessellated,
-                 SharedPtr<ShaderProgram> light_pass,                 
+                 SharedPtr<ShaderProgram> light_pass,
                  SharedPtr<ShaderProgram> shadow_depth,
                  SharedPtr<ShaderProgram> particle_shader ); /* @TAG{PS} */
 
@@ -62,21 +58,22 @@ public:
    SharedPtr<ModelInstance> get_instance_ptr(Uint32 obj_id);
 
 private:
+   // TODO: set in SceneManager() to facilitate (de)serialization
    Uint64 _next_light_id = 1;
+   Uint64 _next_model_id = 1;
 
-   Uint32 _find_light_index( Uint64 id ) const;
-   SharedPtr<ShaderProgram>        _lighting_shader_program;
-   SharedPtr<ShaderProgram>        _geometry_shader_program;
-   SharedPtr<ShaderProgram>        _shadow_depth_shader;
-   SharedPtr<ShaderProgram>        _particle_shader; /* @TAG{PS} */
-   SharedPtr<ShaderProgram>        _tessellation_shader_program;
+   Uint32                    _find_light_index( Uint64 id ) const;
+   SharedPtr<ShaderProgram>  _geometry_shader_program;
+   SharedPtr<ShaderProgram>  _tessellation_shader_program;
+   SharedPtr<ShaderProgram>  _lighting_shader_program;
+   SharedPtr<ShaderProgram>  _shadow_depth_shader;
+   SharedPtr<ShaderProgram>  _particle_shader; /* @TAG{PS} */
 
    //DepthMap stuff for Shadowmapping
    Uint32                                     _depth_map_FBO_id;
    HashMap< SharedPtr<Shadowcaster>, Uint32>  _shadow_maps;// = { _shadowcasters ,  _depth_map_ids };
 
    Vector<WeakPtr<ModelInstance>>     _instances;
-
    Vector<WeakPtr<ParticleSystem>>    _particle_systems;
 
    HashMap<Uint64, WeakPtr<Light>>    _lights;
@@ -90,12 +87,13 @@ private:
    //Listen for transform changes in our ModelInstances
 
 
-   Uint64 _generate_light_id();
-   void _light_destruction_listener( Uint64 id );
-   void _light_change_listener(      Uint64 id );
-
-   void _lights_to_gpu();
-   void _render_to_quad();
+   [[nodiscard]] Uint32 _generate_light_id();
+   [[nodiscard]] Uint32 _generate_model_id();
+   void                 _light_destruction_listener( Uint64 id );
+   void                 _light_change_listener(      Uint64 id );
+   void                 _lights_to_gpu();
+   void                 _render_to_quad();
+   void                 _sort_by_distance( Viewport const & );
 };
 
 
