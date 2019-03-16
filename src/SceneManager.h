@@ -82,7 +82,8 @@ private:
    Uint32                             _num_lights;     // how much of the light capacity is used
 
    //If models orientation has been changed, shadowmap needs to be updated
-   bool _should_recalculate_shadowmap = false;
+   Bool _should_recalculate_shadowmap = false;
+   Bool _should_sort_front_to_back    = false;
 
    //Listen for transform changes in our ModelInstances
 

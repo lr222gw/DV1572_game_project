@@ -8,7 +8,7 @@ SharedPtr<ModelInstance> SceneManager::instantiate_model(
 {
    auto callback_lambda = [=]() {
       _should_recalculate_shadowmap = true; // for lightmap recalculation
-      _sort_by_distance();                  // for front-to-back rendering
+      _should_sort_front_to_back    = true; // for front-to-back rendering
    };
    // construct return value (shared pointer):
    auto instance_ptr = // TODO: switch to UniquePtr..?
@@ -102,6 +102,9 @@ void SceneManager::update( Float32 delta_time_ms ) {
 
 // TODO: use ShaderProgram::use()
 void SceneManager::draw( Viewport &view ) {
+   if ( _should_sort_front_to_back )
+      _sort_by_distance( view ); // for front-to-back rendering
+
    auto &g_buffer = view.get_g_buffer();
 
    auto lighting_pass_loc = _lighting_shader_program->get_location();
@@ -208,7 +211,7 @@ void SceneManager::draw( Viewport &view ) {
    glBindTexture(   GL_TEXTURE_2D, g_buffer_data.pos_tex_loc );
 
    glActiveTexture( GL_TEXTURE5);
-   glBindTexture(	  GL_TEXTURE_2D, g_buffer_data.pic_tex_loc );
+   glBindTexture(   GL_TEXTURE_2D, g_buffer_data.pic_tex_loc );
 
    glUniform3fv( glGetUniformLocation( lighting_pass_loc, "view_pos"),
                  1,
@@ -626,52 +629,52 @@ void SceneManager::_lights_to_gpu() {
 
 Uint32 SceneManager::get_object_id_at_pixel(Uint32 x, Uint32 y, Viewport &view)
 {
-	//_geometry_shader_program->use();
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, view.get_g_buffer().buffer_loc);
-	glReadBuffer(GL_COLOR_ATTACHMENT5);
+   //_geometry_shader_program->use();
+   glBindFramebuffer(GL_READ_FRAMEBUFFER, view.get_g_buffer().buffer_loc);
+   glReadBuffer(GL_COLOR_ATTACHMENT5);
 
-//	Uint32 pixel_info[4]{};
-	struct pixel_info_struct
-	{
-		Float32 x;
-		Float32 y;
-		Float32 z;
-		Float32 w;
-	};
-	pixel_info_struct pixel_info;
+// Uint32 pixel_info[4]{};
+   struct pixel_info_struct
+   {
+      Float32 x;
+      Float32 y;
+      Float32 z;
+      Float32 w;
+   };
+   pixel_info_struct pixel_info;
 //
-//	glReadPixels(x, y, 1, 1, GL_RGBA, GL_UNSIGNED_INT, (void*)&pixel_info);
+// glReadPixels(x, y, 1, 1, GL_RGBA, GL_UNSIGNED_INT, (void*)&pixel_info);
 //
-//	Uint32 obj_id = (pixel_info[0] & 0xFF << 24)
+// Uint32 obj_id = (pixel_info[0] & 0xFF << 24)
 //                 + (pixel_info[1] & 0xFF << 16)
 //                 + (pixel_info[2] & 0xFF <<  8)
 //                 + (pixel_info[3] & 0xFF <<  0); // TODO: validate that we get the correct ids
 
-	//Uint8 pixel_info[4] {};
+   //Uint8 pixel_info[4] {};
 
-	glReadPixels( x, view.height-y, 1, 1, GL_RGBA, GL_FLOAT, &pixel_info );
+   glReadPixels( x, view.height-y, 1, 1, GL_RGBA, GL_FLOAT, &pixel_info );
 
-	// probably don't need the & 0xFF since we send up in increments of 8 bytes
-	Uint32 obj_id = ( ((Int32)(pixel_info.x * 255) & 0xFF) <<  0)
+   // probably don't need the & 0xFF since we send up in increments of 8 bytes
+   Uint32 obj_id  = ( ((Int32)(pixel_info.x * 255) & 0xFF) <<  0)
                   + ( ((Int32)(pixel_info.y * 255) & 0xFF) <<  8)
                   + ( ((Int32)(pixel_info.z * 255) & 0xFF) << 16)
-				  + ( ((Int32)(pixel_info.w * 255) & 0xFF) << 24);
-	glReadBuffer(GL_NONE);
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+                  + ( ((Int32)(pixel_info.w * 255) & 0xFF) << 24);
+   glReadBuffer(GL_NONE);
+   glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 
-	return obj_id;
+   return obj_id;
 }
 
 SharedPtr<ModelInstance> SceneManager::get_instance_ptr( Uint32 obj_id ) {
-	for ( auto &e : _instances ) {
-		if ( !e.expired() ) {
-			auto e_ptr = e.lock();
-			if ( e_ptr->id == obj_id )
-				return e_ptr;
-		}
-	}
-	//assert( false && "[ERROR] Instance of id no longer exists." );
-	if constexpr ( Config::is_debugging )
+   for ( auto &e : _instances ) {
+      if ( !e.expired() ) {
+         auto e_ptr = e.lock();
+         if ( e_ptr->id == obj_id )
+            return e_ptr;
+      }
+   }
+   //assert( false && "[ERROR] Instance of id no longer exists." );
+   if constexpr ( Config::is_debugging )
       std::cout << "[MOUSE_PICKING] no model hit\n";
 
    return nullptr;
@@ -758,14 +761,11 @@ void SceneManager::_sort_by_distance( Viewport const &viewport ) {
    std::sort( _instances.begin(),
               _instances.end(),
               [&cam_pos]( WeakPtr<ModelInstance> const &lhs, WeakPtr<ModelInstance> const &rhs ) { // comparator lambda
-                    // start off with high distances (in case they've expired):
-                    auto lhs_dist { std::numeric_limits<float>::infinity() };
-                    auto rhs_dist { std::numeric_limits<float>::infinity() };
                     // extract the two elements' potential distances:
-                    if ( !lhs.expired() )
-                       lhs_dist = glm::distance( cam_pos, lhs.lock()->model_transform.get_position() );
-                    if ( !rhs.expired() )
-                       rhs_dist = glm::distance( cam_pos, rhs.lock()->model_transform.get_position() );
+                    auto lhs_dist = lhs.expired() ? std::numeric_limits<float>::infinity()
+                                                  : glm::distance( cam_pos, lhs.lock()->model_transform.get_position() );
+                    auto rhs_dist = rhs.expired() ? std::numeric_limits<float>::infinity()
+                                                  : glm::distance( cam_pos, rhs.lock()->model_transform.get_position() );
                     // compare the two distances:
                     return lhs_dist < rhs_dist;
                  } );
