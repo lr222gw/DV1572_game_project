@@ -6,7 +6,7 @@ SharedPtr<ModelInstance> SceneManager::instantiate_model(
    Transform const&          transform,
    Bool                      tessellation_enabled )
 {
-   auto callback_lambda = [=]() {
+   auto callback_lambda = [this]() {
       _should_recalculate_shadowmap = true; // for lightmap recalculation
       _should_sort_front_to_back    = true; // for front-to-back rendering
    };
