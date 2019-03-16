@@ -54,14 +54,14 @@ Vector<SharedPtr<Mesh>> const & Model::get_meshes() const {
 }
 
 void Model::_draw( ShaderProgram &shader_program, Bool should_tessellate ) const {
-   
+
    for ( auto &e : get_meshes() ){  // for each mesh in the model
-      
+
       if ( should_tessellate )
          e->_draw_tessellated( shader_program ); // call the mesh's tessellated draw function
       else e->_draw( shader_program );           // call the mesh's draw function
-      
-      
+
+
    }
 }
 
@@ -196,6 +196,21 @@ SharedPtr<Mesh> Model::_process_mesh( aiMesh *mesh, aiScene const *scene ) {
          } break;
 
          default: assert( false && "Engine does not support multiple emissive maps." );
+      }
+
+      switch ( material->GetTextureCount(aiTextureType_DISPLACEMENT) ) {
+         case 0: {
+            textures.displacement = std::make_shared<DisplacementTexture>();
+         } break;
+
+         case 1: {
+            aiString texture_name;
+            material->GetTexture( aiTextureType_DISPLACEMENT, 0, &texture_name );
+            FilePath path { FileType::texture, String(texture_name.C_Str()) };
+            textures.displacement = std::make_shared<DisplacementTexture>(path);
+         } break;
+
+         default: assert( false && "Engine does not support multiple displacement maps." );
       }
 
 

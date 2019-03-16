@@ -157,9 +157,9 @@ void SceneManager::draw( Viewport &view ) {
          instance.lock()->draw();
 
       counter++;
-      int h = 0;
+      int h = 0; // TODO: remove
    }
-      
+
 
    // Particle system:
 
