@@ -526,6 +526,9 @@ Int32 main( Int32 argc, char const *argv[] ) {
    auto geometry_vert_shader    { shader_manager.load_shader( "g_buffer.vert" )        }; // TODO: rename files
    auto geometry_frag_shader    { shader_manager.load_shader( "g_buffer.frag" )        }; // TODO: rename files
    auto geometry_geom_shader    { shader_manager.load_shader( "g_buffer.geom" )        };
+   //auto geo_tess_vert_shader    { shader_manager.load_shader( "g_buffer_tess.vert") };
+   auto geo_tess_tesc_shader    { shader_manager.load_shader( "g_buffer.tesc")         };
+   auto geo_tess_tese_shader    { shader_manager.load_shader( "g_buffer.tese")         };
    auto shadowdepth_vert_shader { shader_manager.load_shader( "shadow_depth.vert" )    };
    auto shadowdepth_frag_shader { shader_manager.load_shader( "shadow_depth.frag" )    };
    /* PS */ auto ps_vert_shader { shader_manager.load_shader( "particle_system.vert" ) }; //
@@ -537,6 +540,12 @@ Int32 main( Int32 argc, char const *argv[] ) {
                                                                  geometry_geom_shader,
                                                                  geometry_vert_shader } ) };
 
+   auto geometry_tessellation_program{ shader_manager.create_program({  geometry_frag_shader,
+                                                                        geometry_geom_shader,
+                                                                        geometry_vert_shader,
+                                                                        geo_tess_tesc_shader,
+                                                                        geo_tess_tese_shader}) };
+
    auto lighting_program      { shader_manager.create_program({ lighting_frag_shader, lighting_vert_shader }) };
 
    auto shadowdepth_program   { shader_manager.create_program({ shadowdepth_frag_shader, shadowdepth_vert_shader }) };
@@ -544,7 +553,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    auto particle_program      { shader_manager.create_program({ ps_vert_shader, ps_frag_shader }) };    /* @TAG{PS} */
 
    //Add Lightning program to Scenemanager
-   SceneManager  scene_manager{ geometry_program, lighting_program , shadowdepth_program, particle_program }; /* @TAG{PS} */
+   SceneManager  scene_manager{ geometry_program, geometry_tessellation_program, lighting_program , shadowdepth_program, particle_program }; /* @TAG{PS} */
 
    Vector<SharedPtr<Light>> light_instances;
 

@@ -39,6 +39,7 @@ public:
    {}
 
 private:
+   template <Bool tessellated>
    void _draw( ShaderProgram & ) const;
    void _initialize_mesh();
 

@@ -31,6 +31,7 @@ public:
 
    [[nodiscard]] String get_name() const;
 
+   template <Bool tessellated>
    void draw( ShaderProgram & ) const;
 
 private:
