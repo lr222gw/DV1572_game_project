@@ -660,12 +660,17 @@ Int32 main( Int32 argc, char const *argv[] ) {
    }
 
    SharedPtr<Model> floor = asset_manager.load_model("floor.obj");
-   model_instances.push_back(scene_manager.instantiate_model(floor,
+   
+   for (int i = 0; i < 256; i++) {
+      int n = 10;
+      model_instances.push_back(scene_manager.instantiate_model(floor,
          geometry_tessellation_program,
-         Transform(Vec3(0.0, 0.0, 0.0),
-         Vec3(0.0f, 0.0f ,0.0f),
-         //Vec3(0.0f, 0.0, 0.0f),
-         Vec3(100.0f, 1.0f, 100.0f)),true));
+         Transform(Vec3(n*(i / 16) - 80, -1.0f, n*(i % 16) - 80),
+            Vec3(0.0f, 0.0f, 0.0f),
+            //Vec3(0.0f, 0.0, 0.0f),
+            Vec3(5.0f, 1.0f, 5.0f)), true));
+   }
+   
 
 
    //Tool to see more clearly how Light frustrum looks like

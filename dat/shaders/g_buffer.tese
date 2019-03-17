@@ -49,15 +49,15 @@ void main()
 	pos_gs = interpolate3D(pos_te[0],pos_te[1],pos_te[2]);
 
 	//vec4 Normal = texture(tex_disp, gl_TessCoord.xy);
-	vec4 displacement = texture(tex_disp, uv_gs);
+	vec4 displacement = texture(tex_disp, uv_gs );
 
 	//vec3 tex_disp_val = texture( tex_disp, gl_TessCoord.xy ).rgb;
 	//float avg_disp_val = (tex_disp_val.r + tex_disp_val.g + tex_disp_val.b) / 3;
 	//
 	//float heterogenous_disp_val = avg_disp_val / 128 - 1.0f;
-
-	pos_gs += normal * displacement.xyz * 5;
-
+	float yreset = pos_gs.y;
+	pos_gs += normal * displacement.xyz * 2;
+	//pos_gs.y += (yreset - pos_gs.y);
 
 
 	//gl_Position = projection * view * vec4(pos,1.0f);//vec4(pos_gs,1.0f);

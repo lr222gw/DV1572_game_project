@@ -26,7 +26,7 @@ void main(void) {
 
 
 	//TODO: Interpolera vertricerna
-	if(result > 0.0 ){
+	if(result > 0.0 ){ //TODO: REMOVE AFTER DEMO
 
 	    gl_Position = gl_in[0].gl_Position;
 		//gs_color = vs_color[0];

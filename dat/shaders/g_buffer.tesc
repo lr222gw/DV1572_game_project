@@ -30,7 +30,7 @@ float distance_to_tesslevel(float first, float second)
 void main()
 {
     // Set the control points of the output patch
-    pos_te[gl_InvocationID] = pos_tc[gl_InvocationID]; //TODO: use gl_out[ gl_InvocationID].gl_Position Or in Evalshader? 
+    pos_te[gl_InvocationID] = pos_tc[gl_InvocationID];
     uv_te[gl_InvocationID]  = uv_tc[gl_InvocationID];
     tbn_te[gl_InvocationID] = tbn_tc[gl_InvocationID];
 
@@ -40,14 +40,16 @@ void main()
     float cam_to_right_side		= distance(view_pos, pos_tc[2]);
 	//float cam_to_top_side		= distance(view_pos, pos_tc[3]);
 
+	float max_dist = 50.0f;
+
     // Calculate the tessellation levels
-    gl_TessLevelOuter[0] = gl_MaxTessGenLevel;//distance_to_tesslevel(cam_to_bottom_side,	cam_to_right_side	);
-    gl_TessLevelOuter[1] = gl_MaxTessGenLevel;//distance_to_tesslevel(cam_to_right_side,		cam_to_top_side		);
-    gl_TessLevelOuter[2] = gl_MaxTessGenLevel;//distance_to_tesslevel(cam_to_top_side,		cam_to_left_side	);
+    gl_TessLevelOuter[0] = max(mix(gl_MaxTessGenLevel, 2, cam_to_left_side/max_dist  ),1);//distance_to_tesslevel(cam_to_bottom_side,	cam_to_right_side	);
+    gl_TessLevelOuter[1] = max(mix(gl_MaxTessGenLevel, 2, cam_to_bottom_side/max_dist),1);//distance_to_tesslevel(cam_to_right_side,		cam_to_top_side		);
+    gl_TessLevelOuter[2] = max(mix(gl_MaxTessGenLevel, 2, cam_to_right_side/max_dist ),1);//distance_to_tesslevel(cam_to_top_side,		cam_to_left_side	);
 	//gl_TessLevelOuter[3] = 4;//distance_to_tesslevel(cam_to_left_side,		cam_to_bottom_side	);
 
 	//inner tessellation level are based on the outer tessellated levels for the corresponding side (horizontal and vertical)
-    gl_TessLevelInner[0] = gl_MaxTessGenLevel;	 //(gl_TessLevelOuter[0] + gl_TessLevelOuter[2])/
+    gl_TessLevelInner[0] = max(mix(gl_MaxTessGenLevel, 2, ((cam_to_left_side + cam_to_bottom_side + cam_to_right_side)/3)/max_dist),1);	 //(gl_TessLevelOuter[0] + gl_TessLevelOuter[2])/
 	//gl_TessLevelInner[1] = 4;	 //(gl_TessLevelOuter[1] + gl_TessLevelOuter[3])/
 
 	//gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
