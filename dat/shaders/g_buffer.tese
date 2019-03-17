@@ -45,8 +45,8 @@ void main()
 
 
 	uv_gs = interpolate2D(uv_te[0], uv_te[1],uv_te[2]);
-	pos_gs = (gl_TessCoord.x*gl_in[0].gl_Position+gl_TessCoord.y*gl_in[1].gl_Position+gl_TessCoord.z* gl_in[2].gl_Position).xyz;//interpolate3D(pos_te[0],pos_te[1],pos_te[2]);
-	//pos_gs = interpolate3D(pos_te[0],pos_te[1],pos_te[2]);
+	//pos_gs = (gl_TessCoord.x*gl_in[0].gl_Position+gl_TessCoord.y*gl_in[1].gl_Position+gl_TessCoord.z* gl_in[2].gl_Position).xyz;//interpolate3D(pos_te[0],pos_te[1],pos_te[2]);
+	pos_gs = interpolate3D(pos_te[0],pos_te[1],pos_te[2]);
 
 	//vec4 Normal = texture(tex_disp, gl_TessCoord.xy);
 	vec4 displacement = texture(tex_disp, uv_gs);
@@ -56,7 +56,7 @@ void main()
 	//
 	//float heterogenous_disp_val = avg_disp_val / 128 - 1.0f;
 
-	pos_gs += normal * displacement.xyz * 15;
+	pos_gs += normal * displacement.xyz * 5;
 
 
 

@@ -665,7 +665,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
          Transform(Vec3(0.0, 0.0, 0.0),
          Vec3(0.0f, 0.0f ,0.0f),
          //Vec3(0.0f, 0.0, 0.0f),
-         Vec3(20.0f, 1.0f, 20.0f)),true));
+         Vec3(100.0f, 1.0f, 100.0f)),true));
 
 
    //Tool to see more clearly how Light frustrum looks like
