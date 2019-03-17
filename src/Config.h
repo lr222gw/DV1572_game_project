@@ -19,19 +19,27 @@ struct Config {
                               start_width  = 1024;
 
    static constexpr Uint32    particle_max_count = 8192;
+   static constexpr Uint32    ssao_kernel_count  =   64;   // needs to be equal to ssao.frag::kernel_size!
+   static constexpr Uint32    ssao_noise_side    =    8;   // needs to be equal to ssao.frag::noise_side & ssao_blur.frag::noise_side!
+   static constexpr Float32   ssao_scale_growth_factor  = 1 / ssao_kernel_count;
 
    static constexpr Float32   near_plane         =  0.001f,
                               far_plane          =  500.0f,
                               fov_rad            =  1.2708f, // 90 degrees in radians
                               start_aspect_ratio = (Float32)start_height / (Float32)start_width;
 
+#ifndef DEBUG
+   static constexpr Bool      is_debugging = false;
+#else
    static constexpr Bool      is_debugging = true;
+#endif
 
    static String const  shader_path;
    static String const   model_path;
    static String const texture_path; //TODO: unneeded?
 
 /*------------------------------ global variables -------------------------------*/
+
    Bool is_wireframe_mode = false; // used in SceneManager::Draw()
    Bool is_imgui_toggled  = false;
    RenderMode render_mode = RenderMode::composite;

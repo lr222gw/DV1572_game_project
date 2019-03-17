@@ -4,6 +4,22 @@
 		"selected_items":
 		[
 			[
+				"noise",
+				"noise_tex_loc"
+			],
+			[
+				"get",
+				"get_is_tessellation_enabled()\t  Bool"
+			],
+			[
+				"shou",
+				"_should_sort_front_to_back"
+			],
+			[
+				"_gener",
+				"_generate_model_id()\t  Uint32"
+			],
+			[
 				"shader",
 				"shader_program\t  ShaderProgram &"
 			],
@@ -54,10 +70,6 @@
 			[
 				"TRE",
 				"TREE_ENTRY_BASIC"
-			],
-			[
-				"get",
-				"get_parent"
 			],
 			[
 				"first",
@@ -112,56 +124,45 @@
 	"buffers":
 	[
 		{
-			"contents": "#define STB_IMAGE_IMPLEMENTATION //Den bor här annars kompilerar inte stb_image.h\n\n#include \"misc/defs.h\"\n#include \"Config.h\"\n#include \"debug.h\"\n\n#include \"misc/ImGui/imgui.h\"\n#include \"misc/ImGui/imgui_impl_glfw.h\"\n#include \"misc/ImGui/imgui_impl_opengl3.h\"\n\n#include \"AssetManager.h\"\n#include \"ShaderManager.h\"\n#include \"Viewport.h\"\n#include \"SceneManager.h\"\n\n#include \"Light.h\"\n\n// temp:\n//    #include <cstdio>\n//    #include <unistd.h>\n\n#include \"shadowcasterDebug.h\"\n\n// #include \"misc/stb_image.h\"\n// #include <range/v3/all.hpp>\n\n/* @TAG{PS} */\n#include \"ParticleSystem.h\"\n#include <random> /* used by particle system algorithm defined in main */\n\n\nFloat32 g_move_speed            = 25.0f; // TODO: refactor away ugly globalness\nBool    g_is_mouse_look_enabled = false;\n// temp debug for mouse picking\n\n\n// For opengl debuging\nvoid APIENTRY glDebugOutput( GLenum        source,\n\t                          GLenum        type,\n\t                          GLuint        id,\n\t                          GLenum        severity,\n\t                          GLsizei       length,\n\t                          const GLchar *message,\n\t                          const void   *userParam ) {\n\t// ignore non-significant error/warning codes\n\tif ( id == 131169 || id == 131185 || id == 131218 || id == 131204 )\n      return;\n\n\tstd::cout << \"--------------------\\n\";;\n\tstd::cout << \"DEBUG MESSAGE (\" << id << \"): \" << message << \"\\n\";\n\n\tswitch ( source ) {\n   \tcase GL_DEBUG_SOURCE_API:             std::cout << \"SOURCE: API\";             break;\n   \tcase GL_DEBUG_SOURCE_WINDOW_SYSTEM:   std::cout << \"SOURCE: Window System\";   break;\n   \tcase GL_DEBUG_SOURCE_SHADER_COMPILER: std::cout << \"SOURCE: Shader Compiler\"; break;\n   \tcase GL_DEBUG_SOURCE_THIRD_PARTY:     std::cout << \"SOURCE: Third Party\";     break;\n   \tcase GL_DEBUG_SOURCE_APPLICATION:     std::cout << \"SOURCE: Application\";     break;\n   \tcase GL_DEBUG_SOURCE_OTHER:           std::cout << \"SOURCE: Other\";           break;\n\t}\n   std::cout << \"\\n\";\n\n\tswitch ( type ) {\n   \tcase GL_DEBUG_TYPE_ERROR:               std::cout << \"TYPE: Error\";                break;\n   \tcase GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: std::cout << \"TYPE: Deprecated Behaviour\"; break;\n   \tcase GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:  std::cout << \"TYPE: Undefined Behaviour\";  break;\n   \tcase GL_DEBUG_TYPE_PORTABILITY:         std::cout << \"TYPE: Portability\";          break;\n   \tcase GL_DEBUG_TYPE_PERFORMANCE:         std::cout << \"TYPE: Performance\";          break;\n   \tcase GL_DEBUG_TYPE_MARKER:              std::cout << \"TYPE: Marker\";               break;\n   \tcase GL_DEBUG_TYPE_PUSH_GROUP:          std::cout << \"TYPE: Push Group\";           break;\n   \tcase GL_DEBUG_TYPE_POP_GROUP:           std::cout << \"TYPE: Pop Group\";            break;\n   \tcase GL_DEBUG_TYPE_OTHER:               std::cout << \"TYPE: Other\";                break;\n\t}\n   std::cout << \"\\n\";\n\n\tswitch ( severity ) {\n   \tcase GL_DEBUG_SEVERITY_HIGH:         std::cout << \"SEVERITY: high\";         break;\n   \tcase GL_DEBUG_SEVERITY_MEDIUM:       std::cout << \"SEVERITY: medium\";       break;\n   \tcase GL_DEBUG_SEVERITY_LOW:          std::cout << \"SEVERITY: low\";          break;\n   \tcase GL_DEBUG_SEVERITY_NOTIFICATION: std::cout << \"SEVERITY: notification\"; break;\n\t}\n   std::cout << \"\\n\\n\";\n}\n\nvoid create_demo_scene( /*...*/ ) {\n   // TODO: setup the viewport camera\n\n   // load the statue into memory\n   //auto statue_handle = assets.load_model( \"12330_Statue_v1_L2.obj\" );\n\n   // create 9 statues arranged thusly:\n   //   0  1  2\n   //   3  4  5\n   //   6  7  8\n   for ( int i=0;  i<9;  ++i ) {\n      glm::vec3 position { i/3, i%3, 0 };\n      //auto instance_id = scene.add_object( statue_handle, position );\n   }\n}\n\n\n\n\n[[nodiscard]] String lowercase( char const *base ) {\n   String s ( base );\n   std::transform( s.begin(), s.end(), s.begin(), ::tolower );\n   return s;\n}\n\n[[nodiscard]] String uppercase( char const *base ) {\n   String s ( base );\n   std::transform( s.begin(), s.end(), s.begin(), ::toupper );\n   return s;\n}\n\n\nvoid process_mouse( GLFWwindow   *window,\n                    Viewport     &cam,\n                    SceneManager  scene,\n                    Float32       delta_time_s )\n{\n   // yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a\n   // direction vector pointing to the right so we initially rotate a bit to the left.\n   static Float64 yaw         = -90.0f;\n   static Float64 pitch       =  0.0f;\n   static Float64 last_x      =  800.0f / 2.0;\n   static Float64 last_y      =  600.0 / 2.0;\n   static Bool    first_mouse = true;\n\n   Float64 x_pos, y_pos;\n\n   glfwGetCursorPos( window, &x_pos, &y_pos );\n\n   if ( first_mouse ) {\n      last_x      = cam.forward.x;\n      last_y      = cam.forward.y;\n      first_mouse = false;\n   }\n\n   // mouse picking\n   if (true) { //Getting crashes again\n      if ( glfwGetMouseButton( window, GLFW_MOUSE_BUTTON_1) ) {\n\t\t  Uint32     obj_id = scene.get_object_id_at_pixel(x_pos, y_pos, cam);\n\t\t  auto instance_ptr = scene.get_instance_ptr(obj_id);\n\t\t  if ( instance_ptr != nullptr )\n\t\t  {\n\t\t\t  SharedPtr<ModelInstance> model = instance_ptr;\n\t\t\t  model->transform( Transform::make_rotation(Vec3(0.0, 1.0, 0.0)) );\n\t\t  }\n         std::cout << x_pos << \":\" << y_pos << \".  Model id: \" << obj_id << std::endl;\n      }\n   }\n\n\n   Bool has_changed = last_x != x_pos || last_y != y_pos;\n\n   Float64 x_offset = x_pos - last_x;\n   Float64 y_offset = last_y - y_pos;\n   last_x           = x_pos;\n   last_y           = y_pos;\n\n   if ( glfwGetMouseButton( window, GLFW_MOUSE_BUTTON_MIDDLE) != GLFW_PRESS ) {\n      if ( !g_is_mouse_look_enabled ) {\n         glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_NORMAL );\n         return;\n      }\n   }\n   else {\n      glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_DISABLED );\n   }\n\n\n   // 'http://justsomething.co/wp-content/uploads/2013/11/guns-replaced-thumbs-up-20.jpg'\n\n   Float64 sensitivity = 0.05;\n   x_offset *= sensitivity;\n   y_offset *= sensitivity;\n\n   yaw   += x_offset;\n   pitch += y_offset;\n\n   if ( pitch > 89.0f )\n      pitch =  89.0f;\n   if ( pitch < -89.0f )\n      pitch = -89.0f;\n\n   if ( has_changed ) {\n      cam.forward.x = cos( glm::radians(yaw)) * cos(glm::radians(pitch) );\n      cam.forward.y = sin( glm::radians(pitch)                          );\n      cam.forward.z = sin( glm::radians(yaw)) * cos(glm::radians(pitch) );\n      cam.forward   = glm::normalize( cam.forward );\n\n      auto view = cam.get_view();  // get view (pos, rot, scale)\n\n      view.look_at( cam.forward, view.get_position()); // rotate view\n      cam.set_view( view );        // update cam view\n      //Transform().set_rotation()\n\n      //auto hm = Transform(view.get_position(), cam.forward);\n      //auto hm = Transform::make_rotation(( cam.forward));\n\n      //cam.transform(hm);\n\n      //cam.transform(Transform::make_rotation(Vec3(1.0f, 0.0f, 0.0f), glm::radians(0.1f)));\n\n      //cam.transform(Transform::make_rotation(Vec3(1.0f, 0.0f, 0.0f), cam.forward.x));\n      //auto t = Transform::make_rotation(cam.forward);\n      //cam.transform(t);\n      //auto rotation = Transform::make_rotation(cam.forward);\n\n      //TODO:\n\n   }\n}\n\n//void process_picking(GLFWwindow *window, SceneManager scene, Viewport view)\n//{\n//\n//}\n\nvoid toggle_input_callback( GLFWwindow  *window,\n                            Int32        key,\n                            Int32        scancode,\n                            Int32        action,\n                            Int32        mods )\n{\n   if ( key == GLFW_KEY_ESCAPE  &&  action == GLFW_PRESS )\n      glfwSetWindowShouldClose( window, true );\n\n   if ( (key == GLFW_KEY_F1 )  &&  action == GLFW_PRESS ) {\n      g_is_mouse_look_enabled = !g_is_mouse_look_enabled;\n      if ( g_is_mouse_look_enabled )\n         glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_DISABLED );\n      else\n         glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_NORMAL );\n   }\n\n\n   if ( key == GLFW_KEY_F2  &&  action == GLFW_PRESS )\n      config.is_wireframe_mode = !config.is_wireframe_mode; // used in SceneManager::Draw()\n   if ( key == GLFW_KEY_F3  &&  action == GLFW_PRESS )\n      config.render_mode = RenderMode::composite;\n   if ( key == GLFW_KEY_F4  &&  action == GLFW_PRESS )\n      config.render_mode = RenderMode::albedo;\n   if ( key == GLFW_KEY_F5  &&  action == GLFW_PRESS )\n      config.render_mode = RenderMode::normals;\n   if ( key == GLFW_KEY_F6  &&  action == GLFW_PRESS )\n      config.render_mode = RenderMode::specular;\n   if ( key == GLFW_KEY_F7  &&  action == GLFW_PRESS )\n      config.render_mode = RenderMode::positional;\n   if ( key == GLFW_KEY_F8  &&  action == GLFW_PRESS )\n      config.render_mode = RenderMode::emissive;\n   if ( key == GLFW_KEY_F9  &&  action == GLFW_PRESS )\n      config.render_mode = RenderMode::textureless;\n   if ( key == GLFW_KEY_F10 &&  action == GLFW_PRESS)\n\t   config.render_mode = RenderMode::picking;\n   if ( key == GLFW_KEY_F12 &&  action == GLFW_PRESS )\n      config.is_imgui_toggled = !config.is_imgui_toggled;\n\n\n}\n\n\n\nvoid process_input( GLFWwindow  *window,\n                    Viewport    &cam,\n                    Float32      time_delta_ms )\n{\n\n   // glfwSetInputMode( window, GLFW_STICKY_KEYS, 1 );\n\n   Float32    move_distance = g_move_speed * (time_delta_ms * 1000);\n   Transform  offset;\n\n\n   if ( glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS ) {\n      offset = Transform::make_translation(\n                  Vec3( 1.0f, 1.0f, move_distance )\n                  *\n                  cam.forward\n               );\n      cam.transform( offset);\n\n   }\n   if ( glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS ) {\n      offset = Transform::make_translation(\n                  Vec3( -1.0f, -1.0f, -move_distance )\n                  *\n                  cam.forward\n               );\n      cam.transform(offset);\n   }\n   if ( glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS ) {\n      offset = Transform::make_translation(\n                  Vec3( move_distance, 1.0f, 1.0f )\n                  *\n                  glm::cross( -cam.forward, Vec3(0.0, 1.0f, 0.0f) )\n               );\n      cam.transform(offset);\n   }\n   if ( glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS ) {\n      offset = Transform::make_translation(\n                  Vec3( -move_distance, -1.0f, -1.0f )\n                  *\n                  glm::cross( -cam.forward, Vec3(0.0f, 1.0f, 0.0f) )\n               );\n      cam.transform(offset);\n   }\n   if ( glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS ) {\n      offset = Transform::make_translation(\n                  Vec3( 0.0f, -move_distance, 0.0f)\n               );\n      cam.transform(offset);\n\n   }\n   if ( glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS ) {\n      offset = Transform::make_translation(\n                  Vec3( 0.0f, move_distance, 0.0f )\n               );\n      cam.transform(offset);\n\n   }\n\n\n/*\n   if ( glfwGetKey(window, GLFW_KEY_W)            == GLFW_PRESS ) { // forward\n      cam.transform( translation * forward );\n   }\n   if ( glfwGetKey(window, GLFW_KEY_S)            == GLFW_PRESS ) { // backward\n      // auto backward = forward * Transform::make_rotation( Vec3(   0,  180,  0 ) );\n      // cam.transform( translation * backward );\n   }\n   if ( glfwGetKey(window, GLFW_KEY_A)            == GLFW_PRESS ) { // left\n      // auto left     = forward * Transform::make_rotation( Vec3(   0,  -90,  0 ) );\n      // cam.transform( translation * left );\n   }\n   if ( glfwGetKey(window, GLFW_KEY_D)            == GLFW_PRESS ) { // right\n      // auto right    = forward * Transform::make_rotation( Vec3(   0,   90,  0 ) );\n      // cam.transform( translation * right );\n   }\n   if ( glfwGetKey(window, GLFW_KEY_SPACE)        == GLFW_PRESS ) { // up\n      // auto up       = forward * Transform::make_rotation( Vec3( -90,    0,  0 ) );\n      // cam.transform( translation * up );\n   }\n   if ( glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS ) { // down\n      // auto down     = forward * Transform::make_rotation( Vec3( -90,    0,  0 ) );\n      // cam.transform( translation * down );\n   }\n*/\n}\n\n\n/*\nvoid process_input( GLFWwindow *window, Viewport &cam, Float32 delta ) {\n   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)\n      glfwSetWindowShouldClose(window, true);\n   if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS)\n      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);\n   if (glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS)\n      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);\n   if (glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS) {\n      mouse_look = !mouse_look;\n      if (mouse_look)\n         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);\n      else\n         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);\n   }\n\n   //If movement is disabled\n   if ( !mouse_look )\n      return;\n\n   // TODO: fix camera navigation\n   Float32 camspeed = g_move_speed * delta;\n   Transform offset;\n\n\n   if ( glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS ) {\n      offset = Transform::make_translation(Vec3(1.0, 1.0, camspeed )* -cam.front);\n      cam.transform( offset);\n   }\n   if ( glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS ) {\n      offset = Transform::make_translation(Vec3(-1.0, -1.0, -camspeed)* -cam.front);\n      cam.transform(offset);\n   }\n   if ( glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS ) {\n      offset = Transform::make_translation(Vec3(camspeed , 1.0, 1.0)*glm::cross(cam.front, Vec3(0.0, 1.0f, 0.0f)));\n      cam.transform(offset);\n   }\n   if ( glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS ) {\n      offset = Transform::make_translation(Vec3(-camspeed, -1.0, -1.0)* glm::cross( cam.front, Vec3(0.0, 1.0f, 0.0f)));\n      cam.transform(offset);\n   }\n   if ( glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS ) {\n      offset = Transform::make_translation(Vec3(0.0, camspeed, 0.0) );\n      cam.transform(offset);\n   }\n   if ( glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS ) {\n      offset = Transform::make_translation(Vec3(0.0, -camspeed, 0.0));\n      cam.transform(offset);\n   }\n}\n*/\n\n\n\n// TODO: refactor into debug.h/cpp\nvoid draw_camera_debug_window( Vec3    &position,\n                               Vec3    &rotation,\n                               Float32 &fov_rad )\n{\n   if ( !config.is_imgui_toggled )\n      return;\n\n   ImGui::Begin( \"Camera:\" ); // begin our Camera window:\n   {  // draw our window GUI components and do I/O:\n      ImGui::SliderAngle( \"X-axis\", &rotation.x );\n      ImGui::SliderAngle( \"Y-axis\", &rotation.y );\n      ImGui::SliderAngle( \"Z-axis\", &rotation.z );\n      // add some vertical spacing:\n      ImGui::Spacing();\n      // read in the camera position:\n      ImGui::SliderFloat( \"X pos\", &position.x, -255, +255 );\n      ImGui::SliderFloat( \"Y pos\", &position.y, -255, +255 );\n      ImGui::SliderFloat( \"Z pos\", &position.z, -255, +255 );\n      // add some vertical spacing:\n      ImGui::Spacing();\n      // FOV slider:\n      ImGui::SliderAngle( \"FOV\", &fov_rad );\n      // add some vertical spacing:\n      ImGui::Spacing();\n      // print our current framerate:\n      ImGui::Text( \"\\t%.1f FPS (avg %.3f ms/frame)\",\n                  ImGui::GetIO().Framerate,\n                  1000.0f / ImGui::GetIO().Framerate );\n   } ImGui::End(); // end our Camera window\n}\n\n\n// void print_cwd() {\n//    char path[1024] = \"\";\n//    getcwd( path, 1024 );\n//    printf( \"%s\\n\", path ); //std::filesystem::current_path().c_str() );\n// }\n\n\nInt32 main( Int32 argc, char const *argv[] ) {\n\t// initialise GLFW\n\tglewExperimental = true; // <- needed for core profile\n\tif ( !glfwInit() ) {\n\t\tfprintf( stderr, \"[ERROR] Failed to initialize GLFW.\\n\" );\n\t\treturn -1;\n\t}\n\n\t// 4xAA\n\tglfwWindowHint( GLFW_SAMPLES, 4 );\n\t// GLSL v130\n\tchar const *glsl_version = \"#version 440\";\n\t// OpenGL v4.4\n\tglfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 4 );\n\tglfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 4 );\n\t// for MacOS; should not be needed\n\tglfwWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE );\n\t// use OpenGL core profile\n\tglfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );\n\n\t// open a window and create its OpenGL context\n\tGLFWwindow *window;\n\n\twindow = glfwCreateWindow( Config::start_width,\n                              Config::start_height,\n                              \"3D Project -- WINDOW\",\n                              NULL,\n                              NULL );\n\n\tif ( window == NULL ) {\n\t\tfprintf(stderr, \"[ERROR] Failed to open GLFW window.\\n\"\n\t\t\t             \"        If you have an Intel GPU, they're not 4.4 compatible.\\n\" );\n\t\tgetchar();\n\t\tglfwTerminate();\n\t\treturn -1;\n\t}\n\tglfwMakeContextCurrent( window ); // initialize GLEW\n\n   // glfwSwapInterval(1); // enable vsync -- TODO: decide!\n\n\tif ( glewInit() != GLEW_OK ) {\n\t\tfprintf( stderr, \"[ERROR] Failed to initialize GLEW.\\n\" );\n\t\treturn -1;\n\t}\n\n\t// ensure we can capture the escape key being pressed below\n\tglfwSetInputMode( window, GLFW_STICKY_KEYS, 1 );\n   // glfwSetCursorPosCallback(window, mouse_callback); // TODO: make a call back matching template that calls on our process_mouse();\n   glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);\n   // glfwSetCursorPosCallback(window, process_mouse);\n   glfwSetKeyCallback( window, toggle_input_callback);\n\n   // for enabeling opengl debugging\n   glEnable(GL_DEBUG_OUTPUT);\n   glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);\n   glDebugMessageCallback(glDebugOutput, nullptr);\n   glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);\n\n\t// ImGui context setup\n\tIMGUI_CHECKVERSION();\n\tImGui::CreateContext();\n\tImGuiIO& io = ImGui::GetIO(); (void)io; // wot?\n // io.configFlags |= ImGuiconfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls\n // io.configFlags |= ImGuiconfigFlags_NavEnableGamepad;   // Enable Gamepad Controls\n\n\t// setup ImGui style\n\tImGui::StyleColorsDark();\n\n\t// setup platform and renderer bindings\n\tImGui_ImplGlfw_InitForOpenGL( window, true );\n\tImGui_ImplOpenGL3_Init( glsl_version );\n\n\tglEnable( GL_DEPTH_TEST   );\n\tglEnable( GL_STENCIL_TEST );\n\n   ShaderManager shader_manager{};\n   AssetManager  asset_manager{};\n\n   auto lighting_vert_shader    { shader_manager.load_shader( \"lightSha.vert\" )        }; // TODO: rename files\n   auto lighting_frag_shader    { shader_manager.load_shader( \"lightSha.frag\" )        }; // TODO: rename files\n   auto geometry_vert_shader    { shader_manager.load_shader( \"g_buffer.vert\" )        }; // TODO: rename files\n   auto geometry_frag_shader    { shader_manager.load_shader( \"g_buffer.frag\" )        }; // TODO: rename files\n   auto geometry_geom_shader    { shader_manager.load_shader( \"g_buffer.geom\" )        };\n   auto shadowdepth_vert_shader { shader_manager.load_shader( \"shadow_depth.vert\" )    };\n   auto shadowdepth_frag_shader { shader_manager.load_shader( \"shadow_depth.frag\" )    };\n   /* PS */ auto ps_vert_shader { shader_manager.load_shader( \"particle_system.vert\" ) }; //\n   /* PS */ auto ps_geom_shader { shader_manager.load_shader( \"particle_system.geom\" ) }; //  /* @TAG{PS} */\n   /* PS */ auto ps_frag_shader { shader_manager.load_shader( \"particle_system.frag\" ) }; //\n\n\n   auto geometry_program      { shader_manager.create_program( { geometry_frag_shader,\n                                                                 geometry_vert_shader,\n                                                                 geometry_geom_shader } ) };\n\n   auto lighting_program      { shader_manager.create_program({ lighting_frag_shader, lighting_vert_shader }) };\n\n   auto shadowdepth_program   { shader_manager.create_program({ shadowdepth_frag_shader, shadowdepth_vert_shader }) };\n\n   auto particle_program      { shader_manager.create_program({ ps_vert_shader, ps_geom_shader, ps_frag_shader }) };    /* @TAG{PS} */\n\n   //Add Lightning program to Scenemanager\n   SceneManager  scene_manager{ geometry_program, lighting_program , shadowdepth_program, particle_program }; /* @TAG{PS} */\n\n   Vector<SharedPtr<Light>> light_instances;\n\n   light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,\n                                                               Vec3(  0.0f,   0.0f,   0.0f ),\n                                                               Vec3( 10.0f,  10.0f,  10.0f ),\n                                                               Vec3(  1.0f,   0.0f,   0.0f ),\n                                                                0.1,\n                                                               14.0,\n                                                                0.0,\n                                                                1.0 } ) );\n\n   light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,\n                                                  Vec3( 0.0f,  0.0f,  0.0f ),\n                                                  Vec3( 1.0f,  4.0f,  5.0f ),\n                                                  Vec3( 1.0f,  1.0f,  0.0f ),\n                                                  0.1,\n                                                  7.0,\n                                                  0.0,\n                                                  1.0 } ) );\n\n   light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,\n                                                  Vec3( 0.0f,  0.0f,  0.0f ),\n                                                  Vec3( 2.0f,  1.0f,  5.0f ),\n                                                  Vec3( 1.0f,  0.0f,  1.0f ),\n                                                   0.1,\n                                                  17.0,\n                                                   0.0,\n                                                   1.0} ) );\n\n   light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,\n                                                  Vec3( 0.0f,  0.0f,  0.0f ),\n                                                  Vec3( 1.0f,  5.0f,  6.0f ),\n                                                  Vec3( 0.0f,  1.0f,  0.0f ),\n                                                   0.1,\n                                                  11.0,\n                                                   0.0,\n                                                   1.0 } ) );\n\n   light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,\n                                    Vec3( 0.0f,  0.0f,  1.0f ),\n                                    Vec3( 3.0f,  3.0f,  1.0f ),\n                                    Vec3( 0.0f,  1.0f,  1.0f ),\n                                    0.1,\n                                    2.0,\n                                    0.0,\n                                    1.0 } ) );\n\n   light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,\n                                    Vec3( 0.0f,  0.0f,   0.0f ),\n                                    Vec3( 1.0f,  2.0f,  10.0f ),\n                                    Vec3( 0.0f,  0.0f,   1.0f ),\n                                    0.1,\n                                    1.0,\n                                    0.0,\n                                    1.0 } ) );\n\n   light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,\n                                    Vec3(  0.0f,  0.0f,  0.0f ),\n                                    Vec3( 10.0f,  0.0f,  5.0f ),\n                                    Vec3(  1.0f,  1.0f,  1.0f ),\n                                    0.1,\n                                    7.0,\n                                    0.0,\n                                    1.0 } ) );\n\n   light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,\n                                                Vec3(  0.0f,  0.0f,   0.0f ),\n                                                Vec3( 10.0f,  5.0f,  10.0f ),\n                                                Vec3(  1.0f,  0.3f,   0.5f ),\n                                                 0.1,\n                                                17.0,\n                                                 0.0,\n                                                 1.0 } ) );\n\n   //SharedPtr<Model> nanosuit_model = asset_manager.load_model( \"ape.obj\" );\n\n   SharedPtr<Model> ape_model = asset_manager.load_model( \"ape.obj\" );\n\n\n   //SharedPtr<Model> isle = asset_manager.load_model(\"Small Tropical Island.obj\");\n\n   Vec3 poss = Vec3( 101.0f,  100.0f,  100.0f );\n   Vec3 dirr = Vec3( -45.0f,    0.0f,  -45.0f );\n\n   Float32 intensity   =   0.5f; // 50%\n   Float32 radius      = 570.0f;\n   Float32 degree      =   0.0f;\n   Float32 specularity =   1.0f;\n\n   auto sun = scene_manager.instantiate_light( Light::Data{ Light::Type::directional,\n                                                            glm::normalize(poss - dirr),\n                                                            poss,\n                                                            Vec3( 1.0f,  1.0f,  1.0f ),\n                                                            intensity, //Percentage\n                                                            radius,\n                                                            degree,\n                                                            specularity } );\n   light_instances.push_back( sun );\n\n   SharedPtr<Shadowcaster> light_sc = std::make_shared<Shadowcaster>(sun);\n\n   //Must initialize before first use (set_light_matrix(...) atleast once!)\n   light_sc->set_Light_matrix(0.1f, glm::length(poss - dirr), 50, -50, 50, -50, poss, dirr, Vec3(0.0f, 1.0f, 0.0f));\n   scene_manager.set_shadowcasting( light_sc );\n\n   Vector<SharedPtr<ModelInstance>> model_instances;\n   //model_instances.push_back(scene_manager.instantiate_model(isle,geometry_program, Transform(Vec3(1*(2 / 8) -40, 150.0f, 2*(2 % 8) - 40),\n   //   Vec3(0.0f, 0.0f, 0.0f),\n   //   Vec3(.3f, .3f, .3f))));\n\n   model_instances.reserve( 64 );\n   for ( auto i=0;  i<64;  ++i ) {\n      Float32 n = 9; // spacing\n      model_instances.push_back(\n         scene_manager.instantiate_model(ape_model,\n                                          geometry_program,\n                                          Transform( Vec3( n*(i/8)-40,  0.0f,  n*(i%8)-40 ),\n                                                     Vec3(       0.0f,  0.0f,        0.0f ),\n                                                     Vec3(       1.3f,  1.3f,        1.3f ) ) ) );\n   }\n\n   SharedPtr<Model> floor = asset_manager.load_model(\"floor.obj\");\n   model_instances.push_back(scene_manager.instantiate_model(floor,\n         geometry_program,\n         Transform(Vec3(0.0, 0.0, 0.0),\n         Vec3(0.0f, 0.0f ,0.0f),\n         //Vec3(0.0f, 0.0, 0.0f),\n         Vec3(18.0f, 1.0f, 18.0f))));\n\n\n   //Tool to see more clearly how Light frustrum looks like\n   ShadowcasterDebug sundbg = ShadowcasterDebug(light_sc, &asset_manager, &scene_manager, &model_instances, geometry_program, &poss, &dirr);\n\n   //SunApe->set_transform()\n\n   /* TODO */ Vec3       cam_rotations {  0.0f,   0.0f,   0.0f };\n   /* TODO */ Vec3       cam_position  {  0.0f, 20.0f,  15.0f };\n   /* TODO */ Transform  cam_transform;\n   /* TODO */ Float32    fov_rad { Config::fov_rad }; // 90 degrees\n   /* TODO */ Viewport view { cam_position, window, geometry_program, fov_rad };\n   /* TODO */ view.bind_shader_program( geometry_program );\n   /* TODO */ //TODO: remove when we dont want to se dogass\n   /* TODO */ view._g_buffer_init();\n   /* TODO */ //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);\n\n   glUseProgram( lighting_program->get_location() );\n\n   // @TAG{TEXTURE_CHANNEL}\n   glUniform1i( glGetUniformLocation( lighting_program->get_location(), \"g_tex_albedo\" ), 0 );\n   glUniform1i( glGetUniformLocation( lighting_program->get_location(), \"g_tex_spec\"   ), 1 );\n   glUniform1i( glGetUniformLocation( lighting_program->get_location(), \"g_tex_norm\"   ), 2 );\n   glUniform1i( glGetUniformLocation( lighting_program->get_location(), \"g_tex_emit\"   ), 3 );\n   glUniform1i( glGetUniformLocation( lighting_program->get_location(), \"g_tex_pos\"    ), 4 );\n   glUniform1i( glGetUniformLocation( lighting_program->get_location(), \"g_tex_pic\"    ), 5 );\n   glUniform1i( glGetUniformLocation( lighting_program->get_location(), \"shadowMap\"    ), 6 );\n\n   //glEnable(GL_CULL_FACE);\n   glDisable( GL_BLEND );\n\n   /* @TAG{PS} */\n   /* PS */ auto ps_logic = [] ( ParticleSystem::Data &data, Float32 delta_t_ms ) {\n   /* PS */    using  Particle = ParticleSystem::Data::Particle;\n   /* PS */\n   /* PS */    static Float32 const birthrate_per_ms   { 12.0f / 1'000      }; // 12 per s\n   /* PS */    static Float32 const avg_lifespan_ms    { 60'000.0f          };\n   /* PS */    static Float32 const avg_mass_kg        {     0.01f          };\n   /* PS */    static Float32 const avg_scale          {   100.00f          };\n   /* PS */    static Uvec4   const colour_rgba        { 255, 255, 255, 255 };\n   /* PS */    static Float32 const radius_m           { 30.f               };\n   /* PS */    static Float32       time_pool_ms       { .0f                };\n   /* PS */\n   /* PS */    time_pool_ms += delta_t_ms;\n   /* PS */\n   /* PS */    for ( auto i = 0;  i < data.count;  ++i ) {\n   /* PS */        auto &particle          =  data.data[i]; // TODO: rename in ParticleSystem\n   /* PS */        particle.spatial[1]    +=  -.1f * delta_t_ms;\n   /* PS */        particle.time_ms_left  -=  delta_t_ms;\n   /* PS */    }\n   /* PS */\n   /* PS */    std::random_device rd;\n   /* PS */    std::mt19937 mt( rd() );\n   /* PS */    std::uniform_real_distribution<Float32> dist( -radius_m, +radius_m );\n   /* PS */\n   /* PS */    while ( time_pool_ms > birthrate_per_ms ) {\n   /* PS */       data.add( Particle { colour_rgba,\n   /* PS */                            Vec4 { dist(mt), dist(mt), dist(mt), avg_scale }, // random position\n   /* PS */                            Vec3 { .0f, -.1f, .0f },\n   /* PS */                            avg_lifespan_ms,\n   /* PS */                            avg_mass_kg } );\n   /* PS */       time_pool_ms -= birthrate_per_ms;\n   /* PS */    }\n   /* PS */ };\n   /* PS */\n   /* PS */ TextureSet snowflake_tex {\n   /* PS */    std::make_shared<DiffuseTexture>  ( FilePath{ FileType::texture, \"snowflake_dif.png\"  }),\n   /* PS */    std::make_shared<NormalTexture>   ( FilePath{ FileType::texture, \"snowflake_nor.png\"  }),\n   /* PS */    std::make_shared<SpecularTexture> ( FilePath{ FileType::texture, \"snowflake_spec.png\" }),\n   /* PS */    std::make_shared<EmissiveTexture> ( FilePath{ FileType::texture, \"snowflake_emit.png\" })\n   /* PS */ };\n   /* PS */\n   /* PS */ auto ps { std::make_shared<ParticleSystem>( Transform::make_translation(Vec3{.0f, 3.0f, .0f}), snowflake_tex, ps_logic ) };\n   /* PS */ scene_manager.instantiate_particle_system( ps ); // TODO: revamp in SceneManager\n   /* PS */ ps->start();\n\n// main loop:\n\twhile ( !glfwWindowShouldClose(window) ) {\n      Float32 delta_time_ms { ImGusi::GetIO().DeltaTime / 1000.f };\n      scene_manager.update( delta_time_ms );\n\n\t\t// poll & handle events such as window resizing and input from the keyboard or mouse\n\t\t// use io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if imgui wants to use the user's input\n\t\t// - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.\n\t\t// - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application.\n\t\t// Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.\n\t\tglfwPollEvents();\n\n\t\t// start the Dear ImGui frame \n\t\tImGui_ImplOpenGL3_NewFrame();\n\t\tImGui_ImplGlfw_NewFrame();\n\t\tImGui::NewFrame();\n\n      // myView.bind_shader_program( *shaProg );\n      // draw_camera_debug_window( cam_position, cam_rotations, fov_rad );\n      // cam_transform.set_rotation( cam_rotations );\n      // cam_transform.set_position( cam_position );\n      // myView.set_view( cam_transform );\n      // myView.set_fov( fov_rad );\n      scene_manager.draw_debug_scene_inspection();\n\n      // TODO: bryt ut till debug\n      if ( config.is_imgui_toggled ) {\n         ImGui::Begin( \"Settings:\" );\n         ImGui::SliderFloat( \"Move speed\", &g_move_speed, 0.0f, 25.0f );\n         ImGui::End();\n      }\n\n      Array<Float32,4> corners = light_sc->getCorners();\n\n      for ( auto &light : light_instances )\n         debug::lightsource( light, scene_manager );\n\n      light_sc->set_Light_matrix( 0.1f,\n                                  glm::length(poss-dirr),\n                                  corners[0],\n                                  corners[1],\n                                  corners[2],\n                                  corners[3],\n                                  sun->get_position(),\n                                  sun->get_direction(),\n                                  Vec3(0.0f, 1.0f, 0.0f) ); // up vector?\n\n      sundbg.light_caster_debugg_tool_render();\n\n      process_mouse( window, view, scene_manager, delta_time_ms );\n      process_input( window, view, delta_time_ms );\n\n      // glMatrixMode( GL_PROJECTION );\n      // glLoadIdentity();\n\n      //auto mo = model_instances[10]->model_transform;\n      //auto pos = mo.get_position();\n      //mo.set_position(Vec3(0.0f, 0.0f, 0.0f));\n      ////mo.set_rotation(Vec3(1.0f, 0.0f, 0.0f), glm::radians(30.0f));\n      //\n      //   //set_rotation(Vec3(1.0f, 0.0f, 0.0f), glm::radians(30.0f));\n      //model_instances[10]->set_transform(mo);\n      //\n      //mo.set_position(pos);\n      //model_instances[10]->set_transform(mo);\n\n      auto mo = model_instances[10];\n      mo->transform( Transform::make_rotation(Vec3(1.0f, 0.0f, 0.0f), glm::radians(30.0f) ) );\n\n      auto mo2 = model_instances[11];\n\n      //auto t = Transform::make_translation(Vec3(0.10f, 0.0f, 0.0f));\n      //auto r = Transform::make_rotation(Vec3(0.0f, 1.0f, 0.0f), glm::radians(30.0f));\n      //r.look_at(Vec3(0.0, 0.0, 0.0), t.get_position());\n      //t.set_rotation(r.get_rotation());\n      auto mdl = mo2->model_transform;\n      //mdl.look_at(Vec3(13.0f, 0.0f, 0.0f), Vec3(0.0f, 0.0f, 0.00001f) );\n      static Float32 g = 0.0f;\n      static Float32 h = 0.0f;\n\n\n      static bool hm = true;\n      static bool isPressed = false;\n      static float time = ImGui::GetTime();\n      float curTime = ImGui::GetTime();\n\n      float timepast = curTime - time;\n\n      if (glfwGetKey(window, GLFW_KEY_P)&& timepast > 0.25) {\n         isPressed = !isPressed;\n\n\n         time = ImGui::GetTime();\n      }\n      if (true && isPressed) {\n\n         if (g > 2) {\n            hm = false;\n         }\n         else if (g < -2) {\n            hm = true;\n         }\n\n         if (hm) {\n            g += 0.01f;\n         }\n         else {\n            g -= 0.01f;\n         }\n         h += 0.01f;\n\n         for (int i = 0; i < 64-1; i++) {\n            Float32 size = 0.1f;\n            //mo2->transform(Transform::make_translation(Vec3(0.0,0.0,0.0)));\n\n            model_instances[i]->set_transform(Transform::make_translation(model_instances[i]->model_transform.get_position()));\n            model_instances[i]->transform(Transform::make_rotation(Vec3((Float32)glm::cos(15 * g*(((i % 4))% 2)), (Float32)glm::cos(12*g*((i % 3))), (Float32)glm::sin(g/2* (i % 2)))) * Transform::make_translation(Vec3((Float32)glm::sin(g*i)*((i % 3)* size), (Float32)glm::sin(g* (i % 2)* size)*0.02 , (Float32)glm::sin(g/10)*((i%5) % 2))));\n\n         }\n         //model_instances[63]->set_transform(Transform::make_translation(model_instances[63]->model_transform.get_position()));\n         auto cur = model_instances[63]->model_transform;\n         //model_instances[63]->transform(Transform::make_translation(glm::normalize(Vec3(0.f, 0.f, 20.0f))));\n         //model_instances[63]->transform(Transform::make_translation(glm::normalize(Vec3(1 * glm::cos(2 * g + cur.get_position().y) + cur.get_position().x, 1 * glm::sin(2 * g + cur.get_position().x) + cur.get_position().y, 0))));\n         //model_instances[63]->transform(Transform::make_translation((Vec3((0.5 ) * glm::cos(2 * h + cur.get_position().x) /*+ cur.get_position().y*/, 0, (0.5 ) * glm::sin(2 * h /* + cur.get_position().y*/) /*+ cur.get_position().x*/))));\n         Float32 radius = 30;\n         Vec3 rotateAround(0.0,0.0,0.0);//Might be wrong\n         Float32 speed = 5;\n         model_instances[63]->set_transform(Transform::make_translation((Vec3((radius) * glm::cos(speed * h + rotateAround.x) + rotateAround.y, rotateAround.z, (radius) * glm::sin(speed * h  + rotateAround.x) + rotateAround.y))));\n\n      }\n\n      //mdl.set_position(Vec3(1.0f ,0.0f,0.0f));\n      //mo2->transform(mdl);\n\n      //mo2->set_transform(mdl);\n\n\n      scene_manager.draw( view );\n\n      ImGui::Render();\n      ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );\n      glfwMakeContextCurrent( window );\n      glfwSwapBuffers( window );\n\n\n      //ImGui::Text( \"\\t%.1f FPS (avg %.3f ms/frame)\",\n        //          ImGui::GetIO().Framerate,\n          //        1000.0f / ImGui::GetIO().Framerate\n\n      auto fps        = ImGui::GetIO().Framerate;\n      auto mspfps     = 1000.0f / ImGui::GetIO().Framerate;\n      char title[512] = {};\n      snprintf( title, 512, \"3D Project ─ %3.1f FPS (%3.1fms/frame)\", fps, mspfps );\n      glfwSetWindowTitle( window, title );\n\n\n\t} // main loop end\n\n   // cleanup:\n\tImGui_ImplOpenGL3_Shutdown();\n\tImGui_ImplGlfw_Shutdown();\n\tImGui::DestroyContext();\n\tglfwDestroyWindow( window );\n\tglfwTerminate(); // close OpenGL window & terminate GLFW\n\treturn 0; // successful exit\n}\n",
+			"file": "Makefile",
+			"settings":
+			{
+				"buffer_size": 2313,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
 			"file": "src/main.cpp",
-			"file_size": 37452,
-			"file_write_time": 131964676580814931,
 			"settings":
 			{
-				"buffer_size": 37451,
+				"buffer_size": 40392,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "src/ParticleSystem.cpp",
+			"file": "src/Mesh.cpp",
 			"settings":
 			{
-				"buffer_size": 12279,
+				"buffer_size": 3610,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "/usr/include/c++/8/bits/move.h",
+			"file": "src/Texture.h",
 			"settings":
 			{
-				"buffer_size": 6529,
+				"buffer_size": 6918,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "src/ParticleSystem.h",
+			"file": "src/Texture.cpp",
 			"settings":
 			{
-				"buffer_size": 5509,
-				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "inc/glm/detail/type_vec3.inl",
-			"settings":
-			{
-				"buffer_size": 27209,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "inc/glm/detail/type_vec4.inl",
-			"settings":
-			{
-				"buffer_size": 37181,
+				"buffer_size": 1884,
 				"line_ending": "Unix"
 			}
 		},
@@ -169,7 +170,175 @@
 			"file": "src/SceneManager.cpp",
 			"settings":
 			{
-				"buffer_size": 22839,
+				"buffer_size": 27314,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/SceneManager.h",
+			"settings":
+			{
+				"buffer_size": 4677,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "dat/shaders/g_buffer_tess.geom",
+			"settings":
+			{
+				"buffer_size": 1257,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "dat/shaders/g_buffer.tesc",
+			"settings":
+			{
+				"buffer_size": 1990,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "dat/shaders/g_buffer.tese",
+			"settings":
+			{
+				"buffer_size": 1620,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "dat/shaders/g_buffer_tess.vert",
+			"settings":
+			{
+				"buffer_size": 867,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "dat/shaders/ssao.frag",
+			"settings":
+			{
+				"buffer_size": 1784,
+				"encoding": "UTF-8",
+				"line_ending": "Unix",
+				"name": "ssao.frag"
+			}
+		},
+		{
+			"file": "dat/shaders/ssao.vert",
+			"settings":
+			{
+				"buffer_size": 208,
+				"encoding": "UTF-8",
+				"line_ending": "Unix",
+				"name": "ssao.vert"
+			}
+		},
+		{
+			"contents": "Searching 35 files for \"displacement_map\" (case sensitive)\n\n0 matches",
+			"settings":
+			{
+				"buffer_size": 69,
+				"line_ending": "Unix",
+				"name": "Find Results",
+				"scratch": true
+			}
+		},
+		{
+			"file": "src/Model.cpp",
+			"settings":
+			{
+				"buffer_size": 7735,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "dat/shaders/g_buffer.frag",
+			"settings":
+			{
+				"buffer_size": 1049,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "dat/shaders/g_buffer.vert",
+			"settings":
+			{
+				"buffer_size": 1001,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "dat/shaders/lightSha.frag",
+			"settings":
+			{
+				"buffer_size": 8301,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "dat/shaders/g_buffer.geom",
+			"settings":
+			{
+				"buffer_size": 2523,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "dat/shaders/ssao_blur.frag",
+			"settings":
+			{
+				"buffer_size": 724,
+				"encoding": "UTF-8",
+				"line_ending": "Unix",
+				"name": "ssao_blur.frag"
+			}
+		},
+		{
+			"file": "src/SuperSampledAmbientOcclusion.h",
+			"settings":
+			{
+				"buffer_size": 2207,
+				"encoding": "UTF-8",
+				"line_ending": "Unix",
+				"name": "class SuperSampledAmbientOcclusion {"
+			}
+		},
+		{
+			"file": "src/Config.h",
+			"settings":
+			{
+				"buffer_size": 2561,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/Viewport.h",
+			"settings":
+			{
+				"buffer_size": 2330,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/Viewport.cpp",
+			"settings":
+			{
+				"buffer_size": 14323,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/Config.cpp",
+			"settings":
+			{
+				"buffer_size": 273,
 				"line_ending": "Unix"
 			}
 		}
@@ -234,8 +403,44 @@
 		"selected_items":
 		[
 			[
+				"git push",
+				"git: push"
+			],
+			[
+				"git commit",
+				"git: commit including unstaged files"
+			],
+			[
+				"co",
+				"git: commit"
+			],
+			[
+				"git pull",
+				"git: pull"
+			],
+			[
+				"commit",
+				"git: commit including unstaged files"
+			],
+			[
 				"push",
 				"git: push"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"reset",
+				"git: reset"
+			],
+			[
+				"stash dro",
+				"git: stash drop"
+			],
+			[
+				"stash",
+				"git: stash save"
 			],
 			[
 				"diff",
@@ -246,8 +451,20 @@
 				"git: pull"
 			],
 			[
-				"commit",
+				"git committ",
 				"git: commit including unstaged files"
+			],
+			[
+				"status",
+				"git: status"
+			],
+			[
+				"git comm",
+				"git: commit including unstaged files"
+			],
+			[
+				"comit",
+				"git: commit"
 			],
 			[
 				"syntax",
@@ -270,18 +487,6 @@
 				"Package Control: List Packages"
 			],
 			[
-				"git push",
-				"git: push"
-			],
-			[
-				"git pull",
-				"git: pull"
-			],
-			[
-				"git commit",
-				"git: commit including unstaged files"
-			],
-			[
 				"gdb",
 				"SublimeGDB: Start Debugging"
 			],
@@ -294,20 +499,12 @@
 				"LSP: Restart Servers"
 			],
 			[
-				"git comm",
-				"git: commit including unstaged files"
-			],
-			[
 				"float",
 				"Code Folding: Fold Tag Attributes"
 			],
 			[
 				"git pus",
 				"git: push"
-			],
-			[
-				"status",
-				"git: status"
 			],
 			[
 				"syntax c++",
@@ -344,14 +541,6 @@
 			[
 				"disab",
 				"LSP: Disable Language Server Globally"
-			],
-			[
-				"stash",
-				"git: stash drop"
-			],
-			[
-				"install",
-				"Package Control: Install Package"
 			],
 			[
 				"menu",
@@ -434,7 +623,7 @@
 		"show_minimap": false,
 		"show_open_files": false,
 		"show_tabs": false,
-		"side_bar_visible": false,
+		"side_bar_visible": true,
 		"status_bar_visible": false
 	},
 	"expanded_folders":
@@ -447,65 +636,87 @@
 	],
 	"file_history":
 	[
-		"/home/falk/Code/DV1568_3DProjekt/src/ParticleSystem.cpp",
-		"/home/falk/Code/DV1568_3DProjekt/dat/shaders/particle_system.frag",
-		"/home/falk/Code/DV1568_3DProjekt/src/ParticleSystem.h",
-		"/home/falk/Code/DV1568_3DProjekt/src/SceneManager.cpp",
-		"/usr/include/c++/8/bits/shared_ptr.h",
-		"/usr/include/c++/8/bits/shared_ptr_base.h",
-		"/usr/include/c++/8/bits/stl_vector.h",
-		"/home/falk/Code/DV1568_3DProjekt/src/SceneManager.h",
-		"/home/falk/Code/DV1568_3DProjekt/src/Texture.h",
+		"/home/falk/Code/DV1568_3DProjekt/src/ssao.vert",
 		"/home/falk/Code/DV1568_3DProjekt/src/Config.h",
-		"/home/falk/Code/DV1568_3DProjekt/src/Transform.h",
-		"/home/falk/Code/DV1568_3DProjekt/src/misc/defs.h",
-		"/home/falk/Code/DV1568_3DProjekt/dat/shaders/particle_system.geom",
-		"/home/falk/Code/DV1568_3DProjekt/dat/shaders/particle_system.vert",
-		"/home/falk/Code/DV1568_3DProjekt/src/main.cpp",
-		"/home/falk/Code/DV1568_3DProjekt/dat/shaders/g_buffer.vert",
-		"/home/falk/Code/DV1568_3DProjekt/src/ModelInstance.cpp",
-		"/home/falk/Code/DV1568_3DProjekt/src/Texture.cpp",
-		"/home/falk/Code/DV1568_3DProjekt/src/Transform.cpp",
 		"/home/falk/Code/DV1568_3DProjekt/src/ModelInstance.h",
-		"/home/falk/Code/DV1568_3DProjekt/src/Model.cpp",
-		"/usr/include/c++/8/ext/new_allocator.h",
-		"/home/falk/Code/DV1568_3DProjekt/dat/shaders/g_buffer.frag",
-		"/home/falk/Code/DV1568_3DProjekt/dat/shaders/g_buffer.geom",
-		"/home/falk/Code/DV1568_3DProjekt/dat/shaders/lightSha.frag",
-		"/home/falk/Code/DV1568_3DProjekt/src/Viewport.h",
-		"/home/falk/Code/DV1568_3DProjekt/src/Viewport.cpp",
+		"/home/falk/Code/DV1568_3DProjekt/src/main.cpp",
 		"/home/falk/Code/DV1568_3DProjekt/src/Mesh.h",
 		"/home/falk/Code/DV1568_3DProjekt/src/Mesh.cpp",
+		"/home/falk/Code/DV1568_3DProjekt/src/Model.h",
+		"/home/falk/Code/DV1568_3DProjekt/src/Model.cpp",
+		"/home/falk/Code/DV1568_3DProjekt/src/SceneManager.cpp",
+		"/home/falk/Code/DV1568_3DProjekt/src/ModelInstance.cpp",
+		"/usr/include/c++/8/bits/shared_ptr.h",
+		"/home/falk/Code/DV1568_3DProjekt/src/AssetManager.cpp",
+		"/usr/include/c++/8/bits/allocator.h",
+		"/usr/include/c++/8/ext/new_allocator.h",
+		"/usr/include/c++/8/bits/shared_ptr_base.h",
+		"/usr/include/c++/8/ext/aligned_buffer.h",
+		"/usr/include/c++/8/bits/allocated_ptr.h",
+		"/usr/include/c++/8/bits/stl_algo.h",
+		"/usr/include/c++/8/bits/move.h",
+		"/usr/include/c++/8/bits/predefined_ops.h",
+		"/usr/include/c++/8/bits/stl_vector.h",
+		"/usr/include/c++/8/bits/stl_iterator.h",
+		"/usr/include/c++/8/bits/stl_algobase.h",
+		"/home/falk/Code/DV1568_3DProjekt/src/Viewport.cpp",
+		"/home/falk/Code/DV1568_3DProjekt/src/Transform.h",
+		"/home/falk/Code/DV1568_3DProjekt/src/Transform.cpp",
+		"/home/falk/Code/DV1568_3DProjekt/src/Texture.h",
+		"/home/falk/Code/DV1568_3DProjekt/src/Texture.cpp",
+		"/home/falk/Code/DV1568_3DProjekt/src/ParticleSystem.cpp",
+		"/home/falk/Code/DV1568_3DProjekt/dat/shaders/particle_system.frag",
+		"/home/falk/Code/DV1568_3DProjekt/dat/shaders/g_buffer.frag",
+		"/home/falk/Code/DV1568_3DProjekt/dat/shaders/lightSha.frag",
+		"/home/falk/Code/DV1568_3DProjekt/src/Viewport.h",
+		"/home/falk/Code/DV1568_3DProjekt/dat/shaders/lightSha.vert",
+		"/home/falk/Code/DV1568_3DProjekt/dat/shaders/g_buffer_tess.vert",
+		"/home/falk/Code/DV1568_3DProjekt/dat/shaders/g_buffer.tese",
+		"/home/falk/Code/DV1568_3DProjekt/dat/shaders/g_buffer.tesc",
+		"/home/falk/Code/DV1568_3DProjekt/dat/shaders/g_buffer.geom",
+		"/home/falk/Code/DV1568_3DProjekt/dat/shaders/shadow_depth.frag",
+		"/home/falk/Code/DV1568_3DProjekt/dat/shaders/particle_system.geom",
+		"/home/falk/Code/DV1568_3DProjekt/dat/shaders/g_buffer_tess.geom",
+		"/home/falk/Code/DV1568_3DProjekt/dat/shaders/g_buffer.vert",
+		"/home/falk/Code/DV1568_3DProjekt/src/SceneManager.h",
+		"/usr/include/c++/8/utility",
+		"/usr/include/c++/8/variant",
+		"/home/falk/Code/DV1568_3DProjekt/src/ShaderManager.cpp",
+		"/home/falk/Code/DV1568_3DProjekt/src/Shader.cpp",
+		"/home/falk/Code/DV1568_3DProjekt/src/shadowcasterDebug.h",
+		"/home/falk/Code/DV1568_3DProjekt/src/shadowcasterDebug.cpp",
+		"/home/falk/Code/DV1568_3DProjekt/src/ShaderManager.h",
+		"/home/falk/Code/DV1568_3DProjekt/Makefile",
+		"/home/falk/Code/DV1568_3DProjekt/src/misc/defs.h",
+		"/home/falk/Code/DV1568_3DProjekt/dat/shaders/particle_system.vert",
+		"/home/falk/Code/DV1568_3DProjekt/src/Shadowcaster.h",
+		"/home/falk/Code/DV1568_3DProjekt/src/ParticleSystem.h",
+		"/home/falk/Code/DV1568_3DProjekt/dat/shaders/shadow_depth.vert",
+		"/build/gcc-8-jvgBNN/gcc-8-8.2.0/src/libstdc++-v3/libsupc++/guard.cc",
+		"/home/falk/Code/DV1568_3DProjekt/inc/glm/detail/type_vec4.inl",
+		"/build/gcc-8-jvgBNN/gcc-8-8.2.0/build/x86_64-linux-gnu/libstdc++-v3/include/x86_64-linux-gnu/bits/gthr-default.h",
+		"/usr/include/c++/8/bits/std_function.h",
+		"/home/falk/Code/DV1568_3DProjekt/src/misc/ImGui/imgui.h",
+		"/home/falk/Code/DV1568_3DProjekt/inc/glm/detail/type_vec3.inl",
 		"/home/falk/Code/DV1568_3DProjekt/dat/shaders/New Text Document.txt",
 		"/home/falk/Code/DV1568_3DProjekt/doc/tags.md",
 		"/home/falk/.config/sublime-text-3/Packages/SublimeGDB/SublimeGDB.sublime-settings",
-		"/home/falk/Code/DV1568_3DProjekt/Makefile",
-		"/home/falk/Code/DV1568_3DProjekt/src/Model.h",
 		"/home/falk/Code/DV1568_3DProjekt/doc/TODO.md",
-		"/home/falk/Code/DV1568_3DProjekt/inc/glm/detail/type_vec3.inl",
 		"/home/falk/Code/DV1568_3DProjekt/imgui.ini",
-		"/home/falk/Code/DV1568_3DProjekt/dat/shaders/shadow_depth.frag",
 		"/home/falk/Code/DV1568_3DProjekt/src/Light.cpp",
 		"/home/falk/Code/DV1568_3DProjekt/src/debug.h",
 		"/home/falk/Code/DV1568_3DProjekt/src/debug.cpp",
 		"/home/falk/Code/DV1568_3DProjekt/src/ShaderProgram.cpp",
-		"/home/falk/Code/DV1568_3DProjekt/src/misc/ImGui/imgui.h",
 		"/home/falk/Code/DV1568_3DProjekt/src/Light.h",
-		"/home/falk/Code/DV1568_3DProjekt/dat/shaders/shadow_depth.vert",
 		"/home/falk/.config/sublime-text-3/Packages/User/SublimeGDB.sublime-settings",
 		"/home/falk/.config/sublime-text-3/Packages/User/Default (Linux).sublime-keymap",
 		"/home/falk/.config/sublime-text-3/Packages/SublimeGDB/Default.sublime-keymap",
 		"/home/falk/Code/DV1568_3DProjekt/src/ShaderProgram.h",
-		"/home/falk/Code/DV1568_3DProjekt/src/shadowcasterDebug.cpp",
-		"/home/falk/Code/DV1568_3DProjekt/dat/shaders/lightSha.vert",
 		"/home/falk/Code/DV1568_3DProjekt/3D_Project.sublime-project",
 		"/home/falk/Code/DV1568_3DProjekt/src/Shadowcaster.cpp",
 		"/home/falk/Code/DV1568_3DProjekt/inc/glm/ext/matrix_transform.inl",
 		"/media/falk/Astrala/code/sandbox/main.cpp",
 		"/usr/include/c++/8/functional",
-		"/home/falk/Code/DV1568_3DProjekt/src/ShaderManager.cpp",
-		"/home/falk/Code/DV1568_3DProjekt/src/Shadowcaster.h",
-		"/home/falk/Code/DV1568_3DProjekt/src/ShaderManager.h",
 		"/home/falk/Code/DV1568_3DProjekt/dat/models/ape.mtl",
 		"/home/falk/Code/DV1568_3DProjekt/inc/glm/integer.hpp",
 		"/home/falk/Code/DV1568_3DProjekt/inc/GL/glew.h",
@@ -552,33 +763,11 @@
 		"/home/falk/code/osdev/lab3/fsTesting/testVectors.d/common.h",
 		"/home/falk/code/osdev/lab3/fsTesting/testVectors.d/entry.cc",
 		"/home/falk/code/osdev/lab3/fsTesting/hardware.h",
-		"/home/falk/code/osdev/lab3/fsTesting/hardware.cc",
-		"/home/falk/code/osdev/Lab2/training5.cc",
-		"/home/falk/code/osdev/Lab2/training4.cc",
-		"/home/falk/code/osdev/Lab2/logs/results.log",
-		"/home/falk/code/osdev/Lab2/training3.c",
-		"/home/falk/code/osdev/Lab2/training2.c",
-		"/home/falk/code/osdev/Lab2/training1.c",
-		"/home/falk/code/osdev/Lab2/test.bash",
-		"/home/falk/code/osdev/Lab2/training4.c",
-		"/home/falk/code/osdev/Lab2/t2_8_time.txt",
-		"/home/falk/code/osdev/Lab2/test2.txt",
-		"/home/falk/code/osdev/Lab2/test2.",
-		"/home/falk/code/osdev/Lab2/txt",
-		"/home/falk/code/osdev/bareBones/user-printf.h",
-		"/home/falk/code/osdev/bareBones/tickhandler.h",
-		"/home/falk/code/osdev/bareBones/initrd/init",
-		"/home/falk/code/osdev/bareBones/serial.c",
-		"/home/falk/code/osdev/bareBones/mem.c",
-		"/home/falk/code/osdev/bareBones/mem.h",
-		"/home/falk/code/osdev/bareBones/kernel.c",
-		"/home/falk/code/osdev/bareBones/pcb.h",
-		"/home/falk/code/osdev/bareBones/serial.h",
-		"/home/falk/code/osdev/bareBones/termhandler.h"
+		"/home/falk/code/osdev/lab3/fsTesting/hardware.cc"
 	],
 	"find":
 	{
-		"height": 27.0
+		"height": 37.0
 	},
 	"find_in_files":
 	{
@@ -594,6 +783,33 @@
 		"case_sensitive": true,
 		"find_history":
 		[
+			"draw(",
+			"displacement_map",
+			"light",
+			"draw(",
+			"ps.draw",
+			"debug",
+			"dbg",
+			"TEXTURE",
+			"@TAG{TEXTURE_CHANNEL}",
+			"shadow",
+			"shado",
+			"shad",
+			"sundb",
+			"draw(",
+			"get_inst",
+			"InstanceVariantPtr",
+			"<<<<",
+			"Uint64",
+			"debug",
+			"Model id",
+			"texture",
+			"Make sure to run",
+			"make sure to run",
+			"start",
+			"rememb",
+			"HEAD",
+			"vao",
 			"delta_time_s",
 			"MAX(",
 			"MAX",
@@ -647,151 +863,39 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 11,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "src/main.cpp",
+					"file": "Makefile",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 37451,
+						"buffer_size": 2313,
 						"regions":
 						{
-						},
-						"selection":
-						[
-							[
-								30961,
-								30948
-							]
-						],
-						"settings":
-						{
-							"auto_complete_triggers":
-							[
-								{
-									"characters": "<",
-									"selector": "text.html"
-								},
-								{
-									"characters": ".>:",
-									"selector": "source.c++"
-								}
-							],
-							"color_helper.box_height": 17,
-							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
-							"color_helper.file_palette":
-							[
-							],
-							"color_helper.preview_meta":
-							{
-							},
-							"color_helper.scan":
-							{
-								"current_ext": ".cpp",
-								"current_syntax": "C++/C++",
-								"enabled": false,
-								"last_updated": 1551993622.85
-							},
-							"git_gutter_is_enabled": true,
-							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
-							"lsp_language":
-							{
-								"clangd": "cpp"
-							},
-							"markdonw_live_preview_last_run": 1551993756.76,
-							"show_definitions": false,
-							"syntax": "Packages/C++/C++.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 13554.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 0,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "src/ParticleSystem.cpp",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 12279,
-						"regions":
-						{
-							"col_0000FFFF":
+							"col_FFFF00FF":
 							{
 								"flags": 16,
 								"regions":
 								[
 									[
-										1214,
-										1218
+										1670,
+										1678
 									]
 								],
-								"scope": "col_0000FFFF"
+								"scope": "col_FFFF00FF"
 							},
-							"col_0000FFFF_icon":
+							"col_FFFF00FF_icon":
 							{
 								"flags": 16,
-								"icon": "Packages/User/Color Highlight.cache/col_0000FFFF_circle.png",
+								"icon": "Packages/User/Color Highlight.cache/col_FFFF00FF_circle.png",
 								"regions":
 								[
 									[
-										1150,
-										1150
-									]
-								],
-								"scope": "col_gutter"
-							},
-							"col_008000FF":
-							{
-								"flags": 16,
-								"regions":
-								[
-									[
-										1144,
-										1149
-									]
-								],
-								"scope": "col_008000FF"
-							},
-							"col_008000FF_icon":
-							{
-								"flags": 16,
-								"icon": "Packages/User/Color Highlight.cache/col_008000FF_circle.png",
-								"regions":
-								[
-									[
-										1080,
-										1080
-									]
-								],
-								"scope": "col_gutter"
-							},
-							"col_FF0000FF":
-							{
-								"flags": 16,
-								"regions":
-								[
-									[
-										1076,
-										1079
-									]
-								],
-								"scope": "col_FF0000FF"
-							},
-							"col_FF0000FF_icon":
-							{
-								"flags": 16,
-								"icon": "Packages/User/Color Highlight.cache/col_FF0000FF_circle.png",
-								"regions":
-								[
-									[
-										1012,
-										1012
+										1623,
+										1623
 									]
 								],
 								"scope": "col_gutter"
@@ -800,8 +904,56 @@
 						"selection":
 						[
 							[
-								6567,
-								6567
+								827,
+								827
+							]
+						],
+						"settings":
+						{
+							"color_helper.box_height": 16,
+							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
+							"color_helper.file_palette":
+							[
+							],
+							"color_helper.preview_meta":
+							{
+							},
+							"color_helper.scan":
+							{
+								"current_ext": "",
+								"current_syntax": "Makefile/Makefile",
+								"enabled": false,
+								"last_updated": 1552773648.47
+							},
+							"font_size": 9,
+							"git_gutter_is_enabled": true,
+							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
+							"markdonw_live_preview_last_run": 1552782062.25,
+							"syntax": "Packages/Makefile/Makefile.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 108.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 25,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "src/main.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 40392,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								360,
+								360
 							]
 						],
 						"settings":
@@ -817,7 +969,7 @@
 									"selector": "source.c++"
 								}
 							],
-							"color_helper.box_height": 17,
+							"color_helper.box_height": 13,
 							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
 							"color_helper.file_palette":
 							[
@@ -830,108 +982,7 @@
 								"current_ext": ".cpp",
 								"current_syntax": "C++/C++",
 								"enabled": false,
-								"last_updated": 1551993622.85
-							},
-							"git_gutter_is_enabled": true,
-							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
-							"history_list_is_closing": true,
-							"lsp_language":
-							{
-								"clangd": "cpp"
-							},
-							"markdonw_live_preview_last_run": 1551993774.31,
-							"show_definitions": false,
-							"syntax": "Packages/C++/C++.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 2304.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "/usr/include/c++/8/bits/move.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 6529,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								3051,
-								3051
-							]
-						],
-						"settings":
-						{
-							"color_helper.box_height": 17,
-							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
-							"color_helper.file_palette":
-							[
-							],
-							"color_helper.preview_meta":
-							{
-							},
-							"color_helper.scan":
-							{
-								"current_ext": ".h",
-								"current_syntax": "C++/C++",
-								"enabled": false,
-								"last_updated": 1551993622.85
-							},
-							"lsp_language":
-							{
-								"clangd": "cpp"
-							},
-							"markdonw_live_preview_last_run": 1551994117.32,
-							"show_definitions": false,
-							"syntax": "Packages/C++/C++.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 1456.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 6,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "src/ParticleSystem.h",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 5509,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2451,
-								2451
-							]
-						],
-						"settings":
-						{
-							"color_helper.box_height": 17,
-							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
-							"color_helper.file_palette":
-							[
-							],
-							"color_helper.preview_meta":
-							{
-							},
-							"color_helper.scan":
-							{
-								"current_ext": ".h",
-								"current_syntax": "C++/C++",
-								"enabled": false,
-								"last_updated": 1551993622.85
+								"last_updated": 1552773648.47
 							},
 							"git_gutter_is_enabled": true,
 							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
@@ -939,154 +990,7 @@
 							{
 								"clangd": "cpp"
 							},
-							"markdonw_live_preview_last_run": 1551993879.22,
-							"show_definitions": false,
-							"syntax": "Packages/C++/C++.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 646.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 3,
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "inc/glm/detail/type_vec3.inl",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 27209,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								972,
-								972
-							]
-						],
-						"settings":
-						{
-							"color_helper.file_palette":
-							[
-							],
-							"color_helper.scan":
-							{
-								"current_ext": ".inl",
-								"current_syntax": "C++/C++",
-								"enabled": false,
-								"last_updated": 1551993622.85
-							},
-							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
-							"lsp_language":
-							{
-								"clangd": "cpp"
-							},
-							"markdonw_live_preview_last_run": 1551994149.25,
-							"show_definitions": false,
-							"syntax": "Packages/C++/C++.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 358.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 5,
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "inc/glm/detail/type_vec4.inl",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 37181,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								5034,
-								5034
-							]
-						],
-						"settings":
-						{
-							"color_helper.box_height": 17,
-							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
-							"color_helper.file_palette":
-							[
-							],
-							"color_helper.preview_meta":
-							{
-							},
-							"color_helper.scan":
-							{
-								"current_ext": ".inl",
-								"current_syntax": "C++/C++",
-								"enabled": false,
-								"last_updated": 1551993622.85
-							},
-							"git_gutter_is_enabled": true,
-							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
-							"lsp_language":
-							{
-								"clangd": "cpp"
-							},
-							"markdonw_live_preview_last_run": 1551994142.85,
-							"show_definitions": false,
-							"syntax": "Packages/C++/C++.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 2572.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 4,
-					"type": "text"
-				},
-				{
-					"buffer": 6,
-					"file": "src/SceneManager.cpp",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 22839,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								3357,
-								3357
-							]
-						],
-						"settings":
-						{
-							"color_helper.box_height": 17,
-							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
-							"color_helper.file_palette":
-							[
-							],
-							"color_helper.preview_meta":
-							{
-							},
-							"color_helper.scan":
-							{
-								"current_ext": ".cpp",
-								"current_syntax": "C++/C++",
-								"enabled": false,
-								"last_updated": 1551993622.85
-							},
-							"git_gutter_is_enabled": true,
-							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
-							"lsp_language":
-							{
-								"clangd": "cpp"
-							},
-							"markdonw_live_preview_last_run": 1551993779.09,
+							"markdonw_live_preview_last_run": 1552782155.43,
 							"show_definitions": false,
 							"syntax": "Packages/C++/C++.sublime-syntax"
 						},
@@ -1094,7 +998,1294 @@
 						"translation.y": 1638.0,
 						"zoom_level": 1.0
 					},
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "src/Mesh.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3610,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3377,
+								3377
+							]
+						],
+						"settings":
+						{
+							"color_helper.box_height": 13,
+							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
+							"color_helper.file_palette":
+							[
+							],
+							"color_helper.preview_meta":
+							{
+							},
+							"color_helper.scan":
+							{
+								"current_ext": ".cpp",
+								"current_syntax": "C++/C++",
+								"enabled": false,
+								"last_updated": 1552773648.47
+							},
+							"git_gutter_is_enabled": true,
+							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
+							"lsp_language":
+							{
+								"clangd": "cpp"
+							},
+							"markdonw_live_preview_last_run": 1552790357.1,
+							"show_definitions": false,
+							"syntax": "Packages/C++/C++.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 906.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 17,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "src/Texture.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6918,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"color_helper.box_height": 13,
+							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
+							"color_helper.file_palette":
+							[
+							],
+							"color_helper.preview_meta":
+							{
+							},
+							"color_helper.scan":
+							{
+								"current_ext": ".h",
+								"current_syntax": "C++/C++",
+								"enabled": false,
+								"last_updated": 1552773648.47
+							},
+							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
+							"lsp_language":
+							{
+								"clangd": "cpp"
+							},
+							"markdonw_live_preview_last_run": 1552790301.36,
+							"show_definitions": false,
+							"syntax": "Packages/C++/C++.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 19,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "src/Texture.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1884,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1884,
+								1884
+							]
+						],
+						"settings":
+						{
+							"color_helper.box_height": 13,
+							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
+							"color_helper.file_palette":
+							[
+							],
+							"color_helper.preview_meta":
+							{
+							},
+							"color_helper.scan":
+							{
+								"current_ext": ".cpp",
+								"current_syntax": "C++/C++",
+								"enabled": false,
+								"last_updated": 1552773648.47
+							},
+							"git_gutter_is_enabled": true,
+							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
+							"lsp_language":
+							{
+								"clangd": "cpp"
+							},
+							"markdonw_live_preview_last_run": 1552790301.95,
+							"show_definitions": false,
+							"syntax": "Packages/C++/C++.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 18,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "src/SceneManager.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 27314,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								7540,
+								7540
+							]
+						],
+						"settings":
+						{
+							"auto_complete_triggers":
+							[
+								{
+									"characters": "<",
+									"selector": "text.html"
+								},
+								{
+									"characters": ".>:",
+									"selector": "source.c++"
+								}
+							],
+							"color_helper.box_height": 22,
+							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
+							"color_helper.file_palette":
+							[
+							],
+							"color_helper.preview_meta":
+							{
+							},
+							"color_helper.scan":
+							{
+								"current_ext": ".cpp",
+								"current_syntax": "C++/C++",
+								"enabled": false,
+								"last_updated": 1552773648.47
+							},
+							"font_size": 13,
+							"git_gutter_is_enabled": true,
+							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
+							"lsp_language":
+							{
+								"clangd": "cpp"
+							},
+							"markdonw_live_preview_last_run": 1552790066.59,
+							"show_definitions": false,
+							"syntax": "Packages/C++/C++.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 3988.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "src/SceneManager.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4677,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								57,
+								57
+							]
+						],
+						"settings":
+						{
+							"auto_complete_triggers":
+							[
+								{
+									"characters": "<",
+									"selector": "text.html"
+								},
+								{
+									"characters": ".>:",
+									"selector": "source.c++"
+								}
+							],
+							"color_helper.box_height": 13,
+							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
+							"color_helper.file_palette":
+							[
+							],
+							"color_helper.preview_meta":
+							{
+							},
+							"color_helper.scan":
+							{
+								"current_ext": ".h",
+								"current_syntax": "C++/C++",
+								"enabled": false,
+								"last_updated": 1552773648.47
+							},
+							"git_gutter_is_enabled": true,
+							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
+							"lsp_language":
+							{
+								"clangd": "cpp"
+							},
+							"markdonw_live_preview_last_run": 1552792838.3,
+							"show_definitions": false,
+							"syntax": "Packages/C++/C++.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 42.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "dat/shaders/g_buffer_tess.geom",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1257,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"color_helper.box_height": 13,
+							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
+							"color_helper.file_palette":
+							[
+							],
+							"color_helper.preview_meta":
+							{
+							},
+							"color_helper.scan":
+							{
+								"current_ext": ".geom",
+								"current_syntax": "OpenGL Shading Language (GLSL)/GLSL",
+								"enabled": false,
+								"last_updated": 1552773648.47
+							},
+							"git_gutter_is_enabled": true,
+							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
+							"markdonw_live_preview_last_run": 1552790178.58,
+							"syntax": "Packages/OpenGL Shading Language (GLSL)/GLSL.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 14,
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "dat/shaders/g_buffer.tesc",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1990,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"color_helper.box_height": 13,
+							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
+							"color_helper.file_palette":
+							[
+							],
+							"color_helper.preview_meta":
+							{
+							},
+							"color_helper.scan":
+							{
+								"current_ext": ".tesc",
+								"current_syntax": "OpenGL Shading Language (GLSL)/GLSL",
+								"enabled": false,
+								"last_updated": 1552773648.47
+							},
+							"git_gutter_is_enabled": true,
+							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
+							"markdonw_live_preview_last_run": 1552790655.28,
+							"syntax": "Packages/OpenGL Shading Language (GLSL)/GLSL.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 8,
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "dat/shaders/g_buffer.tese",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1620,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"color_helper.box_height": 13,
+							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
+							"color_helper.file_palette":
+							[
+							],
+							"color_helper.preview_meta":
+							{
+							},
+							"color_helper.scan":
+							{
+								"current_ext": ".tese",
+								"current_syntax": "OpenGL Shading Language (GLSL)/GLSL",
+								"enabled": false,
+								"last_updated": 1552773648.47
+							},
+							"git_gutter_is_enabled": true,
+							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
+							"markdonw_live_preview_last_run": 1552790657.35,
+							"syntax": "Packages/OpenGL Shading Language (GLSL)/GLSL.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 13,
+					"type": "text"
+				},
+				{
+					"buffer": 10,
+					"file": "dat/shaders/g_buffer_tess.vert",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 867,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"color_helper.box_height": 13,
+							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
+							"color_helper.file_palette":
+							[
+							],
+							"color_helper.preview_meta":
+							{
+							},
+							"color_helper.scan":
+							{
+								"current_ext": ".vert",
+								"current_syntax": "OpenGL Shading Language (GLSL)/GLSL",
+								"enabled": false,
+								"last_updated": 1552773648.47
+							},
+							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
+							"markdonw_live_preview_last_run": 1552790649.49,
+							"syntax": "Packages/OpenGL Shading Language (GLSL)/GLSL.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 15,
+					"type": "text"
+				},
+				{
+					"buffer": 11,
+					"file": "dat/shaders/ssao.frag",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1784,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1346,
+								1346
+							]
+						],
+						"settings":
+						{
+							"auto_name": "ssao.frag",
+							"color_helper.box_height": 18,
+							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
+							"color_helper.file_palette":
+							[
+							],
+							"color_helper.preview_meta":
+							{
+							},
+							"color_helper.scan":
+							{
+								"current_ext": ".frag",
+								"current_syntax": "OpenGL Shading Language (GLSL)/GLSL",
+								"enabled": false,
+								"last_updated": 1552773648.47
+							},
+							"font_size": 11,
+							"git_gutter_is_enabled": true,
+							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
+							"syntax": "Packages/OpenGL Shading Language (GLSL)/GLSL.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 171.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "src/main.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 40392,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								29955,
+								29955
+							]
+						],
+						"settings":
+						{
+							"auto_complete_triggers":
+							[
+								{
+									"characters": "<",
+									"selector": "text.html"
+								},
+								{
+									"characters": ".>:",
+									"selector": "source.c++"
+								}
+							],
+							"color_helper.box_height": 13,
+							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
+							"color_helper.file_palette":
+							[
+							],
+							"color_helper.preview_meta":
+							{
+							},
+							"color_helper.scan":
+							{
+								"current_ext": ".cpp",
+								"current_syntax": "C++/C++",
+								"enabled": false,
+								"last_updated": 1552773648.47
+							},
+							"git_gutter_is_enabled": true,
+							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
+							"lsp_language":
+							{
+								"clangd": "cpp"
+							},
+							"markdonw_live_preview_last_run": 1552782155.43,
+							"show_definitions": false,
+							"syntax": "Packages/C++/C++.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 9671.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 10,
+					"type": "text"
+				},
+				{
+					"buffer": 12,
+					"file": "dat/shaders/ssao.vert",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 208,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								11,
+								11
+							]
+						],
+						"settings":
+						{
+							"auto_name": "ssao.vert",
+							"color_helper.box_height": 13,
+							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
+							"color_helper.file_palette":
+							[
+							],
+							"color_helper.preview_meta":
+							{
+							},
+							"color_helper.scan":
+							{
+								"current_ext": ".vert",
+								"current_syntax": "OpenGL Shading Language (GLSL)/GLSL",
+								"enabled": false,
+								"last_updated": 1552773648.47
+							},
+							"git_gutter_is_enabled": true,
+							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
+							"syntax": "Packages/OpenGL Shading Language (GLSL)/GLSL.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 9,
+					"type": "text"
+				},
+				{
+					"buffer": 13,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 69,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"color_helper.box_height": 13,
+							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
+							"color_helper.file_palette":
+							[
+							],
+							"color_helper.preview_meta":
+							{
+							},
+							"color_helper.scan":
+							{
+								"current_ext": null,
+								"current_syntax": "Default/Find Results",
+								"enabled": false,
+								"last_updated": 1552773648.47
+							},
+							"detect_indentation": false,
+							"git_gutter_is_enabled": false,
+							"line_numbers": false,
+							"output_tag": 1,
+							"result_base_dir": "",
+							"result_file_regex": "^([^ \t].*):$",
+							"result_line_regex": "^ +([0-9]+):",
+							"scroll_past_end": true,
+							"syntax": "Packages/Default/Find Results.hidden-tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 16,
+					"type": "text"
+				},
+				{
+					"buffer": 14,
+					"file": "src/Model.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 7735,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								6145,
+								6145
+							]
+						],
+						"settings":
+						{
+							"color_helper.box_height": 13,
+							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
+							"color_helper.file_palette":
+							[
+							],
+							"color_helper.preview_meta":
+							{
+							},
+							"color_helper.scan":
+							{
+								"current_ext": ".cpp",
+								"current_syntax": "C++/C++",
+								"enabled": false,
+								"last_updated": 1552773648.47
+							},
+							"git_gutter_is_enabled": true,
+							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
+							"lsp_language":
+							{
+								"clangd": "cpp"
+							},
+							"markdonw_live_preview_last_run": 1552789843.3,
+							"show_definitions": false,
+							"syntax": "Packages/C++/C++.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 2184.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 24,
+					"type": "text"
+				},
+				{
+					"buffer": 15,
+					"file": "dat/shaders/g_buffer.frag",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1049,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								198,
+								198
+							]
+						],
+						"settings":
+						{
+							"color_helper.box_height": 29,
+							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
+							"color_helper.file_palette":
+							[
+							],
+							"color_helper.preview_meta":
+							{
+							},
+							"color_helper.scan":
+							{
+								"current_ext": ".frag",
+								"current_syntax": "OpenGL Shading Language (GLSL)/GLSL",
+								"enabled": false,
+								"last_updated": 1552773648.47
+							},
+							"font_size": 17,
+							"git_gutter_is_enabled": true,
+							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
+							"markdonw_live_preview_last_run": 1552786535.07,
+							"syntax": "Packages/OpenGL Shading Language (GLSL)/GLSL.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 180.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 12,
+					"type": "text"
+				},
+				{
+					"buffer": 16,
+					"file": "dat/shaders/g_buffer.vert",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1001,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"color_helper.box_height": 13,
+							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
+							"color_helper.file_palette":
+							[
+							],
+							"color_helper.preview_meta":
+							{
+							},
+							"color_helper.scan":
+							{
+								"current_ext": ".vert",
+								"current_syntax": "OpenGL Shading Language (GLSL)/GLSL",
+								"enabled": false,
+								"last_updated": 1552773648.47
+							},
+							"git_gutter_is_enabled": true,
+							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
+							"markdonw_live_preview_last_run": 1552792133.77,
+							"syntax": "Packages/OpenGL Shading Language (GLSL)/GLSL.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 11,
+					"type": "text"
+				},
+				{
+					"buffer": 17,
+					"file": "dat/shaders/lightSha.frag",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 8301,
+						"regions":
+						{
+							"col_FFC0CBFF":
+							{
+								"flags": 16,
+								"regions":
+								[
+									[
+										8184,
+										8188
+									]
+								],
+								"scope": "col_FFC0CBFF"
+							},
+							"col_FFC0CBFF_icon":
+							{
+								"flags": 16,
+								"icon": "Packages/User/Color Highlight.cache/col_FFC0CBFF_circle.png",
+								"regions":
+								[
+									[
+										8131,
+										8131
+									]
+								],
+								"scope": "col_gutter"
+							}
+						},
+						"selection":
+						[
+							[
+								1778,
+								1778
+							]
+						],
+						"settings":
+						{
+							"color_helper.box_height": 13,
+							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
+							"color_helper.file_palette":
+							[
+							],
+							"color_helper.preview_meta":
+							{
+							},
+							"color_helper.scan":
+							{
+								"current_ext": ".frag",
+								"current_syntax": "OpenGL Shading Language (GLSL)/GLSL",
+								"enabled": false,
+								"last_updated": 1552773648.47
+							},
+							"git_gutter_is_enabled": true,
+							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
+							"markdonw_live_preview_last_run": 1552786541.99,
+							"syntax": "Packages/OpenGL Shading Language (GLSL)/GLSL.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 126.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 20,
+					"type": "text"
+				},
+				{
+					"buffer": 18,
+					"file": "dat/shaders/g_buffer.geom",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2523,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"color_helper.box_height": 13,
+							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
+							"color_helper.file_palette":
+							[
+							],
+							"color_helper.preview_meta":
+							{
+							},
+							"color_helper.scan":
+							{
+								"current_ext": ".geom",
+								"current_syntax": "OpenGL Shading Language (GLSL)/GLSL",
+								"enabled": false,
+								"last_updated": 1552773648.47
+							},
+							"git_gutter_is_enabled": true,
+							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
+							"markdonw_live_preview_last_run": 1552789948.35,
+							"syntax": "Packages/OpenGL Shading Language (GLSL)/GLSL.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 22,
+					"type": "text"
+				}
+			]
+		},
+		{
+			"selected": 1,
+			"sheets":
+			[
+				{
+					"buffer": 19,
+					"file": "dat/shaders/ssao_blur.frag",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 724,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								721,
+								721
+							]
+						],
+						"settings":
+						{
+							"auto_name": "ssao_blur.frag",
+							"color_helper.box_height": 13,
+							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
+							"color_helper.file_palette":
+							[
+							],
+							"color_helper.preview_meta":
+							{
+							},
+							"color_helper.scan":
+							{
+								"current_ext": ".frag",
+								"current_syntax": "OpenGL Shading Language (GLSL)/GLSL",
+								"enabled": false,
+								"last_updated": 1552773648.47
+							},
+							"git_gutter_is_enabled": true,
+							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
+							"syntax": "Packages/OpenGL Shading Language (GLSL)/GLSL.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 20,
+					"file": "src/SuperSampledAmbientOcclusion.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2207,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								155,
+								155
+							]
+						],
+						"settings":
+						{
+							"auto_complete_triggers":
+							[
+								{
+									"characters": "<",
+									"selector": "text.html"
+								},
+								{
+									"characters": ".>:",
+									"selector": "source.c++"
+								}
+							],
+							"auto_name": "class SuperSampledAmbientOcclusion {",
+							"color_helper.box_height": 13,
+							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
+							"color_helper.file_palette":
+							[
+							],
+							"color_helper.preview_meta":
+							{
+							},
+							"color_helper.scan":
+							{
+								"current_ext": ".h",
+								"current_syntax": "C++/C++",
+								"enabled": false,
+								"last_updated": 1552773648.47
+							},
+							"git_gutter_is_enabled": true,
+							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
+							"lsp_language":
+							{
+								"clangd": "cpp"
+							},
+							"show_definitions": false,
+							"syntax": "Packages/C++/C++.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 84.0,
+						"zoom_level": 1.0
+					},
 					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 21,
+					"file": "src/Config.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2561,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								14,
+								14
+							]
+						],
+						"settings":
+						{
+							"auto_complete_triggers":
+							[
+								{
+									"characters": "<",
+									"selector": "text.html"
+								},
+								{
+									"characters": ".>:",
+									"selector": "source.c++"
+								}
+							],
+							"color_helper.box_height": 13,
+							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
+							"color_helper.file_palette":
+							[
+							],
+							"color_helper.preview_meta":
+							{
+							},
+							"color_helper.scan":
+							{
+								"current_ext": ".h",
+								"current_syntax": "C++/C++",
+								"enabled": false,
+								"last_updated": 1552773648.47
+							},
+							"git_gutter_is_enabled": true,
+							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
+							"lsp_language":
+							{
+								"clangd": "cpp"
+							},
+							"markdonw_live_preview_last_run": 1552782256.25,
+							"show_definitions": false,
+							"syntax": "Packages/C++/C++.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 22,
+					"file": "src/Viewport.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2330,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								273,
+								273
+							]
+						],
+						"settings":
+						{
+							"auto_complete_triggers":
+							[
+								{
+									"characters": "<",
+									"selector": "text.html"
+								},
+								{
+									"characters": ".>:",
+									"selector": "source.c++"
+								}
+							],
+							"color_helper.box_height": 13,
+							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
+							"color_helper.file_palette":
+							[
+							],
+							"color_helper.preview_meta":
+							{
+							},
+							"color_helper.scan":
+							{
+								"current_ext": ".h",
+								"current_syntax": "C++/C++",
+								"enabled": false,
+								"last_updated": 1552773648.47
+							},
+							"git_gutter_is_enabled": true,
+							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
+							"lsp_language":
+							{
+								"clangd": "cpp"
+							},
+							"markdonw_live_preview_last_run": 1552785587.75,
+							"show_definitions": false,
+							"syntax": "Packages/C++/C++.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 42.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 23,
+					"file": "src/Viewport.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 14323,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								5163,
+								5163
+							]
+						],
+						"settings":
+						{
+							"auto_complete_triggers":
+							[
+								{
+									"characters": "<",
+									"selector": "text.html"
+								},
+								{
+									"characters": ".>:",
+									"selector": "source.c++"
+								}
+							],
+							"color_helper.box_height": 13,
+							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
+							"color_helper.file_palette":
+							[
+							],
+							"color_helper.preview_meta":
+							{
+							},
+							"color_helper.scan":
+							{
+								"current_ext": ".cpp",
+								"current_syntax": "C++/C++",
+								"enabled": false,
+								"last_updated": 1552773648.47
+							},
+							"git_gutter_is_enabled": true,
+							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
+							"lsp_language":
+							{
+								"clangd": "cpp"
+							},
+							"markdonw_live_preview_last_run": 1552785635.91,
+							"show_definitions": false,
+							"syntax": "Packages/C++/C++.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 1899.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 21,
+					"type": "text"
+				},
+				{
+					"buffer": 24,
+					"file": "src/Config.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 273,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								273,
+								273
+							]
+						],
+						"settings":
+						{
+							"color_helper.box_height": 13,
+							"color_helper.color_scheme": "Packages/Colorsublime - Themes/Monokai.tmTheme",
+							"color_helper.file_palette":
+							[
+							],
+							"color_helper.preview_meta":
+							{
+							},
+							"color_helper.scan":
+							{
+								"current_ext": ".cpp",
+								"current_syntax": "C++/C++",
+								"enabled": false,
+								"last_updated": 1552773648.47
+							},
+							"git_gutter_is_enabled": true,
+							"git_savvy.repo_path": "/home/falk/Code/DV1568_3DProjekt",
+							"lsp_language":
+							{
+								"clangd": "cpp"
+							},
+							"markdonw_live_preview_last_run": 1552783741.99,
+							"show_definitions": false,
+							"syntax": "Packages/C++/C++.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 23,
 					"type": "text"
 				}
 			]
@@ -1102,11 +2293,11 @@
 	],
 	"incremental_find":
 	{
-		"height": 27.0
+		"height": 23.0
 	},
 	"input":
 	{
-		"height": 58.0
+		"height": 62.0
 	},
 	"layout":
 	{
@@ -1117,11 +2308,18 @@
 				0,
 				1,
 				1
+			],
+			[
+				1,
+				0,
+				2,
+				1
 			]
 		],
 		"cols":
 		[
 			0.0,
+			0.744700042796,
 			1.0
 		],
 		"rows":
@@ -1133,7 +2331,7 @@
 	"menu_visible": true,
 	"output.GitSavvy":
 	{
-		"height": 326.0
+		"height": 346.0
 	},
 	"output.astyle_error_message":
 	{
@@ -1141,11 +2339,11 @@
 	},
 	"output.diagnostics":
 	{
-		"height": 96.0
+		"height": 155.0
 	},
 	"output.exec":
 	{
-		"height": 261.0
+		"height": 263.0
 	},
 	"output.find_results":
 	{
@@ -1167,7 +2365,7 @@
 	"project": "3D_Project.sublime-project",
 	"replace":
 	{
-		"height": 50.0
+		"height": 42.0
 	},
 	"save_all_on_build": true,
 	"select_file":
@@ -1177,16 +2375,24 @@
 		"selected_items":
 		[
 			[
+				"main",
+				"src/main.cpp"
+			],
+			[
+				"confi",
+				"src/Config.h"
+			],
+			[
+				"scenen",
+				"src/SceneManager.cpp"
+			],
+			[
 				"sceneman",
 				"src/SceneManager.cpp"
 			],
 			[
 				"parti",
 				"src/ParticleSystem.cpp"
-			],
-			[
-				"main",
-				"src/main.cpp"
 			],
 			[
 				"part",
@@ -1215,10 +2421,6 @@
 			[
 				"scene",
 				"src/SceneManager.cpp"
-			],
-			[
-				"confi",
-				"src/Config.h"
 			],
 			[
 				"imgui",
