@@ -101,7 +101,7 @@ void Mesh::_draw_tessellated( ShaderProgram &shader_program_tessellated ) const 
 
    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ebo);
 
-   glPatchParameteri(GL_PATCH_VERTICES, 4);
+   glPatchParameteri(GL_PATCH_VERTICES, 3);
 
    glDrawElements(GL_PATCHES,
                   _indices.size(),
