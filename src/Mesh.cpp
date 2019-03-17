@@ -95,10 +95,10 @@ void Mesh::_draw( ShaderProgram &shader_program ) const {
 void Mesh::_draw_tessellated( ShaderProgram &shader_program_tessellated ) const {
    shader_program_tessellated.use();
    TextureSet::ScopedBindGuard pin { _textures, shader_program_tessellated }; // RAII
-   
+
    glBindVertexArray(_vao);
 
-   
+
 
    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ebo);
 

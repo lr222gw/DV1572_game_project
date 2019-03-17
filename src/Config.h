@@ -2,14 +2,15 @@
 
 #include "misc/defs.h"
 
-enum RenderMode : Uint32 { composite   = 0,
-                           albedo      = 1,
-                           normals     = 2,
-                           specular    = 3,
-                           positional  = 4,
-                           emissive    = 5,
-                           textureless = 6,
-                           picking	   = 7 };
+enum RenderMode : Uint32 { composite    = 0,
+                           albedo       = 1,
+                           specular     = 2,
+                           normals      = 3,
+                           emissive     = 4,
+                           displacement = 5,
+                           positional   = 6,
+                           textureless  = 7,
+                           picking	    = 8 };
 
 enum class FileType { model, texture };
 

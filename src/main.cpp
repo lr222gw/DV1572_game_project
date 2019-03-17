@@ -233,6 +233,8 @@ void toggle_input_callback( GLFWwindow  *window,
       config.render_mode = RenderMode::textureless;
    if ( key == GLFW_KEY_F10 &&  action == GLFW_PRESS)
 	   config.render_mode = RenderMode::picking;
+   if ( key == GLFW_KEY_F11 &&  action == GLFW_PRESS)
+      config.render_mode = RenderMode::displacement;
    if ( key == GLFW_KEY_F12 &&  action == GLFW_PRESS )
       config.is_imgui_toggled = !config.is_imgui_toggled;
 
@@ -667,7 +669,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
 
    //Tool to see more clearly how Light frustrum looks like
-   //ShadowcasterDebug sundbg = ShadowcasterDebug(light_sc, &asset_manager, &scene_manager, &model_instances, geometry_program, &poss, &dirr);
+   ShadowcasterDebug sundbg = ShadowcasterDebug(light_sc, &asset_manager, &scene_manager, &model_instances, geometry_program, &poss, &dirr);
 
    //SunApe->set_transform()
 
@@ -688,9 +690,10 @@ Int32 main( Int32 argc, char const *argv[] ) {
    glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_spec"   ), 1 );
    glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_norm"   ), 2 );
    glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_emit"   ), 3 );
-   glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_pos"    ), 4 );
-   glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_pic"    ), 5 );
-   glUniform1i( glGetUniformLocation( lighting_program->get_location(), "shadowMap"    ), 6 );
+   glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_disp"   ), 4 );
+   glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_pos"    ), 5 );
+   glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_pic"    ), 6 );
+   glUniform1i( glGetUniformLocation( lighting_program->get_location(), "shadowMap"    ), 7 );
 
    //glEnable(GL_CULL_FACE);
    //glEnable( GL_BLEND );
@@ -716,20 +719,20 @@ Int32 main( Int32 argc, char const *argv[] ) {
    /* PS */    elapsed_time += delta_t_ms;
    /* PS */    time_pool_ms += (delta_t_ms);
    /* PS */
-               static Float32 sin[8] {};
-               static Float32 cos[8] {};
-               for ( int i=0;  i<8;  ++i ) {
-                  sin[i] = (0.10 * glm::sin(glm::radians((elapsed_time * 0.01 + i*53))));
-                  cos[i] = (0.05 * glm::cos(glm::radians((elapsed_time * 0.01 + i*37))));
-               }
-
+   /* PS */    static Float32 sin[8] {};
+   /* PS */    static Float32 cos[8] {};
+   /* PS */    for ( int i=0;  i<8;  ++i ) {
+   /* PS */       sin[i] = (0.10 * glm::sin(glm::radians((elapsed_time * 0.01 + i*53))));
+   /* PS */       cos[i] = (0.05 * glm::cos(glm::radians((elapsed_time * 0.01 + i*37))));
+   /* PS */    }
+   /* PS */
    /* PS */    for ( auto i = 0;  i < data.count;  ++i ) {
    /* PS */        auto &particle          =  data.data[i]; // TODO: rename in ParticleSystem
-   /* PS */        //Pos
+   /* PS */        // position:
    /* PS */        particle.spatial[1]    +=  (-.005f -(i % 20)/43) * delta_t_ms;
    /* PS */        particle.spatial[0]    += sin[(i+31)%8];
    /* PS */        particle.spatial[2]    += cos[(i+47)%8];
-   /* PS */        //Scale
+   /* PS */        // scale:
    /* PS */        particle.spatial[3]     = avg_scale * (1-(avg_lifespan_ms-particle.time_ms_left)/avg_lifespan_ms);
    /* PS */        particle.time_ms_left  -= delta_t_ms;
    /* PS */
@@ -749,12 +752,13 @@ Int32 main( Int32 argc, char const *argv[] ) {
    /* PS */    }
    /* PS */ };
    /* PS */
-   /* PS */ auto snowflake_dif  = std::make_shared<DiffuseTexture>  ( FilePath{ FileType::texture, "snowflake_dif.png"  });
-   /* PS */ auto snowflake_nor  = std::make_shared<NormalTexture>   ( FilePath{ FileType::texture, "snowflake_nor.png"  });
-   /* PS */ auto snowflake_spec = std::make_shared<SpecularTexture> ( FilePath{ FileType::texture, "snowflake_spec.png" });
-   /* PS */ auto snowflake_emit = std::make_shared<EmissiveTexture> ( FilePath{ FileType::texture, "snowflake_emit.png" });
+   /* PS */ auto snowflake_dif  = std::make_shared<DiffuseTexture>      ( FilePath{ FileType::texture, "snowflake_dif.png"  });
+   /* PS */ auto snowflake_nor  = std::make_shared<NormalTexture>       ( FilePath{ FileType::texture, "snowflake_nor.png"  });
+   /* PS */ auto snowflake_spec = std::make_shared<SpecularTexture>     ( FilePath{ FileType::texture, "snowflake_spec.png" });
+   /* PS */ auto snowflake_emit = std::make_shared<EmissiveTexture>     ( FilePath{ FileType::texture, "snowflake_emit.png" });
+   /* PS */ auto snowflake_disp = std::make_shared<DisplacementTexture> ( /* no displacement texture */ );
    /* PS */
-   /* PS */ TextureSet snowflake_tex { snowflake_dif, snowflake_nor, snowflake_spec, snowflake_emit };
+   /* PS */ TextureSet snowflake_tex { snowflake_dif, snowflake_nor, snowflake_spec, snowflake_emit, snowflake_disp };
    /* PS */
    /* PS */ auto ps { std::make_shared<ParticleSystem>( Transform::make_translation(Vec3{.0f, 3.0f, .0f}), snowflake_tex, ps_logic ) };
    /* PS */ scene_manager.instantiate_particle_system( ps ); // TODO: revamp in SceneManager
@@ -812,7 +816,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
                                   sun->get_direction(),
                                   Vec3(0.0f, 1.0f, 0.0f) ); // up vector?
 
-      //sundbg.light_caster_debugg_tool_render();
+      sundbg.light_caster_debugg_tool_render();
 
       process_mouse( window, view, scene_manager, delta_time_ms );
       process_input( window, view, delta_time_ms );
