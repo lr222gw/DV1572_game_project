@@ -19,8 +19,8 @@ out mat3 tbn_gs;
 void main()
 {
 
-	vec2 uv1 = mix(uv_te[1],uv_te[0],gl_TessCoord.x);
-	vec2 uv2 = mix(uv_te[2],uv_te[3],gl_TessCoord.x);
+	vec2 uv1 = mix(uv_te[1],uv_te[3],gl_TessCoord.x);
+	vec2 uv2 = mix(uv_te[2],uv_te[0],gl_TessCoord.x);
 	uv_gs = mix(uv1, uv2, gl_TessCoord.y);
 
 	//TODO: Check if "tbn_te[1][0]" is the Tangent Vector...
@@ -42,12 +42,22 @@ void main()
 	vec3 p1 = mix(pos_te[1],pos_te[0],gl_TessCoord.x);
 	vec3 p2 = mix(pos_te[2],pos_te[3],gl_TessCoord.x);
 	vec3 pos = mix(p1, p2, gl_TessCoord.y);
+	//vec4 pos = vec4(0.0f);
+
+
+	//const vec4 bc = vec4(1,3,3,1);
+	//for(int j = 0; j < 4; ++j){
+	//	for(int i = 0; i < 4; ++i){
+	//		pos += bc[i] * pow( gl_TessCoord.x, i) * pow(1.0 - gl_TessCoord.x, 3-i) * bc[j] * pow( gl_TessCoord.y, j) * pow(1.0 - gl_TessCoord.y, 3-j ) * vec4(pos_te[4*j+i],1.0f);
+	//	}
+	//}
 
 	float displacement = texture(displacement_map, uv_gs.xy).x;
 	// Displace the vertex along the normal
 	pos_gs = (pos.xyz + normal * displacement * 23); //TODO: add Factor instead of hardcoded "23"
 
-	gl_Position = projection * view * vec4(pos,1.0f);//vec4(pos_gs,1.0f);
+	//gl_Position = projection * view * vec4(pos,1.0f);//vec4(pos_gs,1.0f);
+	gl_Position = projection * view * vec4(pos_gs,1.0f);
 
 
 } 

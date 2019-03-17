@@ -38,15 +38,15 @@ void main()
     float cam_to_left_side		= distance(view_pos, pos_tc[0]);
     float cam_to_bottom_side	= distance(view_pos, pos_tc[1]);
     float cam_to_right_side		= distance(view_pos, pos_tc[2]);
-	float cam_to_top_side		= distance(view_pos, pos_tc[2]);
+	float cam_to_top_side		= distance(view_pos, pos_tc[3]);
 
     // Calculate the tessellation levels
-    gl_TessLevelOuter[0] = distance_to_tesslevel(cam_to_bottom_side,	cam_to_right_side	);
-    gl_TessLevelOuter[1] = distance_to_tesslevel(cam_to_right_side,		cam_to_top_side		);
-    gl_TessLevelOuter[2] = distance_to_tesslevel(cam_to_top_side,		cam_to_left_side	);
-	gl_TessLevelOuter[3] = distance_to_tesslevel(cam_to_left_side,		cam_to_bottom_side	);
+    gl_TessLevelOuter[0] = 4;//distance_to_tesslevel(cam_to_bottom_side,	cam_to_right_side	);
+    gl_TessLevelOuter[1] = 4;//distance_to_tesslevel(cam_to_right_side,		cam_to_top_side		);
+    gl_TessLevelOuter[2] = 4;//distance_to_tesslevel(cam_to_top_side,		cam_to_left_side	);
+	gl_TessLevelOuter[3] = 4;//distance_to_tesslevel(cam_to_left_side,		cam_to_bottom_side	);
 
 	//inner tessellation level are based on the outer tessellated levels for the corresponding side (horizontal and vertical)
-    gl_TessLevelInner[0] = (gl_TessLevelOuter[0] + gl_TessLevelOuter[2])/4;
-	gl_TessLevelInner[1] = (gl_TessLevelOuter[1] + gl_TessLevelOuter[3])/4;
+    gl_TessLevelInner[0] = 4;	 //(gl_TessLevelOuter[0] + gl_TessLevelOuter[2])/
+	gl_TessLevelInner[1] = 4;	 //(gl_TessLevelOuter[1] + gl_TessLevelOuter[3])/
 } 
