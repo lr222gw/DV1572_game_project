@@ -136,14 +136,15 @@ void Viewport::_g_buffer_init() {
       //g-buffer init:
       glGenFramebuffers(  1, &(_g_buffer.buffer_loc) );
       // g-buffer Texture attatchments init:
-      glGenTextures(      1, &(_g_buffer.alb_tex_loc) );
-      glGenTextures(      1, &(_g_buffer.spe_tex_loc) );
-      glGenTextures(      1, &(_g_buffer.nor_tex_loc) );
-      glGenTextures(      1, &(_g_buffer.emi_tex_loc) );
-      glGenTextures(      1, &(_g_buffer.dis_tex_loc) );
-      glGenTextures(      1, &(_g_buffer.pos_tex_loc) );
-	   glGenTextures(      1, &(_g_buffer.pic_tex_loc) );
-      glGenRenderbuffers( 1, &(_g_buffer.depth_loc)   );
+      glGenTextures(      1, &(_g_buffer.alb_tex_loc)  );
+      glGenTextures(      1, &(_g_buffer.spe_tex_loc)  );
+      glGenTextures(      1, &(_g_buffer.nor_tex_loc)  );
+      glGenTextures(      1, &(_g_buffer.emi_tex_loc)  );
+      glGenTextures(      1, &(_g_buffer.dis_tex_loc)  );
+      glGenTextures(      1, &(_g_buffer.pos_tex_loc)  );
+	   glGenTextures(      1, &(_g_buffer.pic_tex_loc)  );
+      glGenTextures(      1, &(_g_buffer.ssao_tex_loc) );
+      glGenRenderbuffers( 1, &(_g_buffer.depth_loc)    );
       initialized = true;
   }
 
@@ -356,21 +357,24 @@ void Viewport::_g_buffer_init() {
 
 
 
-// picking (RGBA) light texture for g-buffer
+
+
 
 //   glBindTexture( GL_TEXTURE_2D,
-//	               _g_buffer.pic_tex_loc);
+//                _g_buffer.pic_tex_loc);
 //
 //
 //   glTexImage2D( GL_TEXTURE_2D,
-//	              0,
-//	              GL_RGBA8,
-//	              width,
-//	              height,
-//	              0,
-//	              GL_RGBA,
-//	              GL_UNSIGNED_BYTE,
-//	              NULL );
+//               0,
+//               GL_RGBA8,
+//               width,
+//               height,
+//               0,
+//               GL_RGBA,
+//               GL_UNSIGNED_BYTE,
+//               NULL );
+
+// picking (RGBA) texture for g-buffer
 
    glBindTexture( GL_TEXTURE_2D,
                   _g_buffer.pic_tex_loc );
@@ -405,16 +409,53 @@ void Viewport::_g_buffer_init() {
 
 
 
-// Describe for fragment shader to write to these buffers (?)
-   GLuint attachments[] = { GL_COLOR_ATTACHMENT0,
-                            GL_COLOR_ATTACHMENT1,
-                            GL_COLOR_ATTACHMENT2,
-                            GL_COLOR_ATTACHMENT3,
-                            GL_COLOR_ATTACHMENT4,
-                            GL_COLOR_ATTACHMENT5,
-                            GL_COLOR_ATTACHMENT6 };
 
-   glDrawBuffers( 7, attachments ); // TODO: BJÖRN SEE HÄR TILL MIGSJÄLV
+   // SSAO (R) texture for g-buffer
+//* SSAO */ glBindTexture( GL_TEXTURE_2D,
+//* SSAO */                _g_buffer.ssao_tex_loc );
+//* SSAO */
+//* SSAO */ glTexImage2D( GL_TEXTURE_2D,
+//* SSAO */               0,
+//* SSAO */               GL_RED,
+//* SSAO */               width,
+//* SSAO */               height,
+//* SSAO */               0,
+//* SSAO */               GL_RGB,
+//* SSAO */               GL_FLOAT,
+//* SSAO */               NULL );
+//* SSAO */
+//* SSAO */ // setting minifier:
+//* SSAO */ glTexParameteri( GL_TEXTURE_2D,
+//* SSAO */                  GL_TEXTURE_MIN_FILTER,
+//* SSAO */                  GL_NEAREST );
+//* SSAO */
+//* SSAO */ // setting magnifier:
+//* SSAO */ glTexParameteri( GL_TEXTURE_2D,
+//* SSAO */                  GL_TEXTURE_MAG_FILTER,
+//* SSAO */                  GL_NEAREST );
+//* SSAO */
+//* SSAO */ // attach the texture id to currently bound g-buffer
+//* SSAO */ glFramebufferTexture2D( GL_FRAMEBUFFER,
+//* SSAO */                         GL_COLOR_ATTACHMENT7,
+//* SSAO */                         GL_TEXTURE_2D,
+//* SSAO */                         _g_buffer.ssao_tex_loc,
+//* SSAO */                         0 );
+
+
+
+
+// Describe for fragment shader to write to these buffers (?)
+   GLuint attachments[] = { GL_COLOR_ATTACHMENT0
+                          , GL_COLOR_ATTACHMENT1
+                          , GL_COLOR_ATTACHMENT2
+                          , GL_COLOR_ATTACHMENT3
+                          , GL_COLOR_ATTACHMENT4
+                          , GL_COLOR_ATTACHMENT5
+                          , GL_COLOR_ATTACHMENT6
+              //* SSAO */ , GL_COLOR_ATTACHMENT7
+                          };
+
+   glDrawBuffers( 7, attachments ); // 8 if SSAO
 
 // Create a render buffer object for depth buffer
 

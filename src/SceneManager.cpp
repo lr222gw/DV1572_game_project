@@ -100,6 +100,9 @@ void SceneManager::update( Float32 delta_time_ms ) {
 }
 
 
+
+
+
 // TODO: use ShaderProgram::use()
 void SceneManager::draw( Viewport &view ) {
    if ( _should_sort_front_to_back )
@@ -192,6 +195,28 @@ void SceneManager::draw( Viewport &view ) {
 
    // disabling wireframe rendering so that the quad will render after the lighting pass
    glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+
+
+   // SSAO:
+//*SSAO*/ glBindFramebuffer( GL_DRAW_FRAMEBUFFER, /*TODO*/ );
+//*SSAO*/ glClear( GL_COLOR_BUFFER_BIT );
+//*SSAO*/ SuperSampledAmbientOcclusion ssao; // TODO: wrap shader programs inside SSAO class?
+//*SSAO*/ GBufferData gbuffer = view.get_g_buffer();
+//*SSAO*/ glClear(         GL_COLOR_BUFFER_BIT );
+//*SSAO*/ glActiveTexture( GL_TEXTURE0 );
+//*SSAO*/ glBindTexture(   GL_TEXTURE_2D, gbuffer.nor_tex_loc );
+//*SSAO*/ glActiveTexture( GL_TEXTURE1 );
+//*SSAO*/ glBindTexture(   GL_TEXTURE_2D, gbuffer.pos_tex_loc );
+//*SSAO*/ glActiveTexture( GL_TEXTURE2 );
+//*SSAO*/ glBindTexture(   GL_TEXTURE_2D, ssao.get_noise_texture_location() );
+//*SSAO*/ _ssao_main_shader->use();
+//*SSAO*/ // TODO: upload resolution from view
+//*SSAO*/ // TODO: upload ssao_kernel via uniform
+//*SSAO*/ // TODO: upload projection matrix from view
+//*SSAO*/ // TODO: unbind framebuffer
+//*SSAO*/ // TODO STUFF
+//*SSAO*/ _ssao_blur_shader->use();
+//*SSAO*/ // TODO: use in lightshad.frag
 
 // 2. Lighting pass:
    glBindFramebuffer( GL_DRAW_FRAMEBUFFER, 0 );
@@ -523,18 +548,23 @@ void SceneManager::update_shadowmap()
 
 }
 
-SceneManager::SceneManager( SharedPtr<ShaderProgram> geo_pass,
-                            SharedPtr<ShaderProgram> geo_pass_tessellated,
-                            SharedPtr<ShaderProgram> light_pass,
-                            SharedPtr<ShaderProgram> shadow_depth,
-                            SharedPtr<ShaderProgram> particle_shader ) /* @TAG{PS} */
+SceneManager::SceneManager( SharedPtr<ShaderProgram> geo_pass
+                          , SharedPtr<ShaderProgram> geo_pass_tessellated
+                          , SharedPtr<ShaderProgram> light_pass
+                          , SharedPtr<ShaderProgram> shadow_depth
+                          , SharedPtr<ShaderProgram> particle_shader   /* @TAG{PS} */
+               //* SSAO */, SharedPtr<ShaderProgram> ssao_main_shader
+               //* SSAO */, SharedPtr<ShaderProgram> ssao_blur_shader
+                          )
 :
-   _geometry_shader_program      ( geo_pass     ),
-   _tessellation_shader_program  ( geo_pass_tessellated),
-   _lighting_shader_program      ( light_pass   ),
-   _shadow_depth_shader          ( shadow_depth ),
-   _particle_shader              ( particle_shader ), /* @TAG{PS} */
-   _num_lights                   ( 0 )
+         _geometry_shader_program      ( geo_pass             ),
+         _tessellation_shader_program  ( geo_pass_tessellated ),
+         _lighting_shader_program      ( light_pass           ),
+         _shadow_depth_shader          ( shadow_depth         ),
+         _particle_shader              ( particle_shader      ),  /* @TAG{PS} */
+//*SSAO*/_ssao_main_shader             ( ssao_main_shader     ),
+//*SSAO*/_ssao_blur_shader             ( ssao_blur_shader     ),
+         _num_lights                   ( 0                    )
 {
    _init_depth_map_FBO();
 }
@@ -647,11 +677,10 @@ void SceneManager::_lights_to_gpu() {
                  (Uint32)config.render_mode );
 }
 
-Uint32 SceneManager::get_object_id_at_pixel(Uint32 x, Uint32 y, Viewport &view)
-{
+Uint32 SceneManager::get_object_id_at_pixel( Uint32 x, Uint32 y, Viewport &view ) const {
    //_geometry_shader_program->use();
-   glBindFramebuffer(GL_READ_FRAMEBUFFER, view.get_g_buffer().buffer_loc);
-   glReadBuffer(GL_COLOR_ATTACHMENT5);
+   glBindFramebuffer( GL_READ_FRAMEBUFFER, view.get_g_buffer().buffer_loc );
+   glReadBuffer(      GL_COLOR_ATTACHMENT6 );
 
 // Uint32 pixel_info[4]{};
    struct pixel_info_struct

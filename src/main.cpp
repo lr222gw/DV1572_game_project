@@ -503,20 +503,23 @@ Int32 main( Int32 argc, char const *argv[] ) {
    ShaderManager shader_manager{};
    AssetManager  asset_manager{};
 
-   auto lighting_vert_shader    { shader_manager.load_shader( "lightSha.vert" )        }; // TODO: rename files
-   auto lighting_frag_shader    { shader_manager.load_shader( "lightSha.frag" )        }; // TODO: rename files
-   auto geometry_vert_shader    { shader_manager.load_shader( "g_buffer.vert" )        }; // TODO: rename files
-   auto geometry_frag_shader    { shader_manager.load_shader( "g_buffer.frag" )        }; // TODO: rename files
-   auto geometry_geom_shader    { shader_manager.load_shader( "g_buffer.geom" )        };
-   auto geo_tess_geom_shader    { shader_manager.load_shader( "g_buffer_tess.geom" )   };
-   auto geo_tess_vert_shader    { shader_manager.load_shader( "g_buffer_tess.vert")    };
-   auto geo_tess_tesc_shader    { shader_manager.load_shader( "g_buffer.tesc")         };
-   auto geo_tess_tese_shader    { shader_manager.load_shader( "g_buffer.tese")         };
-   auto shadowdepth_vert_shader { shader_manager.load_shader( "shadow_depth.vert" )    };
-   auto shadowdepth_frag_shader { shader_manager.load_shader( "shadow_depth.frag" )    };
-   /* PS */ auto ps_vert_shader { shader_manager.load_shader( "particle_system.vert" ) }; //
-   /* PS */ //auto ps_geom_shader { shader_manager.load_shader( "particle_system.geom" ) }; //  /* @TAG{PS} */
-   /* PS */ auto ps_frag_shader { shader_manager.load_shader( "particle_system.frag" ) }; //
+   auto lighting_vert_shader           { shader_manager.load_shader( "lightSha.vert" )         }; // TODO: rename files
+   auto lighting_frag_shader           { shader_manager.load_shader( "lightSha.frag" )         }; // TODO: rename files
+   auto geometry_vert_shader           { shader_manager.load_shader( "g_buffer.vert" )         }; // TODO: rename files
+   auto geometry_frag_shader           { shader_manager.load_shader( "g_buffer.frag" )         }; // TODO: rename files
+   auto geometry_geom_shader           { shader_manager.load_shader( "g_buffer.geom" )         };
+   auto geo_tess_geom_shader           { shader_manager.load_shader( "g_buffer_tess.geom" )    };
+   auto geo_tess_vert_shader           { shader_manager.load_shader( "g_buffer_tess.vert")     };
+   auto geo_tess_tesc_shader           { shader_manager.load_shader( "g_buffer.tesc")          };
+   auto geo_tess_tese_shader           { shader_manager.load_shader( "g_buffer.tese")          };
+   auto shadowdepth_vert_shader        { shader_manager.load_shader( "shadow_depth.vert" )     };
+   auto shadowdepth_frag_shader        { shader_manager.load_shader( "shadow_depth.frag" )     };
+   /* PS */ auto ps_vert_shader        { shader_manager.load_shader( "particle_system.vert" )  };
+   /* PS */ //auto ps_geom_shader { shader_manager.load_shader( "particle_system.geom" )       };
+   /* PS */ auto ps_frag_shader        { shader_manager.load_shader( "particle_system.frag" )  };
+   //*SSAO*/ auto ssao_vert_shader      { shader_manager.load_shader( "ssao.vert" )             };
+   //*SSAO*/ auto ssao_main_frag_shader { shader_manager.load_shader( "ssao.frag" )             };
+   //*SSAO*/ auto ssao_blur_frag_shader { shader_manager.load_shader( "ssao_blur.frag" )        };
 
 
    auto geometry_program      { shader_manager.create_program( { geometry_frag_shader,
@@ -535,8 +538,18 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
    auto particle_program      { shader_manager.create_program({ ps_vert_shader, ps_frag_shader }) };    /* @TAG{PS} */
 
+   //* SSAO */ auto ssao_main_program { shader_manager.create_program({ ssao_vert_shader, ssao_main_frag_shader }) };
+   //* SSAO */ auto ssao_blur_program { shader_manager.create_program({ ssao_vert_shader, ssao_blur_frag_shader }) };
+
    //Add Lightning program to Scenemanager
-   SceneManager  scene_manager{ geometry_program, geometry_tessellation_program, lighting_program , shadowdepth_program, particle_program }; /* @TAG{PS} */
+   SceneManager  scene_manager { geometry_program
+                               , geometry_tessellation_program
+                               , lighting_program
+                               , shadowdepth_program
+                               , particle_program /* @TAG{PS} */
+                     //* SSAO */, ssao_main_program
+                     //* SSAO */, ssao_blur_program
+                               };
 
    Vector<SharedPtr<Light>> light_instances;
 
@@ -699,70 +712,66 @@ Int32 main( Int32 argc, char const *argv[] ) {
    //glEnable( GL_BLEND );
    //glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
-
-
-
-
-   /* @TAG{PS} */
-   /* PS */ auto ps_logic = [] ( ParticleSystem::Data &data, Float32 delta_t_ms ) {
-   /* PS */    using  Particle = ParticleSystem::Data::Particle;
-   /* PS */
-   /* PS */    static Float32 const births_per_s       { 240.0f                 };
-   /* PS */    static Float32 const ms_between_births  { 1'000.f / births_per_s };
-   /* PS */    static Float32 const avg_lifespan_ms    { 9'000.0f               };
-   /* PS */    static Float32 const avg_mass_kg        {     0.01f              };
-   /* PS */    static Float32 const avg_scale          {     0.50f              };
-   /* PS */    static Uvec4   const colour_rgba        { 255, 255, 255, 255     };
-   /* PS */    static Float32 const radius_m           { 120.f                  };
-   /* PS */    static Float32       time_pool_ms       { .0f                    };
-   /* PS */    static Float32       elapsed_time       {  0                     };
-   /* PS */    elapsed_time += delta_t_ms;
-   /* PS */    time_pool_ms += (delta_t_ms);
-   /* PS */
-   /* PS */    static Float32 sin[8] {};
-   /* PS */    static Float32 cos[8] {};
-   /* PS */    for ( int i=0;  i<8;  ++i ) {
-   /* PS */       sin[i] = (0.10 * glm::sin(glm::radians((elapsed_time * 0.01 + i*53))));
-   /* PS */       cos[i] = (0.05 * glm::cos(glm::radians((elapsed_time * 0.01 + i*37))));
-   /* PS */    }
-   /* PS */
-   /* PS */    for ( auto i = 0;  i < data.count;  ++i ) {
-   /* PS */        auto &particle          =  data.data[i]; // TODO: rename in ParticleSystem
-   /* PS */        // position:
-   /* PS */        particle.spatial[1]    +=  (-.005f -(i % 20)/43) * delta_t_ms;
-   /* PS */        particle.spatial[0]    += sin[(i+31)%8];
-   /* PS */        particle.spatial[2]    += cos[(i+47)%8];
-   /* PS */        // scale:
-   /* PS */        particle.spatial[3]     = avg_scale * (1-(avg_lifespan_ms-particle.time_ms_left)/avg_lifespan_ms);
-   /* PS */        particle.time_ms_left  -= delta_t_ms;
-   /* PS */
-   /* PS */    }
-   /* PS */
-   /* PS */    std::random_device rd;
-   /* PS */    std::mt19937 mt( rd() );
-   /* PS */    std::uniform_real_distribution<Float32> dist( -radius_m, +radius_m );
-   /* PS */    std::uniform_real_distribution<Float32> scale_dist( -.30f, +.30f );
-   /* PS */    while ( time_pool_ms > ms_between_births ) {
-   /* PS */       data.add( Particle { colour_rgba,
-   /* PS */                            Vec4 { dist(mt), 40.0f, dist(mt), avg_scale }, // random position
-   /* PS */                            Vec3 { .0f, -.01f, .0f },
-   /* PS */                            avg_lifespan_ms,
-   /* PS */                            avg_mass_kg } );
-   /* PS */       time_pool_ms -= ms_between_births;
-   /* PS */    }
-   /* PS */ };
-   /* PS */
-   /* PS */ auto snowflake_dif  = std::make_shared<DiffuseTexture>      ( FilePath{ FileType::texture, "snowflake_dif.png"  });
-   /* PS */ auto snowflake_nor  = std::make_shared<NormalTexture>       ( FilePath{ FileType::texture, "snowflake_nor.png"  });
-   /* PS */ auto snowflake_spec = std::make_shared<SpecularTexture>     ( FilePath{ FileType::texture, "snowflake_spec.png" });
-   /* PS */ auto snowflake_emit = std::make_shared<EmissiveTexture>     ( FilePath{ FileType::texture, "snowflake_emit.png" });
-   /* PS */ auto snowflake_disp = std::make_shared<DisplacementTexture> ( /* no displacement texture */ );
-   /* PS */
-   /* PS */ TextureSet snowflake_tex { snowflake_dif, snowflake_nor, snowflake_spec, snowflake_emit, snowflake_disp };
-   /* PS */
-   /* PS */ auto ps { std::make_shared<ParticleSystem>( Transform::make_translation(Vec3{.0f, 3.0f, .0f}), snowflake_tex, ps_logic ) };
-   /* PS */ scene_manager.instantiate_particle_system( ps ); // TODO: revamp in SceneManager
-   /* PS */ ps->start();
+/* @TAG{PS} */
+/* PS */ auto ps_logic = [] ( ParticleSystem::Data &data, Float32 delta_t_ms ) {
+/* PS */    using  Particle = ParticleSystem::Data::Particle;
+/* PS */
+/* PS */    static Float32 const births_per_s       { 240.0f                 };
+/* PS */    static Float32 const ms_between_births  { 1'000.f / births_per_s };
+/* PS */    static Float32 const avg_lifespan_ms    { 9'000.0f               };
+/* PS */    static Float32 const avg_mass_kg        {     0.01f              };
+/* PS */    static Float32 const avg_scale          {     0.50f              };
+/* PS */    static Uvec4   const colour_rgba        { 255, 255, 255, 255     };
+/* PS */    static Float32 const radius_m           { 120.f                  };
+/* PS */    static Float32       time_pool_ms       { .0f                    };
+/* PS */    static Float32       elapsed_time       {  0                     };
+/* PS */    elapsed_time += delta_t_ms;
+/* PS */    time_pool_ms += (delta_t_ms);
+/* PS */
+/* PS */    static Float32 sin[8] {};
+/* PS */    static Float32 cos[8] {};
+/* PS */    for ( int i=0;  i<8;  ++i ) {
+/* PS */       sin[i] = (0.10 * glm::sin(glm::radians((elapsed_time * 0.01 + i*53))));
+/* PS */       cos[i] = (0.05 * glm::cos(glm::radians((elapsed_time * 0.01 + i*37))));
+/* PS */    }
+/* PS */
+/* PS */    for ( auto i = 0;  i < data.count;  ++i ) {
+/* PS */        auto &particle          =  data.data[i]; // TODO: rename in ParticleSystem
+/* PS */        // position:
+/* PS */        particle.spatial[1]    +=  (-.005f -(i % 20)/43) * delta_t_ms;
+/* PS */        particle.spatial[0]    += sin[(i+31)%8];
+/* PS */        particle.spatial[2]    += cos[(i+47)%8];
+/* PS */        // scale:
+/* PS */        particle.spatial[3]     = avg_scale * (1-(avg_lifespan_ms-particle.time_ms_left)/avg_lifespan_ms);
+/* PS */        particle.time_ms_left  -= delta_t_ms;
+/* PS */
+/* PS */    }
+/* PS */
+/* PS */    std::random_device rd;
+/* PS */    std::mt19937 mt( rd() );
+/* PS */    std::uniform_real_distribution<Float32> dist( -radius_m, +radius_m );
+/* PS */    std::uniform_real_distribution<Float32> scale_dist( -.30f, +.30f );
+/* PS */    while ( time_pool_ms > ms_between_births ) {
+/* PS */       data.add( Particle { colour_rgba,
+/* PS */                            Vec4 { dist(mt), 40.0f, dist(mt), avg_scale }, // random position
+/* PS */                            Vec3 { .0f, -.01f, .0f },
+/* PS */                            avg_lifespan_ms,
+/* PS */                            avg_mass_kg } );
+/* PS */       time_pool_ms -= ms_between_births;
+/* PS */    }
+/* PS */ };
+/* PS */
+/* PS */ auto snowflake_dif  = std::make_shared<DiffuseTexture>      ( FilePath{ FileType::texture, "snowflake_dif.png"  });
+/* PS */ auto snowflake_nor  = std::make_shared<NormalTexture>       ( FilePath{ FileType::texture, "snowflake_nor.png"  });
+/* PS */ auto snowflake_spec = std::make_shared<SpecularTexture>     ( FilePath{ FileType::texture, "snowflake_spec.png" });
+/* PS */ auto snowflake_emit = std::make_shared<EmissiveTexture>     ( FilePath{ FileType::texture, "snowflake_emit.png" });
+/* PS */ auto snowflake_disp = std::make_shared<DisplacementTexture> ( /* no displacement texture */ );
+/* PS */
+/* PS */ TextureSet snowflake_tex { snowflake_dif, snowflake_nor, snowflake_spec, snowflake_emit, snowflake_disp };
+/* PS */
+/* PS */ auto ps { std::make_shared<ParticleSystem>( Transform::make_translation(Vec3{.0f, 3.0f, .0f}), snowflake_tex, ps_logic ) };
+/* PS */ scene_manager.instantiate_particle_system( ps ); // TODO: revamp in SceneManager
+/* PS */ ps->start();
 
 // main loop:
 	while ( !glfwWindowShouldClose(window) ) {

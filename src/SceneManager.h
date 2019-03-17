@@ -7,6 +7,7 @@
 #include "misc/ImGui/imgui_impl_glfw.h"
 #include "misc/ImGui/imgui_impl_opengl3.h"
 
+//*SSAO*/#include "SuperSampledAmbientOcclusion.h"
 #include "ModelInstance.h"
 #include "ShaderProgram.h"
 #include "Transform.h"
@@ -47,15 +48,18 @@ public:
    void use_depth_map_FBO();   // TODO: rename
    void update_shadowmap();
 
-   SceneManager( SharedPtr<ShaderProgram> geo_pass,
-                 SharedPtr<ShaderProgram> geo_pass_tessellated,
-                 SharedPtr<ShaderProgram> light_pass,
-                 SharedPtr<ShaderProgram> shadow_depth,
-                 SharedPtr<ShaderProgram> particle_shader ); /* @TAG{PS} */
+   SceneManager( SharedPtr<ShaderProgram> geo_pass
+               , SharedPtr<ShaderProgram> geo_pass_tessellated
+               , SharedPtr<ShaderProgram> light_pass
+               , SharedPtr<ShaderProgram> shadow_depth
+               , SharedPtr<ShaderProgram> particle_shader    /* @TAG{PS} */
+   //* SSAO */ , SharedPtr<ShaderProgram> ssao_main_shader,
+   //* SSAO */ , SharedPtr<ShaderProgram> ssao_blur_shader
+               );
 
-   Uint32 get_object_id_at_pixel( Uint32 x, Uint32 y, Viewport & );
+   Uint32 get_object_id_at_pixel( Uint32 x, Uint32 y, Viewport & ) const;
 
-   SharedPtr<ModelInstance> get_instance_ptr(Uint32 obj_id);
+   SharedPtr<ModelInstance> get_instance_ptr( Uint32 obj_id );
 
 private:
    // TODO: set in SceneManager() to facilitate (de)serialization
@@ -68,6 +72,8 @@ private:
    SharedPtr<ShaderProgram>  _lighting_shader_program;
    SharedPtr<ShaderProgram>  _shadow_depth_shader;
    SharedPtr<ShaderProgram>  _particle_shader; /* @TAG{PS} */
+   SharedPtr<ShaderProgram>  _ssao_main_shader;
+   SharedPtr<ShaderProgram>  _ssao_blur_shader;
 
    //DepthMap stuff for Shadowmapping
    Uint32                                     _depth_map_FBO_id;
