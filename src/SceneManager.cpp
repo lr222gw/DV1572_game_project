@@ -470,9 +470,8 @@ void SceneManager::use_depth_map_FBO()
 
 void SceneManager::update_shadowmap()
 {
-   if (_shadow_maps.size() == 0) {
+   if ( _shadow_maps.size() == 0 )
       return;
-   }
 
    //glBindFramebuffer(GL_FRAMEBUFFER, this->_depth_map_FBO_id);
    use_depth_map_FBO();
@@ -483,7 +482,7 @@ void SceneManager::update_shadowmap()
    glGetIntegerv(GL_VIEWPORT, oldSize);
 
 
-   for (auto &e : _shadow_maps) {
+   for ( auto &e : _shadow_maps ) {
       //_shadowcasters[i]
       //send lightMatrix to
       glUniformMatrix4fv(
@@ -502,12 +501,18 @@ void SceneManager::update_shadowmap()
       //glActiveTexture(GL_TEXTURE0/*+ count*/);
 
       //Render from light pov
-      for (auto &instance : _instances) {
-         if (!instance.expired()) {
-            SharedPtr<ShaderProgram> previous = instance.lock()->get_shader_program();
-            instance.lock()->set_shader_program(this->_shadow_depth_shader);
-            instance.lock()->draw();
-            instance.lock()->set_shader_program(previous);
+      for ( auto &instance : _instances ) {
+         if ( !instance.expired() ) {
+            auto model    = instance.lock();
+            auto previous = model->get_shader_program();
+            auto is_tessellated = model->get_is_tessellation_enabled();
+            if ( is_tessellated )
+               model->set_is_tessellation_enabled( false );
+            model->set_shader_program(this->_shadow_depth_shader);
+            model->draw();
+            model->set_shader_program(previous);
+            if ( is_tessellated )
+               model->set_is_tessellation_enabled( true );
          }
       }
 
