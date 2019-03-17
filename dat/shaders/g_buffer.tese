@@ -4,7 +4,8 @@ layout(triangles, equal_spacing, ccw) in; //TODO: Clockwise or Counter Clockwise
 
 uniform mat4 view;
 uniform mat4 projection;
-uniform sampler2D displacement_map;
+uniform sampler2D tex_disp;
+uniform sampler2D tex_norm;
 //uniform float displacementFactor;
  
 in vec3 pos_te[];
@@ -34,44 +35,6 @@ vec3 interpolate3D(vec3 v0, vec3 v1, vec3 v2)
 void main()
 {
 
-	//vec2 uv1 = mix(uv_te[1],uv_te[3],gl_TessCoord.x);
-	//vec2 uv2 = mix(uv_te[2],uv_te[0],gl_TessCoord.x);
-	//uv_gs = mix(uv1, uv2, gl_TessCoord.y);
-	//
-	////TODO: Check if "tbn_te[1][0]" is the Tangent Vector...
-	//vec3 tangent1 = mix(tbn_te[1][0],tbn_te[0][0],gl_TessCoord.x);
-	//vec3 tangent2 = mix(tbn_te[2][0],tbn_te[3][0],gl_TessCoord.x);
-	//vec3 tangent = mix(tangent1, tangent2, gl_TessCoord.y);
-	//
-	//vec3 bitangent1 = mix(tbn_te[1][1],tbn_te[0][1],gl_TessCoord.x);
-	//vec3 bitangent2 = mix(tbn_te[2][1],tbn_te[3][1],gl_TessCoord.x);
-	//vec3 bitangent = mix(bitangent1, bitangent2, gl_TessCoord.y);
-	//
-	//vec3 normal1 = mix(tbn_te[1][2],tbn_te[0][2],gl_TessCoord.x);
-	//vec3 normal2 = mix(tbn_te[2][2],tbn_te[3][2],gl_TessCoord.x);
-	//vec3 normal = mix(normal1, normal2, gl_TessCoord.y);
-	//
-	//tbn_gs = mat3(tangent, bitangent, normal);
-	//
-	////TODO: Conversion:  to vec4 or gl_TessCoord to vec3?
-	//vec3 p1 = mix(pos_te[1],pos_te[0],gl_TessCoord.x);
-	//vec3 p2 = mix(pos_te[2],pos_te[3],gl_TessCoord.x);
-	//vec3 pos = mix(p1, p2, gl_TessCoord.y);
-	////vec4 pos = vec4(0.0f);
-
-
-	//const vec4 bc = vec4(1,3,3,1);
-	//for(int j = 0; j < 4; ++j){
-	//	for(int i = 0; i < 4; ++i){
-	//		pos += bc[i] * pow( gl_TessCoord.x, i) * pow(1.0 - gl_TessCoord.x, 3-i) * bc[j] * pow( gl_TessCoord.y, j) * pow(1.0 - gl_TessCoord.y, 3-j ) * vec4(pos_te[4*j+i],1.0f);
-	//	}
-	//}
-
-	//float displacement = texture(displacement_map, uv_gs.xy).x;
-	// Displace the vertex along the normal
-	//pos_gs = (pos.xyz + normal * displacement * 23); //TODO: add Factor instead of hardcoded "23"
-
-
 	vec3 tangent = interpolate3D(tbn_te[0][0],tbn_te[1][0],tbn_te[2][0]);
 	
 	vec3 bitangent = interpolate3D(tbn_te[0][1],tbn_te[1][1],tbn_te[2][1]);
@@ -81,15 +44,19 @@ void main()
 	tbn_gs = mat3(tangent, bitangent, normal);
 
 
-
-
-
 	uv_gs = interpolate2D(uv_te[0], uv_te[1],uv_te[2]);
-	pos_gs = interpolate3D(pos_te[0],pos_te[1],pos_te[2]);
+	pos_gs = (gl_TessCoord.x*gl_in[0].gl_Position+gl_TessCoord.y*gl_in[1].gl_Position+gl_TessCoord.z* gl_in[2].gl_Position).xyz;//interpolate3D(pos_te[0],pos_te[1],pos_te[2]);
+	//pos_gs = interpolate3D(pos_te[0],pos_te[1],pos_te[2]);
 
+	//vec4 Normal = texture(tex_disp, gl_TessCoord.xy);
+	vec4 displacement = texture(tex_disp, uv_gs);
 
+	//vec3 tex_disp_val = texture( tex_disp, gl_TessCoord.xy ).rgb;
+	//float avg_disp_val = (tex_disp_val.r + tex_disp_val.g + tex_disp_val.b) / 3;
+	//
+	//float heterogenous_disp_val = avg_disp_val / 128 - 1.0f;
 
-
+	pos_gs += normal * displacement.xyz * 15;
 
 
 
