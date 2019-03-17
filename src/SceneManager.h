@@ -28,6 +28,9 @@ public:
                                                Transform const &,
                                                Bool tessellation_enabled = false );
 
+
+   UniquePtr<Viewport> instantiate_viewport( Vec3 position, GLFWwindow *, SharedPtr<ShaderProgram>, Float32 fov = Config::fov_rad );
+
    SharedPtr<Light> instantiate_light( Light::Data );
 
    void instantiate_particle_system( WeakPtr<ParticleSystem> ); /* @TAG{PS} */

@@ -24,7 +24,12 @@ struct GBufferData {
 class Viewport {
 /*--------------- class member functions & operators ------------*/
 public:
-   Viewport( Vec3 position, GLFWwindow *window, SharedPtr<ShaderProgram>, Float32 fov = Config::fov_rad );
+   Viewport( Vec3                      position,
+             GLFWwindow               *window,
+             SharedPtr<ShaderProgram>  shader, // TODO: remove this abomination
+             std::function<void()>     callback_on_transform,
+             Float32                   fov = Config::fov_rad );
+
    Viewport( Viewport  const &)            = delete;
    Viewport( Viewport && )                 = delete;
    Viewport& operator=( Viewport const & ) = delete;
@@ -56,6 +61,7 @@ private:
    Mat4                     _projection;
    GLFWwindow              *_window;
    SharedPtr<ShaderProgram> _shader_program;
+   std::function<void()>    _callback_on_transform;
 
 public:
    Vec3  forward = Vec3(1.0f); // TODO: refactor away

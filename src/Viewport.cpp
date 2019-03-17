@@ -6,13 +6,15 @@
 Viewport::Viewport( Vec3                      position,
                     GLFWwindow               *window,
                     SharedPtr<ShaderProgram>  shader_program,
+                    std::function<void()>     callback_on_transform,
                     Float32                   fov_rad )
 :
-   _fov            ( fov_rad          ),
-   _aspect         ( -1.0f            ),
-   _window         ( window           ),
-   _shader_program ( shader_program   ),
-   forward         ( 0.0f, 0.0f, 1.0f )
+   _fov                   ( fov_rad               ),
+   _aspect                ( -1.0f                 ),
+   _window                ( window                ),
+   _shader_program        ( shader_program        ),
+   _callback_on_transform ( callback_on_transform ),
+   forward                ( 0.0f,   0.0f,   1.0f  )
 {
    _view = Transform( position );
 
@@ -23,6 +25,7 @@ Viewport::Viewport( Vec3                      position,
 
    _update_aspect_ratio();
    _write_to_buffer();
+   _callback_on_transform();
 }
 
 void Viewport::_update_aspect_ratio() {
@@ -48,17 +51,18 @@ void Viewport::_generate_perspective() {
 
 void Viewport::transform( Transform const &transform ) {
    _view *= transform;
-
    //TODO: Kan denna vara här?
    //Ligger här för att vi nu måste uppdatera vår viewports transforms view med LookAt...
    _view.look_at(this->forward, _view.get_position() + this->forward); // rotate view
    this->set_view(_view);
    _write_to_buffer();
+   _callback_on_transform();
 }
 
 void Viewport::set_view( Transform const &transform ) {
    _view = transform;
    _write_to_buffer();
+   _callback_on_transform();
 }
 
 [[nodiscard]] Transform Viewport::get_view() const {

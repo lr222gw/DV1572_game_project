@@ -7,9 +7,9 @@ SharedPtr<ModelInstance> SceneManager::instantiate_model(
    Bool                      tessellation_enabled )
 {
    auto callback_lambda = [this]() {
-      _should_recalculate_shadowmap = true; // for lightmap recalculation
-      _should_sort_front_to_back    = true; // for front-to-back rendering
-   };
+                             _should_recalculate_shadowmap = true; // for lightmap recalculation
+                             _should_sort_front_to_back    = true; // for front-to-back rendering
+                          };
    // construct return value (shared pointer):
    auto instance_ptr = // TODO: switch to UniquePtr..?
       std::make_shared<ModelInstance>( model,
@@ -24,6 +24,18 @@ SharedPtr<ModelInstance> SceneManager::instantiate_model(
 
    return instance_ptr;
 }
+
+UniquePtr<Viewport> SceneManager::instantiate_viewport( Vec3        position,
+                                          GLFWwindow               *window,
+                                          SharedPtr<ShaderProgram>  shader_program,
+                                          Float32                   fov_rad )
+{
+   auto callback_lambda = [this]() {
+                             _should_sort_front_to_back = true; // for front-to-back rendering
+                          };
+   return std::make_unique<Viewport>( position, window, shader_program, callback_lambda, fov_rad );
+}
+
 
 Uint32 SceneManager::_generate_light_id() {
    return _next_light_id++;
@@ -105,8 +117,10 @@ void SceneManager::update( Float32 delta_time_ms ) {
 
 // TODO: use ShaderProgram::use()
 void SceneManager::draw( Viewport &view ) {
-   if ( _should_sort_front_to_back )
+   if ( _should_sort_front_to_back ) {
       _sort_by_distance( view ); // for front-to-back rendering
+      _should_sort_front_to_back = false;
+   }
 
    auto &g_buffer = view.get_g_buffer();
 
@@ -394,9 +408,9 @@ void SceneManager::draw_debug_scene_inspection() {
             transform = instance->model_transform;
 
             //glm::rotation(Mat4(1.0f), rotation);
-            transform.set_rotation(Vec3(1.0f, 0.0f, 0.0f), rotation.x);
-            transform.set_rotation(Vec3(0.0f, 1.0f, 0.0f), rotation.y);
-            transform.set_rotation(Vec3(0.0f, 0.0f, 1.0f), rotation.z);
+            transform.set_rotation( Vec3(1.0f, 0.0f, 0.0f), rotation.x );
+            transform.set_rotation( Vec3(0.0f, 1.0f, 0.0f), rotation.y );
+            transform.set_rotation( Vec3(0.0f, 0.0f, 1.0f), rotation.z );
 
             //transform.set_rotation(transform.get_rotation());
             //position = oldPos;

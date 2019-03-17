@@ -686,14 +686,14 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
    //SunApe->set_transform()
 
-   /* TODO */ Vec3       cam_rotations {  0.0f,   0.0f,   0.0f };
-   /* TODO */ Vec3       cam_position  {  0.0f, 20.0f,  15.0f };
-   /* TODO */ Transform  cam_transform;
-   /* TODO */ Float32    fov_rad { Config::fov_rad }; // 90 degrees
-   /* TODO */ Viewport view { cam_position, window, geometry_program, fov_rad };
-   /* TODO */ view.bind_shader_program( geometry_program );
+   /* TODO */ Vec3        cam_rotations {  0.0f,   0.0f,   0.0f };
+   /* TODO */ Vec3        cam_position  {  0.0f, 20.0f,  15.0f };
+   /* TODO */ Transform   cam_transform;
+   /* TODO */ Float32     fov_rad { Config::fov_rad }; // 90 degrees
+   /* TODO */ auto view = scene_manager.instantiate_viewport( cam_position, window, geometry_program, fov_rad );
+   /* TODO */ view->bind_shader_program( geometry_program );
    /* TODO */ //TODO: remove when we dont want to se dogass
-   /* TODO */ view._g_buffer_init();
+   /* TODO */ view->_g_buffer_init();
    /* TODO */ //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
    glUseProgram( lighting_program->get_location() );
@@ -827,8 +827,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
       sundbg.light_caster_debugg_tool_render();
 
-      process_mouse( window, view, scene_manager, delta_time_ms );
-      process_input( window, view, delta_time_ms );
+      process_mouse( window, *view, scene_manager, delta_time_ms );
+      process_input( window, *view, delta_time_ms );
 
       // glMatrixMode( GL_PROJECTION );
       // glLoadIdentity();
@@ -915,7 +915,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
       //mo2->set_transform(mdl);
 
 
-      scene_manager.draw( view );
+      scene_manager.draw( *view );
 
       ImGui::Render();
       ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );
