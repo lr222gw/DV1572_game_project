@@ -4,6 +4,10 @@
 layout (vertices = 3) out; //TODO: More vertrices? 
 uniform vec3 view_pos;
 
+//tess_percent, boost Tessellation Level by adding a value from 0.0f to 1.0f
+//Default should be 0
+uniform float tess_percent; 
+
 // input data per Controlpoint
 in vec3 pos_tc[];
 in vec2 uv_tc[];
@@ -19,16 +23,16 @@ float distance_to_tesslevel(float dist)
 {
 	//Decides the level of detail based on distance to campos
     //float average = (first + second) * 0.5;
-	if (dist <= 10.0)	    { return gl_MaxTessGenLevel;			}
-    else if (dist <= 15.0)  { return gl_MaxTessGenLevel*0.95;	}		//gl_MaxTessGenLevel*0.75;
-    else if (dist <= 30.0)  { return gl_MaxTessGenLevel*0.90;	}       //gl_MaxTessGenLevel*0.50;
-	else if (dist <= 35.0)  { return gl_MaxTessGenLevel*0.85; 	}		//gl_MaxTessGenLevel*0.20;
-	else if (dist <= 40.0)  { return gl_MaxTessGenLevel*0.80;	}		//gl_MaxTessGenLevel*0.10;
-	else if (dist <= 50.0)  { return gl_MaxTessGenLevel*0.70;	}	
-	else if (dist <= 75.0)  { return gl_MaxTessGenLevel*0.60;	}   
-	else if (dist <= 95.0)  { return gl_MaxTessGenLevel*0.50; 	}	
-	else if (dist <= 120.0) { return gl_MaxTessGenLevel*0.10;	}		
-    else				    { return 1;		}
+	if (dist <= 10.0)	    { return max(gl_MaxTessGenLevel*min(1.0f  + tess_percent, 1.0f), 1.0f	);	}
+    else if (dist <= 15.0)  { return max(gl_MaxTessGenLevel*min(0.95f + tess_percent, 1.0f), 1.0f	);	}		
+    else if (dist <= 30.0)  { return max(gl_MaxTessGenLevel*min(0.90f + tess_percent, 1.0f), 1.0f	);	}       
+	else if (dist <= 35.0)  { return max(gl_MaxTessGenLevel*min(0.85f + tess_percent, 1.0f), 1.0f	);  }		
+	else if (dist <= 40.0)  { return max(gl_MaxTessGenLevel*min(0.80f + tess_percent, 1.0f), 1.0f	);	}		
+	else if (dist <= 50.0)  { return max(gl_MaxTessGenLevel*min(0.60f + tess_percent, 1.0f), 1.0f	);	}	
+	else if (dist <= 75.0)  { return max(gl_MaxTessGenLevel*min(0.45f + tess_percent, 1.0f), 1.0f	);	}   
+	else if (dist <= 95.0)  { return max(gl_MaxTessGenLevel*min(0.20f + tess_percent, 1.0f), 1.0f	);  }	
+	else if (dist <= 120.0) { return max(gl_MaxTessGenLevel*min(0.05f + tess_percent, 1.0f), 1.0f	);	}		
+    else				    { return 1;																	}
 } 
 
 float level (vec4 poz1, vec4 poz2){

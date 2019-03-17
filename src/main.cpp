@@ -701,6 +701,15 @@ Int32 main( Int32 argc, char const *argv[] ) {
    /* TODO */ view->_g_buffer_init();
    /* TODO */ //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+   glUseProgram(geometry_tessellation_program->get_location());
+   float displacement_factor = 1; 
+   float tess_percent = 0;
+   glUniform1f(   glGetUniformLocation(geometry_tessellation_program->get_location(), "displacement_factor"), 
+                  displacement_factor);
+   
+   glUniform1f(   glGetUniformLocation(geometry_tessellation_program->get_location(), "tess_percent"),
+                  tess_percent);
+
    glUseProgram( lighting_program->get_location() );
 
    // @TAG{TEXTURE_CHANNEL}
@@ -788,6 +797,15 @@ Int32 main( Int32 argc, char const *argv[] ) {
          printf( "-------------------------------- Frame %5d --------------------------------\n", frame++ );
       }
 
+      glUseProgram(geometry_tessellation_program->get_location());
+      glUniform1f(glGetUniformLocation(geometry_tessellation_program->get_location(), "displacement_factor"),
+         displacement_factor);
+
+      glUniform1f(glGetUniformLocation(geometry_tessellation_program->get_location(), "tess_percent"),
+         tess_percent);
+
+
+
 		// poll & handle events such as window resizing and input from the keyboard or mouse
 		// use io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if imgui wants to use the user's input
 		// - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
@@ -813,6 +831,13 @@ Int32 main( Int32 argc, char const *argv[] ) {
          ImGui::Begin( "Settings:" );
          ImGui::SliderFloat( "Move speed", &g_move_speed, 0.0f, 25.0f );
          ImGui::End();
+
+         ImGui::Begin("Tessellation Settings:");
+         ImGui::SliderFloat("Displacement Factor: ", &displacement_factor, 0.0f, 10.0f);
+         ImGui::SliderFloat("Tessellation level Percent: ", &tess_percent, -1.0f, 1.0f);
+         ImGui::End();
+
+
       }
 
       Array<Float32,4> corners = light_sc->getCorners();
