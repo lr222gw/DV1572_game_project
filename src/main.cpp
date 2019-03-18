@@ -1,4 +1,4 @@
-#define STB_IMAGE_IMPLEMENTATION //Den bor här annars kompilerar inte stb_image.h
+#define  STB_IMAGE_IMPLEMENTATION //Den bor här annars kompilerar inte stb_image.h
 
 #include "misc/defs.h"
 #include "Config.h"
@@ -14,49 +14,35 @@
 #include "SceneManager.h"
 
 #include "Light.h"
-
-// temp:
-//    #include <cstdio>
-//    #include <unistd.h>
-
 #include "shadowcasterDebug.h"
 
-// #include "misc/stb_image.h"
-// #include <range/v3/all.hpp>
+#include "ParticleSystem.h" /* @TAG{PS} */
+#include <random>           /* used by particle system algorithm defined in main; TODO: move to defs */
 
-/* @TAG{PS} */
-#include "ParticleSystem.h"
-#include <random> /* used by particle system algorithm defined in main */
-
-
-Float32 g_move_speed            = 25.0f; // TODO: refactor away ugly globalness
-Bool    g_is_mouse_look_enabled = false;
-// temp debug for mouse picking
-
-
-// For opengl debuging
-void APIENTRY glDebugOutput( GLenum        source,
-	                          GLenum        type,
-	                          GLuint        id,
-	                          GLenum        severity,
-	                          GLsizei       length,
-	                          const GLchar *message,
-	                          const void   *userParam ) {
+// for OpenGL debugging
+void APIENTRY glDebugOutput( GLenum         source,
+	                          GLenum         type,
+	                          GLuint         id,
+	                          GLenum         severity,
+	                          GLsizei        length,
+	                          const GLchar  *message,
+	                          const void    *userParam ) {
 	// ignore non-significant error/warning codes
 	if ( id == 131169 || id == 131185 || id == 131218 || id == 131204 )
       return;
 
-   if ( severity == GL_DEBUG_SEVERITY_NOTIFICATION ) return;
+   if ( severity == GL_DEBUG_SEVERITY_NOTIFICATION )
+      return;
 
 	std::cout << "DEBUG MESSAGE (" << id << "): " << message << "\n";
 
 	switch ( source ) {
-   	case GL_DEBUG_SOURCE_API:             std::cout << "SOURCE: API";             break;
-   	case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   std::cout << "SOURCE: Window System";   break;
-   	case GL_DEBUG_SOURCE_SHADER_COMPILER: std::cout << "SOURCE: Shader Compiler"; break;
-   	case GL_DEBUG_SOURCE_THIRD_PARTY:     std::cout << "SOURCE: Third Party";     break;
-   	case GL_DEBUG_SOURCE_APPLICATION:     std::cout << "SOURCE: Application";     break;
-   	case GL_DEBUG_SOURCE_OTHER:           std::cout << "SOURCE: Other";           break;
+   	case GL_DEBUG_SOURCE_API:               std::cout << "SOURCE: API";                break;
+   	case GL_DEBUG_SOURCE_WINDOW_SYSTEM:     std::cout << "SOURCE: Window System";      break;
+   	case GL_DEBUG_SOURCE_SHADER_COMPILER:   std::cout << "SOURCE: Shader Compiler";    break;
+   	case GL_DEBUG_SOURCE_THIRD_PARTY:       std::cout << "SOURCE: Third Party";        break;
+   	case GL_DEBUG_SOURCE_APPLICATION:       std::cout << "SOURCE: Application";        break;
+   	case GL_DEBUG_SOURCE_OTHER:             std::cout << "SOURCE: Other";              break;
 	}
    std::cout << "\n";
 
@@ -74,121 +60,95 @@ void APIENTRY glDebugOutput( GLenum        source,
    std::cout << "\n";
 
 	switch ( severity ) {
-   	case GL_DEBUG_SEVERITY_HIGH:         std::cout << "SEVERITY: high";         break;
-   	case GL_DEBUG_SEVERITY_MEDIUM:       std::cout << "SEVERITY: medium";       break;
-   	case GL_DEBUG_SEVERITY_LOW:          std::cout << "SEVERITY: low";          break;
-   	case GL_DEBUG_SEVERITY_NOTIFICATION: std::cout << "SEVERITY: notification"; break;
+   	case GL_DEBUG_SEVERITY_HIGH:            std::cout << "SEVERITY: high";             break;
+   	case GL_DEBUG_SEVERITY_MEDIUM:          std::cout << "SEVERITY: medium";           break;
+   	case GL_DEBUG_SEVERITY_LOW:             std::cout << "SEVERITY: low";              break;
+   	case GL_DEBUG_SEVERITY_NOTIFICATION:    std::cout << "SEVERITY: notification";     break;
 	}
    std::cout << "\n\n";
 }
 
-[[nodiscard]] String lowercase( char const *base ) {
-   String s ( base );
-   std::transform( s.begin(), s.end(), s.begin(), ::tolower );
-   return s;
-}
-
-[[nodiscard]] String uppercase( char const *base ) {
-   String s ( base );
-   std::transform( s.begin(), s.end(), s.begin(), ::toupper );
-   return s;
-}
-
-void process_mouse( GLFWwindow   *window,
-                    Viewport     &cam,
-                    SceneManager  scene,
+// function for mouse input (clicking, looking, and picking)
+void process_mouse( GLFWwindow   *window, // GLFW window is needed for input
+                    Viewport     &cam,    // cam is needed for positional info
+                    SceneManager &scene,  // scene is needed for mouse picking
                     Float32       delta_time_s )
 {
    // yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a
    // direction vector pointing to the right so we initially rotate a bit to the left.
-   static Float64 yaw         = -90.0f;
-   static Float64 pitch       =  0.0f;
-   static Float64 last_x      =  800.0f / 2.0;
-   static Float64 last_y      =  600.0 / 2.0;
-   static Bool    first_mouse = true;
+   static Float64 yaw            = -90.0f;
+   static Float64 pitch          =   0.0f;
+   static Float64 last_x         = {0}; // resolution/2;
+   static Float64 last_y         = {0}; // resolution/2;
+   static Bool    is_initialized = false;
 
    Float64 x_pos, y_pos;
-
+   // get the current cursor XY-position from the GLFW window
    glfwGetCursorPos( window, &x_pos, &y_pos );
 
-   if ( first_mouse ) {
-      last_x      = cam.forward.x;
-      last_y      = cam.forward.y;
-      first_mouse = false;
+   // this is so that in case it's the first frame, the current position
+   // is used as if it were the last position.
+   if ( !is_initialized ) {
+      last_x         = cam.forward.x;
+      last_y         = cam.forward.y;
+      is_initialized = true;
    }
 
    // mouse picking
-   if ( true ) { // getting crashes again
-      if ( glfwGetMouseButton( window, GLFW_MOUSE_BUTTON_1 ) ) {
-         Uint32     obj_id = scene.get_object_id_at_pixel(x_pos, y_pos, cam);
-         auto instance_ptr = scene.get_instance_ptr(obj_id);
-         if ( instance_ptr != nullptr ) {
-            SharedPtr<ModelInstance> model = instance_ptr;
-            model->transform( Transform::make_rotation(Vec3(0.0, 1.0, 0.0)) );
-         }
-         if constexpr ( Config::is_debugging )
+   if ( !config.is_imgui_toggled ) {                                           // ignore mouse picking if GUI is active
+      if ( glfwGetMouseButton( window, GLFW_MOUSE_BUTTON_1 ) ) {               // if the left mouse button is clicked
+         Uint32     obj_id  = scene.get_object_id_at_pixel(x_pos, y_pos, cam); // get the ID of the fragment at the
+         auto instance_ptr  = scene.get_instance_ptr(obj_id);                  // current mouse position XY-coordinate.
+         if ( instance_ptr != nullptr ) {                                      // if the return value is a nullptr,
+            SharedPtr<ModelInstance> model = instance_ptr;                     // then no valid model instance occupied
+            model->transform( Transform::make_rotation(Vec3(0.0, 0.2, 0.0)) ); // that fragment (e.g. just background).
+         }                                                                     // We then rotate the potential match as
+         if constexpr ( Config::is_debugging ) // debug terminal output:       // a simple way to get feedback.
             std::cout << "[MOUSE_PICKING]" << x_pos  << ":" << y_pos
                       << ". Model id: "    << obj_id << "\n";
       }
    }
 
-
-   Bool has_changed = last_x != x_pos || last_y != y_pos;
-
-   Float64 x_offset = x_pos - last_x;
-   Float64 y_offset = last_y - y_pos;
-   last_x           = x_pos;
-   last_y           = y_pos;
-
+   // this is for middle mouse button viewing
    if ( glfwGetMouseButton( window, GLFW_MOUSE_BUTTON_MIDDLE) != GLFW_PRESS ) {
-      if ( !g_is_mouse_look_enabled ) {
+      if ( !config.is_mouse_look_enabled ) {
          glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_NORMAL );
          return;
       }
    }
    else glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_DISABLED );
 
-
-   // 'http://justsomething.co/wp-content/uploads/2013/11/guns-replaced-thumbs-up-20.jpg'
-
    Float64 sensitivity = 0.05;
+   Float64 x_offset    = x_pos  - last_x;
+   Float64 y_offset    = last_y - y_pos;
+
+   // to avoid repeated recomputations in vain
+   Bool has_changed =  last_x != x_pos  ||  last_y != y_pos;
+
+   last_x    = x_pos; // needs to be done after has_changed
+   last_y    = y_pos; // needs to be done after has_changed
+
    x_offset *= sensitivity;
    y_offset *= sensitivity;
 
+   // euler angles for mouse rotation
    yaw   += x_offset;
    pitch += y_offset;
 
-   if ( pitch > 89.0f )
-      pitch =  89.0f;
-   if ( pitch < -89.0f )
-      pitch = -89.0f;
+   // to avoid deadlocks at 90 degree pitch
+   if ( pitch > +89.0f ) pitch = +89.0f;
+   if ( pitch < -89.0f ) pitch = -89.0f;
 
    if ( has_changed ) {
+      // cam forward is the unit vector of the camera's forward direction
       cam.forward.x = cos( glm::radians(yaw)) * cos(glm::radians(pitch) );
       cam.forward.y = sin( glm::radians(pitch)                          );
       cam.forward.z = sin( glm::radians(yaw)) * cos(glm::radians(pitch) );
-      cam.forward   = glm::normalize( cam.forward );
+      cam.forward   = glm::normalize( cam.forward );   // normalize
 
-      auto view = cam.get_view();  // get view (pos, rot, scale)
-
+      auto view     = cam.get_view();                  // get view (pos, rot, scale)
       view.look_at( cam.forward, view.get_position()); // rotate view
-      cam.set_view( view );        // update cam view
-      //Transform().set_rotation()
-
-      //auto hm = Transform(view.get_position(), cam.forward);
-      //auto hm = Transform::make_rotation(( cam.forward));
-
-      //cam.transform(hm);
-
-      //cam.transform(Transform::make_rotation(Vec3(1.0f, 0.0f, 0.0f), glm::radians(0.1f)));
-
-      //cam.transform(Transform::make_rotation(Vec3(1.0f, 0.0f, 0.0f), cam.forward.x));
-      //auto t = Transform::make_rotation(cam.forward);
-      //cam.transform(t);
-      //auto rotation = Transform::make_rotation(cam.forward);
-
-      //TODO:
-
+      cam.set_view( view );                            // update cam view
    }
 }
 
@@ -207,8 +167,8 @@ void toggle_input_callback( GLFWwindow  *window,
       glfwSetWindowShouldClose( window, true );
 
    if ( (key == GLFW_KEY_F1 )  &&  action == GLFW_PRESS ) {
-      g_is_mouse_look_enabled = !g_is_mouse_look_enabled;
-      if ( g_is_mouse_look_enabled )
+      config.is_mouse_look_enabled = !config.is_mouse_look_enabled;
+      if ( config.is_mouse_look_enabled )
          glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_DISABLED );
       else
          glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_NORMAL );
@@ -250,7 +210,7 @@ void process_input( GLFWwindow  *window,
 
    // glfwSetInputMode( window, GLFW_STICKY_KEYS, 1 );
 
-   Float32    move_distance = g_move_speed * (time_delta_ms * 1000);
+   Float32    move_distance = config.fly_move_speed * (time_delta_ms * 1000);
    Transform  offset;
 
 
@@ -299,90 +259,8 @@ void process_input( GLFWwindow  *window,
                   Vec3( 0.0f, move_distance, 0.0f )
                );
       cam.transform(offset);
-
-   }
-
-
-/*
-   if ( glfwGetKey(window, GLFW_KEY_W)            == GLFW_PRESS ) { // forward
-      cam.transform( translation * forward );
-   }
-   if ( glfwGetKey(window, GLFW_KEY_S)            == GLFW_PRESS ) { // backward
-      // auto backward = forward * Transform::make_rotation( Vec3(   0,  180,  0 ) );
-      // cam.transform( translation * backward );
-   }
-   if ( glfwGetKey(window, GLFW_KEY_A)            == GLFW_PRESS ) { // left
-      // auto left     = forward * Transform::make_rotation( Vec3(   0,  -90,  0 ) );
-      // cam.transform( translation * left );
-   }
-   if ( glfwGetKey(window, GLFW_KEY_D)            == GLFW_PRESS ) { // right
-      // auto right    = forward * Transform::make_rotation( Vec3(   0,   90,  0 ) );
-      // cam.transform( translation * right );
-   }
-   if ( glfwGetKey(window, GLFW_KEY_SPACE)        == GLFW_PRESS ) { // up
-      // auto up       = forward * Transform::make_rotation( Vec3( -90,    0,  0 ) );
-      // cam.transform( translation * up );
-   }
-   if ( glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS ) { // down
-      // auto down     = forward * Transform::make_rotation( Vec3( -90,    0,  0 ) );
-      // cam.transform( translation * down );
-   }
-*/
-}
-
-
-/*
-void process_input( GLFWwindow *window, Viewport &cam, Float32 delta ) {
-   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-      glfwSetWindowShouldClose(window, true);
-   if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS)
-      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-   if (glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS)
-      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-   if (glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS) {
-      mouse_look = !mouse_look;
-      if (mouse_look)
-         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-      else
-         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-   }
-
-   //If movement is disabled
-   if ( !mouse_look )
-      return;
-
-   // TODO: fix camera navigation
-   Float32 camspeed = g_move_speed * delta;
-   Transform offset;
-
-
-   if ( glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS ) {
-      offset = Transform::make_translation(Vec3(1.0, 1.0, camspeed )* -cam.front);
-      cam.transform( offset);
-   }
-   if ( glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS ) {
-      offset = Transform::make_translation(Vec3(-1.0, -1.0, -camspeed)* -cam.front);
-      cam.transform(offset);
-   }
-   if ( glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS ) {
-      offset = Transform::make_translation(Vec3(camspeed , 1.0, 1.0)*glm::cross(cam.front, Vec3(0.0, 1.0f, 0.0f)));
-      cam.transform(offset);
-   }
-   if ( glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS ) {
-      offset = Transform::make_translation(Vec3(-camspeed, -1.0, -1.0)* glm::cross( cam.front, Vec3(0.0, 1.0f, 0.0f)));
-      cam.transform(offset);
-   }
-   if ( glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS ) {
-      offset = Transform::make_translation(Vec3(0.0, camspeed, 0.0) );
-      cam.transform(offset);
-   }
-   if ( glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS ) {
-      offset = Transform::make_translation(Vec3(0.0, -camspeed, 0.0));
-      cam.transform(offset);
    }
 }
-*/
-
 
 
 // TODO: refactor into debug.h/cpp
@@ -391,8 +269,7 @@ void draw_camera_debug_window( Vec3    &position,
                                Float32 &fov_rad )
 {
    if ( !config.is_imgui_toggled )
-      return;
-
+      return; // early exit if IMGUI is disabled
    ImGui::Begin( "Camera:" ); // begin our Camera window:
    {  // draw our window GUI components and do I/O:
       ImGui::SliderAngle( "X-axis", &rotation.x );
@@ -412,17 +289,11 @@ void draw_camera_debug_window( Vec3    &position,
       ImGui::Spacing();
       // print our current framerate:
       ImGui::Text( "\t%.1f FPS (avg %.3f ms/frame)",
-                  ImGui::GetIO().Framerate,
-                  1000.0f / ImGui::GetIO().Framerate );
+                   ImGui::GetIO().Framerate,
+                   1000.0f / ImGui::GetIO().Framerate );
    } ImGui::End(); // end our Camera window
 }
 
-
-// void print_cwd() {
-//    char path[1024] = "";
-//    getcwd( path, 1024 );
-//    printf( "%s\n", path ); //std::filesystem::current_path().c_str() );
-// }
 
 
 Int32 main( Int32 argc, char const *argv[] ) {
@@ -446,14 +317,11 @@ Int32 main( Int32 argc, char const *argv[] ) {
 	glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
 
 	// open a window and create its OpenGL context
-	GLFWwindow *window;
-
-	window = glfwCreateWindow( Config::start_width,
-                              Config::start_height,
-                              "3D Project -- WINDOW",
-                              NULL,
-                              NULL );
-
+	GLFWwindow *window  = glfwCreateWindow( Config::start_width,
+                                           Config::start_height,
+                                           "3D Project -- WINDOW",
+                                           NULL,
+                                           NULL );
 	if ( window == NULL ) {
 		fprintf(stderr, "[ERROR] Failed to open GLFW window.\n"
 			             "        If you have an Intel GPU, they're not 4.4 compatible.\n" );
@@ -487,8 +355,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io; // wot?
- // io.configFlags |= ImGuiconfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
- // io.configFlags |= ImGuiconfigFlags_NavEnableGamepad;   // Enable Gamepad Controls
+   // io.configFlags |= ImGuiconfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
+   // io.configFlags |= ImGuiconfigFlags_NavEnableGamepad;   // Enable Gamepad Controls
 
 	// setup ImGui style
 	ImGui::StyleColorsDark();
@@ -500,23 +368,22 @@ Int32 main( Int32 argc, char const *argv[] ) {
 	glEnable( GL_DEPTH_TEST   );
 	glEnable( GL_STENCIL_TEST );
 
-   ShaderManager shader_manager{};
-   AssetManager  asset_manager{};
+   ShaderManager shader_manager {};
+   AssetManager  asset_manager  {};
 
-   auto lighting_vert_shader           { shader_manager.load_shader( "lightSha.vert" )         }; // TODO: rename files
-   auto lighting_frag_shader           { shader_manager.load_shader( "lightSha.frag" )         }; // TODO: rename files
-   auto geometry_vert_shader           { shader_manager.load_shader( "g_buffer.vert" )         }; // TODO: rename files
-   auto geometry_frag_shader           { shader_manager.load_shader( "g_buffer.frag" )         }; // TODO: rename files
-   auto geometry_geom_shader           { shader_manager.load_shader( "g_buffer.geom" )         };
-   auto geo_tess_geom_shader           { shader_manager.load_shader( "g_buffer_tess.geom" )    };
-   auto geo_tess_vert_shader           { shader_manager.load_shader( "g_buffer_tess.vert")     };
-   auto geo_tess_tesc_shader           { shader_manager.load_shader( "g_buffer.tesc")          };
-   auto geo_tess_tese_shader           { shader_manager.load_shader( "g_buffer.tese")          };
-   auto shadowdepth_vert_shader        { shader_manager.load_shader( "shadow_depth.vert" )     };
-   auto shadowdepth_frag_shader        { shader_manager.load_shader( "shadow_depth.frag" )     };
-   /* PS */ auto ps_vert_shader        { shader_manager.load_shader( "particle_system.vert" )  };
-   /* PS */ //auto ps_geom_shader { shader_manager.load_shader( "particle_system.geom" )       };
-   /* PS */ auto ps_frag_shader        { shader_manager.load_shader( "particle_system.frag" )  };
+   auto lighting_vert_shader            { shader_manager.load_shader( "lightSha.vert" )         }; // TODO: rename files
+   auto lighting_frag_shader            { shader_manager.load_shader( "lightSha.frag" )         }; // TODO: rename files
+   auto geometry_vert_shader            { shader_manager.load_shader( "g_buffer.vert" )         }; // TODO: rename files
+   auto geometry_frag_shader            { shader_manager.load_shader( "g_buffer.frag" )         }; // TODO: rename files
+   auto geometry_geom_shader            { shader_manager.load_shader( "g_buffer.geom" )         };
+   auto geo_tess_geom_shader            { shader_manager.load_shader( "g_buffer_tess.geom" )    };
+   auto geo_tess_vert_shader            { shader_manager.load_shader( "g_buffer_tess.vert")     };
+   auto geo_tess_tesc_shader            { shader_manager.load_shader( "g_buffer.tesc")          };
+   auto geo_tess_tese_shader            { shader_manager.load_shader( "g_buffer.tese")          };
+   auto shadowdepth_vert_shader         { shader_manager.load_shader( "shadow_depth.vert" )     };
+   auto shadowdepth_frag_shader         { shader_manager.load_shader( "shadow_depth.frag" )     };
+   /*  PS */ auto ps_vert_shader        { shader_manager.load_shader( "particle_system.vert" )  };
+   /*  PS */ auto ps_frag_shader        { shader_manager.load_shader( "particle_system.frag" )  };
    //*SSAO*/ auto ssao_vert_shader      { shader_manager.load_shader( "ssao.vert" )             };
    //*SSAO*/ auto ssao_main_frag_shader { shader_manager.load_shader( "ssao.frag" )             };
    //*SSAO*/ auto ssao_blur_frag_shader { shader_manager.load_shader( "ssao_blur.frag" )        };
@@ -679,7 +546,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 			   Vec3(1.3f, 1.3f, 1.3f)), true));
 
    SharedPtr<Model> floor = asset_manager.load_model("floor_8x8(1).obj");
-   
+
    //for (int i = 0; i < 256; i++) {
    //   int n = 10;
    //   model_instances.push_back(scene_manager.instantiate_model(floor,
@@ -689,7 +556,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    //         //Vec3(0.0f, 0.0, 0.0f),
    //         Vec3(5.0f, 1.0f, 5.0f)), true));
    //}
-   
+
    model_instances.push_back(scene_manager.instantiate_model(floor,
       geometry_tessellation_program,
       Transform(Vec3(0.0f, 0.0f, 0.0f),
@@ -715,11 +582,11 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
    glUseProgram(geometry_tessellation_program->get_location());
    //Set standard values and vectors, set uniform to change values through applikation
-   float displacement_factor = 2;  
-   float tess_percent = 0;
-   glUniform1f(   glGetUniformLocation(geometry_tessellation_program->get_location(), "displacement_factor"), 
+   Float32 displacement_factor =  2;
+   Float32 tess_percent        = -1;
+   glUniform1f(   glGetUniformLocation(geometry_tessellation_program->get_location(), "displacement_factor"),
                   displacement_factor);
-   
+
    glUniform1f(   glGetUniformLocation(geometry_tessellation_program->get_location(), "tess_percent"),
                   tess_percent);
 
@@ -743,8 +610,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
 /* PS */ auto ps_logic = [] ( ParticleSystem::Data &data, Float32 delta_t_ms ) {
 /* PS */    using  Particle = ParticleSystem::Data::Particle;
 /* PS */
-/* PS */    static Float32 const births_per_s       { 240.0f                 };
-/* PS */    static Float32 const ms_between_births  { 1'000.f / births_per_s };
+/* PS */    static Float32 const births_per_s       { 120.0f                 }; // if too high and Config::particle_max_count is too low,
+/* PS */    static Float32 const ms_between_births  { 1'000.f / births_per_s }; // ^ might cause the particles to be created in clusters.
 /* PS */    static Float32 const avg_lifespan_ms    { 9'000.0f               };
 /* PS */    static Float32 const avg_mass_kg        {     0.01f              };
 /* PS */    static Float32 const avg_scale          {     0.50f              };
@@ -842,7 +709,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
       // TODO: bryt ut till debug
       if ( config.is_imgui_toggled ) {
          ImGui::Begin( "Settings:" );
-         ImGui::SliderFloat( "Move speed", &g_move_speed, 0.0f, 25.0f );
+         ImGui::SliderFloat( "Move speed", &config.fly_move_speed, 0.0f, 25.0f );
          ImGui::End();
 
          ImGui::Begin("Tessellation Settings:");

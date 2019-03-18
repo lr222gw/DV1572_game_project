@@ -18,9 +18,9 @@ struct Config {
    static constexpr Int32     start_height =  768,
                               start_width  = 1024;
 
-   static constexpr Uint32    particle_max_count = 8192;
-   static constexpr Uint32    ssao_kernel_count  =   64;   // needs to be equal to ssao.frag::kernel_size!
-   static constexpr Uint32    ssao_noise_side    =    8;   // needs to be equal to ssao.frag::noise_side & ssao_blur.frag::noise_side!
+   static constexpr Uint32    particle_max_count = 2048;
+   static constexpr Uint32    ssao_kernel_count  =   64; // needs to be equal to ssao.frag::kernel_size!
+   static constexpr Uint32    ssao_noise_side    =    8; // needs to be equal to ssao.frag::noise_side & ssao_blur.frag::noise_side!
    static constexpr Float32   ssao_scale_growth_factor  = 1 / ssao_kernel_count;
 
    static constexpr Float32   near_plane         =  0.001f,
@@ -39,10 +39,11 @@ struct Config {
    static String const texture_path; //TODO: unneeded?
 
 /*------------------------------ global variables -------------------------------*/
-
-   Bool is_wireframe_mode = false; // used in SceneManager::Draw()
-   Bool is_imgui_toggled  = false;
-   RenderMode render_mode = RenderMode::composite;
+   Bool        is_wireframe_mode     = false; // used in SceneManager::Draw()
+   Bool        is_imgui_toggled      = false;
+   Bool        is_mouse_look_enabled = false;
+   Float32     fly_move_speed        = 25.0f; // TODO: revamp!
+   RenderMode  render_mode           = RenderMode::composite;
 
 
 } extern config; // <- our global Config instance declaration, defined in Config.cpp

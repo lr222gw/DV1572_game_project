@@ -16,7 +16,7 @@ void ParticleSystem::_sort_back_to_front( Vec3 const &view_position ) { // @TODO
 
 // translates the CPU-side particle data (AoS) to VBO data (contiguous; SoA)
 void ParticleSystem::_update_vbo_data() {
-   assert( _particles.count < Data::capacity && "Out of bounds!" );
+   assert( _particles.count <= Data::capacity && "Out of bounds!" );
    for ( auto i = 0;  i < _particles.count;  ++i ) {
       _colour_vbo_data[i][0] = _particles.data[i].colour[0]; // red
       _colour_vbo_data[i][1] = _particles.data[i].colour[1]; // green
@@ -51,14 +51,16 @@ GLuint ParticleSystem::_generate_billboard_vbo() {
    return location;
 }
 
-void ParticleSystem::_partition() {
+void ParticleSystem::_partition() { // TODO: move into Data
    // TODO: combine with sorting
    auto new_end = std::partition(  _particles.data,
-                                  &_particles.data[_particles.count],
+                                  &_particles.data[_particles.capacity],
                                   [] ( Data::Particle const& p ) {
                                      return p.time_ms_left > 0.0f;
                                   } );
-   _particles.count = new_end - _particles.data;
+   if ( new_end == &_particles.data[Config::particle_max_count] )
+      _particles.count   = Config::particle_max_count;
+   else _particles.count = std::distance( &_particles.data[0], new_end ); // TODO: undersök
 }
 
 
@@ -67,11 +69,11 @@ ParticleSystem::ParticleSystem( Transform              &&transform,
                                 TextureSet               textures,
                                 UpdateAlgorithm          updater,
                                 InitializationAlgorithm  initializer ):
-   _is_running        ( false                     ),
-   _transform         ( std::move(transform)      ),
-   _initializer       ( initializer               ),
-   _updater           ( updater                   ),
-   _textures          ( textures                  )
+   _is_running        ( false                ),
+   _transform         ( std::move(transform) ),
+   _initializer       ( initializer          ),
+   _updater           ( updater              ),
+   _textures          ( textures             )
 {
 // Initialize particle data
    _initializer( _particles );
@@ -128,11 +130,12 @@ ParticleSystem::~ParticleSystem() {
 
 // Updater
 void ParticleSystem::update( Float32 delta_time_ms ) {
-   if ( !_is_running ) return;
+   if ( !_is_running )
+      return;
 
 // Run update algorithm to update particle data:
-   _updater( _particles, delta_time_ms );
    _partition();
+   _updater( _particles, delta_time_ms );
 }
 
 
@@ -146,7 +149,7 @@ void ParticleSystem::draw( Vec3 const &viewport_position,  ShaderProgram &shader
 
    glBindVertexArray( _vao_loc );
 
-   
+
 
    TextureSet::ScopedBindGuard pin { _textures, shader_program }; // RAII
 
@@ -248,7 +251,6 @@ void ParticleSystem::stop() {
    _is_running = false;
 }
 
-
 void ParticleSystem::set_state( Bool state ) {
    _is_running = state;
 }
@@ -278,7 +280,14 @@ Transform const & ParticleSystem::get_transform() const {
 }
 
 void ParticleSystem::Data::add( Particle p ) {
+   static Uint32 id = 0;
+   std::cout << "[creating particle] ID:[#" << id++ << "]. Count was: " << count;
+
    if ( count < capacity )
-      data[count] = std::move( p );
-   ++count;
+      data[count++] = std::move( p );
+
+   std::cout << ", after: " << count;
+   if ( id == 511 || count == 511 )
+      std::cout << " ";
+   std::cout << "\n";
 }

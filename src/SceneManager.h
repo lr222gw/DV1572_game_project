@@ -60,6 +60,13 @@ public:
    //* SSAO */ , SharedPtr<ShaderProgram> ssao_blur_shader
                );
 
+   SceneManager()                                       = delete;
+   SceneManager(SceneManager const & )                  = delete;
+   SceneManager(SceneManager      && )                  = delete;
+   SceneManager const& operator=(SceneManager const & ) = delete;
+   SceneManager const& operator=(SceneManager      && ) = delete;
+  ~SceneManager() {};
+
    Uint32 get_object_id_at_pixel( Uint32 x, Uint32 y, Viewport & ) const;
 
    SharedPtr<ModelInstance> get_instance_ptr( Uint32 obj_id );
@@ -104,6 +111,10 @@ private:
    void                 _lights_to_gpu();
    void                 _render_to_quad();
    void                 _sort_by_distance( Viewport const & );
+
+   static void   _initialize_quad_vao();
+   static GLuint _quad_vao;
+   static GLuint _quad_vbo;
 };
 
 

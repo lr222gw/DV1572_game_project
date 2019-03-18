@@ -1,5 +1,8 @@
 #include "SceneManager.h"
 
+GLuint SceneManager::_quad_vao {};
+GLuint SceneManager::_quad_vbo {};
+
 SharedPtr<ModelInstance> SceneManager::instantiate_model(
    SharedPtr<Model>          model,
    SharedPtr<ShaderProgram>  shader_program,
@@ -111,10 +114,6 @@ void SceneManager::update( Float32 delta_time_ms ) {
             ps.lock()->update( delta_time_ms );
 }
 
-
-
-
-
 // TODO: use ShaderProgram::use()
 void SceneManager::draw( Viewport &view ) {
    if ( _should_sort_front_to_back ) {
@@ -127,7 +126,7 @@ void SceneManager::draw( Viewport &view ) {
    auto lighting_pass_loc = _lighting_shader_program->get_location();
    auto geometry_pass_loc = _geometry_shader_program->get_location();
 
-  
+
 
    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -292,56 +291,59 @@ void SceneManager::draw( Viewport &view ) {
    _render_to_quad();
 }
 
+
+void SceneManager::_initialize_quad_vao() {
+   static Bool has_run = false;
+
+   if ( has_run )
+      return; // early exit
+
+   Float32 quad_verts[] = { // NOTE: try setting as static in case of error?
+      //   X      Y     Z       U     V
+         -1.0f,  1.0f, 0.0f,   0.0f, 1.0f,
+         -1.0f, -1.0f, 0.0f,   0.0f, 0.0f,
+          1.0f,  1.0f, 0.0f,   1.0f, 1.0f,
+          1.0f, -1.0f, 0.0f,   1.0f, 0.0f,
+   };
+
+   // setup plane VAO
+   glGenVertexArrays( 1, &_quad_vao );
+   glGenBuffers(      1, &_quad_vbo );
+
+   glBindVertexArray( _quad_vao );
+   glBindBuffer( GL_ARRAY_BUFFER, _quad_vbo );
+
+   glBufferData( GL_ARRAY_BUFFER,
+                 sizeof(quad_verts),
+                 &quad_verts,
+                 GL_STATIC_DRAW);
+
+   glEnableVertexAttribArray(0);
+
+   // screen 2D position
+   glVertexAttribPointer( 0,
+                          3,
+                          GL_FLOAT,
+                          GL_FALSE,
+                          5 * sizeof(Float32), // X,Y,Z,U,V = 5 Float32 channels
+                          (void*)0);
+
+   glEnableVertexAttribArray(1);
+
+   // screen 2D UV
+   glVertexAttribPointer( 1,
+                          2,
+                          GL_FLOAT,
+                          GL_FALSE,
+                          5 * sizeof(Float32),
+                          (void*)(3 * sizeof(Float32)));
+}
+
+
+
 void SceneManager::_render_to_quad() {
-
-   static Uint32  quad_vao = 0;
-   static Uint32  quad_vbo;
-
-   if ( 0 == quad_vao ) {
-      Float32 quad_verts[] = {
-         //   X      Y     Z       U     V
-            -1.0f,  1.0f, 0.0f,   0.0f, 1.0f,
-            -1.0f, -1.0f, 0.0f,   0.0f, 0.0f,
-             1.0f,  1.0f, 0.0f,   1.0f, 1.0f,
-             1.0f, -1.0f, 0.0f,   1.0f, 0.0f,
-      };
-
-      // setup plane VAO
-      glGenVertexArrays(1, &quad_vao);
-      glGenBuffers(1, &quad_vbo);
-      glBindVertexArray(quad_vao);
-
-      glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
-
-      glBufferData(GL_ARRAY_BUFFER,
-         sizeof(quad_verts),
-         &quad_verts,
-         GL_STATIC_DRAW);
-
-      glEnableVertexAttribArray(0);
-
-      //Screen 2D Pos
-      glVertexAttribPointer(0,
-         3,
-         GL_FLOAT,
-         GL_FALSE,
-         5 * sizeof(Float32), // X,Y,Z,U,V = 5 Float32 channels
-         (void*)0);
-
-      glEnableVertexAttribArray(1);
-
-      //Screen 2D uv
-      glVertexAttribPointer( 1,
-                             2,
-                             GL_FLOAT,
-                             GL_FALSE,
-                             5 * sizeof(Float32),
-                             (void*)(3 * sizeof(Float32)));
-   }
-   glBindVertexArray( quad_vao );
-
+   glBindVertexArray( _quad_vao );
    glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
-
    glBindVertexArray(0);
 }
 
@@ -582,6 +584,7 @@ SceneManager::SceneManager( SharedPtr<ShaderProgram> geo_pass
 //*SSAO*/_ssao_blur_shader             ( ssao_blur_shader     ),
          _num_lights                   ( 0                    )
 {
+   _initialize_quad_vao();
    _init_depth_map_FBO();
 }
 

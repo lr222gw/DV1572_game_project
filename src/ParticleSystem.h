@@ -30,8 +30,6 @@
       // }
 
 
-
-
 class ParticleSystem {
 public:
    using Rgba = GLubyte[4];
@@ -51,9 +49,9 @@ public:
 
       void add( Particle );
 
-      static Uint32 constexpr capacity       = { Config::particle_max_count };
-      Particle                data[capacity] = {};
-      Uint32                  count          = { 0 };
+      static Uint32 constexpr  capacity        { Config::particle_max_count };
+      Particle                 data[capacity]  {};
+      Uint32                   count           { 0 };
    };
 
    using InitializationAlgorithm = std::function< void( Data & ) >;
