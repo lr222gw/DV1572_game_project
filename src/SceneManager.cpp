@@ -441,7 +441,7 @@ void SceneManager::draw_debug_scene_inspection() {
    } ImGui::End(); // end our Inspection window
 }
 
-void SceneManager::set_shadowcasting(SharedPtr<Shadowcaster> light)
+void SceneManager::set_shadowcasting( SharedPtr<Shadowcaster> light )
 {
    //TODO: If-statement to check validity of light, is it directional?
    use_depth_map_FBO();
