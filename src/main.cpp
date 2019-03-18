@@ -672,18 +672,24 @@ Int32 main( Int32 argc, char const *argv[] ) {
                                                      Vec3(       1.3f,  1.3f,        1.3f ) ) ) );
    }
 
-   SharedPtr<Model> floor = asset_manager.load_model("floor.obj");
+   SharedPtr<Model> floor = asset_manager.load_model("floor_8x8(1).obj");
    
-   for (int i = 0; i < 256; i++) {
-      int n = 10;
-      model_instances.push_back(scene_manager.instantiate_model(floor,
-         geometry_tessellation_program,
-         Transform(Vec3(n*(i / 16) - 80, -1.0f, n*(i % 16) - 80),
-            Vec3(0.0f, 0.0f, 0.0f),
-            //Vec3(0.0f, 0.0, 0.0f),
-            Vec3(5.0f, 1.0f, 5.0f)), true));
-   }
+   //for (int i = 0; i < 256; i++) {
+   //   int n = 10;
+   //   model_instances.push_back(scene_manager.instantiate_model(floor,
+   //      geometry_tessellation_program,
+   //      Transform(Vec3(n*(i / 16) - 80, -1.0f, n*(i % 16) - 80),
+   //         Vec3(0.0f, 0.0f, 0.0f),
+   //         //Vec3(0.0f, 0.0, 0.0f),
+   //         Vec3(5.0f, 1.0f, 5.0f)), true));
+   //}
    
+   model_instances.push_back(scene_manager.instantiate_model(floor,
+      geometry_tessellation_program,
+      Transform(Vec3(0.0f, -1.5f, 0.0f),
+         Vec3(0.0f, 0.0f, 0.0f),
+         //Vec3(0.0f, 0.0, 0.0f),
+         Vec3(10.0f, 1.0f, 10.0f)), true));
 
 
    //Tool to see more clearly how Light frustrum looks like
@@ -702,7 +708,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    /* TODO */ //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
    glUseProgram(geometry_tessellation_program->get_location());
-   float displacement_factor = 1; 
+   float displacement_factor = 3; 
    float tess_percent = 0;
    glUniform1f(   glGetUniformLocation(geometry_tessellation_program->get_location(), "displacement_factor"), 
                   displacement_factor);

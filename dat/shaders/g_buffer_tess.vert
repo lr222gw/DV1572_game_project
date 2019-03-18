@@ -21,11 +21,9 @@ void main() {
 
 	tbn_tc = mat3(tang, btan, norm);
 
+	//Output for vertex to Tessepipeline should not be in ClipSpace...
 	vec4 pos_world = model_transform * vec4( pos_vs, 1.0 );
 	pos_tc         = pos_world.xyz;
-
-	//Output for vertex to Tessepipeline should not be in ClipSpace...
-	//TODO: problem? Raden under kanske ska vara enabled
 	gl_Position    = pos_world;
 	//gl_Position    = projection * view  * pos_world;
 }
