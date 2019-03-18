@@ -175,12 +175,12 @@ void Viewport::_g_buffer_init() {
    // setting minifier:
    glTexParameteri( GL_TEXTURE_2D,
                     GL_TEXTURE_MIN_FILTER,
-                    GL_NEAREST );
+                    GL_LINEAR );
 
    // setting magnifier:
    glTexParameteri( GL_TEXTURE_2D,
                     GL_TEXTURE_MAG_FILTER,
-                    GL_NEAREST );
+                    GL_LINEAR );
 
    // attach the texture id to currently bound g-buffer
    glFramebufferTexture2D( GL_FRAMEBUFFER,
@@ -208,12 +208,12 @@ void Viewport::_g_buffer_init() {
    // sitting minifier:
    glTexParameteri( GL_TEXTURE_2D,
                     GL_TEXTURE_MIN_FILTER,
-                    GL_NEAREST );
+                    GL_LINEAR );
 
    // setting magnifier:
    glTexParameteri( GL_TEXTURE_2D,
                     GL_TEXTURE_MAG_FILTER,
-                    GL_NEAREST );
+                    GL_LINEAR );
 
    // attach the texture id for spec to Currently bound g-buffer
    glFramebufferTexture2D( GL_FRAMEBUFFER,
@@ -242,12 +242,12 @@ void Viewport::_g_buffer_init() {
    // setting minifier:
    glTexParameteri( GL_TEXTURE_2D,
                     GL_TEXTURE_MIN_FILTER,
-                    GL_NEAREST );
+                    GL_LINEAR );
 
    // setting magnifier:
    glTexParameteri( GL_TEXTURE_2D,
                     GL_TEXTURE_MAG_FILTER,
-                    GL_NEAREST );
+                    GL_LINEAR );
 
    // describe and attatch the texture id for norm to Currently bound g-buffer
    glFramebufferTexture2D( GL_FRAMEBUFFER,
@@ -277,12 +277,12 @@ void Viewport::_g_buffer_init() {
    // setting minifier:
    glTexParameteri( GL_TEXTURE_2D,
                     GL_TEXTURE_MIN_FILTER,
-                    GL_NEAREST );
+                    GL_LINEAR );
 
    // setting magnifier:
    glTexParameteri( GL_TEXTURE_2D,
                     GL_TEXTURE_MAG_FILTER,
-                    GL_NEAREST );
+                    GL_LINEAR );
 
    // attach the texture id to currently bound g-buffer
    glFramebufferTexture2D( GL_FRAMEBUFFER,
@@ -311,12 +311,12 @@ void Viewport::_g_buffer_init() {
    // setting minifier:
    glTexParameteri( GL_TEXTURE_2D,
                     GL_TEXTURE_MIN_FILTER,
-                    GL_NEAREST );
+                    GL_LINEAR );
 
    // setting magnifier:
    glTexParameteri( GL_TEXTURE_2D,
                     GL_TEXTURE_MAG_FILTER,
-                    GL_NEAREST );
+                    GL_LINEAR );
 
    // attach the texture id to currently bound g-buffer
    glFramebufferTexture2D( GL_FRAMEBUFFER,

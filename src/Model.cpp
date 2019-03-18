@@ -37,6 +37,7 @@ void Model::_load_model( String const &filename ) {
    }
 
    _process_node( scene->mRootNode, scene );
+   importer.FreeScene();
 }
 
 void Model::_process_node( aiNode *node,  aiScene const *scene ) {
