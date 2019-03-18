@@ -662,7 +662,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    //   Vec3(.3f, .3f, .3f))));
 
    model_instances.reserve( 64 );
-   for ( auto i=0;  i<64;  ++i ) {
+   for ( auto i=0;  i<63;  ++i ) {
       Float32 n = 9; // spacing
       model_instances.push_back(
          scene_manager.instantiate_model( ape_model,
@@ -671,6 +671,12 @@ Int32 main( Int32 argc, char const *argv[] ) {
                                                      Vec3(       0.0f,  0.0f,        0.0f ),
                                                      Vec3(       1.3f,  1.3f,        1.3f ) ) ) );
    }
+   model_instances.push_back(
+	   scene_manager.instantiate_model(ape_model,
+		   geometry_tessellation_program,
+		   Transform(Vec3(9*(63 / 8) - 40, 0.0f, 9*(63 % 8) - 40),
+			   Vec3(0.0f, 0.0f, 0.0f),
+			   Vec3(1.3f, 1.3f, 1.3f)), true));
 
    SharedPtr<Model> floor = asset_manager.load_model("floor_8x8(1).obj");
    
