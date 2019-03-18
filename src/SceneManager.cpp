@@ -127,14 +127,18 @@ void SceneManager::draw( Viewport &view ) {
    auto lighting_pass_loc = _lighting_shader_program->get_location();
    auto geometry_pass_loc = _geometry_shader_program->get_location();
 
+  
+
+   //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
+
    //TODO: Make modelinstance supply unique ID to Callback Function and then in CAllback function compare the boundingbox of the modelinstance with the frustrum of all the active shadowcasters and recalculate shadowmap for any intersections
-   if ( _should_recalculate_shadowmap ) {
+   if (_should_recalculate_shadowmap) {
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       this->update_shadowmap();
       _should_recalculate_shadowmap = false;
    }
-
-   //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
    _tessellation_shader_program->use();
    /*CHANGE*/ view.bind_shader_program(_tessellation_shader_program);
@@ -144,8 +148,6 @@ void SceneManager::draw( Viewport &view ) {
    glUniform3fv(glGetUniformLocation(_tessellation_shader_program->get_location(), "view_pos"),
       1,
       glm::value_ptr(view_pos));
-
-
 
 
   /*CHANGE*/ _geometry_shader_program->use(); // glUseProgram( geometry_pass_loc );
@@ -540,7 +542,7 @@ void SceneManager::update_shadowmap()
       //glActiveTexture(GL_TEXTURE0/*+ count*/);
 
       //Render from light pov
-      for ( auto &instance : _instances ) {
+      for ( auto &instance : _instances ) { //TODO: Fix Shadowcasting for tessellated models
          if ( !instance.expired() ) {
             auto model    = instance.lock();
             auto previous = model->get_shader_program();

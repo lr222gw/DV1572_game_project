@@ -692,7 +692,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    
    model_instances.push_back(scene_manager.instantiate_model(floor,
       geometry_tessellation_program,
-      Transform(Vec3(0.0f, -1.5f, 0.0f),
+      Transform(Vec3(0.0f, 0.0f, 0.0f),
          Vec3(0.0f, 0.0f, 0.0f),
          //Vec3(0.0f, 0.0, 0.0f),
          Vec3(10.0f, 1.0f, 10.0f)), true));
@@ -714,7 +714,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
    /* TODO */ //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
    glUseProgram(geometry_tessellation_program->get_location());
-   float displacement_factor = 3; 
+   //Set standard values and vectors, set uniform to change values through applikation
+   float displacement_factor = 2;  
    float tess_percent = 0;
    glUniform1f(   glGetUniformLocation(geometry_tessellation_program->get_location(), "displacement_factor"), 
                   displacement_factor);
@@ -845,7 +846,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
          ImGui::End();
 
          ImGui::Begin("Tessellation Settings:");
-         ImGui::SliderFloat("Displacement Factor: ", &displacement_factor, 0.0f, 10.0f);
+         ImGui::SliderFloat("Displacement Factor: ", &displacement_factor, -10.0f, 10.0f);
          ImGui::SliderFloat("Tessellation level Percent: ", &tess_percent, -1.0f, 1.0f);
          ImGui::End();
 
