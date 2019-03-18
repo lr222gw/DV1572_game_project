@@ -49,8 +49,10 @@ void main()
 
 	//sample displacementmap based on interpolated uv_coords
 	vec4 displacement = texture(tex_disp, uv_gs );
+
 	//Apply displacement on interpolated position
-	pos_gs += normal * displacement.xyz * displacement_factor;
+	vec3 halfvec = vec3(.5f,.5f,.5f); // halfvec makes our displacement value go up and down
+	pos_gs += normal * ((displacement.xyz-halfvec)*2) * displacement_factor; //Multiply by 2 to get the right displacementLevel...
 
 	gl_Position = projection * view * vec4(pos_gs,1.0f);
 
