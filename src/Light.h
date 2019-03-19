@@ -123,7 +123,7 @@ public:
    Light( std::function<void(Uint64)>  on_destruction_callback,
           std::function<void(Uint64)>  on_change_callback,
           Uint64                       id,
-          Light::Data const           &data )
+          Light::Data            &data ) //Change to non-const, need pointers  in ShadowcasterDebug
    :
       _on_destruction_callback ( on_destruction_callback ),
       _on_change_callback      ( on_change_callback      ),
@@ -164,6 +164,8 @@ private:
    Data                        _data;
 
 public:
-   Data   const &data; // <- publicly exposed const data  // TODO: decide on this or above
+
+   //TODO: data is set to non-const, used in ShadowMapDebugger
+   Data      &data; // <- publicly exposed const data  // TODO: decide on this or above
    Uint64 const id;                                       // TODO: decide on this or above
 };

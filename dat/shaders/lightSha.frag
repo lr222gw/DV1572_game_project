@@ -106,6 +106,9 @@ void main() {
               lighting = vec3(1.0, 0.0, 1.0 ); // TODO
            }
            else if ( light.type == directional_light_t ) {
+
+				light.dir = normalize(light.pos- light.dir) ;
+
       			vec3 normal  = norm;
       			// ambient
       			vec3 ambient = light.rgb * vec3(0.2);
