@@ -1,12 +1,12 @@
 #version 440 core
-layout ( triangles    ) in;
+layout ( triangles ) in;
 layout ( triangle_strip, max_vertices = 3) out;
 
-in vec2 uv_gs[];
+in vec2  uv_gs[];
 in vec3 pos_gs[];
 in mat3 tbn_gs[];
 
-out vec2 uv_fs;
+out vec2  uv_fs;
 out vec3 pos_fs;
 out mat3 tbn_fs;
 
@@ -25,7 +25,7 @@ void main(void) {
 	float result   = max( dot( normalize(normal), vector_a ), 0 );
 
 
-	//TODO: Interpolera vertricerna here? 
+	//TODO: Interpolera vertricerna here?
 	if(result > 0.0 ){ //TODO: REMOVE AFTER DEMO
 
 	    gl_Position = gl_in[0].gl_Position;

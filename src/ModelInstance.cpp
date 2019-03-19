@@ -21,21 +21,22 @@ ModelInstance::ModelInstance( SharedPtr<Model>   model,
 
 void ModelInstance::draw() {
    // transfer transform (model) matrix to the shader pogram:
-
    _shader_program->use();
+
    glUniformMatrix4fv( _shader_program->get_transform_location(),
                        1,
                        GL_FALSE,
-                       &(_transform.matrix[0][0]));
+                       &(_transform.matrix[0][0]) );
    // convert ID to RGBA color:
-   Vec4 id_as_rgba { (Float32((id) >> 0  & 0xFF)) / 255,
-                     (Float32((id) >> 8  & 0xFF)) / 255,
+   Vec4 id_as_rgba { (Float32((id) >>  0 & 0xFF)) / 255,
+                     (Float32((id) >>  8 & 0xFF)) / 255,
                      (Float32((id) >> 16 & 0xFF)) / 255,
                      (Float32((id) >> 24 & 0xFF)) / 255 };
+
    // index for picking
-   glUniform4fv(glGetUniformLocation(_shader_program->get_location(), "obj_id"),
-      1,
-      glm::value_ptr(id_as_rgba));
+   glUniform4fv( glGetUniformLocation(_shader_program->get_location(), "obj_id"),
+                 1,
+                 glm::value_ptr(id_as_rgba));
    // draw model:
    _model->_draw( *_shader_program, _is_tessellation_enabled );
 }

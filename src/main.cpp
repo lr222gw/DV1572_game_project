@@ -259,7 +259,8 @@ void process_input( GLFWwindow  *window,
 }
 
 
-// TODO: refactor into debug.h/cpp
+// (currently deprecated) TODO: refactor into debug.h/cpp
+[[deprecated]]
 void draw_camera_debug_window( Vec3    &position,
                                Vec3    &rotation,
                                Float32 &fov_rad )
@@ -299,10 +300,9 @@ Int32 main( Int32 argc, char const *argv[] ) {
 		fprintf( stderr, "[ERROR] Failed to initialize GLFW.\n" );
 		return -1;
 	}
-
-	// 4xAA
-	glfwWindowHint( GLFW_SAMPLES, 4 );
-	// GLSL v130
+	// MSAA
+	glfwWindowHint( GLFW_SAMPLES, GLFW_DONT_CARE );
+	// GLSL v440
 	char const *glsl_version = "#version 440";
 	// OpenGL v4.4
 	glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 4 );
@@ -311,7 +311,6 @@ Int32 main( Int32 argc, char const *argv[] ) {
 	glfwWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE );
 	// use OpenGL core profile
 	glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
-
 	// open a window and create its OpenGL context
 	GLFWwindow *window  = glfwCreateWindow( Config::start_width,
                                            Config::start_height,
@@ -334,25 +333,20 @@ Int32 main( Int32 argc, char const *argv[] ) {
 		return -1;
 	}
 
-	// ensure we can capture the escape key being pressed below
-	glfwSetInputMode( window, GLFW_STICKY_KEYS, 1 );
-   // glfwSetCursorPosCallback(window, mouse_callback); // TODO: make a call back matching template that calls on our process_mouse();
-   glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-   // glfwSetCursorPosCallback(window, process_mouse);
-   glfwSetKeyCallback( window, toggle_input_callback);
+	// setup input
+   glfwSetInputMode(   window, GLFW_CURSOR, GLFW_CURSOR_NORMAL );
+   glfwSetKeyCallback( window, toggle_input_callback );
 
-   // for enabeling opengl debugging
-   glEnable(GL_DEBUG_OUTPUT);
-   glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-   glDebugMessageCallback(glDebugOutput, nullptr);
-   glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+   // for enabling OpenGL debugging
+   glEnable( GL_DEBUG_OUTPUT );
+   glEnable( GL_DEBUG_OUTPUT_SYNCHRONOUS );
+   glDebugMessageCallback( glDebugOutput, nullptr );
+   glDebugMessageControl( GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE );
 
 	// ImGui context setup
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO(); (void)io; // wot?
-   // io.configFlags |= ImGuiconfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
-   // io.configFlags |= ImGuiconfigFlags_NavEnableGamepad;   // Enable Gamepad Controls
+	ImGuiIO& io = ImGui::GetIO(); (void)io; // last part just disables -Wunused-variable warning
 
 	// setup ImGui style
 	ImGui::StyleColorsDark();
@@ -362,15 +356,16 @@ Int32 main( Int32 argc, char const *argv[] ) {
 	ImGui_ImplOpenGL3_Init( glsl_version );
 
 	glEnable( GL_DEPTH_TEST   );
-	glEnable( GL_STENCIL_TEST );
+	glEnable( GL_STENCIL_TEST ); // TODO: implement support for stencil test for g-buffer
 
    ShaderManager shader_manager {};
    AssetManager  asset_manager  {};
 
-   auto lighting_vert_shader            { shader_manager.load_shader( "lightSha.vert" )         }; // TODO: rename files
-   auto lighting_frag_shader            { shader_manager.load_shader( "lightSha.frag" )         }; // TODO: rename files
-   auto geometry_vert_shader            { shader_manager.load_shader( "g_buffer.vert" )         }; // TODO: rename files
-   auto geometry_frag_shader            { shader_manager.load_shader( "g_buffer.frag" )         }; // TODO: rename files
+   // TODO: consistent names
+   auto lighting_vert_shader            { shader_manager.load_shader( "lightSha.vert" )         };
+   auto lighting_frag_shader            { shader_manager.load_shader( "lightSha.frag" )         };
+   auto geometry_vert_shader            { shader_manager.load_shader( "g_buffer.vert" )         };
+   auto geometry_frag_shader            { shader_manager.load_shader( "g_buffer.frag" )         };
    auto geometry_geom_shader            { shader_manager.load_shader( "g_buffer.geom" )         };
    auto geo_tess_geom_shader            { shader_manager.load_shader( "g_buffer_tess.geom" )    };
    auto geo_tess_vert_shader            { shader_manager.load_shader( "g_buffer_tess.vert")     };
@@ -384,10 +379,12 @@ Int32 main( Int32 argc, char const *argv[] ) {
    //*SSAO*/ auto ssao_main_frag_shader { shader_manager.load_shader( "ssao.frag" )             };
    //*SSAO*/ auto ssao_blur_frag_shader { shader_manager.load_shader( "ssao_blur.frag" )        };
 
+   //* SSAO */ auto ssao_main_program { shader_manager.create_program({ ssao_vert_shader, ssao_main_frag_shader }) };
+   //* SSAO */ auto ssao_blur_program { shader_manager.create_program({ ssao_vert_shader, ssao_blur_frag_shader }) };
 
-   auto geometry_program      { shader_manager.create_program( { geometry_frag_shader,
-                                                                 geometry_geom_shader,
-                                                                 geometry_vert_shader } ) };
+   auto geometry_program { shader_manager.create_program( { geometry_frag_shader,
+                                                            geometry_geom_shader,
+                                                            geometry_vert_shader } ) };
 
    auto geometry_tessellation_program{ shader_manager.create_program({  geometry_frag_shader,
                                                                         geo_tess_geom_shader,
@@ -395,106 +392,99 @@ Int32 main( Int32 argc, char const *argv[] ) {
                                                                         geo_tess_tesc_shader,
                                                                         geo_tess_tese_shader}) };
 
-   auto lighting_program      { shader_manager.create_program({ lighting_frag_shader, lighting_vert_shader }) };
+   auto lighting_program    { shader_manager.create_program({ lighting_frag_shader, lighting_vert_shader }) };
 
-   auto shadowdepth_program   { shader_manager.create_program({ shadowdepth_frag_shader, shadowdepth_vert_shader }) };
+   auto shadowdepth_program { shader_manager.create_program({ shadowdepth_frag_shader, shadowdepth_vert_shader }) };
 
-   auto particle_program      { shader_manager.create_program({ ps_vert_shader, ps_frag_shader }) };    /* @TAG{PS} */
+   auto particle_program    { shader_manager.create_program({ ps_vert_shader, ps_frag_shader }) }; /* @TAG{PS} */
 
-   //* SSAO */ auto ssao_main_program { shader_manager.create_program({ ssao_vert_shader, ssao_main_frag_shader }) };
-   //* SSAO */ auto ssao_blur_program { shader_manager.create_program({ ssao_vert_shader, ssao_blur_frag_shader }) };
-
-   //Add Lightning program to Scenemanager
+   // add Lightning shader program to SceneManager
    SceneManager  scene_manager { geometry_program
                                , geometry_tessellation_program
                                , lighting_program
                                , shadowdepth_program
                                , particle_program /* @TAG{PS} */
-                     //* SSAO */, ssao_main_program
-                     //* SSAO */, ssao_blur_program
+                    //* SSAO */, ssao_main_program
+                    //* SSAO */, ssao_blur_program
                                };
 
-   Vector<SharedPtr<Light>> light_instances;
+   Vector<SharedPtr<Light>> light_instances; // keeps light instances alive & enables access
 
    light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,
-                                                               Vec3(  0.0f,   0.0f,   0.0f ),
-                                                               Vec3( 10.0f,  10.0f,  10.0f ),
-                                                               Vec3(  1.0f,   0.0f,   0.0f ),
-                                                                0.1,
-                                                               14.0,
-                                                                0.0,
-                                                                1.0 } ) );
+                                                                             Vec3(  0.0f,   0.0f,   0.0f ),
+                                                                             Vec3( 10.0f,  10.0f,  10.0f ),
+                                                                             Vec3(  1.0f,   0.0f,   0.0f ),
+                                                                              0.1,
+                                                                             14.0,
+                                                                              0.0,
+                                                                              1.0 } ) );
 
    light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,
-                                                  Vec3( 0.0f,  0.0f,  0.0f ),
-                                                  Vec3( 1.0f,  4.0f,  5.0f ),
-                                                  Vec3( 1.0f,  1.0f,  0.0f ),
-                                                  0.1,
-                                                  7.0,
-                                                  0.0,
-                                                  1.0 } ) );
+                                                                             Vec3( 0.0f,  0.0f,  0.0f ),
+                                                                             Vec3( 1.0f,  4.0f,  5.0f ),
+                                                                             Vec3( 1.0f,  1.0f,  0.0f ),
+                                                                             0.1,
+                                                                             7.0,
+                                                                             0.0,
+                                                                             1.0 } ) );
 
    light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,
-                                                  Vec3( 0.0f,  0.0f,  0.0f ),
-                                                  Vec3( 2.0f,  1.0f,  5.0f ),
-                                                  Vec3( 1.0f,  0.0f,  1.0f ),
-                                                   0.1,
-                                                  17.0,
-                                                   0.0,
-                                                   1.0} ) );
+                                                                             Vec3( 0.0f,  0.0f,  0.0f ),
+                                                                             Vec3( 2.0f,  1.0f,  5.0f ),
+                                                                             Vec3( 1.0f,  0.0f,  1.0f ),
+                                                                              0.1,
+                                                                             17.0,
+                                                                              0.0,
+                                                                              1.0} ) );
 
    light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,
-                                                  Vec3( 0.0f,  0.0f,  0.0f ),
-                                                  Vec3( 1.0f,  5.0f,  6.0f ),
-                                                  Vec3( 0.0f,  1.0f,  0.0f ),
-                                                   0.1,
-                                                  11.0,
-                                                   0.0,
-                                                   1.0 } ) );
+                                                                             Vec3( 0.0f,  0.0f,  0.0f ),
+                                                                             Vec3( 1.0f,  5.0f,  6.0f ),
+                                                                             Vec3( 0.0f,  1.0f,  0.0f ),
+                                                                              0.1,
+                                                                             11.0,
+                                                                              0.0,
+                                                                              1.0 } ) );
 
    light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,
-                                    Vec3( 0.0f,  0.0f,  1.0f ),
-                                    Vec3( 3.0f,  3.0f,  1.0f ),
-                                    Vec3( 0.0f,  1.0f,  1.0f ),
-                                    0.1,
-                                    2.0,
-                                    0.0,
-                                    1.0 } ) );
+                                                                             Vec3( 0.0f,  0.0f,  1.0f ),
+                                                                             Vec3( 3.0f,  3.0f,  1.0f ),
+                                                                             Vec3( 0.0f,  1.0f,  1.0f ),
+                                                                             0.1,
+                                                                             2.0,
+                                                                             0.0,
+                                                                             1.0 } ) );
 
    light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,
-                                    Vec3( 0.0f,  0.0f,   0.0f ),
-                                    Vec3( 1.0f,  2.0f,  10.0f ),
-                                    Vec3( 0.0f,  0.0f,   1.0f ),
-                                    0.1,
-                                    1.0,
-                                    0.0,
-                                    1.0 } ) );
+                                                                             Vec3( 0.0f,  0.0f,   0.0f ),
+                                                                             Vec3( 1.0f,  2.0f,  10.0f ),
+                                                                             Vec3( 0.0f,  0.0f,   1.0f ),
+                                                                             0.1,
+                                                                             1.0,
+                                                                             0.0,
+                                                                             1.0 } ) );
 
    light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,
-                                    Vec3(  0.0f,  0.0f,  0.0f ),
-                                    Vec3( 10.0f,  0.0f,  5.0f ),
-                                    Vec3(  1.0f,  1.0f,  1.0f ),
-                                    0.1,
-                                    7.0,
-                                    0.0,
-                                    1.0 } ) );
+                                                                             Vec3(  0.0f,  0.0f,  0.0f ),
+                                                                             Vec3( 10.0f,  0.0f,  5.0f ),
+                                                                             Vec3(  1.0f,  1.0f,  1.0f ),
+                                                                             0.1,
+                                                                             7.0,
+                                                                             0.0,
+                                                                             1.0 } ) );
 
    light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,
-                                                Vec3(  0.0f,  0.0f,   0.0f ),
-                                                Vec3( 10.0f,  5.0f,  10.0f ),
-                                                Vec3(  1.0f,  0.3f,   0.5f ),
-                                                 0.1,
-                                                17.0,
-                                                 0.0,
-                                                 1.0 } ) );
-
-   //SharedPtr<Model> nanosuit_model = asset_manager.load_model( "ape.obj" );
+                                                                             Vec3(  0.0f,  0.0f,   0.0f ),
+                                                                             Vec3( 10.0f,  5.0f,  10.0f ),
+                                                                             Vec3(  1.0f,  0.3f,   0.5f ),
+                                                                              0.1,
+                                                                             17.0,
+                                                                              0.0,
+                                                                              1.0 } ) );
 
    SharedPtr<Model> ape_model = asset_manager.load_model( "ape.obj" );
 
-
-   //SharedPtr<Model> isle = asset_manager.load_model("Small Tropical Island.obj");
-
+   // parameters for the Sun / shadowcasting light
    Vec3 poss = Vec3( 101.0f,  100.0f,  100.0f );
    Vec3 dirr = Vec3( -45.0f,    0.0f,  -45.0f );
 
@@ -507,23 +497,21 @@ Int32 main( Int32 argc, char const *argv[] ) {
                                                             glm::normalize(poss - dirr),
                                                             poss,
                                                             Vec3( 1.0f,  1.0f,  1.0f ),
-                                                            intensity, //Percentage
+                                                            intensity, // percentage
                                                             radius,
                                                             degree,
                                                             specularity } );
    light_instances.push_back( sun );
 
-   SharedPtr<Shadowcaster> light_sc = std::make_shared<Shadowcaster>(sun);
+   auto light_sc = std::make_shared<Shadowcaster>(sun);
 
-   //Must initialize before first use (set_light_matrix(...) atleast once!)
+   // must initialize before first use set_light_matrix(...) atleast once!
    light_sc->set_Light_matrix(0.1f, glm::length(poss - dirr), 50, -50, 50, -50, poss, dirr, Vec3(0.0f, 1.0f, 0.0f));
    scene_manager.set_shadowcasting( light_sc );
 
-   Vector<SharedPtr<ModelInstance>> model_instances;
-   //model_instances.push_back(scene_manager.instantiate_model(isle,geometry_program, Transform(Vec3(1*(2 / 8) -40, 150.0f, 2*(2 % 8) - 40),
-   //   Vec3(0.0f, 0.0f, 0.0f),
-   //   Vec3(.3f, .3f, .3f))));
+   Vector<SharedPtr<ModelInstance>> model_instances; // keeps model instances alive  & enables access
 
+   // we create 64 monkeys (tessellated one outside the loop) in a grid
    model_instances.reserve( 64 );
    for ( auto i=0;  i<63;  ++i ) {
       Float32 n = 9; // spacing
@@ -534,57 +522,42 @@ Int32 main( Int32 argc, char const *argv[] ) {
                                                      Vec3(       0.0f,  0.0f,        0.0f ),
                                                      Vec3(       1.3f,  1.3f,        1.3f ) ) ) );
    }
+   // tessellated ape
    model_instances.push_back(
-	   scene_manager.instantiate_model(ape_model,
-		   geometry_tessellation_program,
-		   Transform(Vec3(9*(63 / 8) - 40, 0.0f, 9*(63 % 8) - 40),
-			   Vec3(0.0f, 0.0f, 0.0f),
-			   Vec3(1.3f, 1.3f, 1.3f)), true));
+	   scene_manager.instantiate_model( ape_model,
+		                                 geometry_tessellation_program,
+		                                 Transform( Vec3( 9*(63 / 8) - 40, 0.0f, 9*(63 % 8) - 40),
+			                                         Vec3( 0.0f, 0.0f, 0.0f),
+			                                         Vec3( 1.3f, 1.3f, 1.3f ) ), true ) );
 
-   SharedPtr<Model> floor = asset_manager.load_model("floor_8x8(1).obj");
+   SharedPtr<Model> floor = asset_manager.load_model("floor_64x64(1).obj");
 
-   //for (int i = 0; i < 256; i++) {
-   //   int n = 10;
-   //   model_instances.push_back(scene_manager.instantiate_model(floor,
-   //      geometry_tessellation_program,
-   //      Transform(Vec3(n*(i / 16) - 80, -1.0f, n*(i % 16) - 80),
-   //         Vec3(0.0f, 0.0f, 0.0f),
-   //         //Vec3(0.0f, 0.0, 0.0f),
-   //         Vec3(5.0f, 1.0f, 5.0f)), true));
-   //}
-
-   model_instances.push_back(scene_manager.instantiate_model(floor,
-      geometry_tessellation_program,
-      Transform(Vec3(0.0f, 0.0f, 0.0f),
-         Vec3(0.0f, 0.0f, 0.0f),
-         //Vec3(0.0f, 0.0, 0.0f),
-         Vec3(10.0f, 1.0f, 10.0f)), true));
+   // tessellated floor
+   model_instances.push_back(
+      scene_manager.instantiate_model( floor,
+                                       geometry_tessellation_program,
+                                       Transform( Vec3(  0.0f, 0.0f,  0.0f ),
+                                                  Vec3(  0.0f, 0.0f,  0.0f ),
+                                                  Vec3( 10.0f, 1.0f, 10.0f ) ), true) );
 
 
-   //Tool to see more clearly how Light frustrum looks like
-   ShadowcasterDebug sundbg = ShadowcasterDebug(light_sc, &asset_manager, &scene_manager, &model_instances, geometry_program, &poss, &dirr);
+   // debug tool to see more clearly how Light frustrum looks like
+   ShadowcasterDebug sundbg = ShadowcasterDebug(  light_sc,
+                                                 &asset_manager,
+                                                 &scene_manager,
+                                                 &model_instances,
+                                                  geometry_program,
+                                                 &poss,
+                                                 &dirr);
 
-   //SunApe->set_transform()
+   // creating the camera viewport
+   Vec3 view_position { 0.0f, 20.0f, 15.0f };
+   auto view = scene_manager.instantiate_viewport( view_position, window, geometry_program );
+   view->bind_shader_program( geometry_program ); // TODO: shouldn't be necessary here
 
-   /* TODO */ Vec3        cam_rotations {  0.0f,   0.0f,   0.0f };
-   /* TODO */ Vec3        cam_position  {  0.0f, 20.0f,  15.0f };
-   /* TODO */ Transform   cam_transform;
-   /* TODO */ Float32     fov_rad { Config::fov_rad }; // 90 degrees
-   /* TODO */ auto view = scene_manager.instantiate_viewport( cam_position, window, geometry_program, fov_rad );
-   /* TODO */ view->bind_shader_program( geometry_program );
-   /* TODO */ //TODO: remove when we dont want to se dogass
-   /* TODO */ view->_g_buffer_init();
-   /* TODO */ //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-   glUseProgram(geometry_tessellation_program->get_location());
-   //Set standard values and vectors, set uniform to change values through applikation
+   // set tessellated related values (that will later be uploaded as uniforms)
    Float32 displacement_factor =    2;
-   Float32 tess_percent        = -0.5;
-   glUniform1f(   glGetUniformLocation(geometry_tessellation_program->get_location(), "displacement_factor"),
-                  displacement_factor);
-
-   glUniform1f(   glGetUniformLocation(geometry_tessellation_program->get_location(), "tess_percent"),
-                  tess_percent);
+   Float32 tess_percent        = -0.9;
 
    glUseProgram( lighting_program->get_location() );
 
@@ -598,23 +571,27 @@ Int32 main( Int32 argc, char const *argv[] ) {
    glUniform1i( glGetUniformLocation( lighting_program->get_location(), "g_tex_pic"    ), 6 );
    glUniform1i( glGetUniformLocation( lighting_program->get_location(), "shadowMap"    ), 7 );
 
-   //glEnable(GL_CULL_FACE);
-   //glEnable( GL_BLEND );
-   //glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+   // glEnable( GL_CULL_FACE ); // TODO: enable
+   glDisable(  GL_CULL_FACE );  // TODO: disable
+
+   // TODO: fix transparency handling (by changing RGBA alpha usage)
+   // glEnable( GL_BLEND );
+   // glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
 /* @TAG{PS} */
+/* PS */ // Lambda function encapsulating particle logic
 /* PS */ auto ps_logic = [] ( ParticleSystem::Data &data, Float32 delta_t_ms ) {
 /* PS */    using  Particle = ParticleSystem::Data::Particle;
 /* PS */
-/* PS */    static Float32 const births_per_s       { 120.0f                 }; // if too high and Config::particle_max_count is too low,
-/* PS */    static Float32 const ms_between_births  { 1'000.f / births_per_s }; // ^ might cause the particles to be created in clusters.
-/* PS */    static Float32 const avg_lifespan_ms    { 9'000.0f               };
-/* PS */    static Float32 const avg_mass_kg        {     0.01f              };
-/* PS */    static Float32 const avg_scale          {     0.50f              };
-/* PS */    static Uvec4   const colour_rgba        { 255, 255, 255, 255     };
-/* PS */    static Float32 const radius_m           { 120.f                  };
-/* PS */    static Float32       time_pool_ms       { .0f                    };
-/* PS */    static Float32       elapsed_time       {  0                     };
+/* PS */    static Float32 const births_per_s      { 120.0f                 }; // if too high and Config::particle_max_count is too low,
+/* PS */    static Float32 const ms_between_births { 1'000.f / births_per_s }; // ^ might cause the particles to be created in clusters.
+/* PS */    static Float32 const avg_lifespan_ms   { 9'000.0f               };
+/* PS */    static Float32 const avg_mass_kg       {     0.01f              };
+/* PS */    static Float32 const avg_scale         {     0.50f              };
+/* PS */    static Uvec4   const colour_rgba       { 255, 255, 255, 255     };
+/* PS */    static Float32 const radius_m          { 120.f                  };
+/* PS */    static Float32       time_pool_ms      { .0f                    };
+/* PS */    static Float32       elapsed_time      {  0                     };
 /* PS */    elapsed_time += delta_t_ms;
 /* PS */    time_pool_ms += (delta_t_ms);
 /* PS */
@@ -660,8 +637,9 @@ Int32 main( Int32 argc, char const *argv[] ) {
 /* PS */ TextureSet snowflake_tex { snowflake_dif, snowflake_nor, snowflake_spec, snowflake_emit, snowflake_disp };
 /* PS */
 /* PS */ auto ps { std::make_shared<ParticleSystem>( Transform::make_translation(Vec3{.0f, 3.0f, .0f}), snowflake_tex, ps_logic ) };
+/* PS */ // instantiating particle system
 /* PS */ scene_manager.instantiate_particle_system( ps ); // TODO: revamp in SceneManager
-/* PS */ ps->start();
+/* PS */ ps->start(); // starting it
 
 // main loop:
 	while ( !glfwWindowShouldClose(window) ) {
@@ -673,20 +651,14 @@ Int32 main( Int32 argc, char const *argv[] ) {
          printf( "-------------------------------- Frame %5d --------------------------------\n", frame++ );
       }
 
-      glUseProgram(geometry_tessellation_program->get_location());
-      glUniform1f(glGetUniformLocation(geometry_tessellation_program->get_location(), "displacement_factor"),
-         displacement_factor);
+      glUseProgram( geometry_tessellation_program->get_location() );
+      glUniform1f( glGetUniformLocation(geometry_tessellation_program->get_location(), "displacement_factor"),
+                   displacement_factor );
 
-      glUniform1f(glGetUniformLocation(geometry_tessellation_program->get_location(), "tess_percent"),
-         tess_percent);
+      glUniform1f( glGetUniformLocation(geometry_tessellation_program->get_location(), "tess_percent"),
+                   tess_percent );
 
-
-
-		// poll & handle events such as window resizing and input from the keyboard or mouse
-		// use io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if imgui wants to use the user's input
-		// - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
-		// - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application.
-		// Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
+		// poll & handle events such as window resizing, input, etc
 		glfwPollEvents();
 
 		// start the Dear ImGui frame
@@ -694,15 +666,9 @@ Int32 main( Int32 argc, char const *argv[] ) {
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-      // myView.bind_shader_program( *shaProg );
-      // draw_camera_debug_window( cam_position, cam_rotations, fov_rad );
-      // cam_transform.set_rotation( cam_rotations );
-      // cam_transform.set_position( cam_position );
-      // myView.set_view( cam_transform );
-      // myView.set_fov( fov_rad );
       scene_manager.draw_debug_scene_inspection();
 
-      // TODO: bryt ut till debug
+      // TODO: refactor into debug.h/cpp
       if ( config.is_imgui_toggled ) {
          ImGui::Begin( "Settings:" );
          ImGui::SliderFloat( "Move speed", &config.fly_move_speed, 0.0f, 25.0f );
@@ -712,127 +678,74 @@ Int32 main( Int32 argc, char const *argv[] ) {
          ImGui::SliderFloat("Displacement Factor: ", &displacement_factor, -10.0f, 10.0f);
          ImGui::SliderFloat("Tessellation level Percent: ", &tess_percent, -1.0f, 1.0f);
          ImGui::End();
-
-
       }
 
-      Array<Float32,4> corners = light_sc->getCorners();
-
-      for ( auto &light : light_instances )
-         debug::lightsource( light, scene_manager );
-
-      light_sc->set_Light_matrix( 0.1f,
-                                  glm::length(poss-dirr),
-                                  corners[0],
-                                  corners[1],
-                                  corners[2],
-                                  corners[3],
-                                  sun->get_position(),
-                                  sun->get_direction(),
-                                  Vec3(0.0f, 1.0f, 0.0f) ); // up vector?
-
-      sundbg.light_caster_debugg_tool_render();
+/*light_dbg*/ Array<Float32,4> corners = light_sc->getCorners();
+/*light_dbg*/ for ( auto &light : light_instances )
+/*light_dbg*/    debug::lightsource( light, scene_manager );
+/*lightcast*/ light_sc->set_Light_matrix( 0.1f,
+/*lightcast*/                             glm::length(poss-dirr),
+/*lightcast*/                             corners[0],
+/*lightcast*/                             corners[1],
+/*lightcast*/                             corners[2],
+/*lightcast*/                             corners[3],
+/*lightcast*/                             sun->get_position(),
+/*lightcast*/                             sun->get_direction(),
+/*lightcast*/                             Vec3(0.0f, 1.0f, 0.0f) ); // up vector?
+/*light_dbg*/ sundbg.light_caster_debugg_tool_render();
 
       process_mouse( window, *view, scene_manager, delta_time_ms );
       process_input( window, *view, delta_time_ms );
 
-      // glMatrixMode( GL_PROJECTION );
-      // glLoadIdentity();
 
-      //auto mo = model_instances[10]->model_transform;
-      //auto pos = mo.get_position();
-      //mo.set_position(Vec3(0.0f, 0.0f, 0.0f));
-      ////mo.set_rotation(Vec3(1.0f, 0.0f, 0.0f), glm::radians(30.0f));
-      //
-      //   //set_rotation(Vec3(1.0f, 0.0f, 0.0f), glm::radians(30.0f));
-      //model_instances[10]->set_transform(mo);
-      //
-      //mo.set_position(pos);
-      //model_instances[10]->set_transform(mo);
+/*dance*/ auto mo  = model_instances[10];
+/*dance*/ mo->transform( Transform::make_rotation(Vec3(1.0f, 0.0f, 0.0f), glm::radians(30.0f) ) );
+/*dance*/ auto mo2 = model_instances[11];
+/*dance*/ auto mdl = mo2->model_transform;
+/*dance*/ static Float32 g = 0.0f;
+/*dance*/ static Float32 h = 0.0f;
+/*dance*/ static bool  hm = true;
+/*dance*/ static bool  isPressed = false;
+/*dance*/ static float time = ImGui::GetTime();
+/*dance*/ float curTime  = ImGui::GetTime();
+/*dance*/ float timepast = curTime - time;
+/*dance*/ if (glfwGetKey(window, GLFW_KEY_P)&& timepast > 0.25) {
+/*dance*/    isPressed = !isPressed;
+/*dance*/    time = ImGui::GetTime();
+/*dance*/ }
+/*dance*/ if (true && isPressed) {
+/*dance*/    if (g > 2)
+/*dance*/       hm = false;
+/*dance*/    else if (g < -2)
+/*dance*/       hm = true;
+/*dance*/    if (hm)
+/*dance*/       g += 0.01f;
+/*dance*/    else g -= 0.01f;
+/*dance*/    h += 0.01f;
+/*dance*/    for (int i = 0; i < 64-1; i++) {
+/*dance*/       Float32 size = 0.1f;
+/*dance*/       model_instances[i]->set_transform(Transform::make_translation(model_instances[i]->model_transform.get_position()));
+/*dance*/       model_instances[i]->transform(Transform::make_rotation(Vec3((Float32)glm::cos(15 * g*(((i % 4))% 2)), (Float32)glm::cos(12*g*((i % 3))), (Float32)glm::sin(g/2* (i % 2)))) * Transform::make_translation(Vec3((Float32)glm::sin(g*i)*((i % 3)* size), (Float32)glm::sin(g* (i % 2)* size)*0.02 , (Float32)glm::sin(g/10)*((i%5) % 2))));
+/*dance*/    }
+/*dance*/    auto cur = model_instances[63]->model_transform;
+/*dance*/    Float32 radius = 30;
+/*dance*/    Vec3 rotateAround(0.0,0.0,0.0);//Might be wrong
+/*dance*/    Float32 speed = 5;
+/*dance*/    model_instances[63]->set_transform(Transform::make_translation((Vec3((radius) * glm::cos(speed * h + rotateAround.x) + rotateAround.y, rotateAround.z, (radius) * glm::sin(speed * h  + rotateAround.x) + rotateAround.y))));
+/*dance*/ }
 
-      auto mo = model_instances[10];
-      mo->transform( Transform::make_rotation(Vec3(1.0f, 0.0f, 0.0f), glm::radians(30.0f) ) );
-
-      auto mo2 = model_instances[11];
-
-      //auto t = Transform::make_translation(Vec3(0.10f, 0.0f, 0.0f));
-      //auto r = Transform::make_rotation(Vec3(0.0f, 1.0f, 0.0f), glm::radians(30.0f));
-      //r.look_at(Vec3(0.0, 0.0, 0.0), t.get_position());
-      //t.set_rotation(r.get_rotation());
-      auto mdl = mo2->model_transform;
-      //mdl.look_at(Vec3(13.0f, 0.0f, 0.0f), Vec3(0.0f, 0.0f, 0.00001f) );
-      static Float32 g = 0.0f;
-      static Float32 h = 0.0f;
-
-
-      static bool hm = true;
-      static bool isPressed = false;
-      static float time = ImGui::GetTime();
-      float curTime = ImGui::GetTime();
-
-      float timepast = curTime - time;
-
-      if (glfwGetKey(window, GLFW_KEY_P)&& timepast > 0.25) {
-         isPressed = !isPressed;
-
-
-         time = ImGui::GetTime();
-      }
-      if (true && isPressed) {
-
-         if (g > 2) {
-            hm = false;
-         }
-         else if (g < -2) {
-            hm = true;
-         }
-
-         if (hm) {
-            g += 0.01f;
-         }
-         else {
-            g -= 0.01f;
-         }
-         h += 0.01f;
-
-         for (int i = 0; i < 64-1; i++) {
-            Float32 size = 0.1f;
-            //mo2->transform(Transform::make_translation(Vec3(0.0,0.0,0.0)));
-
-            model_instances[i]->set_transform(Transform::make_translation(model_instances[i]->model_transform.get_position()));
-            model_instances[i]->transform(Transform::make_rotation(Vec3((Float32)glm::cos(15 * g*(((i % 4))% 2)), (Float32)glm::cos(12*g*((i % 3))), (Float32)glm::sin(g/2* (i % 2)))) * Transform::make_translation(Vec3((Float32)glm::sin(g*i)*((i % 3)* size), (Float32)glm::sin(g* (i % 2)* size)*0.02 , (Float32)glm::sin(g/10)*((i%5) % 2))));
-
-         }
-         //model_instances[63]->set_transform(Transform::make_translation(model_instances[63]->model_transform.get_position()));
-         auto cur = model_instances[63]->model_transform;
-         //model_instances[63]->transform(Transform::make_translation(glm::normalize(Vec3(0.f, 0.f, 20.0f))));
-         //model_instances[63]->transform(Transform::make_translation(glm::normalize(Vec3(1 * glm::cos(2 * g + cur.get_position().y) + cur.get_position().x, 1 * glm::sin(2 * g + cur.get_position().x) + cur.get_position().y, 0))));
-         //model_instances[63]->transform(Transform::make_translation((Vec3((0.5 ) * glm::cos(2 * h + cur.get_position().x) /*+ cur.get_position().y*/, 0, (0.5 ) * glm::sin(2 * h /* + cur.get_position().y*/) /*+ cur.get_position().x*/))));
-         Float32 radius = 30;
-         Vec3 rotateAround(0.0,0.0,0.0);//Might be wrong
-         Float32 speed = 5;
-         model_instances[63]->set_transform(Transform::make_translation((Vec3((radius) * glm::cos(speed * h + rotateAround.x) + rotateAround.y, rotateAround.z, (radius) * glm::sin(speed * h  + rotateAround.x) + rotateAround.y))));
-
-      }
-
-      //mdl.set_position(Vec3(1.0f ,0.0f,0.0f));
-      //mo2->transform(mdl);
-
-      //mo2->set_transform(mdl);
-
-
+      // draw scene content
       scene_manager.draw( *view );
 
+      // draw imgui components
       ImGui::Render();
       ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );
+
+      // finalize frame
       glfwMakeContextCurrent( window );
       glfwSwapBuffers( window );
 
-
-      //ImGui::Text( "\t%.1f FPS (avg %.3f ms/frame)",
-        //          ImGui::GetIO().Framerate,
-          //        1000.0f / ImGui::GetIO().Framerate
-
+      // title changes
       auto fps        = ImGui::GetIO().Framerate;
       auto mspfps     = 1000.0f / ImGui::GetIO().Framerate;
       char title[512] = {};

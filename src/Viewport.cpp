@@ -17,9 +17,8 @@ Viewport::Viewport( Vec3                      position,
    forward                ( 0.0f,   0.0f,   1.0f  )
 {
    _view = Transform( position );
-
-   //TODO: Kan denna vara här?
-   //Ligger här för att vi nu måste uppdatera vår viewports transforms view med LookAt...
+   // TODO: Kan denna vara här?
+   // Ligger här för att vi nu måste uppdatera vår viewports transforms view med LookAt...
    _view.look_at(this->forward, _view.get_position() + this->forward); // rotate view
    this->set_view(_view);
 

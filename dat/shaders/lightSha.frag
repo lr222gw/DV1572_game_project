@@ -1,16 +1,9 @@
 #version 440 core
 
-in VS_OUT {
-    vec3 FragPos;
-    //vec3 Normal;
-    vec2 uv;
-    vec4 FragPosLightSpace;
-} fs_in;
+uniform sampler2D   shadowMap;
+uniform mat4        lightmatrix;
 
-uniform sampler2D shadowMap;
-uniform mat4      lightmatrix;
-
-//in       vec2       uv_fs;
+in       vec2       uv_fs;
 uniform  sampler2D  g_tex_pos;
 uniform  sampler2D  g_tex_norm;
 uniform  sampler2D  g_tex_spec;
@@ -31,10 +24,12 @@ struct Light {
   float specularity;
 };
 
+// light types "enum" (needs to match Light::Type)
 const uint        point_light_t = 0,
                    spot_light_t = 1,
             directional_light_t = 2;
 
+// render mode "enum" (needs to match Config::RenderMode)
 const uint mode_composite    = 0,
            mode_albedo       = 1,
            mode_specular     = 2,
@@ -55,40 +50,37 @@ uniform vec3  view_pos;
 
 void main() {
    // retrieve data from gbuffer
-   vec3  pos      = texture( g_tex_pos,    fs_in.uv ).rgb;
-   vec3  norm     = texture( g_tex_norm,   fs_in.uv ).rgb;
-   vec3  albedo   = texture( g_tex_albedo, fs_in.uv ).rgb;
-   vec3  spec_rgb = texture( g_tex_spec,   fs_in.uv ).rgb; // TODO: check texture channels
-   float spec_str = texture( g_tex_spec,   fs_in.uv ).w;   // TODO: check texture channels
-   vec4  emissive = texture( g_tex_emit,   fs_in.uv );
+   vec3  pos      = texture( g_tex_pos,    uv_fs ).rgb;
+   vec3  norm     = texture( g_tex_norm,   uv_fs ).rgb;
+   vec3  albedo   = texture( g_tex_albedo, uv_fs ).rgb;
+   vec3  spec_rgb = texture( g_tex_spec,   uv_fs ).rgb; // TODO: check texture channels
+   float spec_str = texture( g_tex_spec,   uv_fs ).w;   // TODO: check texture channels
+   vec4  emissive = texture( g_tex_emit,   uv_fs );
    vec3  emit_rgb = emissive.xyz;
-   vec3  disp_rgb = texture( g_tex_disp,   fs_in.uv ).rgb;
-   vec4  picking  = texture( g_tex_pic,    fs_in.uv );
+   vec3  disp_rgb = texture( g_tex_disp,   uv_fs ).rgb;
+   vec4  picking  = texture( g_tex_pic,    uv_fs );
 
    vec3 view_dir  = normalize( view_pos - pos );
 
    vec3 lighting;
 
    switch ( render_mode ) {
-      case mode_albedo:        lighting = albedo;      break;
-      case mode_normals:       lighting = norm;        break;
-      case mode_specular:      lighting = spec_rgb;    break;
-      case mode_positional:    lighting = pos;         break;
-      case mode_emissive:      lighting = emit_rgb;    break;
-      case mode_displacement:  lighting = disp_rgb;    break;
-      case mode_picking:       lighting = vec3( min( 255, picking.rgb.x*10 ),
-                                                min( 255, picking.rgb.y*10 ),
-                                                min( 255, picking.rgb.z*10 ) ); break; //picking.rgb; break;
+      case mode_albedo:        lighting = albedo;    break;
+      case mode_normals:       lighting = norm;      break;
+      case mode_specular:      lighting = spec_rgb;  break;
+      case mode_positional:    lighting = pos;       break;
+      case mode_emissive:      lighting = emit_rgb;  break;
+      case mode_displacement:  lighting = disp_rgb;  break;
+      case mode_picking:       lighting = vec3( min( 255, picking.rgb.x*2 ), // this is just visual;
+                                                min( 255, picking.rgb.y*2 ), // it doesn't affect the picking G-buffer color attachment
+                                                min( 255, picking.rgb.z*2 ) ); break;
       case mode_textureless: if ( pos.x+pos.y+pos.z!=0 ) albedo = vec3( 1.0 ); // no break so that the mode_composite code gets run
       case mode_composite:
          lighting = emit_rgb;
-         //lighting = albedo * 0.1; // start off with ambient light  Vec3(0.2,0.2,0.2)
-
          for ( int i = 0;  i < num_lights;  ++i ) {
            Light light = lights[i];
 
            if ( light.type == point_light_t ) { // TODO: take one array of each light type and have a loop for each instead
-              ////////////////////////////////////////////////////////////////////////////////////////
               float radius   = light.radius * 100.0;
               float distance = length( light.pos - pos );
               if ( distance < radius ) {
@@ -98,15 +90,14 @@ void main() {
   			         light.rgb = light.rgb * light.intensity;
 
                  // calculate light effect falloff:
-                 float linear_falloff   = (1.0 - distance / radius);       // yields a normalized value (within the range [0, 1.0])
-                 float quad_falloff     = linear_falloff * linear_falloff; // quadratic falloff = linear falloff squared
+                 float linear_falloff   = (1.0 - distance / radius);           // yields a normalized value (within the range [0, 1.0])
+                 float quad_falloff     = linear_falloff * linear_falloff;     // quadratic falloff = linear falloff squared
                  // calculate light diffuse impact:
-                 float light_modulation = max( dot(norm, light_dir), 0.0f ); // yields a normalized value (within the range [0, 1.0])
-                 vec3  diffuse_impact   = albedo * light.rgb * (light_modulation/* * light.intensity */* quad_falloff);
+                 float light_modulation = max( dot(norm, light_dir), 0.0f );   // yields a normalized value (within the range [0, 1.0])
+                 vec3  diffuse_impact   = albedo * light.rgb * (light_modulation * light.intensity * quad_falloff);
                  // calculate specular impact:
                  float spec_modulation  = max( dot(norm, halfway_dir), 0.0f ); // yields a normalized value (within the range [0, 1.0])
-                 //vec3  spec_impact      = vec3(0.1)/num_lights;//(spec_modulation * spec_str * quad_falloff) * spec_rgb; // mix( spec_rgb, light.rgb, 0.5f );
-                 vec3  spec_impact      = light.rgb * (spec_modulation * spec_str * quad_falloff);
+                 vec3  spec_impact      = light.rgb * (spec_modulation * spec_str * quad_falloff); // TODO: remove spec_str
                  // update lighting:
                  lighting              += spec_impact + diffuse_impact; // TODO: emission (+ emit_rgb)
                  // TODO: HDR output?
@@ -144,7 +135,7 @@ void main() {
       			// ambient
       			vec3 ambient = light.rgb * vec3(0.2);
       			// diffuse
-      			float diff = max(dot(light.dir, normal), 0.0);
+      			float diff   = max(dot(light.dir, normal), 0.0);
       			vec3 diffuse = diff * light.rgb;
       			// specular
       			vec3 viewDir = normalize(view_pos - pos);
@@ -154,10 +145,8 @@ void main() {
       			spec = pow(max(dot(normal, halfwayDir), 0.0), 64.0);
       			vec3 specular = spec * light.rgb;
       			// calculate shadow
-
-      			vec4 lightSpacePos = lightmatrix * vec4(pos, 1.0f);//fs_in.FragPosLightSpace.xyz / fs_in.FragPosLightSpace.w;
-
-      			vec3 projCoords = lightSpacePos.xyz / lightSpacePos.w;
+      			vec4 lightSpacePos = lightmatrix * vec4(pos, 1.0f); // fs_in.FragPosLightSpace.xyz / fs_in.FragPosLightSpace.w;
+      			vec3 projCoords    = lightSpacePos.xyz / lightSpacePos.w;
       			// transform to [0,1] range
       			projCoords = projCoords * 0.5 + 0.5;
       			// get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
@@ -166,7 +155,7 @@ void main() {
       			float currentDepth = projCoords.z;
       			// check whether current frag pos is in shadow
       			float shadowBias = 0.005;
-      			float shadow = currentDepth - shadowBias > closestDepth  ? 1.0 : 0.0;
+      			float shadow     = currentDepth - shadowBias > closestDepth ? 1.0 : 0.0;
 
       			//TODO: Disable to not test last light...
       			//lighting += (ambient + (1.0 - shadow) * (diffuse + specular)) * albedo;

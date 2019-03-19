@@ -1,5 +1,9 @@
 #include "ParticleSystem.h"
 
+// uncomment this line to disable debug output for ParticleSystem
+//#define PARTICLE_SYSTEM_DEBUG 1
+
+constexpr Bool is_debugging_particle_system = false;
 
 // TODO: rename 'Config::particle_max_count' to make it more obvious that the limit is on a per ParticleSystem basis
 
@@ -280,14 +284,13 @@ Transform const & ParticleSystem::get_transform() const {
 }
 
 void ParticleSystem::Data::add( Particle p ) {
-   static Uint32 id = 0;
-   std::cout << "[creating particle] ID:[#" << id++ << "]. Count was: " << count;
-
+   if constexpr ( is_debugging_particle_system ) {
+      static Uint32 id = 0;
+      std::cout << "[creating particle] ID:[#" << id++ << "]. Count was: " << count;
+   }
    if ( count < capacity )
       data[count++] = std::move( p );
 
-   std::cout << ", after: " << count;
-   if ( id == 511 || count == 511 )
-      std::cout << " ";
-   std::cout << "\n";
+   if constexpr ( is_debugging_particle_system )
+      std::cout << ", after: " << count << "\n";
 }

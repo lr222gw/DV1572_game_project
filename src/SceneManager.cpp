@@ -703,37 +703,36 @@ void SceneManager::_lights_to_gpu() {
 // @arg y     screen Y coordinate
 // @arg view  viewport (to access G-buffer mouse picking channel)
 Uint32 SceneManager::get_object_id_at_pixel( Uint32 x, Uint32 y, Viewport &view ) const {
-   //_geometry_shader_program->use();
+   // we bind the mouse picking channel from the G-buffer
    glBindFramebuffer( GL_READ_FRAMEBUFFER, view.get_g_buffer().buffer_loc );
    glReadBuffer(      GL_COLOR_ATTACHMENT6 );
 
-// Uint32 pixel_info[4]{};
-   struct pixel_info_struct {
-      Float32 x;
-      Float32 y;
-      Float32 z;
-      Float32 w;
-   };
+   // struct to contain the data glReadPixels return
+   struct pixel_info_struct { Float32 x;
+                              Float32 y;
+                              Float32 z;
+                              Float32 w; };
+
    pixel_info_struct pixel_info;
-//
-// glReadPixels(x, y, 1, 1, GL_RGBA, GL_UNSIGNED_INT, (void*)&pixel_info);
-//
-// Uint32 obj_id = (pixel_info[0] & 0xFF << 24)
-//                 + (pixel_info[1] & 0xFF << 16)
-//                 + (pixel_info[2] & 0xFF <<  8)
-//                 + (pixel_info[3] & 0xFF <<  0); // TODO: validate that we get the correct ids
 
-   //Uint8 pixel_info[4] {};
+   glReadPixels( x,             // the X-coord is unaffected
+                 view.height-y, // map the Y-coord to conform with openGL (top 0 instead of 1)
+                 1,             // width  (in pixels) of rectangle to read; 1x1 pixels in our case
+                 1,             // height (in pixels) of rectangle to read; 1x1 pixels in our case
+                 GL_RGBA,       // read pixels as RGBA
+                 GL_FLOAT,      // store as floats
+                 &pixel_info ); // pointer to first buffer element (1 pixel in our case)
 
-   glReadPixels( x, view.height-y, 1, 1, GL_RGBA, GL_FLOAT, &pixel_info );
 
    // probably don't need the & 0xFF since we send up in increments of 8 bytes
    Uint32 obj_id  = ( ((Int32)(pixel_info.x * 255) & 0xFF) <<  0)
                   + ( ((Int32)(pixel_info.y * 255) & 0xFF) <<  8)
                   + ( ((Int32)(pixel_info.z * 255) & 0xFF) << 16)
                   + ( ((Int32)(pixel_info.w * 255) & 0xFF) << 24);
-   glReadBuffer(GL_NONE);
-   glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+
+   // clean-up
+   glReadBuffer( GL_NONE ); // TODO: change bind clearing zeroes to GL_NONE
+   glBindFramebuffer( GL_READ_FRAMEBUFFER, 0 );
 
    return obj_id;
 }
@@ -746,7 +745,7 @@ SharedPtr<ModelInstance> SceneManager::get_instance_ptr( Uint32 obj_id ) {
             return e_ptr;
       }
    }
-   //assert( false && "[ERROR] Instance of id no longer exists." );
+
    if constexpr ( Config::is_debugging )
       std::cout << "[MOUSE_PICKING] no model hit\n";
 
