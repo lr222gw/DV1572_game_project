@@ -109,6 +109,14 @@ void process_mouse( GLFWwindow   *window, // GLFW window is needed for input
       }
    }
 
+   // to avoid repeated recomputations in vain
+   Bool has_changed =  last_x != x_pos  ||  last_y != y_pos;
+   Float64 x_offset    = x_pos  - last_x;
+   Float64 y_offset    = last_y - y_pos;
+
+   last_x    = x_pos; // needs to be done after has_changed
+   last_y    = y_pos; // needs to be done after has_changed
+
    // this is for middle mouse button viewing
    if ( glfwGetMouseButton( window, GLFW_MOUSE_BUTTON_MIDDLE) != GLFW_PRESS ) {
       if ( !config.is_mouse_look_enabled ) {
@@ -118,16 +126,7 @@ void process_mouse( GLFWwindow   *window, // GLFW window is needed for input
    }
    else glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_DISABLED );
 
-   Float64 sensitivity = 0.05;
-   Float64 x_offset    = x_pos  - last_x;
-   Float64 y_offset    = last_y - y_pos;
-
-   // to avoid repeated recomputations in vain
-   Bool has_changed =  last_x != x_pos  ||  last_y != y_pos;
-
-   last_x    = x_pos; // needs to be done after has_changed
-   last_y    = y_pos; // needs to be done after has_changed
-
+   static constexpr Float64 sensitivity = 0.05;
    x_offset *= sensitivity;
    y_offset *= sensitivity;
 
