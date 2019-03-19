@@ -445,16 +445,17 @@ void SceneManager::draw_debug_scene_inspection() {
    } ImGui::End(); // end our Inspection window
 }
 
-void SceneManager::set_shadowcasting( SharedPtr<Shadowcaster> light )
-{
+
+
+void SceneManager::set_shadowcasting( SharedPtr<Shadowcaster> light ) {
    //TODO: If-statement to check validity of light, is it directional?
    use_depth_map_FBO();
 
    Uint32 depthMap, width, height;
    glGenTextures(1, &depthMap);
 
-   width  = 1024;
-   height = 1024; //TODO: Enable SetSize of Width and height
+   width  = config.shadowmap_side;
+   height = config.shadowmap_side; //TODO: Enable SetSize of Width and height
 
    glBindTexture(GL_TEXTURE_2D, depthMap);
 
@@ -535,7 +536,7 @@ void SceneManager::update_shadowmap()
          GL_FALSE,
          glm::value_ptr(e.first->get_matrix()));
 
-      glViewport(0, 0, 1024, 1024);//TODO: do not hardcode, decide based on Shadowcaster
+      glViewport(0, 0, config.shadowmap_side, config.shadowmap_side); // TODO: do not hardcode, decide based on Shadowcaster
 
 
       glClear(GL_DEPTH_BUFFER_BIT);

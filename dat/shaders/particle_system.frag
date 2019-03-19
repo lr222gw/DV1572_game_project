@@ -19,21 +19,21 @@ layout (location = 3) out  vec4 g_emit;
 layout (location = 4) out  vec4 g_displacement;
 layout (location = 5) out  vec3 g_position;
 
-
 // @TAG{TEXTURE_CHANNEL}
-
 void main() {
-   g_albedo       = texture(   tex_diff, uv_fs ); //* col_fs; // TODO: reactivate
-   g_spec         = texture(   tex_spec, uv_fs );
-   g_normal       = texture(   tex_norm, uv_fs ).xyz;
-   g_normal       = normalize( g_normal * 2.0 - 1.0 ); // TODO: verify necessity
-   g_normal       = normalize( tbn_fs * g_normal );
-   g_emit         = texture(   tex_emit, uv_fs );
-   g_displacement = texture(   tex_disp, uv_fs );
+   g_albedo       = texture(   tex_diff, uv_fs      ); // TODO: mix with col_fs
+   g_spec         = texture(   tex_spec, uv_fs      );
+   g_normal       = texture(   tex_norm, uv_fs      ).xyz;
+   g_normal       = normalize( g_normal * 2.0 - 1.0 ); // tranform from [-1,1] to [0,1]
+   g_normal       = normalize( tbn_fs * g_normal    ); // apply TBN matrix
+   g_emit         = texture(   tex_emit, uv_fs      );
+   g_displacement = texture(   tex_disp, uv_fs      );
    g_position     = pos_fs;
 
-   //TODO: Use glEnable(GL_BLEND) instead, first fix particle system to not store stuff in the RGBA <- A channel...
-	if ( g_albedo.w < 0.525 ) {
-		discard;
-	}
+   // TODO: use glEnable(GL_BLEND) instead, first fix particle system to not store stuff in the RGBA's alpha channel
+	if ( g_albedo.w < 0.525 ) discard; // hard-coded ugliness
 }
+
+// TODO: add texture atlasing to facilitate animated particles or multi-texture particle systems
+
+// TODO: optimizing the fragment coverage by using a third party program to generate a non-quad mesh for the particle based off of the alpha values

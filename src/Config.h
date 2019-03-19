@@ -18,6 +18,8 @@ struct Config {
    static constexpr Int32     start_height =  768,
                               start_width  = 1024;
 
+   static constexpr Int32     shadowmap_side = 4096;
+
    static constexpr Uint32    particle_max_count = 2048;
    static constexpr Uint32    ssao_kernel_count  =   64; // needs to be equal to ssao.frag::kernel_size!
    static constexpr Uint32    ssao_noise_side    =    8; // needs to be equal to ssao.frag::noise_side & ssao_blur.frag::noise_side!

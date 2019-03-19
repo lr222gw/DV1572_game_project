@@ -16,7 +16,7 @@ uniform mat4 model_transform;
 uniform mat4 projection;
 
 void main() {
-	// set up for backface culling by using dotproduct between normal and vector from camera to current vertex
+	// set up for backface culling by using dot product between normal and vector from camera to current vertex
 	vec4  viewPos         = projection * view * vec4(view_pos,1); // convert to view space
 
 	vec3  viewPos_to_vert = normalize(viewPos.xyz) - ((gl_in[0].gl_Position.xyz + gl_in[1].gl_Position.xyz + gl_in[2].gl_Position.xyz) / 3);
