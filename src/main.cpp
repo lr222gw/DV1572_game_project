@@ -200,6 +200,8 @@ void toggle_input_callback( GLFWwindow  *window,
 }
 
 
+//TODO: If holding Space then while holding it we also  start holding CTRL, we will Change direction
+//      If holding CTRL then while holding it we also  start holding  Space, we will NOT Change direction....
 // gets called each frame, GLFW is used to read input
 void process_input( GLFWwindow  *window,
                     Viewport    &cam,
