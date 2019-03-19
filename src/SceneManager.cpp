@@ -696,14 +696,19 @@ void SceneManager::_lights_to_gpu() {
                  (Uint32)config.render_mode );
 }
 
+// returns the ID of the fragment at XY (or 0 if no model instances occupy it)
+//
+//
+// @arg x     screen X coordinate
+// @arg y     screen Y coordinate
+// @arg view  viewport (to access G-buffer mouse picking channel)
 Uint32 SceneManager::get_object_id_at_pixel( Uint32 x, Uint32 y, Viewport &view ) const {
    //_geometry_shader_program->use();
    glBindFramebuffer( GL_READ_FRAMEBUFFER, view.get_g_buffer().buffer_loc );
    glReadBuffer(      GL_COLOR_ATTACHMENT6 );
 
 // Uint32 pixel_info[4]{};
-   struct pixel_info_struct
-   {
+   struct pixel_info_struct {
       Float32 x;
       Float32 y;
       Float32 z;

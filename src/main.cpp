@@ -135,7 +135,7 @@ void process_mouse( GLFWwindow   *window, // GLFW window is needed for input
    yaw   += x_offset;
    pitch += y_offset;
 
-   // to avoid deadlocks at 90 degree pitch
+   // to avoid rotating beyond 90 degree pitch
    if ( pitch > +89.0f ) pitch = +89.0f;
    if ( pitch < -89.0f ) pitch = -89.0f;
 
@@ -152,11 +152,7 @@ void process_mouse( GLFWwindow   *window, // GLFW window is needed for input
    }
 }
 
-//void process_picking(GLFWwindow *window, SceneManager scene, Viewport view)
-//{
-//
-//}
-
+// uses GLFW's callback function to be called just once per key press
 void toggle_input_callback( GLFWwindow  *window,
                             Int32        key,
                             Int32        scancode,
@@ -165,98 +161,98 @@ void toggle_input_callback( GLFWwindow  *window,
 {
    if ( key == GLFW_KEY_ESCAPE  &&  action == GLFW_PRESS )
       glfwSetWindowShouldClose( window, true );
-
-   if ( (key == GLFW_KEY_F1 )  &&  action == GLFW_PRESS ) {
+   // TODO: make mouse scroll affect camera fly speed
+   // TODO: add keybinding map to Config
+   // TODO: refactor I/O into its own module
+   // TODO: add imgui keybindings serialization & deserialization
+   // TODO: add system to make clicked instance into the active instance
+   //       and then add keybindings to affect its position, rotation, scale, etc
+   //       (reference: Blender hotkeys)
+   if ( key ==  GLFW_KEY_F1  &&  action == GLFW_PRESS ) {
       config.is_mouse_look_enabled = !config.is_mouse_look_enabled;
+      // disable mouse cursor if mouse look gets enabled (and vice versa)
       if ( config.is_mouse_look_enabled )
          glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_DISABLED );
       else
          glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_NORMAL );
    }
-
-
-   if ( key == GLFW_KEY_F2  &&  action == GLFW_PRESS )
+   if ( key ==  GLFW_KEY_F2  &&  action == GLFW_PRESS )
       config.is_wireframe_mode = !config.is_wireframe_mode; // used in SceneManager::Draw()
-   if ( key == GLFW_KEY_F3  &&  action == GLFW_PRESS )
+   if ( key ==  GLFW_KEY_F3  &&  action == GLFW_PRESS )
       config.render_mode = RenderMode::composite;
-   if ( key == GLFW_KEY_F4  &&  action == GLFW_PRESS )
+   if ( key ==  GLFW_KEY_F4  &&  action == GLFW_PRESS )
       config.render_mode = RenderMode::albedo;
-   if ( key == GLFW_KEY_F5  &&  action == GLFW_PRESS )
+   if ( key ==  GLFW_KEY_F5  &&  action == GLFW_PRESS )
       config.render_mode = RenderMode::normals;
-   if ( key == GLFW_KEY_F6  &&  action == GLFW_PRESS )
+   if ( key ==  GLFW_KEY_F6  &&  action == GLFW_PRESS )
       config.render_mode = RenderMode::specular;
-   if ( key == GLFW_KEY_F7  &&  action == GLFW_PRESS )
+   if ( key ==  GLFW_KEY_F7  &&  action == GLFW_PRESS )
       config.render_mode = RenderMode::positional;
-   if ( key == GLFW_KEY_F8  &&  action == GLFW_PRESS )
+   if ( key ==  GLFW_KEY_F8  &&  action == GLFW_PRESS )
       config.render_mode = RenderMode::emissive;
-   if ( key == GLFW_KEY_F9  &&  action == GLFW_PRESS )
+   if ( key ==  GLFW_KEY_F9  &&  action == GLFW_PRESS )
       config.render_mode = RenderMode::textureless;
-   if ( key == GLFW_KEY_F10 &&  action == GLFW_PRESS)
+   if ( key == GLFW_KEY_F10  &&  action == GLFW_PRESS)
 	   config.render_mode = RenderMode::picking;
-   if ( key == GLFW_KEY_F11 &&  action == GLFW_PRESS)
+   if ( key == GLFW_KEY_F11  &&  action == GLFW_PRESS)
       config.render_mode = RenderMode::displacement;
-   if ( key == GLFW_KEY_F12 &&  action == GLFW_PRESS )
+   if ( key == GLFW_KEY_F12  &&  action == GLFW_PRESS )
       config.is_imgui_toggled = !config.is_imgui_toggled;
-
-
 }
 
 
-
+// gets called each frame, GLFW is used to read input
 void process_input( GLFWwindow  *window,
                     Viewport    &cam,
                     Float32      time_delta_ms )
 {
-
-   // glfwSetInputMode( window, GLFW_STICKY_KEYS, 1 );
-
    Float32    move_distance = config.fly_move_speed * (time_delta_ms * 1000);
    Transform  offset;
 
-
+   // logic for moving the camera based off of user WASD input
+   // and the viewport's current position and direction.
    if ( glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS ) {
       offset = Transform::make_translation(
-                  Vec3( 1.0f, 1.0f, move_distance )
+                  Vec3( 1.0f, 1.0f, 1.0f )
                   *
-                  cam.forward
+                  cam.forward * move_distance
                );
       cam.transform( offset);
-
    }
    if ( glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS ) {
       offset = Transform::make_translation(
-                  Vec3( -1.0f, -1.0f, -move_distance )
+                  Vec3( -1.0f, -1.0f, -1.0f )
                   *
-                  cam.forward
+                  cam.forward * move_distance
                );
       cam.transform(offset);
    }
    if ( glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS ) {
       offset = Transform::make_translation(
-                  Vec3( move_distance, 1.0f, 1.0f )
+                  Vec3( 1.0f, 1.0f, 1.0f )
                   *
-                  glm::cross( -cam.forward, Vec3(0.0, 1.0f, 0.0f) )
+                  glm::normalize( glm::cross( -cam.forward, Vec3(0.0, 1.0f, 0.0f) ) ) * move_distance
                );
       cam.transform(offset);
    }
    if ( glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS ) {
       offset = Transform::make_translation(
-                  Vec3( -move_distance, -1.0f, -1.0f )
+                  Vec3( -1.0f, -1.0f, -1.0f )
                   *
-                  glm::cross( -cam.forward, Vec3(0.0f, 1.0f, 0.0f) )
+                  glm::normalize( glm::cross( -cam.forward, Vec3(0.0f, 1.0f, 0.0f) ) ) * move_distance
                );
       cam.transform(offset);
    }
    if ( glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS ) {
       offset = Transform::make_translation(
-                  Vec3( 0.0f, -move_distance, 0.0f)
+                  Vec3( 0.0f, -1.0f, 0.0f) * move_distance
                );
       cam.transform(offset);
 
    }
    if ( glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS ) {
       offset = Transform::make_translation(
-                  Vec3( 0.0f, move_distance, 0.0f )
+                  Vec3( 0.0f, 1.0f, 0.0f ) * move_distance
                );
       cam.transform(offset);
    }
@@ -582,8 +578,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
    glUseProgram(geometry_tessellation_program->get_location());
    //Set standard values and vectors, set uniform to change values through applikation
-   Float32 displacement_factor =  2;
-   Float32 tess_percent        = -1;
+   Float32 displacement_factor =    2;
+   Float32 tess_percent        = -0.5;
    glUniform1f(   glGetUniformLocation(geometry_tessellation_program->get_location(), "displacement_factor"),
                   displacement_factor);
 
