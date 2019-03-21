@@ -113,16 +113,17 @@ private:
    }
 
    Uint32 _generate_default_texture() {
-      Uint8   pixel_data[3];
+      Uint8   pixel_data[4];
       GLenum  format;
       Uint32  texture_id;
 
       glGenTextures( 1, &texture_id );
 
       if constexpr ( type == TextureType::diffuse ) {
-         pixel_data[0] = 127;
-         pixel_data[1] = 127;
-         pixel_data[2] = 127;
+         pixel_data[0] = 128;
+         pixel_data[1] = 128;
+         pixel_data[2] = 128;
+         pixel_data[3] = 255;
          format        = GL_RGBA;
       }
       else if      ( type == TextureType::normal ) {
@@ -132,21 +133,22 @@ private:
          format        = GL_RGB;
       }
       else if      ( type == TextureType::specular ) {
-         pixel_data[0] = 127;
-         pixel_data[1] = 127;
-         pixel_data[2] = 127; // TODO: contemplate proper default value
+         pixel_data[0] = 128;
+         pixel_data[1] = 128;
+         pixel_data[2] = 128; // TODO: contemplate proper default value
+         pixel_data[3] = 128;
          format        = GL_RGBA;
       }
       else if      ( type == TextureType::emissive ) {
          pixel_data[0] = 0;
          pixel_data[1] = 0;
          pixel_data[2] = 0;
-         format        = GL_RGBA;
+         format        = GL_RGBA; // TODO: change into GL_RGB?
       }
       else if      ( type == TextureType::displacement ) {
-         pixel_data[0] = 127;
-         pixel_data[1] = 127;
-         pixel_data[2] = 127;
+         pixel_data[0] = 128;
+         pixel_data[1] = 128;
+         pixel_data[2] = 128;
          format        = GL_RGB; // TODO: use single channel
       }
       else assert( false && "Unaccounted for texture type!" );

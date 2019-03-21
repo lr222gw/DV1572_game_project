@@ -291,6 +291,45 @@ void draw_camera_debug_window( Vec3    &position,
 }
 
 
+void show_startup_message( Viewport const& view ) {
+   static constexpr int  my_width  = 400;
+   static constexpr int  my_height = 300;
+   static           bool is_shown  = true;
+
+   if ( !is_shown )
+         return; // end our instructions window early
+
+   ImGui::Begin( "Welcome", // begin our instructions window:
+                 &is_shown,
+                  ImGuiWindowFlags_NoCollapse   |
+                  ImGuiWindowFlags_NoResize     |
+                  ImGuiWindowFlags_NoMove       |
+                  ImGuiWindowFlags_NoBackground |
+                  ImGuiWindowFlags_NoNavInputs  );
+   {
+      // draw our window GUI components and do I/O:
+      ImGui::SetWindowPos(  "Welcome", ImVec2( view.width/2-my_width/2, view.height/2-my_height/2 ) );
+      ImGui::SetWindowSize( "Welcome", ImVec2( my_width, my_height ) );
+      ImGui::Text( "Instructions:\n \
+                  \n\t Press F1    to toggle fly mode               \
+                  \n\t Press F2    to toggle wireframe              \
+                  \n\t Press F3    to set render mode: SHADED       \
+                  \n\t Press F4    to set render mode: ALBEDO       \
+                  \n\t Press F5    to set render mode: NORMAL       \
+                  \n\t Press F6    to set render mode: SPECULAR     \
+                  \n\t Press F7    to set render mode: POSITION     \
+                  \n\t Press F8    to set render mode: EMISSION     \
+                  \n\t Press F9    to set render mode: LIGHTING     \
+                  \n\t Press F10   to set render mode: MOUSEPICK    \
+                  \n\t Press F11   to set render mode: DISPLACEMENT \
+                  \n\t Press F12   to toggle debug GUI              \
+                  \n\t Press P     to initiate dance party          \
+                  \n\t Press WASD  to move forward/left/back/right  \
+                  \n\t Press CTRL  to descend                       \
+                  \n\t Press SPACE to ascend" );
+   } ImGui::End(); // end our instructions window
+}
+
 
 Int32 main( Int32 argc, char const *argv[] ) {
 	// initialise GLFW
@@ -666,6 +705,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
 		ImGui::NewFrame();
 
       scene_manager.draw_debug_scene_inspection();
+
+      show_startup_message( *view );
 
       // TODO: refactor into debug.h/cpp
       if ( config.is_imgui_toggled ) {

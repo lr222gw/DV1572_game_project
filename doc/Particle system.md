@@ -1,3 +1,21 @@
+Libraries:
+  We picked GLEW as the OpenGL extension wrangler;
+  GLM as our maths library;
+  GLFW as our window, OpenGL context, and input library;
+  Assim as our asset loading library;
+  Dear ImGui as our debug GUI library;
+  STB for bitmap loading;
+  and STL & STD for standard functionalities.
+  We also had Better-Enums for a while but dropped it due to complications, and we had planned  on using fmt for string formatting and range-v3 as an STL alternative.
+
+//////////////////////////////////////////////////////////
+
+Workflow:
+  Two of the group members developed on Windows 10 with Visual Studio 2017 (MSVC), while one  member developed on Debian Sid with Sublime Text 3 (Clang++7 & Makefile). We feel like this    gave us various benefits during the development cycle; with the obvious benefit being that   the code's cross-platform compatibility was actively tested and another big benefit being   that certain bugs that were a consequence of undefined behaviour were sometimes easier to   detect since they'd manifest themselves differently for us. It also allowed us to check for   memory leaks thoroughly by running both CRTDBG and ValGrind.
+
+
+//////////////////////////////////////////////////////////
+
 Particle system:
 
 Computation options: GPU-computed particle logic or CPU-side logic.
@@ -14,7 +32,7 @@ Implementation options:
    A VBO with all the particles (most compatible).
 
 Issues to be aware of:
-  Transparency; easiest work around is to sort the particles back-to-front and draw them in that order since due to their billboard nature the only cases where overlapping is an issue is when the distance of two billboards is identical and they overlap within their plans, which could lead to minor Z-fighting.
+  Transparency; the easiest workaround (which we picked) is to sort the particles back-to-front and draw them in that order since due to their billboard nature the only cases where overlapping is an issue is when the distance of two billboards is identical and they overlap within their plans, which could lead to minor Z-fighting.
 
   However, they can still intersect in very noticeable manners with other geometry (fom the regular geometry pass). One potential way of dealing with this is to blend the current particle fragment based off of its proximity to the depth buffer at the same pixel.
 
@@ -31,7 +49,7 @@ Limitations:
 
   This is because we use the alpha data for certain texture channels to encode additional data (such as specular intensity for the specular textures). But this issue is easy to fix by simply changing the shaders to use the value of the RGB parts of the texture both for colour and intensity.
 
-Elaborate on: partition
+To handle the particle lifetime tracking we just use std::partition() on the particle data with a unary predicate lambda that compares whether any given particle has expired. Then the returned index becomes the new particle count.
 
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -70,11 +88,18 @@ TODO, flesh out.
 
 Deferred Shading:
 
-We created a G-buffer with the following channels:
-Albedo
-Specular
-Normal
-Emission
-Position
-Displacement
-...
+We created a G-buffer with the following colour attachment channels:
+ - Albedo       (RGBA colour; with the default being 0x808080FF )
+ - Specular     (specular colour encoded as RGB and intensity encoded as A; with the default being 0x80808080)
+ - Normal       (tangent space RGB; with the default 0x8080FF being neutral)
+ - Emission     (lights baked into RGB; basically baked lights, with the default 0x000000 being neutral)
+ - Position     (R for X, G for Y, B for Z; with the default being 0x??????) TODO!
+ - Dosplacement (bidirectional factor encoded as luma; with the default 0x808080 being neutral)
+ - Instance IDs (encoded as non-interpolated RGB colours, with the default 0x000000 implying NONE)
+
+We use the albedo and specular channels for Phong diffuse shading and Blinn-Phone specular shading.
+The normal map is used for the normal mapping part of the assignment.
+The emission channel was added at our own accord because we were interested in trying it out and since the implementation of it is trivial. The data in this texture colour attachment just gets added during shading as if it were the light impact from some lightsource.
+The position channel is used for lighting and occlusion computations to produce the direction the fragment is viewed at.
+The displacement channel is used for displacement tessellation.
+The instance ID channel is used for mousepicking.
