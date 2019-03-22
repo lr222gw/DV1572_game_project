@@ -14,7 +14,7 @@ uniform  sampler2D  g_tex_pic;
 out      vec4       rgba_rasterizer;
 
 #define AMBIENT_FACTOR 0.18f
-#define DIFFUSE_FACTOR 1.0f - 0.18f
+#define DIFFUSE_FACTOR 1.0f - AMBIENT_FACTOR
 
 struct Light {
   uint  type;
