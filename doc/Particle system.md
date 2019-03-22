@@ -103,3 +103,4 @@ The emission channel was added at our own accord because we were interested in t
 The position channel is used for lighting and occlusion computations to produce the direction the fragment is viewed at.
 The displacement channel is used for displacement tessellation.
 The instance ID channel is used for mousepicking.
+§

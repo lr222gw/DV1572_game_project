@@ -13,6 +13,9 @@ uniform  sampler2D  g_tex_disp;
 uniform  sampler2D  g_tex_pic;
 out      vec4       rgba_rasterizer;
 
+#define AMBIENT_FACTOR 0.18f
+#define DIFFUSE_FACTOR 1.0f - 0.18f
+
 struct Light {
   uint  type;
   vec3  dir;
@@ -81,24 +84,26 @@ void main() {
            Light light = lights[i];
 
            if ( light.type == point_light_t ) { // TODO: take one array of each light type and have a loop for each instead
-              float radius   = light.radius * 100.0;
+              float radius   = light.radius * 10.0;
               float distance = length( light.pos - pos );
               if ( distance < radius ) {
                  vec3  light_dir        = normalize( light.pos - pos );
                  vec3  halfway_dir      = normalize( light_dir + view_dir );
 
-  			         light.rgb = light.rgb * light.intensity;
+  			         light.rgb = light.rgb * light.intensity; // UGLY
                  // calculate light effect falloff:
-                 float linear_falloff   = (1.0 - distance / radius);           // yields a normalized value (within the range [0, 1.0])
+                 float linear_falloff   = 1.0 - (distance / radius);           // yields a normalized value (within the range [0, 1.0])
                  float quad_falloff     = linear_falloff * linear_falloff;     // quadratic falloff = linear falloff squared
+                 // calculate ambient impact:
+                 vec3  ambient_impact   = light.rgb * vec3( AMBIENT_FACTOR );
                  // calculate light diffuse impact:
                  float light_modulation = max( dot(norm, light_dir), 0.0f );   // yields a normalized value (within the range [0, 1.0])
-                 vec3  diffuse_impact   = albedo * light.rgb * (light_modulation * light.intensity * quad_falloff);
+                 vec3  diffuse_impact   = (quad_falloff * DIFFUSE_FACTOR * light_modulation) * light.rgb;
                  // calculate specular impact:
                  float spec_modulation  = max( dot(norm, halfway_dir), 0.0f ); // yields a normalized value (within the range [0, 1.0])
                  vec3  spec_impact      = light.rgb * (spec_modulation * spec_str * quad_falloff); // TODO: remove spec_str
                  // update lighting:
-                 lighting              += spec_impact + diffuse_impact; // TODO: emission (+ emit_rgb)
+                 lighting              += (ambient_impact + spec_impact + diffuse_impact) * albedo ; // TODO: emission (+ emit_rgb)
                  // TODO: HDR output?
               }
            }
@@ -106,6 +111,9 @@ void main() {
               lighting = vec3(1.0, 0.0, 1.0 ); // TODO
            }
            else if ( light.type == directional_light_t ) {
+
+				light.dir = normalize(light.pos- light.dir) ;
+
       			vec3 normal  = norm;
       			// ambient
       			vec3 ambient = light.rgb * vec3(0.2);

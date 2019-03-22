@@ -22,6 +22,8 @@ void Shadowcaster::set_Light_matrix(Float32 n_plane, Float32 f_plane, Float32 le
    _light_proj = glm::ortho(_left, _right, _bottom, _top, _n_plane, _f_plane);
 
    //_source->set_data(LightData);
+   _source->set_direction(_target);
+   _source->set_position(_pos);
    //_source.
    _light_matrix = _light_proj * _light_view;
 }

@@ -200,6 +200,8 @@ void toggle_input_callback( GLFWwindow  *window,
 }
 
 
+//TODO: If holding Space then while holding it we also  start holding CTRL, we will Change direction
+//      If holding CTRL then while holding it we also  start holding  Space, we will NOT Change direction....
 // gets called each frame, GLFW is used to read input
 void process_input( GLFWwindow  *window,
                     Viewport    &cam,
@@ -532,7 +534,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    Float32 specularity =   1.0f;
 
    auto sun = scene_manager.instantiate_light( Light::Data{ Light::Type::directional,
-                                                            glm::normalize(poss - dirr),
+                                                            dirr,//glm::normalize(poss - dirr),
                                                             poss,
                                                             Vec3( 1.0f,  1.0f,  1.0f ),
                                                             intensity, // percentage
@@ -544,7 +546,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    auto light_sc = std::make_shared<Shadowcaster>(sun);
 
    // must initialize before first use set_light_matrix(...) atleast once!
-   light_sc->set_Light_matrix(0.1f, glm::length(poss - dirr), 50, -50, 50, -50, poss, dirr, Vec3(0.0f, 1.0f, 0.0f));
+   light_sc->set_Light_matrix(0.1f, glm::length(sun->get_position() - sun->get_direction()), 50, -50, 50, -50, sun->get_position(), sun->get_direction(), Vec3(0.0f, 1.0f, 0.0f));
    scene_manager.set_shadowcasting( light_sc );
 
    Vector<SharedPtr<ModelInstance>> model_instances; // keeps model instances alive  & enables access
@@ -580,13 +582,15 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
 
    // debug tool to see more clearly how Light frustrum looks like
+   auto sun_pos = sun->get_position();
+   auto sun_dir = sun->get_direction();
    ShadowcasterDebug sundbg = ShadowcasterDebug(  light_sc,
                                                  &asset_manager,
                                                  &scene_manager,
                                                  &model_instances,
                                                   geometry_program,
-                                                 &poss,
-                                                 &dirr);
+                                                 &sun_pos,
+                                                 &sun_dir );
 
    // creating the camera viewport
    Vec3 view_position { 0.0f, 20.0f, 15.0f };
@@ -711,7 +715,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
       // TODO: refactor into debug.h/cpp
       if ( config.is_imgui_toggled ) {
          ImGui::Begin( "Settings:" );
-         ImGui::SliderFloat( "Move speed", &config.fly_move_speed, 0.0f, 25.0f );
+         ImGui::SliderFloat( "Move speed", &config.fly_move_speed, 0.0f, 85.0f );
          ImGui::End();
 
          ImGui::Begin("Tessellation Settings:");
@@ -724,7 +728,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 /*light_dbg*/ for ( auto &light : light_instances )
 /*light_dbg*/    debug::lightsource( light, scene_manager );
 /*lightcast*/ light_sc->set_Light_matrix( 0.1f,
-/*lightcast*/                             glm::length(poss-dirr),
+/*lightcast*/                             glm::length(sun->get_position() - sun->get_direction()),
 /*lightcast*/                             corners[0],
 /*lightcast*/                             corners[1],
 /*lightcast*/                             corners[2],

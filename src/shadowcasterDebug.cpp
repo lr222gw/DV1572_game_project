@@ -5,11 +5,11 @@ void ShadowcasterDebug::light_caster_debugg_tool_render() {
    if (_dbg_initialied) {
 
       auto t = _dbgdat.SunApe_pos->model_transform;
-      t.set_position(*pos);
+      t.set_position(shadowcaster->_source->data.position);
       _dbgdat.SunApe_pos->set_transform(t);
 
       auto f = _dbgdat.SunApe_Look->model_transform;
-      f.set_position(*this->target);
+      f.set_position((*this->target) );
       _dbgdat.SunApe_Look->set_transform(f);
 
       //_dbgdat.SunApe_pos->set_transform(_dbgdat.SunApe_pos_modelTrans);
@@ -19,7 +19,7 @@ void ShadowcasterDebug::light_caster_debugg_tool_render() {
       int prev = 0;
       for (int i = 0; i < 4; i++) {
 
-         Vec3 lookAt = *this->target - *pos;
+         Vec3 lookAt = *this->target - shadowcaster->_source->data.position; //Vec3 lookAt = *this->target - *pos;
          Vec3 tempVertical;
          Vec3 tempHorizontal;
          Vec3 tempPos;
@@ -36,9 +36,9 @@ void ShadowcasterDebug::light_caster_debugg_tool_render() {
 }
 
 ShadowcasterDebug::ShadowcasterDebug(SharedPtr<Shadowcaster> shadowcaster, AssetManager *asset_manager, SceneManager *scene_manager, Vector<SharedPtr<ModelInstance>> *model_instances, SharedPtr<ShaderProgram> geometry_program, Vec3 *poss, Vec3 *dirr)
-   : pos(poss), target(dirr),shadowcaster(shadowcaster)
+   : pos(poss),shadowcaster(shadowcaster)
 {
-
+   target = &shadowcaster->_source->data.direction;
    light_caster_debugg_tool_init(shadowcaster, asset_manager, scene_manager, model_instances, geometry_program,poss,dirr);
 }
 
@@ -58,7 +58,7 @@ void ShadowcasterDebug::light_caster_debugg_tool_init( SharedPtr<Shadowcaster> s
       auto SunApe_pos_model    = asset_manager->load_model("sunApe_pos.obj");
       auto SunApe_look_model   = asset_manager->load_model("sunApe_look.obj");
       auto SunApe_corner_model = asset_manager->load_model("sunApe_corner.obj");
-
+      
       //_dbgdat.corner[4];
       //_dbgdat.corner_trans[4];
       //int corners[]{ -50, 50, -50, 50 };
@@ -69,7 +69,8 @@ void ShadowcasterDebug::light_caster_debugg_tool_init( SharedPtr<Shadowcaster> s
       Vec3 up(0.0f, 1.0f, 0.0f);
       int prev = 0;
       for (int i = 0; i < 4; i++) {
-         Vec3 target = *dirr - *poss;
+         Vec3 target = shadowcaster->_source->data.direction - shadowcaster->_source->data.position;
+         //Vec3 target = *dirr - *poss;
          Vec3 tempVertical;
          Vec3 tempHorizontal;
          Vec3 tempPos;
@@ -90,7 +91,7 @@ void ShadowcasterDebug::light_caster_debugg_tool_init( SharedPtr<Shadowcaster> s
          model_instances->push_back(_dbgdat.corner[i]);
       }
 
-      Transform SunApe_pos_modelTrans = Transform(*poss,
+      Transform SunApe_pos_modelTrans = Transform(shadowcaster->_source->data.position ,
          Vec3(0, 0, 0),
          Vec3(1.3f, 1.3f, 1.3f));
 
@@ -100,7 +101,8 @@ void ShadowcasterDebug::light_caster_debugg_tool_init( SharedPtr<Shadowcaster> s
 
       model_instances->push_back(SunApe_pos);
 
-      Transform sunApe_Look_modeltrans = Transform(*dirr,
+      //Transform sunApe_Look_modeltrans = Transform(shadowcaster->_source->data.direction ,
+      Transform sunApe_Look_modeltrans = Transform(shadowcaster->_source->data.direction, //Vec3 lookAt = *this->target - *pos; ,
          Vec3(0, 0, 0),
          Vec3(1.3f, 1.3f, 1.3f));
 

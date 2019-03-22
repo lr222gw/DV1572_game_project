@@ -4,7 +4,7 @@
 
 
 //class SceneManager;
-//#include "Light.h"
+#include "Light.h"
 class Light; // Forward Declaration; we only point to Light class, does not store instances of it or use Light function
 
 
@@ -39,12 +39,14 @@ public:
    Mat4 get_matrix();
    Array<Float32, 4>    getCorners();
 
+   SharedPtr<Light>  _source;
+
 
 private:
 
 
 
-   SharedPtr<Light>  _source;
+
    Mat4              _light_matrix;
    Mat4              _light_view;
    Mat4              _light_proj;
