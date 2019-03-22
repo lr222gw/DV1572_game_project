@@ -126,13 +126,9 @@ void SceneManager::draw( Viewport &view ) {
    auto lighting_pass_loc = _lighting_shader_program->get_location();
    auto geometry_pass_loc = _geometry_shader_program->get_location();
 
+   // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
-   //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-
-
-   //TODO: Make modelinstance supply unique ID to Callback Function and then in CAllback function compare the boundingbox of the modelinstance with the frustrum of all the active shadowcasters and recalculate shadowmap for any intersections
+   // TODO: Make modelinstance supply unique ID to Callback Function and then in CAllback function compare the boundingbox of the modelinstance with the frustrum of all the active shadowcasters and recalculate shadowmap for any intersections
    if (_should_recalculate_shadowmap) {
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       this->update_shadowmap();
@@ -148,8 +144,7 @@ void SceneManager::draw( Viewport &view ) {
       1,
       glm::value_ptr(view_pos));
 
-
-  /*CHANGE*/ _geometry_shader_program->use(); // glUseProgram( geometry_pass_loc );
+  /*CHANGE*/ _geometry_shader_program->use();
   /*CHANGE*/ view.bind_shader_program( _geometry_shader_program );
 
    glBindFramebuffer( GL_DRAW_FRAMEBUFFER, g_buffer.buffer_loc );
@@ -159,13 +154,12 @@ void SceneManager::draw( Viewport &view ) {
    if ( config.is_wireframe_mode )
       glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
-   //Send view_pos to g_buffer.geom shader
+   // send view_pos to g_buffer.geom shader
    view.update();
    view_pos = view.get_view().get_position();
    glUniform3fv( glGetUniformLocation( geometry_pass_loc, "view_pos"),
                  1,
                  glm::value_ptr(view_pos));
-
 
    // 1. Geometry Pass:
    // TODO: sortera instanserna efter ShaderProgram m.h.a. std::partition()
@@ -173,8 +167,7 @@ void SceneManager::draw( Viewport &view ) {
       if ( !instance.expired() )
          instance.lock()->draw();
 
-
-   // Particle system:
+  // Particle system:
 
   // glBindFramebuffer(GL_FRAMEBUFFER,
   //    g_buffer.buffer_loc);
@@ -204,15 +197,10 @@ void SceneManager::draw( Viewport &view ) {
       if ( !ps.expired() )
          ps.lock()->draw( view_pos, *_particle_shader );
 
-
-
-
-
    // disabling wireframe rendering so that the quad will render after the lighting pass
    glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
-
-   // SSAO:
+//@TAG{SSAO}
 //*SSAO*/ glBindFramebuffer( GL_DRAW_FRAMEBUFFER, /*TODO*/ );
 //*SSAO*/ glClear( GL_COLOR_BUFFER_BIT );
 //*SSAO*/ SuperSampledAmbientOcclusion ssao; // TODO: wrap shader programs inside SSAO class?
@@ -240,9 +228,6 @@ void SceneManager::draw( Viewport &view ) {
    glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
    _lighting_shader_program->use(); // glUseProgram( lighting_pass_loc );
-
-
-   ////////////////////
 
    auto g_buffer_data { view.get_g_buffer() };
 
@@ -278,12 +263,9 @@ void SceneManager::draw( Viewport &view ) {
             "lightmatrix"),
          1,
          GL_FALSE,
-         glm::value_ptr(e.first->get_matrix()));
-      // Mat4 ello = e.first->get_matrix();
-      glActiveTexture(GL_TEXTURE7);
-      glBindTexture(GL_TEXTURE_2D, e.second);
-
-      //glUniform1i(glGetUniformLocation(_light_pass_shader->get_location(), "shadowMap"), 4);
+         glm::value_ptr( e.first->get_matrix()) );
+      glActiveTexture( GL_TEXTURE7 );
+      glBindTexture( GL_TEXTURE_2D, e.second );
    }
 
 

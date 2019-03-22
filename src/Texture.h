@@ -98,11 +98,11 @@ private:
 
          glTexParameteri( GL_TEXTURE_2D,
                           GL_TEXTURE_MIN_FILTER,
-                          GL_LINEAR_MIPMAP_LINEAR );
+                          GL_NEAREST );
 
          glTexParameteri( GL_TEXTURE_2D,
                           GL_TEXTURE_MAG_FILTER,
-                          GL_LINEAR );
+                          GL_NEAREST );
       } // TODO: use {fmt} here for formatting?
       else assert( false && String( "Error while trying to load texture from file using:"
                                     "load_texture_from_file( "+ path.relative_path() +"). ").c_str() );
@@ -181,7 +181,7 @@ private:
 
       glTexParameteri( GL_TEXTURE_2D,
                        GL_TEXTURE_MAG_FILTER,
-                       GL_LINEAR );
+                       GL_NEAREST );
 
       return texture_id;
    }

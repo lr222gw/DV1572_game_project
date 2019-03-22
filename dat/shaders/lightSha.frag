@@ -14,7 +14,7 @@ uniform  sampler2D  g_tex_pic;
 out      vec4       rgba_rasterizer;
 
 #define AMBIENT_FACTOR 0.18f
-#define DIFFUSE_FACTOR 1.0f - AMBIENT_FACTOR
+#define DIFFUSE_FACTOR 1.0f - 0.18f
 
 struct Light {
   uint  type;
@@ -79,33 +79,43 @@ void main() {
                                                 min( 255, picking.rgb.z*2 ) ); break;
       case mode_textureless: if ( pos.x+pos.y+pos.z!=0 ) albedo = vec3( 1.0 ); // no break so that the mode_composite code gets run
       case mode_composite:
-         lighting = emit_rgb;
-         for ( int i = 0;  i < num_lights;  ++i ) {
+         lighting = vec3(0); //emit_rgb; 0xFF00FF
+         for ( int i = 0;  i < num_lights;  ++i ) { // 0xFF00FF
            Light light = lights[i];
 
            if ( light.type == point_light_t ) { // TODO: take one array of each light type and have a loop for each instead
-              float radius   = light.radius ;
-              float distance = length( light.pos - pos );
-              if ( distance < radius ) { //  Blinn-Phong for spec
+                 float radius   = light.radius * 4;
+                 vec3  dist_v   = light.pos - pos;
+                 float dist_f   = sqrt( (dist_v.x*dist_v.x) + (dist_v.y * dist_v.y) + (dist_v.z * dist_v.z) );
+              // float radius   = light.radius * 4; // 0xFF00FF
+              // float dist     = length( light.pos - pos );
+              if ( dist_f < radius ) { //  Blinn-Phong for spec
+                 vec3  lite_dir = normalize( light.pos - pos );
+                 vec3  normal   = normalize( norm );
+                 float diff_mod = 0.5f * dot(normal,lite_dir) + 0.5f;
+                 lighting += diff_mod * vec3( 1, 0, 1 );
+                /*
                  vec3  light_dir        = normalize( light.pos - pos );
                  vec3  halfway_dir      = normalize( light_dir + view_dir );
 
-  			         light.rgb = light.rgb; //* light.intensity * 5; // UGLY
+                 vec3 normal = normalize(norm);
+
+  			         light.rgb = light.rgb; //* light.intensity * 20; // UGLY // 0xFF00FF
                  // calculate light effect falloff:
-                 float linear_falloff   = 1.0 - (distance / radius);           // yields a normalized value (within the range [0, 1.0])
-                 float quad_falloff     = linear_falloff * linear_falloff;     // quadratic falloff = linear falloff squared
+                 //float linear_falloff   = max( (radius-dist)/radius, 0.0f );         // yields a normalized value (within the range [0, 1.0])
+                 //float quad_falloff     = linear_falloff * linear_falloff;     // quadratic falloff = linear falloff squared
                  // calculate ambient impact:
-                 vec3  ambient_impact   = light.rgb * vec3( AMBIENT_FACTOR );
+                 //vec3  ambient_impact   = light.rgb * vec3( AMBIENT_FACTOR );
                  // calculate light diffuse impact:
-                 float light_modulation = max( dot(light_dir, norm), 0.0f );   // yields a normalized value (within the range [0, 1.0])
-                 vec3  diffuse_impact   = (DIFFUSE_FACTOR * light_modulation) * light.rgb ;
+                 float light_modulation = max( dot(normal,light_dir), 0.0f ); //0.5f * dot(normal,light_dir) + 0.5f;   // yields a normalized value (within the range [0, 1.0])
+                 vec3  diffuse_impact   = light_modulation * light.rgb; //(light_modulation * light.rgb );
                  // calculate specular impact:
-                 float spec_modulation  = pow( max( dot(norm, halfway_dir), 0.0f ), 32.0); // yields a normalized value (within the range [0, 1.0])
-                 vec3  spec_impact      = light.rgb * (spec_modulation * spec_str); // TODO: remove spec_str
+                 // float spec_modulation  = pow( max( dot(normal, halfway_dir), 0.0f ), 32.0); // yields a normalized value (within the range [0, 1.0])
+                 // vec3  spec_impact      = light.rgb * (spec_modulation * spec_str); // TODO: remove spec_str
                  // update lighting:
-				 
-                 lighting              += (ambient_impact + spec_impact + diffuse_impact) * quad_falloff * albedo * light.intensity ; // TODO: emission (+ emit_rgb)
+                 lighting              += diffuse_impact * albedo; //(ambient_impact + spec_impact + diffuse_impact) * quad_falloff * albedo ; // TODO: emission (+ emit_rgb) // 0xFF00FF
                  // TODO: HDR output?
+                 //*/
               }
            }
            else if ( light.type == spot_light_t ) {
@@ -113,20 +123,18 @@ void main() {
            }
            else if ( light.type == directional_light_t ) {
 
-				light.dir = normalize(light.pos- light.dir) ;
-
-      			vec3 normal  = norm;
+		     		light.dir = normalize(light.pos - light.dir ) ;
       			// ambient
       			vec3 ambient = light.rgb * vec3(0.2);
       			// diffuse
-      			float diff   = max(dot(light.dir, normal), 0.0);
+      			float diff   = max(dot(light.dir, norm), 0.0);
       			vec3 diffuse = diff * light.rgb;
       			// specular
       			vec3  viewDir    = normalize(view_pos - pos);
-      			vec3  reflectDir = reflect(-light.dir, normal);
+      			vec3  reflectDir = reflect(-light.dir, norm);
       			float spec       = spec_str;
       			vec3  halfwayDir = normalize(light.dir + viewDir);
-      			spec = pow(max(dot(normal, halfwayDir), 0.0), 64.0);
+      			spec = pow(max(dot(norm, halfwayDir), 0.0), 64.0);
       			vec3 specular = spec * light.rgb;
       	// calculate shadow:
             // resolution can be changed in SceneManager::set_shadowcasting()
