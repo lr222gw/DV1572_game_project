@@ -32,7 +32,7 @@ public:
                                              , SharedPtr<ShaderProgram>
                                              , Transform const &
                                              , Bool has_tessellation_enabled = false
-                                             #ifdef   DEBUG
+                                             #ifdef   _DEBUG
                                              , Bool is_a_debug_element       = false
                                              #endif /*DEBUG*/
                                              );
@@ -65,7 +65,7 @@ public:
                , SharedPtr<ShaderProgram> light_pass
                , SharedPtr<ShaderProgram> shadow_depth
                , SharedPtr<ShaderProgram> particle_shader    /* @TAG{PS} */
-            #ifdef DEBUG
+            #ifdef _DEBUG
                , SharedPtr<ShaderProgram> dbg_line_program
             #endif /*DEBUG*/
    //* SSAO */ , SharedPtr<ShaderProgram> ssao_main_shader,
@@ -97,7 +97,7 @@ private:
    SharedPtr<ShaderProgram>                  _particle_shader; /* @TAG{PS} */
 //*SSAO*/ SharedPtr<ShaderProgram>                  _ssao_main_shader;
 //*SSAO*/ SharedPtr<ShaderProgram>                  _ssao_blur_shader;
-#ifdef DEBUG
+#ifdef _DEBUG
    SharedPtr<ShaderProgram>                  _debug_line_shader;
    Vector<WeakPtr<ModelInstance>>            _debug_instances;
 #endif /*DEBUG*/

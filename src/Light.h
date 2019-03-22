@@ -2,7 +2,7 @@
 
 #include "misc/defs.h"
 
-#ifdef DEBUG
+#ifdef _DEBUG
    #include "LightDebugger.h"
 #endif
 
@@ -76,7 +76,7 @@ public:
       data                     ( _data                   ),
       id                       ( id                      )
    {
-   #ifdef DEBUG
+   #ifdef _DEBUG
       _update_debug_circle();
    #endif /*DEBUG*/
    }
@@ -94,7 +94,7 @@ public:
       data                     ( _data                   ),
       id                       ( id                      )
    {
-   #ifdef DEBUG
+   #ifdef _DEBUG
       _update_debug_circle();
    #endif /*DEBUG*/
    }
@@ -135,7 +135,7 @@ public:
    Data         &data; // <- publicly exposed const data   // TODO: decide on this or above
    Uint64 const  id;
 
-   #ifdef DEBUG
+   #ifdef _DEBUG
    public:
       Circle  debug_circle;
 

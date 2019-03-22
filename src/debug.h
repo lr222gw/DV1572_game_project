@@ -204,7 +204,7 @@ public:
    }
 };
 
-//#ifdef DEBUG
+//#ifdef _DEBUG
 //   SharedPtr<ShaderProgram>                  _debug_line_shader;
 //   Vector<WeakPtr<ModelInstance>>            _debug_instances;
 //#endif /*DEBUG*/

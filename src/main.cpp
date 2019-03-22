@@ -1,5 +1,6 @@
 #define  STB_IMAGE_IMPLEMENTATION //Den bor här annars kompilerar inte stb_image.h
 
+
 #include "misc/defs.h"
 #include "Config.h"
 #include "debug.h"
@@ -16,7 +17,7 @@
 #include "Light.h"
 #include "shadowcasterDebug.h"
 
-#ifdef DEBUG
+#ifdef _DEBUG
    #include "LightDebugger.h"
 #endif
 
@@ -38,7 +39,7 @@ void APIENTRY glDebugOutput( GLenum         source,
    if ( severity == GL_DEBUG_SEVERITY_NOTIFICATION )
       return;
 
-	std::cout << "DEBUG MESSAGE (" << id << "): " << message << "\n";
+	std::cout << "_DEBUG MESSAGE (" << id << "): " << message << "\n";
 
 	switch ( source ) {
    	case GL_DEBUG_SOURCE_API:               std::cout << "SOURCE: API";                break;
@@ -382,7 +383,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
    //*SSAO*/ auto ssao_vert_shader      { shader_manager.load_shader( "ssao.vert" )             };
    //*SSAO*/ auto ssao_main_frag_shader { shader_manager.load_shader( "ssao.frag" )             };
    //*SSAO*/ auto ssao_blur_frag_shader { shader_manager.load_shader( "ssao_blur.frag" )        };
-#ifdef DEBUG
+#ifdef _DEBUG
    auto dbg_line_vert_shader            { shader_manager.load_shader( "line_shader.vert" )      };
    auto dbg_line_frag_shader            { shader_manager.load_shader( "line_shader.frag" )      };
 #endif /*DEBUG*/
@@ -408,7 +409,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
    auto particle_program    { shader_manager.create_program({ ps_vert_shader, ps_frag_shader }) }; /* @TAG{PS} */
 
-#ifdef DEBUG
+#ifdef _DEBUG
    auto dbg_line_program    { shader_manager.create_program({ dbg_line_vert_shader, dbg_line_frag_shader }) };
 #endif /*DEBUG*/
 
@@ -418,7 +419,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
                                , lighting_program
                                , shadowdepth_program
                                , particle_program /* @TAG{PS} */
-                           #ifdef DEBUG
+                           #ifdef _DEBUG
                                , dbg_line_program
                            #endif /*DEBUG*/
                     //* SSAO */, ssao_main_program

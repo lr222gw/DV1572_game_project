@@ -32,7 +32,7 @@ void Light::set_direction( Vec3 &&direction ) {
 }
 
 void Light::set_color( Vec3 &&color ) {
-   #ifdef DEBUG
+   #ifdef _DEBUG
       debug_circle.set_color( { GLubyte( color[0] * 255U ),
                                 GLubyte( color[0] * 255U ),
                                 GLubyte( color[0] * 255U ) } );
@@ -42,7 +42,7 @@ void Light::set_color( Vec3 &&color ) {
 }
 
 void Light::set_position( Vec3 const &position ) {
-   #ifdef DEBUG
+   #ifdef _DEBUG
       debug_circle.set_position( position );
    #endif /*DEBUG*/
    _data.position = position;
@@ -55,7 +55,7 @@ void Light::set_direction( Vec3 const &direction ) {
 }
 
 void Light::set_color( Vec3 const &color ) {
-   #ifdef DEBUG
+   #ifdef _DEBUG
       debug_circle.set_color( { GLubyte( color[0] * 255U ),
                                 GLubyte( color[0] * 255U ),
                                 GLubyte( color[0] * 255U ) } );
@@ -70,7 +70,7 @@ void Light::set_intensity( Float32 intensity ) {
 }
 
 void Light::set_radius( Float32 radius ) {
-   #ifdef DEBUG
+   #ifdef _DEBUG
       debug_circle.set_radius( radius );
    #endif /*DEBUG*/
    _data.radius = radius;
@@ -88,7 +88,7 @@ void Light::set_specularity( Float32 specularity ) {
 }
 
 void Light::set_type( Light::Type type ) {
-   #ifdef DEBUG
+   #ifdef _DEBUG
       _update_debug_circle();
    #endif /*DEBUG*/
    _data.type = type;

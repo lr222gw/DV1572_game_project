@@ -30,7 +30,7 @@ struct Config {
                               fov_rad            =  1.2708f, // 90 degrees in radians
                               start_aspect_ratio = (Float32)start_height / (Float32)start_width;
 
-#ifdef DEBUG
+#ifdef _DEBUG
    static Bool constexpr  is_debugging = true;
    static Bool            should_draw_debug_elements; // toggleable
 #else
