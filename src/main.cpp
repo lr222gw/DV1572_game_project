@@ -458,7 +458,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
                                                                              Vec3( 10.0f,  10.0f,  10.0f ),
                                                                              Vec3(  1.0f,   0.0f,   0.0f ),
                                                                               0.1,
-                                                                             14.0,
+                                                                             14.0*10,
                                                                               0.0,
                                                                               1.0 } ) );
 
@@ -467,7 +467,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
                                                                              Vec3( 1.0f,  4.0f,  5.0f ),
                                                                              Vec3( 1.0f,  1.0f,  0.0f ),
                                                                              0.1,
-                                                                             7.0,
+                                                                             7.0 * 10,
                                                                              0.0,
                                                                              1.0 } ) );
 
@@ -476,7 +476,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
                                                                              Vec3( 2.0f,  1.0f,  5.0f ),
                                                                              Vec3( 1.0f,  0.0f,  1.0f ),
                                                                               0.1,
-                                                                             17.0,
+                                                                             17.0 * 10,
                                                                               0.0,
                                                                               1.0} ) );
 
@@ -485,7 +485,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
                                                                              Vec3( 1.0f,  5.0f,  6.0f ),
                                                                              Vec3( 0.0f,  1.0f,  0.0f ),
                                                                               0.1,
-                                                                             11.0,
+                                                                             11.0 * 10,
                                                                               0.0,
                                                                               1.0 } ) );
 
@@ -494,7 +494,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
                                                                              Vec3( 3.0f,  3.0f,  1.0f ),
                                                                              Vec3( 0.0f,  1.0f,  1.0f ),
                                                                              0.1,
-                                                                             2.0,
+                                                                             2.0 * 10,
                                                                              0.0,
                                                                              1.0 } ) );
 
@@ -503,7 +503,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
                                                                              Vec3( 1.0f,  2.0f,  10.0f ),
                                                                              Vec3( 0.0f,  0.0f,   1.0f ),
                                                                              0.1,
-                                                                             1.0,
+                                                                             1.0 * 10,
                                                                              0.0,
                                                                              1.0 } ) );
 
@@ -512,7 +512,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
                                                                              Vec3( 10.0f,  0.0f,  5.0f ),
                                                                              Vec3(  1.0f,  1.0f,  1.0f ),
                                                                              0.1,
-                                                                             7.0,
+                                                                             7.0 * 10,
                                                                              0.0,
                                                                              1.0 } ) );
 
@@ -521,7 +521,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
                                                                              Vec3( 10.0f,  5.0f,  10.0f ),
                                                                              Vec3(  1.0f,  0.3f,   0.5f ),
                                                                               0.1,
-                                                                             17.0,
+                                                                             17.0 * 10,
                                                                               0.0,
                                                                               1.0 } ) );
 
