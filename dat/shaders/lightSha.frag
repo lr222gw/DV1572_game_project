@@ -81,26 +81,30 @@ void main() {
            Light light = lights[i];
 
            if ( light.type == point_light_t ) { // TODO: take one array of each light type and have a loop for each instead
-              float radius   = light.radius * 100.0;
+              float radius   = light.radius;// * 100.0;
               float distance = length( light.pos - pos );
               if ( distance < radius ) {
                  vec3  light_dir        = normalize( light.pos - pos );
                  vec3  halfway_dir      = normalize( light_dir + view_dir );
 
   			         light.rgb = light.rgb * light.intensity;
+					 vec3 ambient = light.rgb * vec3(0.18);
                  // calculate light effect falloff:
                  float linear_falloff   = (1.0 - distance / radius);           // yields a normalized value (within the range [0, 1.0])
                  float quad_falloff     = linear_falloff * linear_falloff;     // quadratic falloff = linear falloff squared
                  // calculate light diffuse impact:
                  float light_modulation = max( dot(norm, light_dir), 0.0f );   // yields a normalized value (within the range [0, 1.0])
-                 vec3  diffuse_impact   = albedo * light.rgb * (light_modulation * light.intensity * quad_falloff);
+                 //vec3  diffuse_impact   = albedo * light.rgb * (light_modulation * light.intensity * quad_falloff);
+                 vec3  diffuse_impact   =  light.rgb * (light_modulation * light.intensity * quad_falloff);
                  // calculate specular impact:
                  float spec_modulation  = max( dot(norm, halfway_dir), 0.0f ); // yields a normalized value (within the range [0, 1.0])
                  vec3  spec_impact      = light.rgb * (spec_modulation * spec_str * quad_falloff); // TODO: remove spec_str
                  // update lighting:
-                 lighting              += spec_impact + diffuse_impact; // TODO: emission (+ emit_rgb)
-                 // TODO: HDR output?
-              }
+                 lighting              += (ambient + spec_impact + diffuse_impact) * albedo ; // TODO: emission (+ emit_rgb)
+                 //lighting              +=  spec_impact + diffuse_impact ; // TODO: emission (+ emit_rgb)
+                 // TODO: HDR output?		//NOTE: We get diffuse_impact by Multiplying the Albedo, We probably should skip that 
+              }								//		and Multiply both spec_impact and diffuse_impact With it, according to guides... 
+											//		lightning += (spec_impact + diffuse_impact) * albedo
            }
            else if ( light.type == spot_light_t ) {
               lighting = vec3(1.0, 0.0, 1.0 ); // TODO
