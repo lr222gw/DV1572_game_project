@@ -17,10 +17,78 @@ Workflow:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Memory Leaks:
+Shader Programs:
 
-TODO:   Assimp, STB, GLFW
-        Task manager lång tid
+  Default Geometry Pass Shader Program
+  Tessellated Geometry Pass Shader Program (shares the fragment shader with the default geometry pass)
+  Lighting Pass Shader Program
+  Particle System Shader Program
+  Shadow Depth Shader Program
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Project structure:
+
+SceneManager        -- provides an interface to instantiate scene-specific components
+   Viewport         -- encapsulates the user's viewport (camera), including window information
+   Light            -- encapsulates various lighting data and lightsource types
+   Shadowcaster     -- wraps a lightsource to add shadow-casting functionality
+   ParticleSystem   -- encapsulates things related to particles and their usage
+   AssetManager     -- provides some functionality for loading various assets
+     Mesh           -- encapsulates meshes, their functionality, and relevant data
+     Model          -- encapsulates models, their functionality, and relevant data
+     ModelInstance  -- wraps a model to avoid duplicating data on the CPU when instantiating a model
+     Texture        -- encapsulates a bitmap and some relevant data
+     TextureSet     -- collection of textures of each type; default generated as 1x1 textures if not provided
+   ShaderManager    -- encapsulates functionality related to loading shaders and compiling shader programs
+     Shader         -- encapsulates a shader and its related functions
+     ShaderProgram  -- encapsulates a shader program and its related functions
+Transform           -- a composite class that encompasses both scaling, rotation, and translation transforms
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Miscellaneous files:
+
+defs.h; a header file that gathers most of our major definitions, using aliases, as well as some include directives in one place.
+
+debug.h/cpp; gathers most of the debug functionality in one place.
+
+Config.h/cpp; gathers most of the global scope configurations in one place.
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Demo scene:
+
+// scene content
+
+The scene consists of a tessellated floor plane, a tessellated funky monkey, an army of non-tessellated monkeys, a snowy particle system, a beatific collection of various colourful point lights, a shadowcasting directional sun light, as well as some debug components.
+
+The demo also provides both a debug GUI that is toggled with F12, as well as various key and mouse bindings to facilitate interactions with the scene.
+
+Directional movement can be done with the WASD and CTRL/SPACE keys, and free flight movement can be toggled with F1. The middle mouse button can also be held to rotate the view even without the free flight mode. A GUI window contains a slider to change the movement speed.
+
+The key P triggers a funky monkey dance party.
+
+The F2 key toggles between wireframe and face rendering.
+
+Render mode can be switched with the following keys:
+F3:  full shading (default; composite of the channels)
+F4:  albedo channel
+F5:  normals channel (viewed in object space)
+F6:  specular channel
+F7:  position channel
+F8:  emission channel
+F9:  lighting mode (composite shading sans the albedo)
+F10: ID channel (colour attachment used by mousepicking)
+F11: displacement channel (colour attachment used by displacement tessellation)
+
+ESC: used to exit the demo when you're feeling lazy
+
+The debug GUI offers a window with sliders for the displacement factor and tessellation level percent.
+
+There's also a window for each lightsource that provides some means of modifying their various attributes. 0xFF00FF
+
+There's also a window listing all the current model instances and exposing access to their data.
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -68,23 +136,13 @@ Front-to-back rendering:
 
 In order to accomplish this acceleration all that is needed is to maintain a sorted order of the model instances that is based off of their distance from the viewport's camera position.
 
-Depending on one's needs, a quad tree or octree would be an ideal data structure for storing them. Then it's just a question of traversing the tree based off of the camera position.
+Depending on one's needs, a quad tree or octree would be an ideal data structure for storing them. Then it's just a question of traversing the tree based off of the camera position. Even for 3D games, many games have a 2D layout  (that is, having the X and Z axes be the longest, while the Y axis is short). The easiest way to achieve this, however, is to just store references to the instances in a vector and then use STD's sort algorithm with a custom lambda that compares two instances' distances from the viewport, with the latter being passed via the lambda capture.
 
-Even for 3D games, many games have a 2D layout  (that is, having the X and Z axes be the longest, while the Y axis is short).
-
-The easiest way to achieve this, however, is to just store references to the instances in a vector and then use STD's sort algorithm with a custom lambda that compares two instances' distances from the viewport, with the latter being passed via the lambda capture.
-
-One small optimization that we did is to have our SceneManager class hand our model instances a callback function that they call everytime they get transformed. If a change happens, a flag is set that frame to sort the instances before iterating them for drawing. Of course, this will also need to be called if the viewport changes its position as well.
-
-The drawback with this naïve vector method in our case is that we keep all instances in one vector. /* Ideally, we'd like to have a separate container for instances within proximity.
-The predicate for this could either be a simple function that implements a distance threshold to determine eligibility; or if a level-of-detail system is used, the LoD could also factor in.
-Then it also depends on what kind of game the engine is to be used for. For a game like Minecraft, the octree approach would be ideal; for a real time stategy game, a quad tree or cell grid system (where each cell contains a set of instances) would be good. */
-
-When it comes to our particle system, however, we don't use front-to-back rendering but rather back-to-front rendering in order to handle transparency in a non-complicated manner.
+One small optimization that we did is to have our SceneManager class hand our model instances a callback function that they call everytime they get transformed. If a change happens, a flag is set that frame to sort the instances before iterating them for drawing. Of course, this will also need to be called if the viewport changes its position as well. The drawback with this naïve vector method in our case is that we keep all instances in one vector. When it comes to our particle system, however, we don't use front-to-back rendering but rather back-to-front rendering in order to handle transparency in a non-complicated manner.
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Backface culling
+Backface culling:
 
 Compare the triangle normal (in the geometry shader) to the camera's facing direction to determine whether it is facing towards or away from the beholder. Using the backface culling built into OpenGL is both easier and gives better results.
 
@@ -107,8 +165,8 @@ The position channel is used for lighting and occlusion computations to produce 
 The displacement channel is used for displacement tessellation.
 The instance ID channel is used for mousepicking.
 
-// TODO:  BESKRIV LIGHT PASS SHADER
-// TODO:  NÄMNA LITE OM LJUSEN
+// TODO:  BESKRIV LIGHT PASS SHADER 0xFF00FF
+// TODO:  NÄMNA LITE OM LJUSEN      0xFF00FF
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -150,3 +208,20 @@ The texture is loaded with the help of Assimp which also calculates the normal, 
 Mouse picking:
 
 We chose to implement a texture that colour codes all the objects that we want to be able to do picking on. So, our SceneManager gives every ModelInstance a distinct ID (number) starting from 1. These numbers are then bitshifted so that we get a vec4 with 8 bits of our 32-bit number in each of the four spaces. This vec4 is then sent up as a uniform to the fragment shader of the geometry pass. After this we then read our texture from the correct G-buffer color attachment and get our RGBA colour. This vec4 is then bitshifted the opposite way and added together into a 32-bit integer which is our unique ID for a model instance. Then this is used by the SceneManager to search through our vector of model instances to get the correct model and its pointer. In our demo, the pointer is then used to rotate the picked model instance to demonstrate that it works.
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Memory Leaks:
+
+We ran both Valgrind and CRTDBG to check for memory leaks, and had various potential leaks; but to the best of their knowledge they originated in some of the libraries that we use (Assimp, STB, potentially GLFW). We ran the demo for an extended period of time and noticed that the resource footprint did not climb but rather subsided and plateaud after the assets had been loaded and instantiated. Also, throughout the project we made use of RAII (Resource Acquisition Is Initialization) to encapsulate the lifetimes of data instances with value semantic and automatic resource management.
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Reflections:
+
+We all found the project to be very educational and fun, and we would like to continue expanding on it on our free time to implement more techniques to further our knowledge and expand our minds.
+
+0xFF00FF gif
+
+Ideally, in the context of front-to-back rendering we'd like to have a separate container for instances within proximity. The predicate for this could either be a simple function that implements a distance threshold to determine eligibility; or if a level-of-detail system is used, the LoD could also factor in.
+Then it also depends on what kind of game the engine is to be used for. For a game like Minecraft, the octree approach would be ideal; for a real time stategy game, a quad tree or cell grid system (where each cell contains a set of instances) would be good.
