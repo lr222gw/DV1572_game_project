@@ -25,7 +25,10 @@ void Model::_load_model( String const &filename ) {
    // Assimp also provides various other post-processing options that we don't use
 
    auto const *scene = importer.ReadFile( filename,
-                                          aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace);
+                                          aiProcess_Triangulate      |
+                                          aiProcess_FlipUVs          |
+                                          aiProcess_GenSmoothNormals |
+                                          aiProcess_CalcTangentSpace );
 
    Bool encountered_error =  !scene
                           || (scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE)
@@ -55,14 +58,10 @@ Vector<SharedPtr<Mesh>> const & Model::get_meshes() const {
 }
 
 void Model::_draw( ShaderProgram &shader_program, Bool should_tessellate ) const {
-
-   for ( auto &e : get_meshes() ){  // for each mesh in the model
-
+   for ( auto &e : get_meshes() ) {  // for each mesh in the model
       if ( should_tessellate )
          e->_draw_tessellated( shader_program ); // call the mesh's tessellated draw function
       else e->_draw( shader_program );           // call the mesh's draw function
-
-
    }
 }
 
@@ -90,25 +89,20 @@ SharedPtr<Mesh> Model::_process_mesh( aiMesh *mesh, aiScene const *scene ) {
                            mesh->mNormals[i].y ,
                            mesh->mNormals[i].z };
 
+      vertex.tangent   = { mesh->mTangents[i].x,
+                           mesh->mTangents[i].y,
+                           mesh->mTangents[i].z };
 
-      //if (dot(cross(norm, tang), btan) < 0.0) {
-      //   tang = tang * -1.0;
-      //}
-
-	  vertex.tangent = { mesh->mTangents[i].x,
-						 mesh->mTangents[i].y,
-						 mesh->mTangents[i].z };
-
-	  vertex.bitangent = { mesh->mBitangents[i].x,
-						   mesh->mBitangents[i].y,
-						   mesh->mBitangents[i].z };
+      vertex.bitangent = { mesh->mBitangents[i].x,
+                           mesh->mBitangents[i].y,
+                           mesh->mBitangents[i].z };
 
      //TODO: Shadow on floor return if we use ">" instead of "<"
-     //if (glm::dot(glm::cross(vertex.normal, vertex.tangent), vertex.bitangent) < 0.0) {
-     //   vertex.tangent = { -mesh->mTangents[i].x,
-     //              -mesh->mTangents[i].y,
-     //              -mesh->mTangents[i].z };
-     //}
+     // if (glm::dot(glm::cross(vertex.normal, vertex.tangent), vertex.bitangent) < 0.0) {
+     //    vertex.tangent = { -mesh->mTangents[i].x,
+     //               -mesh->mTangents[i].y,
+     //               -mesh->mTangents[i].z };
+     // }
 
       // check whether mesh contains textures:
       if ( mesh->mTextureCoords[0] ) {  // if it does, extract UV-coords

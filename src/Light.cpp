@@ -17,60 +17,81 @@
 //    return next_id++;
 // }
 
+// TODO: use Transform?
+
 Light::~Light() { _on_destruction_callback( id ); }
 
-void Light::set_position(    Vec3       &&position    ) {
-   _data.position    = std::move( position  );
+void Light::set_position( Vec3 &&position    ) {
+   _data.position = std::move( position  );
    _on_change_callback( id );
 }
 
-void Light::set_direction(   Vec3       &&direction   ) {
-   _data.direction   = std::move( direction );
+void Light::set_direction( Vec3 &&direction ) {
+   _data.direction = std::move( direction );
    _on_change_callback( id );
 }
 
-void Light::set_color(       Vec3       &&color       ) {
-   _data.color       = std::move( color     );
+void Light::set_color( Vec3 &&color ) {
+   #ifdef DEBUG
+      debug_circle.set_color( { GLubyte( color[0] * 255U ),
+                                GLubyte( color[0] * 255U ),
+                                GLubyte( color[0] * 255U ) } );
+   #endif /*DEBUG*/
+   _data.color = std::move( color );
    _on_change_callback( id );
 }
 
-void Light::set_position(    Vec3 const  &position    ) {
-   _data.position    = position              ;
+void Light::set_position( Vec3 const &position ) {
+   #ifdef DEBUG
+      debug_circle.set_position( position );
+   #endif /*DEBUG*/
+   _data.position = position;
    _on_change_callback( id );
 }
 
-void Light::set_direction(   Vec3 const  &direction   ) {
-   _data.direction   = direction             ;
+void Light::set_direction( Vec3 const &direction ) {
+   _data.direction = direction;
    _on_change_callback( id );
 }
 
-void Light::set_color(       Vec3 const  &color       ) {
-   _data.color       = color                 ;
+void Light::set_color( Vec3 const &color ) {
+   #ifdef DEBUG
+      debug_circle.set_color( { GLubyte( color[0] * 255U ),
+                                GLubyte( color[0] * 255U ),
+                                GLubyte( color[0] * 255U ) } );
+   #endif /*DEBUG*/
+   _data.color = color;
    _on_change_callback( id );
 }
 
-void Light::set_intensity(   Float32      intensity   ) {
-   _data.intensity   = intensity             ;
+void Light::set_intensity( Float32 intensity ) {
+   _data.intensity = intensity;
    _on_change_callback( id );
 }
 
-void Light::set_radius(      Float32      radius      ) {
-   _data.radius      = radius                ;
+void Light::set_radius( Float32 radius ) {
+   #ifdef DEBUG
+      debug_circle.set_radius( radius );
+   #endif /*DEBUG*/
+   _data.radius = radius;
    _on_change_callback( id );
 }
 
-void Light::set_degree(      Float32      degree      ) {
-   _data.degree      = degree                ;
+void Light::set_degree( Float32 degree ) {
+   _data.degree = degree;
    _on_change_callback( id );
 }
 
-void Light::set_specularity( Float32      specularity ) {
-   _data.specularity = specularity           ;
+void Light::set_specularity( Float32 specularity ) {
+   _data.specularity = specularity;
    _on_change_callback( id );
 }
 
-void Light::set_type(        Light::Type  type        ) {
-   _data.type        = type                  ;
+void Light::set_type( Light::Type type ) {
+   #ifdef DEBUG
+      _update_debug_circle();
+   #endif /*DEBUG*/
+   _data.type = type;
    _on_change_callback( id );
 }
 

@@ -10,8 +10,8 @@ Ke 0.0 0.0 0.0
 Ni 1.000000
 d 1.000000
 illum 2
-map_Kd ape_dif.png
-# map_Kn ape_nor.png
-map_Ks ape_spec.png
-map_emissive ape_emit.png
-disp ape_disp.png
+  map_Kd ape_dif.png
+  map_Kn ape_nor.png
+  map_Ks ape_spec.png
+  map_emissive ape_emit.png
+  disp ape_disp.png

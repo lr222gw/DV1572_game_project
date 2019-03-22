@@ -16,6 +16,10 @@
 #include "Light.h"
 #include "shadowcasterDebug.h"
 
+#ifdef DEBUG
+   #include "LightDebugger.h"
+#endif
+
 #include "ParticleSystem.h" /* @TAG{PS} */
 #include <random>           /* used by particle system algorithm defined in main; TODO: move to defs */
 
@@ -292,50 +296,6 @@ void draw_camera_debug_window( Vec3    &position,
    } ImGui::End(); // end our Camera window
 }
 
-
-void show_startup_message( Viewport const& view ) {
-   static constexpr int  my_width  = 400;
-   static constexpr int  my_height = 320;
-   static           bool is_shown  = true;
-
-   if ( !is_shown )
-         return; // end our instructions window early
-
-   ImGui::Begin( "Welcome", // begin our instructions window:
-                 &is_shown,
-                  ImGuiWindowFlags_NoCollapse   |
-                  ImGuiWindowFlags_NoResize     |
-                  ImGuiWindowFlags_NoMove       |
-                  ImGuiWindowFlags_NoBackground |
-                  ImGuiWindowFlags_NoNavInputs  );
-   {
-      // draw our window GUI components and do I/O:
-      ImGui::SetWindowPos(  "Welcome", ImVec2( view.width/2-my_width/2, view.height/2-my_height/2 ) );
-      ImGui::SetWindowSize( "Welcome", ImVec2( my_width, my_height ) );
-      ImGui::Text( "Instructions:\n \
-                  \n\t Press F1    to toggle fly mode               \
-                  \n\t Press F2    to toggle wireframe              \
-                  \n\t Press F3    to set render mode: SHADED       \
-                  \n\t Press F4    to set render mode: ALBEDO       \
-                  \n\t Press F5    to set render mode: NORMAL       \
-                  \n\t Press F6    to set render mode: SPECULAR     \
-                  \n\t Press F7    to set render mode: POSITION     \
-                  \n\t Press F8    to set render mode: EMISSION     \
-                  \n\t Press F9    to set render mode: LIGHTING     \
-                  \n\t Press F10   to set render mode: MOUSEPICK    \
-                  \n\t Press F11   to set render mode: DISPLACEMENT \
-                  \n\t Press F12   to toggle debug GUI              \
-                  \n\t Press P     to initiate dance party          \
-                  \n\t Press WASD  to move forward/left/back/right  \
-                  \n\t Press CTRL  to descend                       \
-                  \n\t Press SPACE to ascend                        \
-                  \n\t Hold middle mouse button to look around      \
-                  \n\t                                              \
-                  \n\t Press ESC to exit" );
-   } ImGui::End(); // end our instructions window
-}
-
-
 Int32 main( Int32 argc, char const *argv[] ) {
 	// initialise GLFW
 	glewExperimental = true; // <- needed for core profile
@@ -422,6 +382,12 @@ Int32 main( Int32 argc, char const *argv[] ) {
    //*SSAO*/ auto ssao_vert_shader      { shader_manager.load_shader( "ssao.vert" )             };
    //*SSAO*/ auto ssao_main_frag_shader { shader_manager.load_shader( "ssao.frag" )             };
    //*SSAO*/ auto ssao_blur_frag_shader { shader_manager.load_shader( "ssao_blur.frag" )        };
+#ifdef DEBUG
+   auto dbg_line_vert_shader            { shader_manager.load_shader( "line_shader.vert" )      };
+   auto dbg_line_frag_shader            { shader_manager.load_shader( "line_shader.frag" )      };
+#endif /*DEBUG*/
+
+
 
    //* SSAO */ auto ssao_main_program { shader_manager.create_program({ ssao_vert_shader, ssao_main_frag_shader }) };
    //* SSAO */ auto ssao_blur_program { shader_manager.create_program({ ssao_vert_shader, ssao_blur_frag_shader }) };
@@ -442,90 +408,103 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
    auto particle_program    { shader_manager.create_program({ ps_vert_shader, ps_frag_shader }) }; /* @TAG{PS} */
 
+#ifdef DEBUG
+   auto dbg_line_program    { shader_manager.create_program({ dbg_line_vert_shader, dbg_line_frag_shader }) };
+#endif /*DEBUG*/
+
    // add Lightning shader program to SceneManager
    SceneManager  scene_manager { geometry_program
                                , geometry_tessellation_program
                                , lighting_program
                                , shadowdepth_program
                                , particle_program /* @TAG{PS} */
+                           #ifdef DEBUG
+                               , dbg_line_program
+                           #endif /*DEBUG*/
                     //* SSAO */, ssao_main_program
                     //* SSAO */, ssao_blur_program
                                };
 
+   // creating the camera viewport
+   Vec3 view_position { 0.0f, 20.0f, 15.0f };
+   auto view = scene_manager.instantiate_viewport( view_position, window, geometry_program );
+   view->bind_shader_program( geometry_program ); // TODO: shouldn't be necessary here
+
    Vector<SharedPtr<Light>> light_instances; // keeps light instances alive & enables access
-/*
+
    light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,
                                                                              Vec3(  0.0f,   0.0f,   0.0f ),
-                                                                             Vec3( 10.0f,  10.0f,  10.0f ),
+                                                                             Vec3( 14.0f,  9.0f,  120.0f ),
                                                                              Vec3(  1.0f,   0.0f,   0.0f ),
                                                                               0.1,
-                                                                             14.0*10,
+                                                                             75.0,
                                                                               0.0,
-                                                                              1.0 } ) );
+                                                                              1.2 } ) );
 
    light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,
                                                                              Vec3( 0.0f,  0.0f,  0.0f ),
-                                                                             Vec3( 1.0f,  4.0f,  5.0f ),
+                                                                             Vec3( 30.0f, 6.0f,  75.0f ),
                                                                              Vec3( 1.0f,  1.0f,  0.0f ),
                                                                              0.1,
-                                                                             7.0 * 10,
+                                                                            99.0,
                                                                              0.0,
-                                                                             1.0 } ) );
+                                                                             1.7 } ) );
 
    light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,
                                                                              Vec3( 0.0f,  0.0f,  0.0f ),
-                                                                             Vec3( 2.0f,  1.0f,  5.0f ),
+                                                                             Vec3( 26.0f,  41.0f,  45.0f ),
                                                                              Vec3( 1.0f,  0.0f,  1.0f ),
                                                                               0.1,
-                                                                             17.0 * 10,
+                                                                             57.0,
                                                                               0.0,
-                                                                              1.0} ) );
-*/
+                                                                              1.2} ) );
+
    light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,
                                                                              Vec3( 0.0f,  0.0f,  0.0f ),
-                                                                             Vec3( 1.0f,  5.0f,  6.0f ),
+                                                                             Vec3( 1.0f,  9.0f,  24.0f ),
                                                                              Vec3( 0.0f,  1.0f,  0.0f ),
                                                                               0.1,
-                                                                             11.0 * 10,
+                                                                             79.0,
                                                                               0.0,
-                                                                              1.0 } ) );
-/*
+                                                                              1.5 } ) );
+
    light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,
                                                                              Vec3( 0.0f,  0.0f,  1.0f ),
-                                                                             Vec3( 3.0f,  3.0f,  1.0f ),
+                                                                             Vec3( 11.0f,  14.0f,  191.0f ),
                                                                              Vec3( 0.0f,  1.0f,  1.0f ),
                                                                              0.1,
-                                                                             2.0 * 10,
+                                                                           150.0,
                                                                              0.0,
-                                                                             1.0 } ) );
+                                                                             0.9 } ) );
 
    light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,
                                                                              Vec3( 0.0f,  0.0f,   0.0f ),
-                                                                             Vec3( 1.0f,  2.0f,  10.0f ),
+                                                                             Vec3( 100.0f,  2.0f,  10.0f ),
                                                                              Vec3( 0.0f,  0.0f,   1.0f ),
                                                                              0.1,
-                                                                             1.0 * 10,
+                                                                            81.0,
                                                                              0.0,
                                                                              1.0 } ) );
 
    light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,
                                                                              Vec3(  0.0f,  0.0f,  0.0f ),
-                                                                             Vec3( 10.0f,  0.0f,  5.0f ),
+                                                                             Vec3( 10.0f,  1.0f,  51.0f ),
                                                                              Vec3(  1.0f,  1.0f,  1.0f ),
                                                                              0.1,
-                                                                             7.0 * 10,
+                                                                            97.0,
                                                                              0.0,
-                                                                             1.0 } ) );
+                                                                             1.9 } ) );
 
    light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,
                                                                              Vec3(  0.0f,  0.0f,   0.0f ),
-                                                                             Vec3( 10.0f,  5.0f,  10.0f ),
+                                                                             Vec3( 150.0f,  25.0f,  200.0f ),
                                                                              Vec3(  1.0f,  0.3f,   0.5f ),
                                                                               0.1,
-                                                                             17.0 * 10,
+                                                                            400.0,
                                                                               0.0,
-                                                                              1.0 } ) );
-*/
+                                                                              1.3 } ) );
+
+
    SharedPtr<Model> ape_model = asset_manager.load_model( "ape.obj" );
 
    // parameters for the Sun / shadowcasting light
@@ -596,14 +575,10 @@ Int32 main( Int32 argc, char const *argv[] ) {
                                                  &sun_pos,
                                                  &sun_dir );
 
-   // creating the camera viewport
-   Vec3 view_position { 0.0f, 20.0f, 15.0f };
-   auto view = scene_manager.instantiate_viewport( view_position, window, geometry_program );
-   view->bind_shader_program( geometry_program ); // TODO: shouldn't be necessary here
 
    // set tessellated related values (that will later be uploaded as uniforms)
-   Float32 displacement_factor =    2;
-   Float32 tess_percent        = -0.9;
+   Float32 displacement_factor =  1.5f;
+   Float32 tess_percent        = -0.9f;
 
    glUseProgram( lighting_program->get_location() );
 
@@ -687,6 +662,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
 /* PS */ scene_manager.instantiate_particle_system( ps ); // TODO: revamp in SceneManager
 /* PS */ ps->start(); // starting it
 
+auto debug_gui = DebugGUI { &scene_manager, &asset_manager, /*UGLY:*/&*view }; /*DEBUG*/ /*GUI*/
+
 // main loop:
 	while ( !glfwWindowShouldClose(window) ) {
       Float32 delta_time_ms { ImGui::GetIO().DeltaTime / 1000.f };
@@ -714,8 +691,6 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
       scene_manager.draw_debug_scene_inspection();
 
-      show_startup_message( *view );
-
       // TODO: refactor into debug.h/cpp
       if ( config.is_imgui_toggled ) {
          ImGui::Begin( "Settings:" );
@@ -727,6 +702,8 @@ Int32 main( Int32 argc, char const *argv[] ) {
          ImGui::SliderFloat("Tessellation level Percent: ", &tess_percent, -1.0f, 1.0f);
          ImGui::End();
       }
+
+      debug_gui.draw(); /*DEBUG*/ /*GUI*/
 
 /*light_dbg*/ Array<Float32,4> corners = light_sc->getCorners();
 /*light_dbg*/ for ( auto &light : light_instances )

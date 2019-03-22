@@ -27,6 +27,7 @@ void ModelInstance::draw() {
                        1,
                        GL_FALSE,
                        &(_transform.matrix[0][0]) );
+
    // convert ID to RGBA color:
    Vec4 id_as_rgba { (Float32((id) >>  0 & 0xFF)) / 255,
                      (Float32((id) >>  8 & 0xFF)) / 255,
@@ -37,6 +38,7 @@ void ModelInstance::draw() {
    glUniform4fv( glGetUniformLocation(_shader_program->get_location(), "obj_id"),
                  1,
                  glm::value_ptr(id_as_rgba));
+
    // draw model:
    _model->_draw( *_shader_program, _is_tessellation_enabled );
 }

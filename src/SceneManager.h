@@ -8,25 +8,34 @@
 #include "misc/ImGui/imgui_impl_opengl3.h"
 
 //*SSAO*/#include "SuperSampledAmbientOcclusion.h"
+
 #include "ModelInstance.h"
 #include "ShaderProgram.h"
 #include "Transform.h"
-#include "Viewport.h"
+
 #include "Shadowcaster.h"
 #include "ParticleSystem.h"
 #include "Light.h"
 
+#include "Viewport.h"
+
+
 constexpr Uint32  light_capacity = 32; // TODO: refactor into config
 
 class SceneManager {
+   friend class DebugGUI;
 // friend class Handle<ModelInstance>;
 // friend class Handle<ParticleSystem>;
 // friend class Handle<Light>;
 public:
-   SharedPtr<ModelInstance> instantiate_model( SharedPtr<Model>,
-                                               SharedPtr<ShaderProgram>,
-                                               Transform const &,
-                                               Bool tessellation_enabled = false );
+   SharedPtr<ModelInstance> instantiate_model( SharedPtr<Model>
+                                             , SharedPtr<ShaderProgram>
+                                             , Transform const &
+                                             , Bool has_tessellation_enabled = false
+                                             #ifdef   DEBUG
+                                             , Bool is_a_debug_element       = false
+                                             #endif /*DEBUG*/
+                                             );
 
 
    UniquePtr<Viewport> instantiate_viewport( Vec3 position, GLFWwindow *, SharedPtr<ShaderProgram>, Float32 fov = Config::fov_rad );
@@ -56,6 +65,9 @@ public:
                , SharedPtr<ShaderProgram> light_pass
                , SharedPtr<ShaderProgram> shadow_depth
                , SharedPtr<ShaderProgram> particle_shader    /* @TAG{PS} */
+            #ifdef DEBUG
+               , SharedPtr<ShaderProgram> dbg_line_program
+            #endif /*DEBUG*/
    //* SSAO */ , SharedPtr<ShaderProgram> ssao_main_shader,
    //* SSAO */ , SharedPtr<ShaderProgram> ssao_blur_shader
                );
@@ -76,26 +88,33 @@ private:
    Uint64 _next_light_id = 1;
    Uint64 _next_model_id = 1;
 
-   Uint32                    _find_light_index( Uint64 id ) const;
-   SharedPtr<ShaderProgram>  _geometry_shader_program;
-   SharedPtr<ShaderProgram>  _tessellation_shader_program;
-   SharedPtr<ShaderProgram>  _lighting_shader_program;
-   SharedPtr<ShaderProgram>  _shadow_depth_shader;
-   SharedPtr<ShaderProgram>  _particle_shader; /* @TAG{PS} */
-   SharedPtr<ShaderProgram>  _ssao_main_shader;
-   SharedPtr<ShaderProgram>  _ssao_blur_shader;
+   Uint32 _find_light_index( Uint64 id ) const;
+
+   SharedPtr<ShaderProgram>                  _geometry_shader_program;
+   SharedPtr<ShaderProgram>                  _tessellation_shader_program;
+   SharedPtr<ShaderProgram>                  _lighting_shader_program;
+   SharedPtr<ShaderProgram>                  _shadow_depth_shader;
+   SharedPtr<ShaderProgram>                  _particle_shader; /* @TAG{PS} */
+//*SSAO*/ SharedPtr<ShaderProgram>                  _ssao_main_shader;
+//*SSAO*/ SharedPtr<ShaderProgram>                  _ssao_blur_shader;
+#ifdef DEBUG
+   SharedPtr<ShaderProgram>                  _debug_line_shader;
+   Vector<WeakPtr<ModelInstance>>            _debug_instances;
+#endif /*DEBUG*/
+
 
    //DepthMap stuff for Shadowmapping
-   Uint32                                     _depth_map_FBO_id;
-   HashMap< SharedPtr<Shadowcaster>, Uint32>  _shadow_maps;// = { _shadowcasters ,  _depth_map_ids };
+   Uint32                                    _depth_map_FBO_id;
+   HashMap<SharedPtr<Shadowcaster>, Uint32>  _shadow_maps;
 
-   Vector<WeakPtr<ModelInstance>>     _instances;
-   Vector<WeakPtr<ParticleSystem>>    _particle_systems;
+   Vector<WeakPtr<ModelInstance>>            _instances;
 
-   HashMap<Uint64, WeakPtr<Light>>    _lights;
-   Array<Light::Data, light_capacity> _light_data;
-   Array<      Uint64,light_capacity> _id_of_light_at; // used to ensure the correct removal of lights
-   Uint32                             _num_lights;     // how much of the light capacity is used
+   Vector<WeakPtr<ParticleSystem>>           _particle_systems;
+
+   HashMap<Uint64, WeakPtr<Light>>           _lights;
+   Array<Light::Data, light_capacity>        _light_data;
+   Array<      Uint64,light_capacity>        _id_of_light_at; // used to ensure the correct removal of lights
+   Uint32                                    _num_lights;     // how much of the light capacity is used
 
    //If models orientation has been changed, shadowmap needs to be updated
    Bool _should_recalculate_shadowmap = false;

@@ -3,10 +3,11 @@
 String to_string( TextureType t ) {
    String s;
    switch (t) {
-      case TextureType::diffuse:   s = "diff";  break;
-      case TextureType::normal:    s = "norm";  break;
-      case TextureType::specular:  s = "spec";  break;
-      case TextureType::emissive:  s = "emit";  break;
+      case TextureType::diffuse:      s = "diff";  break;
+      case TextureType::normal:       s = "norm";  break;
+      case TextureType::specular:     s = "spec";  break;
+      case TextureType::emissive:     s = "emit";  break;
+      case TextureType::displacement: s = "disp";  break;
       default: s = "ERROR";
    }
    return s;

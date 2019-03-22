@@ -2,7 +2,11 @@
 
 #include "misc/defs.h"
 
+// #include "debug.h"
+
+
 class Transform {
+  // friend class DebugGUI;
 public:
    Transform( Vec3 const &position = Vec3(0.0f) ):
       _position ( position         ),
