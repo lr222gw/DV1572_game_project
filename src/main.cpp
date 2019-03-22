@@ -295,7 +295,7 @@ void draw_camera_debug_window( Vec3    &position,
 
 void show_startup_message( Viewport const& view ) {
    static constexpr int  my_width  = 400;
-   static constexpr int  my_height = 300;
+   static constexpr int  my_height = 320;
    static           bool is_shown  = true;
 
    if ( !is_shown )
@@ -328,7 +328,10 @@ void show_startup_message( Viewport const& view ) {
                   \n\t Press P     to initiate dance party          \
                   \n\t Press WASD  to move forward/left/back/right  \
                   \n\t Press CTRL  to descend                       \
-                  \n\t Press SPACE to ascend" );
+                  \n\t Press SPACE to ascend                        \
+                  \n\t Hold middle mouse button to look around      \
+                  \n\t                                              \
+                  \n\t Press ESC to exit" );
    } ImGui::End(); // end our instructions window
 }
 

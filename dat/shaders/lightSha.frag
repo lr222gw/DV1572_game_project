@@ -98,12 +98,12 @@ void main() {
                  vec3  ambient_impact   = light.rgb * vec3( AMBIENT_FACTOR );
                  // calculate light diffuse impact:
                  float light_modulation = max( dot(norm, light_dir), 0.0f );   // yields a normalized value (within the range [0, 1.0])
-                 vec3  diffuse_impact   = (quad_falloff * DIFFUSE_FACTOR * light_modulation) * light.rgb;
+                 vec3  diffuse_impact   = (DIFFUSE_FACTOR * light_modulation) * light.rgb;
                  // calculate specular impact:
                  float spec_modulation  = max( dot(norm, halfway_dir), 0.0f ); // yields a normalized value (within the range [0, 1.0])
-                 vec3  spec_impact      = light.rgb * (spec_modulation * spec_str * quad_falloff); // TODO: remove spec_str
+                 vec3  spec_impact      = light.rgb * (spec_modulation * spec_str); // TODO: remove spec_str
                  // update lighting:
-                 lighting              += (ambient_impact + spec_impact + diffuse_impact) * albedo ; // TODO: emission (+ emit_rgb)
+                 lighting              += (ambient_impact + spec_impact + diffuse_impact) * quad_falloff * albedo ; // TODO: emission (+ emit_rgb)
                  // TODO: HDR output?
               }
            }
