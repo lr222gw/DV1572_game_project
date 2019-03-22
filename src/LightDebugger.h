@@ -88,10 +88,6 @@ public:
                    glow );
 
       // prepare for drawing:
-      //glColor3ub( 0, 255, 255 );
-      glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-
-      // draw
       //glVertexPointer( 3, GL_FLOAT, 0, &_vertices[i*360]);
       //glDrawElements( GL_TRIANGLE_FAN,
       //                _vertices.size(),
@@ -107,7 +103,6 @@ public:
       glDrawArrays( GL_LINE_LOOP, 0, _vertices.size() ); // draw the points and fill it in
 
       // restore to normal:
-      glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
       //glDisableVertexAttribArray( 0 );
       glBindVertexArray( 0 );
    }
