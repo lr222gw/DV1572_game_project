@@ -241,12 +241,12 @@ void Viewport::_g_buffer_init() {
    // setting minifier:
    glTexParameteri( GL_TEXTURE_2D,
                     GL_TEXTURE_MIN_FILTER,
-                    GL_LINEAR );
+                    GL_NEAREST );
 
    // setting magnifier:
    glTexParameteri( GL_TEXTURE_2D,
                     GL_TEXTURE_MAG_FILTER,
-                    GL_LINEAR );
+                    GL_NEAREST );
 
    // describe and attatch the texture id for norm to Currently bound g-buffer
    glFramebufferTexture2D( GL_FRAMEBUFFER,

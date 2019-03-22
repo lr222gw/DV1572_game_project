@@ -398,8 +398,9 @@ Int32 main( Int32 argc, char const *argv[] ) {
 	ImGui_ImplGlfw_InitForOpenGL( window, true );
 	ImGui_ImplOpenGL3_Init( glsl_version );
 
-	glEnable( GL_DEPTH_TEST   );
-	glEnable( GL_STENCIL_TEST ); // TODO: implement support for stencil test for g-buffer
+	glEnable( GL_DEPTH_TEST );
+   //glEnable( GL_NORMALIZE  );
+	//glEnable( GL_STENCIL_TEST ); // TODO: implement support for stencil test for g-buffer
 
    ShaderManager shader_manager {};
    AssetManager  asset_manager  {};
@@ -452,7 +453,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
                                };
 
    Vector<SharedPtr<Light>> light_instances; // keeps light instances alive & enables access
-
+/*
    light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,
                                                                              Vec3(  0.0f,   0.0f,   0.0f ),
                                                                              Vec3( 10.0f,  10.0f,  10.0f ),
@@ -479,7 +480,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
                                                                              17.0,
                                                                               0.0,
                                                                               1.0} ) );
-
+*/
    light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,
                                                                              Vec3( 0.0f,  0.0f,  0.0f ),
                                                                              Vec3( 1.0f,  5.0f,  6.0f ),
@@ -488,7 +489,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
                                                                              11.0,
                                                                               0.0,
                                                                               1.0 } ) );
-
+/*
    light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,
                                                                              Vec3( 0.0f,  0.0f,  1.0f ),
                                                                              Vec3( 3.0f,  3.0f,  1.0f ),
@@ -524,7 +525,7 @@ Int32 main( Int32 argc, char const *argv[] ) {
                                                                              17.0,
                                                                               0.0,
                                                                               1.0 } ) );
-
+*/
    SharedPtr<Model> ape_model = asset_manager.load_model( "ape.obj" );
 
    // parameters for the Sun / shadowcasting light
