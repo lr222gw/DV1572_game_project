@@ -3,11 +3,14 @@
 GLuint SceneManager::_quad_vao {};
 GLuint SceneManager::_quad_vbo {};
 
-SharedPtr<ModelInstance> SceneManager::instantiate_model(
-   SharedPtr<Model>          model,
-   SharedPtr<ShaderProgram>  shader_program,
-   Transform const&          transform,
-   Bool                      tessellation_enabled )
+SharedPtr<ModelInstance> SceneManager::instantiate_model( SharedPtr<Model>          model
+                                                        , SharedPtr<ShaderProgram>  shader_program
+                                                        , Transform const&          transform
+                                                        , Bool                      has_tessellation_enabled
+                                                        #ifdef   DEBUG
+                                                        , Bool                      is_a_debug_element
+                                                        #endif /*DEBUG*/
+                                                        )
 {
    auto callback_lambda = [this]() {
                              _should_recalculate_shadowmap = true; // for lightmap recalculation
@@ -19,19 +22,25 @@ SharedPtr<ModelInstance> SceneManager::instantiate_model(
                                        shader_program,
                                        transform,
                                        callback_lambda,
-                                       tessellation_enabled,
+                                       has_tessellation_enabled,
                                        _generate_light_id() );
+
+   //if constexpr ( Config::is_debugging ) { // activate later when useful
+   //   if ( is_a_debug_element ) {
+   //      _debug_instances.push_back( instance_ptr );
+   //      return instance_ptr;
+   //   }
+   //} /*DEBUG*/
 
    // add a weak pointer to the scene manager's instance list before returning:
    _instances.push_back( instance_ptr );
-
    return instance_ptr;
 }
 
-UniquePtr<Viewport> SceneManager::instantiate_viewport( Vec3        position,
-                                          GLFWwindow               *window,
-                                          SharedPtr<ShaderProgram>  shader_program,
-                                          Float32                   fov_rad )
+UniquePtr<Viewport> SceneManager::instantiate_viewport( Vec3                      position,
+                                                        GLFWwindow               *window,
+                                                        SharedPtr<ShaderProgram>  shader_program,
+                                                        Float32                   fov_rad )
 {
    auto callback_lambda = [this]() {
                              _should_sort_front_to_back = true; // for front-to-back rendering
@@ -166,6 +175,23 @@ void SceneManager::draw( Viewport &view ) {
    for ( auto &instance : _instances )
       if ( !instance.expired() )
          instance.lock()->draw();
+
+   #ifdef DEBUG
+   if constexpr ( Config::is_debugging ) {
+      if ( Config::should_draw_debug_elements ) {
+         // for ( auto &instance : _debug_instances )
+         //    if ( !instance.expired() )
+         //        instance.lock()->draw();
+
+         // draw light debug cues
+         for ( auto &e : _lights ) {
+            auto &light_ptr = std::get<1>( e );
+            if ( !light_ptr.expired() )
+               light_ptr.lock()->debug_circle.draw( view, _debug_line_shader );
+         }
+      }
+   }
+   #endif /*DEBUG*/
 
   // Particle system:
 
@@ -554,6 +580,9 @@ SceneManager::SceneManager( SharedPtr<ShaderProgram> geo_pass
                           , SharedPtr<ShaderProgram> light_pass
                           , SharedPtr<ShaderProgram> shadow_depth
                           , SharedPtr<ShaderProgram> particle_shader   /* @TAG{PS} */
+                       #ifdef DEBUG
+                          , SharedPtr<ShaderProgram> dbg_line_program
+                       #endif /*DEBUG*/
                //* SSAO */, SharedPtr<ShaderProgram> ssao_main_shader
                //* SSAO */, SharedPtr<ShaderProgram> ssao_blur_shader
                           )
@@ -563,6 +592,9 @@ SceneManager::SceneManager( SharedPtr<ShaderProgram> geo_pass
          _lighting_shader_program      ( light_pass           ),
          _shadow_depth_shader          ( shadow_depth         ),
          _particle_shader              ( particle_shader      ),  /* @TAG{PS} */
+     #ifdef DEBUG
+         _debug_line_shader            ( dbg_line_program     ),
+     #endif /*DEBUG*/
 //*SSAO*/_ssao_main_shader             ( ssao_main_shader     ),
 //*SSAO*/_ssao_blur_shader             ( ssao_blur_shader     ),
          _num_lights                   ( 0                    )

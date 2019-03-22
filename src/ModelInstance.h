@@ -4,11 +4,14 @@
 #include "Model.h"
 #include "Transform.h"
 
+//#include "debug.h"
+
 #include "misc/ImGui/imgui.h"
 #include "misc/ImGui/imgui_impl_glfw.h"
 #include "misc/ImGui/imgui_impl_opengl3.h"
 
 class ModelInstance {
+   //friend class DebugGui;
 public:
    ModelInstance( SharedPtr<Model>          model,
                   SharedPtr<ShaderProgram>  shader_program,

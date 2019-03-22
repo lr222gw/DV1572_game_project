@@ -1,6 +1,11 @@
 #pragma once
 
 #include "misc/defs.h"
+
+#ifdef DEBUG
+   #include "LightDebugger.h"
+#endif
+
 //#include "SceneManager.h"
 
 /* // TODO: refactor back from SceneManager.h?
@@ -58,6 +63,7 @@ public:
    Light& operator=( Light const  & ) = delete;
    Light& operator=( Light       && ) = delete;
 
+   // TODO: move definition into source
    // NOTE: to be called via SceneManager::instantiate_light()
    Light( std::function<void(Uint64)>   on_destruction_callback,
           std::function<void(Uint64)>   on_change_callback,
@@ -69,20 +75,29 @@ public:
       _data                    ( std::move(data)         ),
       data                     ( _data                   ),
       id                       ( id                      )
-   {}
+   {
+   #ifdef DEBUG
+      _update_debug_circle();
+   #endif /*DEBUG*/
+   }
 
+   // TODO: move definition into source
    // NOTE: to be called via SceneManager::instantiate_light()
    Light( std::function<void(Uint64)>  on_destruction_callback,
           std::function<void(Uint64)>  on_change_callback,
           Uint64                       id,
-          Light::Data            &data ) //Change to non-const, need pointers  in ShadowcasterDebug
+          Light::Data                 &data ) // change to non-const, need pointers in ShadowcasterDebug
    :
       _on_destruction_callback ( on_destruction_callback ),
       _on_change_callback      ( on_change_callback      ),
       _data                    ( data                    ),
       data                     ( _data                   ),
       id                       ( id                      )
-   {}
+   {
+   #ifdef DEBUG
+      _update_debug_circle();
+   #endif /*DEBUG*/
+   }
 
    ~Light();
 
@@ -116,8 +131,22 @@ private:
    Data                        _data;
 
 public:
-
    //TODO: data is set to non-const, used in ShadowMapDebugger
-   Data      &data; // <- publicly exposed const data  // TODO: decide on this or above
-   Uint64 const id;                                       // TODO: decide on this or above
+   Data         &data; // <- publicly exposed const data   // TODO: decide on this or above
+   Uint64 const  id;
+
+   #ifdef DEBUG
+   public:
+      Circle  debug_circle;
+
+   private:
+      void _update_debug_circle() {
+         debug_circle.set_hidden(   _data.type == Light::Type::point );
+         debug_circle.set_radius(   _data.radius   );
+         debug_circle.set_position( _data.position );
+         debug_circle.set_color( { GLubyte( _data.color[0] * 255U ),
+                                   GLubyte( _data.color[0] * 255U ),
+                                   GLubyte( _data.color[0] * 255U )  } );
+      }
+   #endif /*DEBUG*/                              // TODO: decide on this or above
 };

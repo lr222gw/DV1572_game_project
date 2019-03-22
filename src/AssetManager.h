@@ -7,6 +7,7 @@
 
 // TODO: Gör assetManager till en exclusiv konstruktionspunkt för model
 //       Enda klassen som har tillgång till Models konstruktor...
+
 class AssetManager {
 public:
    // TODO: embed type into filename? extract from within file?

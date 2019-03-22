@@ -22,6 +22,7 @@ struct GBufferData {
 // TODO: fundera över multi-views och hur man ska hantera det
 // TODO: uppåt vektorn baserat på normalen av ytan spelaren står på
 class Viewport {
+
 /*--------------- class member functions & operators ------------*/
 public:
    Viewport( Vec3                      position,
@@ -64,7 +65,7 @@ private:
    std::function<void()>    _callback_on_transform;
 
 public:
-   Vec3  forward = Vec3(1.0f); // TODO: refactor away
+   Vec3        forward = Vec3(1.0f); // TODO: refactor away
    GLint const &width  = _width;
    GLint const &height = _height;
 };
