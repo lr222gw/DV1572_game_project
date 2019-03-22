@@ -80,27 +80,27 @@ void main() {
       case mode_textureless: if ( pos.x+pos.y+pos.z!=0 ) albedo = vec3( 1.0 ); // no break so that the mode_composite code gets run
       case mode_composite:
          lighting = emit_rgb;
-         for ( int i = 0;  i < num_lights;  ++i ) {
+         for ( int i = 3;  i < 4 /*num_lights*/;  ++i ) {
            Light light = lights[i];
 
            if ( light.type == point_light_t ) { // TODO: take one array of each light type and have a loop for each instead
               float radius   = light.radius * 10.0;
               float distance = length( light.pos - pos );
-              if ( distance < radius ) {
+              if ( distance < radius ) { //  Blinn-Phong for spec
                  vec3  light_dir        = normalize( light.pos - pos );
                  vec3  halfway_dir      = normalize( light_dir + view_dir );
 
-  			         light.rgb = light.rgb * light.intensity; // UGLY
+  			         light.rgb = light.rgb; //* light.intensity * 5; // UGLY
                  // calculate light effect falloff:
                  float linear_falloff   = 1.0 - (distance / radius);           // yields a normalized value (within the range [0, 1.0])
                  float quad_falloff     = linear_falloff * linear_falloff;     // quadratic falloff = linear falloff squared
                  // calculate ambient impact:
                  vec3  ambient_impact   = light.rgb * vec3( AMBIENT_FACTOR );
                  // calculate light diffuse impact:
-                 float light_modulation = max( dot(norm, light_dir), 0.0f );   // yields a normalized value (within the range [0, 1.0])
+                 float light_modulation = max( dot(light_dir, norm), 0.0f );   // yields a normalized value (within the range [0, 1.0])
                  vec3  diffuse_impact   = (DIFFUSE_FACTOR * light_modulation) * light.rgb;
                  // calculate specular impact:
-                 float spec_modulation  = max( dot(norm, halfway_dir), 0.0f ); // yields a normalized value (within the range [0, 1.0])
+                 float spec_modulation  = pow( max( dot(norm, halfway_dir), 0.0f ), 32.0); // yields a normalized value (within the range [0, 1.0])
                  vec3  spec_impact      = light.rgb * (spec_modulation * spec_str); // TODO: remove spec_str
                  // update lighting:
                  lighting              += (ambient_impact + spec_impact + diffuse_impact) * quad_falloff * albedo ; // TODO: emission (+ emit_rgb)
