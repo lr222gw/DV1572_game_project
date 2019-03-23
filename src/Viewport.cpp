@@ -174,7 +174,8 @@ void Viewport::_g_buffer_init() {
    // setting minifier:
    glTexParameteri( GL_TEXTURE_2D,
                     GL_TEXTURE_MIN_FILTER,
-                    GL_NEAREST );
+                    GL_NEAREST 
+                    );
 
    // setting magnifier:
    glTexParameteri( GL_TEXTURE_2D,

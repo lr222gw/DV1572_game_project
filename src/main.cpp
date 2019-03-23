@@ -99,20 +99,105 @@ void process_mouse( GLFWwindow   *window, // GLFW window is needed for input
       is_initialized = true;
    }
 
+
+   static SharedPtr<ModelInstance> model;
+   static bool open = false; 
    // mouse picking
-   if ( !config.is_imgui_toggled ) {                                           // ignore mouse picking if GUI is active
+   if ( !config.is_imgui_toggled  && !open) {                                           // ignore mouse picking if GUI is active
       if ( glfwGetMouseButton( window, GLFW_MOUSE_BUTTON_1 ) ) {               // if the left mouse button is clicked
          Uint32     obj_id  = scene.get_object_id_at_pixel(x_pos, y_pos, cam); // get the ID of the fragment at the
          auto instance_ptr  = scene.get_instance_ptr(obj_id);                  // current mouse position XY-coordinate.
          if ( instance_ptr != nullptr ) {                                      // if the return value is a nullptr,
-            SharedPtr<ModelInstance> model = instance_ptr;                     // then no valid model instance occupied
-            model->transform( Transform::make_rotation(Vec3(0.0, 0.2, 0.0)) ); // that fragment (e.g. just background).
+            //SharedPtr<ModelInstance> model = instance_ptr;                     // then no valid model instance occupied
+             model = instance_ptr;                                               // then no valid model instance occupied
+             open = true;
+            /////////////////
+
+            
+
+            ////////////////////
+
+            //model->transform( Transform::make_rotation(Vec3(0.0, 0.2, 0.0)) ); // that fragment (e.g. just background).
          }                                                                     // We then rotate the potential match as
          if constexpr ( Config::is_debugging ) // debug terminal output:       // a simple way to get feedback.
             std::cout << "[MOUSE_PICKING]" << x_pos  << ":" << y_pos
                       << ". Model id: "    << obj_id << "\n";
       }
    }
+
+   if (model != NULL && open) {
+
+     
+      ImGui::Begin("Instance", &open);
+      
+      //ImGui::Button("Close");
+     
+      //ImGui::Begin("Instances:"); // begin our Inspection window:
+              // draw our window GUI components and do I/O:
+
+
+
+      auto transform = model->model_transform;
+
+      Vec3 position = transform.get_position();
+      Vec3 scale = transform.get_scale();
+
+      Float32 position_array[3]{ position.x,
+                                  position.y,
+                                  position.z }; // temp
+
+      Float32 scale_array[3]{ scale.x,
+                               scale.y,
+                               scale.z }; // temp
+
+      Vec3 rotation(0.0f);
+
+      String id = model->get_model()->get_name();
+
+      ImGui::PushID(id.c_str());
+      ImGui::NewLine();
+      ImGui::Text("%s:", id.c_str());
+      ImGui::InputFloat3("Position", position_array, "%.1f");
+
+      ImGui::SliderAngle("X rotation", &rotation.x);
+      ImGui::SliderAngle("Y rotation", &rotation.y);
+      ImGui::SliderAngle("Z rotation", &rotation.z);
+
+      ImGui::InputFloat3("Scale", scale_array, "%.2f");
+      ImGui::NewLine();
+
+      ImGui::Separator();
+      ImGui::PopID();
+
+      Transform trans = Transform(Vec3(0.0f, 0.0f, 0.0f));
+
+      transform = model->model_transform;
+
+      transform.set_position(Vec3(0.0f, 0.0f, 0.0f));
+
+      model->set_transform(transform);
+      transform = model->model_transform;
+
+      transform.set_rotation(Vec3(1.0f, 0.0f, 0.0f), rotation.x);
+      transform.set_rotation(Vec3(0.0f, 1.0f, 0.0f), rotation.y);
+      transform.set_rotation(Vec3(0.0f, 0.0f, 1.0f), rotation.z);
+
+
+      Transform new_transform(Vec3(position_array[0],
+         position_array[1],
+         position_array[2]),
+         /* temp */ transform.get_rotation(),
+         Vec3(scale_array[0],
+            scale_array[1],
+            scale_array[2]));
+
+      model->set_transform(new_transform);
+
+      ImGui::End();
+      
+   }
+   
+
 
    // to avoid repeated recomputations in vain
    Bool has_changed =  last_x != x_pos  ||  last_y != y_pos;

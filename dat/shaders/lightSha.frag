@@ -104,7 +104,7 @@ void main() {
                  float spec_modulation  = pow( max( dot(norm, halfway_dir), 0.0f ), 32.0); // yields a normalized value (within the range [0, 1.0])
                  vec3  spec_impact      = light.rgb * (spec_modulation); // TODO: keep it without spec strength?
                  // update lighting:
-                 lighting              += quad_falloff * (spec_impact + ambient_impact + diffuse_impact) * albedo;
+                 lighting              += quad_falloff * (spec_impact + ambient_impact + diffuse_impact) * albedo * light.intensity;
                  // TODO: HDR output?
               }
            }

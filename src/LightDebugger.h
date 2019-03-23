@@ -33,7 +33,7 @@ public:
       glBufferData( GL_ARRAY_BUFFER, sizeof(_vertices[0])*_vertices.size(), &_vertices[0], GL_STATIC_DRAW );
 
       glEnableVertexAttribArray( 0 );
-      glVertexAttribPointer( _vbo,        // the attribute we want to configure
+      glVertexAttribPointer( 0,           //The index of what attribute we enable with "glEnableVertexAttribArray" // the attribute we want to configure
                              3,           // size (one for each 3D dimensional axis)
                              GL_FLOAT,    // type
                              GL_FALSE,    // not normalized
@@ -88,6 +88,9 @@ public:
                    glow );
 
       // prepare for drawing:
+
+
+
       //glVertexPointer( 3, GL_FLOAT, 0, &_vertices[i*360]);
       //glDrawElements( GL_TRIANGLE_FAN,
       //                _vertices.size(),
