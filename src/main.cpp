@@ -125,6 +125,7 @@ void process_mouse( GLFWwindow   *window, // GLFW window is needed for input
       }
    }
 
+   //if we picked an ModelInstance, open window for manipulating it
    if (model != NULL && open) {
 
      
@@ -775,7 +776,8 @@ auto debug_gui = DebugGUI { &scene_manager, &asset_manager, /*UGLY:*/&*view }; /
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-      scene_manager.draw_debug_scene_inspection();
+      //Removed since we can open them by clicking
+      //scene_manager.draw_debug_scene_inspection();
 
       // TODO: refactor into debug.h/cpp
       if ( config.is_imgui_toggled ) {
