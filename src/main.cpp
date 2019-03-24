@@ -147,6 +147,7 @@ void process_mouse( GLFWwindow   *window, // GLFW window is needed for input
       Vec3 position = transform.get_position();
       Vec3 scale = transform.get_scale();
 
+      
       Float32 position_array[3]{ position.x,
                                   position.y,
                                   position.z }; // temp
@@ -157,15 +158,18 @@ void process_mouse( GLFWwindow   *window, // GLFW window is needed for input
 
       Vec3 rotation(0.0f);
       Vec3 translation(0.0f);
+      Vec3 scaler(0.0f);
 
       String id = model->get_model()->get_name();
-
+      
       ImGui::PushID(id.c_str());
       ImGui::NewLine();
       ImGui::Text("%s:", id.c_str());
       ImGui::InputFloat3("Position", position_array, "%.1f");
 
-      float* pos_arr[3]= { &translation.x, &translation.y, &translation.z };//= { &translation.x, &translation.y, &translation.z };
+      float* pos_arr[3]= { &translation.x, &translation.y, &translation.z };
+      float* scale_arr[3] = { &scaler.x, &scaler.y, &scaler.z };
+      float scale_uniform = 0.0;
       ImGui::SliderFloat3("Translation", *pos_arr,-0.75,0.75);
       //ImGui::SliderAngle("Y Position", &translation.y);
       //ImGui::SliderAngle("Z Position", &translation.z);
@@ -177,6 +181,13 @@ void process_mouse( GLFWwindow   *window, // GLFW window is needed for input
       ImGui::NewLine();
 
       ImGui::InputFloat3("Scale", scale_array, "%.2f");
+      ImGui::SliderFloat3("Scaler", *scale_arr, -0.75, 0.75);
+      ImGui::SliderFloat("uniform", &scale_uniform, -0.75, 0.75);
+
+      scaler.x += scale_uniform;
+      scaler.y += scale_uniform;
+      scaler.z += scale_uniform;
+
       ImGui::NewLine();
 
       ImGui::Separator();
@@ -197,13 +208,12 @@ void process_mouse( GLFWwindow   *window, // GLFW window is needed for input
 
 
       transform.set_position(Vec3(position_array[0], position_array[1], position_array[2]) + translation);
-
+      transform.set_scale(Vec3(scale_array[0], scale_array[1], scale_array[2]) + scaler);
 
       Transform new_transform(transform.get_position(),//translation,
-         /* temp */ transform.get_rotation(),
-         Vec3(scale_array[0],
-            scale_array[1],
-            scale_array[2]));
+         /* temp */           transform.get_rotation(),
+                              transform.get_scale()
+                              );
 
       model->set_transform(new_transform);
 
