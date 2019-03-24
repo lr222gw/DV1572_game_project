@@ -33,7 +33,8 @@ public:
       glBufferData( GL_ARRAY_BUFFER, sizeof(_vertices[0])*_vertices.size(), &_vertices[0], GL_STATIC_DRAW );
 
       glEnableVertexAttribArray( 0 );
-      glVertexAttribPointer( 0,           //The index of what attribute we enable with "glEnableVertexAttribArray" // the attribute we want to configure
+      
+      glVertexAttribPointer( 0,           //The index of what attribute we enable with "glEnableVertexAttribArray"
                              3,           // size (one for each 3D dimensional axis)
                              GL_FLOAT,    // type
                              GL_FALSE,    // not normalized

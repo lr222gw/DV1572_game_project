@@ -28,6 +28,11 @@ public:
    Vec3 *target;
 
    SharedPtr<Shadowcaster> shadowcaster;
+   
+   //NOTE: This Constructor is only for initialization of an empty ShadowcasterDebug instance, 
+   //it should only be used if an instance is needed to be defined before a DBG_DIABLE_START! 
+   ShadowcasterDebug(); 
+
    ShadowcasterDebug(SharedPtr<Shadowcaster> shadowcaster, AssetManager *asset_manager, SceneManager *scene_manager, Vector<SharedPtr<ModelInstance>> *model_instances, SharedPtr<ShaderProgram> geometry_program, Vec3 *poss, Vec3 *dirr);
 
    void light_caster_debugg_tool_init(SharedPtr<Shadowcaster> shadowcaster, AssetManager *asset_manager, SceneManager *scene_manager, Vector<SharedPtr<ModelInstance>> *model_instances, SharedPtr<ShaderProgram> geometry_program, Vec3 *poss, Vec3 *dirr);

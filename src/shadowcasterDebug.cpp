@@ -35,6 +35,11 @@ void ShadowcasterDebug::light_caster_debugg_tool_render() {
 
 }
 
+ShadowcasterDebug::ShadowcasterDebug()
+{
+   std::cout << "Using ShadowcasterDebug Empty Constructor is not valid, only made for Debugging!" << std::endl;
+}
+
 ShadowcasterDebug::ShadowcasterDebug(SharedPtr<Shadowcaster> shadowcaster, AssetManager *asset_manager, SceneManager *scene_manager, Vector<SharedPtr<ModelInstance>> *model_instances, SharedPtr<ShaderProgram> geometry_program, Vec3 *poss, Vec3 *dirr)
    : pos(poss),shadowcaster(shadowcaster)
 {

@@ -1,5 +1,9 @@
 #define  STB_IMAGE_IMPLEMENTATION //Den bor här annars kompilerar inte stb_image.h
 
+//Disables All within DBG_DISABLE_START & DBG_DISABLE_END, any Variables should be declared before DBG_DISABLE_START! 
+#define DBG_ENABLED true
+#define DBG_DISABLE_START if (!DBG_ENABLED) {
+#define DBG_DISABLE_END   }
 
 #include "misc/defs.h"
 #include "Config.h"
@@ -128,11 +132,11 @@ void process_mouse( GLFWwindow   *window, // GLFW window is needed for input
    //if we picked an ModelInstance, open window for manipulating it
    if (model != NULL && open) {
 
-     
+
       ImGui::Begin("Instance", &open);
-      
+
       //ImGui::Button("Close");
-     
+
       //ImGui::Begin("Instances:"); // begin our Inspection window:
               // draw our window GUI components and do I/O:
 
@@ -152,6 +156,7 @@ void process_mouse( GLFWwindow   *window, // GLFW window is needed for input
                                scale.z }; // temp
 
       Vec3 rotation(0.0f);
+      Vec3 translation(0.0f);
 
       String id = model->get_model()->get_name();
 
@@ -160,9 +165,16 @@ void process_mouse( GLFWwindow   *window, // GLFW window is needed for input
       ImGui::Text("%s:", id.c_str());
       ImGui::InputFloat3("Position", position_array, "%.1f");
 
+      float* pos_arr[3]= { &translation.x, &translation.y, &translation.z };//= { &translation.x, &translation.y, &translation.z };
+      ImGui::SliderFloat3("Translation", *pos_arr,-0.75,0.75);
+      //ImGui::SliderAngle("Y Position", &translation.y);
+      //ImGui::SliderAngle("Z Position", &translation.z);
+      ImGui::NewLine();
+
       ImGui::SliderAngle("X rotation", &rotation.x);
       ImGui::SliderAngle("Y rotation", &rotation.y);
       ImGui::SliderAngle("Z rotation", &rotation.z);
+      ImGui::NewLine();
 
       ImGui::InputFloat3("Scale", scale_array, "%.2f");
       ImGui::NewLine();
@@ -184,9 +196,10 @@ void process_mouse( GLFWwindow   *window, // GLFW window is needed for input
       transform.set_rotation(Vec3(0.0f, 0.0f, 1.0f), rotation.z);
 
 
-      Transform new_transform(Vec3(position_array[0],
-         position_array[1],
-         position_array[2]),
+      transform.set_position(Vec3(position_array[0], position_array[1], position_array[2]) + translation);
+
+
+      Transform new_transform(transform.get_position(),//translation,
          /* temp */ transform.get_rotation(),
          Vec3(scale_array[0],
             scale_array[1],
@@ -519,78 +532,80 @@ Int32 main( Int32 argc, char const *argv[] ) {
 
    Vector<SharedPtr<Light>> light_instances; // keeps light instances alive & enables access
 
-   light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,
-                                                                             Vec3(  0.0f,   0.0f,   0.0f ),
-                                                                             Vec3( 14.0f,  9.0f,  120.0f ),
-                                                                             Vec3(  1.0f,   0.0f,   0.0f ),
+   DBG_DISABLE_START
+     
+    light_instances.push_back(scene_manager.instantiate_light(Light::Data{ Light::Type::point,
+                                                                              Vec3(  0.0f,   0.0f,   0.0f ),
+                                                                              Vec3( 14.0f,  9.0f,  120.0f ),
+                                                                              Vec3(  1.0f,   0.0f,   0.0f ),
+                                                                               0.1,
+                                                                              75.0,
+                                                                               0.0,
+                                                                               1.2 } ) );
+    
+    light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,
+                                                                              Vec3( 0.0f,  0.0f,  0.0f ),
+                                                                              Vec3( 30.0f, 6.0f,  75.0f ),
+                                                                              Vec3( 1.0f,  1.0f,  0.0f ),
                                                                               0.1,
-                                                                             75.0,
+                                                                             99.0,
                                                                               0.0,
-                                                                              1.2 } ) );
-
-   light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,
-                                                                             Vec3( 0.0f,  0.0f,  0.0f ),
-                                                                             Vec3( 30.0f, 6.0f,  75.0f ),
-                                                                             Vec3( 1.0f,  1.0f,  0.0f ),
-                                                                             0.1,
-                                                                            99.0,
-                                                                             0.0,
-                                                                             1.7 } ) );
-
-   light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,
-                                                                             Vec3( 0.0f,  0.0f,  0.0f ),
-                                                                             Vec3( 26.0f,  41.0f,  45.0f ),
-                                                                             Vec3( 1.0f,  0.0f,  1.0f ),
+                                                                              1.7 } ) );
+    
+    light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,
+                                                                              Vec3( 0.0f,  0.0f,  0.0f ),
+                                                                              Vec3( 26.0f,  41.0f,  45.0f ),
+                                                                              Vec3( 1.0f,  0.0f,  1.0f ),
+                                                                               0.1,
+                                                                              57.0,
+                                                                               0.0,
+                                                                               1.2} ) );
+    DBG_DISABLE_END
+    light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,
+                                                                              Vec3( 0.0f,  0.0f,  0.0f ),
+                                                                              Vec3( 1.0f,  9.0f,  24.0f ),
+                                                                              Vec3( 0.0f,  1.0f,  0.0f ),
+                                                                               0.7,
+                                                                              79.0,
+                                                                               0.0,
+                                                                               1.5 } ) );
+    DBG_DISABLE_START
+    light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,
+                                                                              Vec3( 0.0f,  0.0f,  1.0f ),
+                                                                              Vec3( 11.0f,  14.0f,  191.0f ),
+                                                                              Vec3( 0.0f,  1.0f,  1.0f ),
                                                                               0.1,
-                                                                             57.0,
+                                                                            150.0,
                                                                               0.0,
-                                                                              1.2} ) );
-
-   light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,
-                                                                             Vec3( 0.0f,  0.0f,  0.0f ),
-                                                                             Vec3( 1.0f,  9.0f,  24.0f ),
-                                                                             Vec3( 0.0f,  1.0f,  0.0f ),
+                                                                              0.9 } ) );
+    
+    light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,
+                                                                              Vec3( 0.0f,  0.0f,   0.0f ),
+                                                                              Vec3( 100.0f,  2.0f,  10.0f ),
+                                                                              Vec3( 0.0f,  0.0f,   1.0f ),
                                                                               0.1,
-                                                                             79.0,
+                                                                             81.0,
                                                                               0.0,
-                                                                              1.5 } ) );
-
-   light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,
-                                                                             Vec3( 0.0f,  0.0f,  1.0f ),
-                                                                             Vec3( 11.0f,  14.0f,  191.0f ),
-                                                                             Vec3( 0.0f,  1.0f,  1.0f ),
-                                                                             0.1,
-                                                                           150.0,
-                                                                             0.0,
-                                                                             0.9 } ) );
-
-   light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,
-                                                                             Vec3( 0.0f,  0.0f,   0.0f ),
-                                                                             Vec3( 100.0f,  2.0f,  10.0f ),
-                                                                             Vec3( 0.0f,  0.0f,   1.0f ),
-                                                                             0.1,
-                                                                            81.0,
-                                                                             0.0,
-                                                                             1.0 } ) );
-
-   light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,
-                                                                             Vec3(  0.0f,  0.0f,  0.0f ),
-                                                                             Vec3( 10.0f,  1.0f,  51.0f ),
-                                                                             Vec3(  1.0f,  1.0f,  1.0f ),
-                                                                             0.1,
-                                                                            97.0,
-                                                                             0.0,
-                                                                             1.9 } ) );
-
-   light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,
-                                                                             Vec3(  0.0f,  0.0f,   0.0f ),
-                                                                             Vec3( 150.0f,  25.0f,  200.0f ),
-                                                                             Vec3(  1.0f,  0.3f,   0.5f ),
+                                                                              1.0 } ) );
+    
+    light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,
+                                                                              Vec3(  0.0f,  0.0f,  0.0f ),
+                                                                              Vec3( 10.0f,  1.0f,  51.0f ),
+                                                                              Vec3(  1.0f,  1.0f,  1.0f ),
                                                                               0.1,
-                                                                            400.0,
+                                                                             97.0,
                                                                               0.0,
-                                                                              1.3 } ) );
-
+                                                                              1.9 } ) );
+    
+    light_instances.push_back( scene_manager.instantiate_light( Light::Data { Light::Type::point,
+                                                                              Vec3(  0.0f,  0.0f,   0.0f ),
+                                                                              Vec3( 150.0f,  25.0f,  200.0f ),
+                                                                              Vec3(  1.0f,  0.3f,   0.5f ),
+                                                                               0.1,
+                                                                             400.0,
+                                                                               0.0,
+                                                                               1.3 } ) );
+    DBG_DISABLE_END
 
    SharedPtr<Model> ape_model = asset_manager.load_model( "ape.obj" );
 
@@ -603,7 +618,10 @@ Int32 main( Int32 argc, char const *argv[] ) {
    Float32 degree      =   0.0f;
    Float32 specularity =   1.0f;
 
-   auto sun = scene_manager.instantiate_light( Light::Data{ Light::Type::directional,
+   SharedPtr<Light> sun;
+   SharedPtr<Shadowcaster> light_sc;
+   DBG_DISABLE_START
+   sun = scene_manager.instantiate_light( Light::Data{ Light::Type::directional,
                                                             dirr,//glm::normalize(poss - dirr),
                                                             poss,
                                                             Vec3( 1.0f,  1.0f,  1.0f ),
@@ -612,12 +630,17 @@ Int32 main( Int32 argc, char const *argv[] ) {
                                                             degree,
                                                             specularity } );
    light_instances.push_back( sun );
+   
 
-   auto light_sc = std::make_shared<Shadowcaster>(sun);
+
+   light_sc = std::make_shared<Shadowcaster>(sun);
 
    // must initialize before first use set_light_matrix(...) atleast once!
    light_sc->set_Light_matrix(0.1f, glm::length(sun->get_position() - sun->get_direction()), 50, -50, 50, -50, sun->get_position(), sun->get_direction(), Vec3(0.0f, 1.0f, 0.0f));
    scene_manager.set_shadowcasting( light_sc );
+   DBG_DISABLE_END
+      
+
 
    Vector<SharedPtr<ModelInstance>> model_instances; // keeps model instances alive  & enables access
 
@@ -650,18 +673,23 @@ Int32 main( Int32 argc, char const *argv[] ) {
                                                   Vec3(  0.0f, 0.0f,  0.0f ),
                                                   Vec3( 10.0f, 1.0f, 10.0f ) ), true) );
 
+   
+   //NOTE: We need to declare this in order to get the DBG_DISABLE to work. A Default constructor for this class does not exist! 
+   ShadowcasterDebug sundbg = ShadowcasterDebug();
 
+   DBG_DISABLE_START
    // debug tool to see more clearly how Light frustrum looks like
    auto sun_pos = sun->get_position();
    auto sun_dir = sun->get_direction();
-   ShadowcasterDebug sundbg = ShadowcasterDebug(  light_sc,
+   sundbg = ShadowcasterDebug(                  light_sc,
                                                  &asset_manager,
                                                  &scene_manager,
                                                  &model_instances,
                                                   geometry_program,
                                                  &sun_pos,
                                                  &sun_dir );
-
+   
+   DBG_DISABLE_END
 
    // set tessellated related values (that will later be uploaded as uniforms)
    Float32 displacement_factor =  1.5f;
@@ -776,7 +804,7 @@ auto debug_gui = DebugGUI { &scene_manager, &asset_manager, /*UGLY:*/&*view }; /
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-      //Removed since we can open them by clicking
+      //NOTE: Removed since we can open them by clicking
       //scene_manager.draw_debug_scene_inspection();
 
       // TODO: refactor into debug.h/cpp
@@ -793,6 +821,8 @@ auto debug_gui = DebugGUI { &scene_manager, &asset_manager, /*UGLY:*/&*view }; /
 
       debug_gui.draw(); /*DEBUG*/ /*GUI*/
 
+DBG_DISABLE_START
+         
 /*light_dbg*/ Array<Float32,4> corners = light_sc->getCorners();
 /*light_dbg*/ for ( auto &light : light_instances )
 /*light_dbg*/    debug::lightsource( light, scene_manager );
@@ -806,6 +836,8 @@ auto debug_gui = DebugGUI { &scene_manager, &asset_manager, /*UGLY:*/&*view }; /
 /*lightcast*/                             sun->get_direction(),
 /*lightcast*/                             Vec3(0.0f, 1.0f, 0.0f) ); // up vector?
 /*light_dbg*/ sundbg.light_caster_debugg_tool_render();
+
+DBG_DISABLE_END
 
       process_mouse( window, *view, scene_manager, delta_time_ms );
       process_input( window, *view, delta_time_ms );

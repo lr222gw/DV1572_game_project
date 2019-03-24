@@ -113,33 +113,43 @@ void main() {
            }
            else if ( light.type == directional_light_t ) {
 
-		     		light.dir = normalize(light.pos - light.dir ) ;
-      			// ambient
-      			vec3 ambient = light.rgb * vec3(0.2);
-      			// diffuse
-      			float diff   = max(dot(light.dir, norm), 0.0);
-      			vec3 diffuse = diff * light.rgb;
-      			// specular
-      			vec3  viewDir    = normalize(view_pos - pos);
-      			vec3  reflectDir = reflect(-light.dir, norm);
-      			float spec       = spec_str;
-      			vec3  halfwayDir = normalize(light.dir + viewDir);
-      			spec = pow(max(dot(norm, halfwayDir), 0.0), 64.0);
-      			vec3 specular = spec * light.rgb;
-      	// calculate shadow:
-            // resolution can be changed in SceneManager::set_shadowcasting()
-      			vec4 lightSpacePos = lightmatrix * vec4(pos, 1.0f);
-      			vec3 projCoords    = lightSpacePos.xyz / lightSpacePos.w; // screen space
-      			// transform from [-1,1] to [0,1] range
-      			projCoords = projCoords / 2 + 0.5f;
+		     	//We store a target positione in our directional lights "dir" member. 
+				//we can get the dir by creating a vector from the light to whatever it's targeting and normalize it
+				light.dir = normalize(light.pos - light.dir) ;
+
+      			// ambient light from lightsource
+      			vec3 ambient_impact = light.rgb * vec3(0.2);
+      			// diffuse factor, gets multiplied with the light's color
+      			float light_modulation   = max(dot(light.dir, norm), 0.0);
+      			vec3 diffuse_impact = light_modulation * light.rgb;
+      			
+				// Specular lighting, this is for regular phong (we use BLINNPHONG for pointlights)
+				// Blinnphong gives better result, 
+				vec3 reflection = reflect(-light.dir, norm);  
+				float spec_modulation  = pow( max( dot(view_dir, reflection), 0.0 ), 128.0); // yields a normalized value (within the range [0, 1.0])
+                vec3  spec_impact      = light.rgb * (spec_modulation * spec_str); // TODO: remove spec_str
+      			
+      			// calculate shadow:
+				// resolution can be changed in SceneManager::set_shadowcasting()
+      			vec4 pos_lightspace = lightmatrix * vec4(pos, 1.0);
+      			vec3 sampling_coords    = pos_lightspace.xyz / pos_lightspace.w; // screen space
+      			// transform from [-1,1] to [0,1] range; To sample from our 2D texture (shadowmap)
+      			sampling_coords = sampling_coords / 2 + 0.5;
       			// get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
-      			float closestDepth = texture( shadowMap, projCoords.xy ).r;
+      			vec4 shadowmap_depth = texture( shadowMap, sampling_coords.xy );      			
       			// get depth of current fragment from light's perspective
-      			float currentDepth = projCoords.z;
-      			// check whether current frag pos is in shadow
-      			float shadowBias    = 0.005; // remove shadow acne
-      			float shadow_toggle = currentDepth - shadowBias > closestDepth ? 0.0 : 1.0; // disables light
-      			lighting += (ambient + shadow_toggle * (diffuse+specular))
+				float shadow_bias    = 0.005; // remove shadow acne      			
+      			// check whether current frag pos is in shadow      			
+      			float shadow_toggle; // shadow_toggle; 0.0 if shadow, 1.0 if no shadow
+
+				//We check if the current depth from our samping_coords is bigger than the closest
+				//If so the current fragment is in shadow; by setting the shadow_toggle to 0.0 it will multiply diffuse and spec with 0 
+				//which will result in no added light.(depth from shadow_depth is stored in "x" since the shadow_map only stores a depth value, so the first...)
+				if((sampling_coords.z - shadow_bias)  >  shadowmap_depth.x ){ shadow_toggle = 0.0;}else{shadow_toggle = 1.0;}
+				//if  we use following code we get the lit zone from our shadowmap, it will be round...
+					//distance( vec4(0.0), pos_lightspace) < distance(vec4(0.0 ), shadowmap_depth)
+
+      			lighting += (ambient_impact + shadow_toggle * (diffuse_impact+spec_impact))
                         * albedo
                         * light.intensity;
          }
