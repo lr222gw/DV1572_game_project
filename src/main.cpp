@@ -1,6 +1,6 @@
 #define  STB_IMAGE_IMPLEMENTATION //Den bor här annars kompilerar inte stb_image.h
 
-//Disables All within DBG_DISABLE_START & DBG_DISABLE_END, any Variables should be declared before DBG_DISABLE_START! 
+//Disables All within DBG_DISABLE_START & DBG_DISABLE_END, any Variables should be declared before DBG_DISABLE_START!!
 #define DBG_ENABLED true
 #define DBG_DISABLE_START if (!DBG_ENABLED) {
 #define DBG_DISABLE_END   }
