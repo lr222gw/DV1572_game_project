@@ -21,7 +21,7 @@ layout (location = 5) out  vec3 g_position;
 
 // @TAG{TEXTURE_CHANNEL}
 void main() {
-   g_albedo       = texture(   tex_diff, uv_fs      ); // TODO: mix with col_fs
+   g_albedo       = mix(texture(   tex_diff, uv_fs      ), col_fs, .5);// TODO: mix with col_fs (Dont know if this work, always mix by 50%?)
    g_spec         = texture(   tex_spec, uv_fs      );
    g_normal       = texture(   tex_norm, uv_fs      ).xyz;
    g_normal       = normalize( g_normal * 2.0 - 1.0 ); // tranform from [-1,1] to [0,1]

@@ -1,7 +1,7 @@
 #define  STB_IMAGE_IMPLEMENTATION //Den bor här annars kompilerar inte stb_image.h
 
 //Disables All within DBG_DISABLE_START & DBG_DISABLE_END, any Variables should be declared before DBG_DISABLE_START!!
-#define DBG_ENABLED true
+#define DBG_ENABLED false
 #define DBG_DISABLE_START if (!DBG_ENABLED) {
 #define DBG_DISABLE_END   }
 
@@ -734,12 +734,14 @@ Int32 main( Int32 argc, char const *argv[] ) {
 /* PS */    static Float32 const avg_lifespan_ms   { 9'000.0f               };
 /* PS */    static Float32 const avg_mass_kg       {     0.01f              };
 /* PS */    static Float32 const avg_scale         {     0.50f              };
-/* PS */    static Uvec4   const colour_rgba       { 255, 255, 255, 255     };
+/* PS */    static Uvec4    colour_rgba       { 255, 255, 255, 255     };
 /* PS */    static Float32 const radius_m          { 120.f                  };
 /* PS */    static Float32       time_pool_ms      { .0f                    };
 /* PS */    static Float32       elapsed_time      {  0                     };
 /* PS */    elapsed_time += delta_t_ms;
 /* PS */    time_pool_ms += (delta_t_ms);
+
+            //colour_rgba[1] = int((elapsed_time/avg_lifespan_ms) * 50) % 255;
 /* PS */
 /* PS */    static Float32 sin[8] {};
 /* PS */    static Float32 cos[8] {};
@@ -756,7 +758,10 @@ Int32 main( Int32 argc, char const *argv[] ) {
 /* PS */        particle.spatial[2]    += cos[(i+47)%8];
 /* PS */        // scale:
 /* PS */        particle.spatial[3]     = avg_scale * (1-(avg_lifespan_ms-particle.time_ms_left)/avg_lifespan_ms);
-/* PS */        particle.time_ms_left  -= delta_t_ms;
+/* PS */        particle.colour[0] = int((elapsed_time / avg_lifespan_ms) * 1000)+50 % 255;
+/* PS */        particle.colour[1] = int((elapsed_time / avg_lifespan_ms) * 1000)+120 % 255;
+/* PS */        particle.colour[2] = int((elapsed_time / avg_lifespan_ms) * 1000)+1 % 255;
+                particle.time_ms_left  -= delta_t_ms;
 /* PS */
 /* PS */    }
 /* PS */

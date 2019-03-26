@@ -146,8 +146,8 @@ void main() {
 				//If so the current fragment is in shadow; by setting the shadow_toggle to 0.0 it will multiply diffuse and spec with 0 
 				//which will result in no added light.(depth from shadow_depth is stored in "x" since the shadow_map only stores a depth value, so the first...)
 				if((sampling_coords.z - shadow_bias)  >  shadowmap_depth.x ){ shadow_toggle = 0.0;}else{shadow_toggle = 1.0;}
-				//if  we use following code we get the lit zone from our shadowmap, it will be round...
-					//distance( vec4(0.0), pos_lightspace) < distance(vec4(0.0 ), shadowmap_depth)
+				//if  we use following code we get the lit zone from our shadowmap, it will be round but also not cast shadows as it should...
+					//distance( vec4(0.0), pos_lightspace) < distance(vec4(0.0 ), shadowmap_depth) <-- does not work as intended...
 
       			lighting += (ambient_impact + shadow_toggle * (diffuse_impact+spec_impact))
                         * albedo
